@@ -1,1 +1,1 @@
-rm *.o *.so *.c
+rm -f *.o *.so *.c
