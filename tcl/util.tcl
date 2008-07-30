@@ -9,3 +9,5 @@ proc stopifne {a b} {
 		error "error: $a != $b"
 	}
 }
+
+source ./util_gsl.tcl

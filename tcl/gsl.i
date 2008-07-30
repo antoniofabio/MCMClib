@@ -2,6 +2,16 @@
 /*
 GSL_VECTOR
 */
+typedef struct 
+{
+  size_t size;
+  size_t stride;
+  double *data;
+  gsl_block *block;
+  int owner;
+} 
+gsl_vector;
+
 gsl_vector *gsl_vector_alloc (const size_t n);
 
 double gsl_vector_get (const gsl_vector * v, const size_t i);
@@ -50,6 +60,16 @@ int gsl_vector_isnonneg (const gsl_vector * v);
 /*
 GSL_MATRIX
 */
+typedef struct 
+{
+  size_t size1;
+  size_t size2;
+  size_t tda;
+  double * data;
+  gsl_block * block;
+  int owner;
+} gsl_matrix;
+
 gsl_matrix * 
 gsl_matrix_alloc (const size_t n1, const size_t n2);
 
