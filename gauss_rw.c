@@ -1,8 +1,8 @@
 #include "gauss_rw.h"
 
-int mcmclib_gauss_rw(gsl_rng* r,
-	double (*loglik) (gsl_vector* x, void* data), gsl_vector* x, void* data,
-	double step_size) {
+int mcmclib_gauss_rw(const gsl_rng* r,
+	double (*loglik) (gsl_vector* x, const void* data), gsl_vector* x, const void* data,
+	const double step_size) {
 	int n = x->size;
 	gsl_vector* old = gsl_vector_alloc(n);
 	gsl_vector_memcpy(old, x);
