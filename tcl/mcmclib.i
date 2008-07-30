@@ -19,7 +19,18 @@
 #include "vector_list.h"
 #include "gauss_am.h"
 #include "mvnorm.h"
+
+double mcmclib_test_dunif(gsl_vector* px, const void* ignore) {
+	double x = gsl_vector_get(px, 0);
+	if((x >= 0.0) && (x <= 1.0))
+		return 0;
+	else
+		return log(0);
+}
+
 %}
+
+%constant double mcmclib_test_dunif(gsl_vector*, const void*);
 
 /*vector_list methods*/
 struct vector_list_str {
@@ -31,6 +42,11 @@ vector_list* mcmclib_vector_list_alloc();
 void mcmclib_vector_list_add(gsl_vector* v, vector_list* last);
 int mcmclib_vector_list_length(vector_list* first);
 void mcmclib_vector_list_free(vector_list* first);
+
+/*Gaussian random walk*/
+int mcmclib_gauss_rw(const gsl_rng* r,
+	double (*loglik) (gsl_vector* x, const void* data), gsl_vector* x, const void* data,
+	const double step_size);
 
 /*Adaptive Metropolis algorithm*/
 typedef struct {
