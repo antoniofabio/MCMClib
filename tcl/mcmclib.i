@@ -46,3 +46,5 @@ void mcmclib_gauss_am_free(mcmclib_gauss_am_data* p);
 int mcmclib_gauss_am(const gsl_rng* r,
 	double (*loglik) (gsl_vector* x, const void* data), gsl_vector* x, const void* data,
 	mcmclib_gauss_am_data*);
+
+%include "gsl.i"
