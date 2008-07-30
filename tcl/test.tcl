@@ -13,5 +13,13 @@ set r [gsl_rng_alloc $gsl_rng_default]
 
 ##gaussian random walk
 set x [list2vector 1]
-puts $mcmclib_test_dunif
 mcmclib_gauss_rw $r $mcmclib_test_dunif $x NULL 1.0
+
+set x [list2vector 0.7]
+set chain [list]
+for {set i 0} {$i < 10000} {incr i} {
+	mcmclib_gauss_rw $r $mcmclib_test_dunif $x NULL 0.1
+	set lx [vector2list $x]
+	stopifnot [expr ($lx >= 0) & ($lx <= 1)]
+	lappend chain $lx
+}
