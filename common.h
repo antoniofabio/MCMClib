@@ -6,7 +6,9 @@
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_randist.h>
+#include <gsl/gsl_blas.h>
+#include <gsl/gsl_linalg.h>
 
-#define isfinite(x) !(isnan((x)) || isinf((x)))
+//#define isfinite(x) !(isnan((x)) || isinf((x)))
 
 #endif
