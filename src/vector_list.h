@@ -9,6 +9,10 @@ struct vector_list_str {
 */
 typedef struct vector_list_str vector_list;
 
+/** alloc a new vector_list object
+*/
+vector_list* mcmclib_vector_list_alloc();
+
 /** append a new vector to the list
 @param v pointer to the vector to be added
 @param last pointer to last list element

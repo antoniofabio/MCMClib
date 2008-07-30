@@ -1,5 +1,11 @@
 #include "vector_list.h"
 
+vector_list* mcmclib_vector_list_alloc() {
+	vector_list* ans = (vector_list*) malloc(sizeof(vector_list));
+	ans->next = NULL;
+	return ans;
+}
+
 void mcmclib_vector_list_add(gsl_vector* v, vector_list* last) {
 	vector_list* item = (vector_list*) malloc(sizeof(vector_list));
 	item->v = v;
