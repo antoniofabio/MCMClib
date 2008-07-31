@@ -1,5 +1,5 @@
-#ifndef __GAUSS_RW_H__
-#define __GAUSS_RW_H__
+#ifndef __GAUSS_AM_H__
+#define __GAUSS_AM_H__
 
 #include <math.h>
 #include <gsl/gsl_rng.h>
