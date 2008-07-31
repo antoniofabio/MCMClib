@@ -35,6 +35,19 @@ stopifne [m2ll $mcov] {{1.25 2.5 3.75} {2.5 5.0 7.5} {3.75 7.5 11.25}}
 ##init RNG
 set r [gsl_rng_alloc $gsl_rng_default]
 
+##Multivariate Gaussian variates
+set sigma [ll2m { {1 0} {0 1} }]
+set out [gsl_vector_alloc 2]
+set ans [list]
+for {set i 0} {$i < 1000} {incr i} {
+	mcmclib_mvnorm $r $sigma $out
+	lappend ans [v2l $out]
+}
+set cov [gsl_matrix_alloc 2 2]
+mcmclib_matrix_covariance [ll2m $ans] $cov
+stopifne [m2ll $cov] \
+	{{1.0020498344099165 0.059333707261511485} {0.059333707261511485 0.891687139422672}}
+
 ##gaussian random walk
 set x [l2v 1]
 mcmclib_gauss_rw $r $mcmclib_test_dunif $x NULL 1.0
@@ -49,4 +62,7 @@ for {set i 0} {$i < 10000} {incr i} {
 }
 
 ##Adaptive Metropolis (Haario et al., 2001)
-
+set x [l2v "0.5 0.5 0.5"]
+set extra [mcmclib_gauss_am_alloc [ll2m { {1 0 0} {0 1 0} {0 0 1} }] 100]
+#FIXME
+#mcmclib_gauss_am $r $mcmclib_test_dunif $x NULL $extra

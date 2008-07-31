@@ -54,6 +54,10 @@ void mcmclib_matrix_rowmeans(gsl_matrix* m, gsl_vector* out);
 void mcmclib_matrix_covariance(gsl_matrix* m, gsl_matrix* out);
 void mcmclib_covariance_update(gsl_matrix* cov, gsl_vector* mean, int* n, gsl_vector* x);
 
+/*multivariate gaussian variates*/
+void mcmclib_mvnorm(const gsl_rng* r, const gsl_matrix* sigma, gsl_vector* out);
+void mcmclib_mvnorm_chol(const gsl_rng* r, const gsl_matrix* sigma_chol, gsl_vector* out);
+
 /*Gaussian random walk*/
 int mcmclib_gauss_rw(const gsl_rng* r,
 	double (*loglik) (gsl_vector* x, const void* data), gsl_vector* x, const void* data,
