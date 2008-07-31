@@ -2,11 +2,14 @@ load ./mcmclib.so
 source ./util.tcl
 
 ##vector_list
-set lst [mcmclib_vector_list_alloc]
-stopifne [vector_list_str_next_get $lst] NULL
-set v [l2v [list 1 2 3]]
-set last [mcmclib_vector_list_append $v $lst]
-stopifne [vector_list_str_v_get $last] $v
+set ll [list\
+	[list 1.0 2.0 3.0]\
+	[list 2.0 4.0 6.0]\
+	[list 3.0 6.0 9.0]\
+	[list 4.0 8.0 12.0]]
+set vl [ll2vl $ll]
+stopifne [mcmclib_vector_list_length $vl] 4
+stopifne [vl2ll $vl] $ll
 
 ##init RNG
 set r [gsl_rng_alloc $gsl_rng_default]
