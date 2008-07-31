@@ -34,10 +34,10 @@ void mcmclib_matrix_covariance(gsl_matrix* m, gsl_matrix* out) {
 	for(int i=0; i<n; i++) {
 		rv = gsl_matrix_submatrix (m, i, 1, i, d);
 		row = &(rv.matrix);
-		gsl_blas_dgemm (CblasNoTrans, CblasTrans, 1.0, row, row, 1.0, out);
+		gsl_blas_dgemm (CblasTrans, CblasNoTrans, 1.0, row, row, 1.0, out);
 	}
 
-	gsl_blas_dgemm (CblasNoTrans, CblasTrans, (double) -n, mean, mean, 1.0, out);
+	gsl_blas_dgemm (CblasTrans, CblasNoTrans, (double) -n, mean, mean, 1.0, out);
 
 	gsl_matrix_scale(out, 1.0 / (double) n);
 
