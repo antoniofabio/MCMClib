@@ -22,6 +22,7 @@
 #include "gauss_am.h"
 #include "mvnorm.h"
 #include "lpdf_gsl_cont.h"
+#include "lpdf_gsl_discr.h"
 
 double mcmclib_test_dunif(gsl_vector* px, const void* ignore) {
 	for(int i=0; i<px->size; i++) {
@@ -83,4 +84,5 @@ int mcmclib_gauss_am(const gsl_rng* r,
 	mcmclib_gauss_am_data* e);
 
 %include "gsl_lpdf_cont.i"
+%include "gsl_lpdf_discr.i"
 %include "gsl.i"
