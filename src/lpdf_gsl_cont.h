@@ -10,14 +10,16 @@ typedef struct {\
 	double* par2;\
 } TYPE_PAR(prefix);\
 TYPE_PAR(prefix)* mcmclib_ ## prefix ## _lpdf_alloc(double* par1, double* par2);\
-void mcmclib_ ## prefix ## _lpdf_free(TYPE_PAR(prefix)* p);
+void mcmclib_ ## prefix ## _lpdf_free(TYPE_PAR(prefix)* p);\
+double mcmclib_ ## prefix ## _lpdf(gsl_vector* x, void* in_p);
 
 #define DECLARE_1PAR(prefix, par1) \
 typedef struct {\
 	double* par1;\
 } TYPE_PAR(prefix);\
 TYPE_PAR(prefix)* mcmclib_ ## prefix ## _lpdf_alloc(double* par1);\
-void mcmclib_ ## prefix ## _lpdf_free(TYPE_PAR(prefix)* p);
+void mcmclib_ ## prefix ## _lpdf_free(TYPE_PAR(prefix)* p);\
+double mcmclib_ ## prefix ## _lpdf(gsl_vector* x, void* in_p);
 /*END OF INTERNAL UTILITY MACROS*/
 
 #include <gsl/gsl_vector.h>
