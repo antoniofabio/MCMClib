@@ -30,7 +30,7 @@ set mean [l2v "0 0 0"]
 mcmclib_matrix_colmeans $m $mean
 mcmclib_covariance_update $mcov $mean $n [l2v {4.0 8.0 12.0}]
 stopifne [intArray_getitem $n 0] 4
-m2ll $mcov
+stopifne [m2ll $mcov] {{1.25 2.5 3.75} {2.5 5.0 7.5} {3.75 7.5 11.25}}
 
 ##init RNG
 set r [gsl_rng_alloc $gsl_rng_default]

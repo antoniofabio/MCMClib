@@ -1,3 +1,3 @@
-gcc -c --std=gnu99 *.c
+gcc -c -g --std=gnu99 *.c
 ar rcs libmcmclib.a *.o
 
