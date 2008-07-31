@@ -1,7 +1,7 @@
 #include <math.h>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_randist.h>
-#include "distribs_univ.h"
+#include "lpdf_gsl_cont.h"
 
 #define IMPLEMENT_1PAR_ALLOCFREE(prefix, par1) \
 TYPE_PAR(prefix)* mcmclib_ ## prefix ## _lpdf_alloc(double* par1){\

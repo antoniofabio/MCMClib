@@ -1,5 +1,5 @@
-#ifndef __DISTRIBS_UNIV_H__
-#define __DISTRIBS_UNIV_H__
+#ifndef __LPDF_GSL_CONT_H__
+#define __LPDF_GSL_CONT_H__
 
 /* INTERNAL UTILITY MACROS*/
 #define TYPE_PAR(prefix) prefix ## _lpdf_p
