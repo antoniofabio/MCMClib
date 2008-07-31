@@ -59,9 +59,11 @@ void mcmclib_mvnorm(const gsl_rng* r, const gsl_matrix* sigma, gsl_vector* out);
 void mcmclib_mvnorm_chol(const gsl_rng* r, const gsl_matrix* sigma_chol, gsl_vector* out);
 
 /*Gaussian random walk*/
+mcmclib_gauss_rw_data* mcmclib_gauss_rw_alloc(double step_size, int dim);
+void mcmclib_gauss_rw_free(mcmclib_gauss_rw_data* p);
 int mcmclib_gauss_rw(const gsl_rng* r,
 	double (*loglik) (gsl_vector* x, const void* data), gsl_vector* x, const void* data,
-	const double step_size);
+	mcmclib_gauss_rw_data* e);
 
 /*Adaptive Metropolis algorithm*/
 typedef struct {

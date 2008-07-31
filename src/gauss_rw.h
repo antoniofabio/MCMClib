@@ -3,6 +3,22 @@
 
 #include "common.h"
 
+/** Gaussian random walk extra data
+*/
+typedef struct {
+	double step_size;
+	gsl_vector* old;
+} mcmclib_gauss_rw_data;
+
+/** alloc (and init) extra Gaussian RW data
+@param step_size gaussian proposal width (s.d.)
+@param dim ambient space dimension
+*/
+mcmclib_gauss_rw_data* mcmclib_gauss_rw_alloc(double step_size, int dim);
+/** free extra Gaussian RW data
+*/
+void mcmclib_gauss_rw_free(mcmclib_gauss_rw_data* p);
+
 /** Gaussian random walk
 @param r RNG state
 @param loglik pointer to a log-likelihood function
@@ -12,6 +28,6 @@
 */
 int mcmclib_gauss_rw(const gsl_rng* r,
 	double (*loglik) (gsl_vector* x, const void* data), gsl_vector* x, const void* data,
-	const double step_size);
+	mcmclib_gauss_rw_data* e);
 
 #endif

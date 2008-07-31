@@ -49,17 +49,20 @@ stopifne [m2ll $cov] \
 	{{1.0020498344099165 0.059333707261511485} {0.059333707261511485 0.891687139422672}}
 
 ##gaussian random walk
+set r [gsl_rng_alloc $gsl_rng_default]
 set x [l2v 1]
-mcmclib_gauss_rw $r $mcmclib_test_dunif $x NULL 1.0
+set extra [mcmclib_gauss_rw_alloc 0.1 1]
+mcmclib_gauss_rw $r $mcmclib_test_dunif $x NULL $extra
 
 set x [l2v 0.7]
 set chain [list]
 for {set i 0} {$i < 10000} {incr i} {
-	mcmclib_gauss_rw $r $mcmclib_test_dunif $x NULL 0.1
+	mcmclib_gauss_rw $r $mcmclib_test_dunif $x NULL $extra
 	set lx [v2l $x]
 	stopifnot [expr ($lx >= 0) & ($lx <= 1)]
 	lappend chain $lx
 }
+mcmclib_gauss_rw_free $extra
 
 ##Adaptive Metropolis (Haario et al., 2001)
 set r [gsl_rng_alloc $gsl_rng_default]

@@ -1,10 +1,23 @@
 #include "gauss_rw.h"
 
+mcmclib_gauss_rw_data* mcmclib_gauss_rw_alloc(double step_size, int dim) {
+	mcmclib_gauss_rw_data* ans = (mcmclib_gauss_rw_data*) malloc(sizeof(mcmclib_gauss_rw_data));
+	ans->old = gsl_vector_alloc(dim);
+	ans->step_size = step_size;
+	return ans;
+}
+
+void mcmclib_gauss_rw_free(mcmclib_gauss_rw_data* p) {
+	gsl_vector_free(p->old);
+	free(p);
+}
+
 int mcmclib_gauss_rw(const gsl_rng* r,
 	double (*loglik) (gsl_vector* x, const void* data), gsl_vector* x, const void* data,
-	const double step_size) {
-	int n = x->size;
-	gsl_vector* old = gsl_vector_alloc(n);
+	mcmclib_gauss_rw_data* e) {
+	int n = e->old->size;
+	double step_size = e->step_size;
+	gsl_vector* old = e->old;
 	gsl_vector_memcpy(old, x);
 	double loglik_old, loglik_new, lik_ratio;
 
@@ -15,24 +28,17 @@ int mcmclib_gauss_rw(const gsl_rng* r,
 			gsl_vector_get(x, n) + gsl_ran_gaussian(r, step_size));
 	}
 
-	if(!isfinite(loglik_old)) {
-		gsl_vector_free(old);
+	if(!isfinite(loglik_old))
 		return 0;
-	}
 
 	loglik_new = loglik(x, data);
-	if(loglik_new >= loglik_old) {
-		gsl_vector_free(old);
+	if(loglik_new >= loglik_old)
 		return 0;
-	}
 
 	lik_ratio = exp(loglik_new - loglik_old);
-	if(isfinite(lik_ratio) && (gsl_rng_uniform(r) <= lik_ratio)) {
-		gsl_vector_free(old);
+	if(isfinite(lik_ratio) && (gsl_rng_uniform(r) <= lik_ratio))
 		return 0;
-	}
 
 	gsl_vector_memcpy(x, old);
-	gsl_vector_free(old);
 	return 0;
 }
