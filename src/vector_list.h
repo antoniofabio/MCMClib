@@ -1,4 +1,5 @@
 #include <gsl/gsl_vector.h>
+#include <gsl/gsl_matrix.h>
 
 struct vector_list_str {
 	gsl_vector* v;
@@ -37,3 +38,8 @@ void mcmclib_vector_list_free(vector_list* first);
 /** 'transpose' a list of vectors
 */
 vector_list* mcmclib_vector_list_transpose(vector_list* first);
+
+/** convert a list of vectors into a matrix
+each list element is interpreted as a row
+*/
+gsl_matrix* mcmclib_vector_list_asmatrix(vector_list* first);

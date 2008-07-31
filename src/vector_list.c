@@ -63,3 +63,15 @@ vector_list* mcmclib_vector_list_transpose(vector_list* first) {
 
 	return head;
 }
+
+gsl_matrix* mcmclib_vector_list_asmatrix(vector_list* first) {
+	int nr = mcmclib_vector_list_length(first);
+	int nc = first->v->size;
+	gsl_matrix* ans = gsl_matrix_alloc(nr, nc);
+	for(int i=0; i<nr; i++) {
+		for(int j=0; j<nc; j++)
+			gsl_matrix_set(ans, i, j, gsl_vector_get(first->v, j));
+		first = first->next;
+	}
+	return ans;
+}
