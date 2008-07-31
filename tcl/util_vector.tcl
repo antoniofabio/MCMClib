@@ -20,3 +20,23 @@ proc vl2ll {vl} {
 	}
 	return $ans
 }
+
+#convert a tcl list of lists into a gsl matrix
+proc ll2m {ll} {
+	return [mcmclib_vector_list_asmatrix [ll2vl $ll]]
+}
+
+#convert a gsl matrix into a list of lists
+proc m2ll {m} {
+	set ans [list]
+	set nr [gsl_matrix_size1_get $m]
+	set nc [gsl_matrix_size2_get $m]
+	for {set i 0} {$i < $nr} {incr i} {
+		set row [list]
+		for {set j 0} {$j < $nc} {incr j} {
+			lappend row [gsl_matrix_get $m $i $j]
+		}
+		lappend ans $row
+	}
+	return $ans
+}

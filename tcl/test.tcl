@@ -11,6 +11,11 @@ set vl [ll2vl $ll]
 stopifne [mcmclib_vector_list_length $vl] 4
 stopifne [vl2ll $vl] $ll
 
+##list<->matrix
+set ll {{1.0 2.0 3.0} {2.0 4.0 6.0} {3.0 6.0 9.0} {4.0 8.0 12.0}}
+set m [ll2m $ll]
+stopifne [m2ll $m] $ll
+
 ##init RNG
 set r [gsl_rng_alloc $gsl_rng_default]
 
