@@ -11,3 +11,4 @@ proc stopifne {a b} {
 }
 
 source ./util_gsl.tcl
+source ./util_vector.tcl
