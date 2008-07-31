@@ -38,22 +38,35 @@ void mcmclib_ ## prefix ## _lpdf_free(TYPE_PAR(prefix)* p){\
 	free(p);\
 }
 
-/*
-GAUSSIAN DISTRIBUTION
-*/
-IMPLEMENT_2PAR_ALLOCFREE(gaussian, mean, precision)
-
-double mcmclib_gaussian_lpdf(gsl_vector* x, void* in_p) {
-	TYPE_PAR(gaussian)* p = (TYPE_PAR(gaussian)*) in_p;
-	double ans = 0;
-	double mean = *(p->mean);
-	double sd = sqrt(1.0 / (*(p->precision)) );
-	for(int i=0; i<x->size; i++)
-		ans += log( gsl_ran_gaussian_pdf(gsl_vector_get(x, i) - mean, sd) );
-	return ans;
+#define IMPLEMENT_2PAR(prefix, par1, par2) \
+IMPLEMENT_2PAR_ALLOCFREE(prefix, par1, par2)\
+\
+double mcmclib_ ## prefix ## _lpdf(gsl_vector* x, void* in_p) {\
+	TYPE_PAR(prefix)* p = ( TYPE_PAR(prefix)* ) in_p;\
+	double ans = 0;\
+	double par1 = *(p->par1);\
+	double par2 = *(p->par2);\
+	for(int i=0; i< x->size; i++)\
+		ans += log( gsl_ran_ ## prefix ## _pdf(gsl_vector_get(x, i), par1, par2) );\
+	return ans;\
 }
 
-/*
-EXPONENTIAL DISTRIBUTION
-*/
+IMPLEMENT_1PAR(gaussian, sd)
 IMPLEMENT_1PAR(exponential, mean)
+IMPLEMENT_1PAR(laplace, a)
+IMPLEMENT_2PAR(exppow, a, b)
+IMPLEMENT_1PAR(cauchy, a)
+IMPLEMENT_1PAR(rayleigh, sigma)
+IMPLEMENT_2PAR(rayleigh_tail, a, sigma)
+IMPLEMENT_2PAR(gamma, a, b)
+IMPLEMENT_2PAR(flat, a, b)
+IMPLEMENT_2PAR(lognormal, zeta, sigma)
+IMPLEMENT_1PAR(chisq, nu)
+IMPLEMENT_2PAR(fdist, nu1, nu2)
+IMPLEMENT_1PAR(tdist, nu)
+IMPLEMENT_2PAR(beta, a, b)
+IMPLEMENT_1PAR(logistic, a)
+IMPLEMENT_2PAR(pareto, a, b)
+IMPLEMENT_2PAR(weibull, a, b)
+IMPLEMENT_2PAR(gumbel1, a, b)
+IMPLEMENT_2PAR(gumbel2, a, b)

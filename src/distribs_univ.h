@@ -23,7 +23,24 @@ void mcmclib_ ## prefix ## _lpdf_free(TYPE_PAR(prefix)* p);
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_randist.h>
 
-DECLARE_2PAR(gaussian, mean, precision)
+DECLARE_1PAR(gaussian, sd)
 DECLARE_1PAR(exponential, mean)
+DECLARE_1PAR(laplace, a)
+DECLARE_2PAR(exppow, a, b)
+DECLARE_1PAR(cauchy, a)
+DECLARE_1PAR(rayleigh, sigma)
+DECLARE_2PAR(rayleigh_tail, a, sigma)
+DECLARE_2PAR(gamma, a, b)
+DECLARE_2PAR(flat, a, b)
+DECLARE_2PAR(lognormal, zeta, sigma)
+DECLARE_1PAR(chisq, nu)
+DECLARE_2PAR(fdist, nu1, nu2)
+DECLARE_1PAR(tdist, nu)
+DECLARE_2PAR(beta, a, b)
+DECLARE_1PAR(logistic, a)
+DECLARE_2PAR(pareto, a, b)
+DECLARE_2PAR(weibull, a, b)
+DECLARE_2PAR(gumbel1, a, b)
+DECLARE_2PAR(gumbel2, a, b)
 
 #endif
