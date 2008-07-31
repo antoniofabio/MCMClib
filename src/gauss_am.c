@@ -47,25 +47,18 @@ int mcmclib_gauss_am(const gsl_rng* r,
 	mcmclib_mvnorm(r, (*t) < t0 ? sigma_zero : cov, x);
 	gsl_vector_add(x, old);
 
-	if(!isfinite(loglik_old)) {
-		gsl_vector_free(old);
+	if(!isfinite(loglik_old))
 		return 0;
-	}
 
 	loglik_new = loglik(x, data);
-	if(loglik_new >= loglik_old) {
-		gsl_vector_free(old);
+	if(loglik_new >= loglik_old)
 		return 0;
-	}
 
 	lik_ratio = exp(loglik_new - loglik_old);
-	if(isfinite(lik_ratio) && (gsl_rng_uniform(r) <= lik_ratio)) {
-		gsl_vector_free(old);
+	if(isfinite(lik_ratio) && (gsl_rng_uniform(r) <= lik_ratio))
 		return 0;
-	}
 
 	gsl_vector_memcpy(x, old);
-	gsl_vector_free(old);
 
 	/*adapt extra parameters*/
 	(*t)--;

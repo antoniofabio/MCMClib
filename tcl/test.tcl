@@ -62,7 +62,19 @@ for {set i 0} {$i < 10000} {incr i} {
 }
 
 ##Adaptive Metropolis (Haario et al., 2001)
+set r [gsl_rng_alloc $gsl_rng_default]
 set x [l2v "0.5 0.5 0.5"]
-set extra [mcmclib_gauss_am_alloc [ll2m { {1 0 0} {0 1 0} {0 0 1} }] 100]
-#FIXME
-#mcmclib_gauss_am $r $mcmclib_test_dunif $x NULL $extra
+set extra [mcmclib_gauss_am_alloc [ll2m { {0.1 0 0} {0 0.1 0} {0 0 0.1} }] 100]
+mcmclib_gauss_am $r $mcmclib_test_dunif $x NULL $extra
+set chain [list]
+for {set i 0} {$i < 10000} {incr i} {
+	mcmclib_gauss_am $r $mcmclib_test_dunif $x NULL $extra
+	set lx [v2l $x]
+	lappend chain $lx
+}
+set cov [gsl_matrix_alloc 3 3]
+mcmclib_matrix_covariance [ll2m $chain] $cov
+stopifne [m2ll $cov] \
+	{{0.08415137716635926 -0.0014242134920127044 -5.698656336101036e-5}\
+ {-0.0014242134920127044 0.08581935002944255 -0.0021620104951330468}\
+ {-5.698656336101036e-5 -0.0021620104951330468 0.08401825041995266}}
