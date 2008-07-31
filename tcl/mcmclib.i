@@ -17,6 +17,7 @@
 /* Put header files here or function declarations like below */
 #include "common.h"
 #include "vector_list.h"
+#include "vector_stats.h"
 #include "gauss_am.h"
 #include "mvnorm.h"
 
@@ -43,6 +44,12 @@ vector_list* mcmclib_vector_list_last(vector_list* i);
 vector_list* mcmclib_vector_list_append(gsl_vector* v, vector_list* last);
 int mcmclib_vector_list_length(vector_list* first);
 void mcmclib_vector_list_free(vector_list* first);
+gsl_matrix* mcmclib_vector_list_asmatrix(vector_list* first);
+
+/*vectorial statistics functions*/
+void mcmclib_matrix_colmeans(gsl_matrix* m, gsl_vector* out);
+void mcmclib_matrix_rowmeans(gsl_matrix* m, gsl_vector* out);
+void mcmclib_matrix_covariance(gsl_matrix* m, gsl_matrix* out);
 
 /*Gaussian random walk*/
 int mcmclib_gauss_rw(const gsl_rng* r,

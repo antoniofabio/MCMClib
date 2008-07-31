@@ -10,4 +10,8 @@ void mcmclib_matrix_colmeans(gsl_matrix* m, gsl_vector* out);
 */
 void mcmclib_matrix_rowmeans(gsl_matrix* m, gsl_vector* out);
 
+/** get variance/covariance matrix out of the 'vertical' matrix 'm'
+*/
+void mcmclib_matrix_covariance(gsl_matrix* m, gsl_matrix* out);
+
 #endif

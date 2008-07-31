@@ -19,3 +19,27 @@ void mcmclib_matrix_rowmeans(gsl_matrix* m, gsl_vector* out) {
 		gsl_vector_set(out, i, gsl_stats_mean(row->data, row->stride, row->size));
 	}
 }
+
+void mcmclib_matrix_covariance(gsl_matrix* m, gsl_matrix* out) {
+	int d = m->size2;
+	int n = m->size1;
+	gsl_matrix* mean = gsl_matrix_alloc(1, d);
+	gsl_matrix_view rv;
+	gsl_matrix* row;
+
+	gsl_vector_view mv = gsl_matrix_row(mean, 0);
+	mcmclib_matrix_colmeans(m, &(mv.vector));
+
+	gsl_matrix_set_zero(out);
+	for(int i=0; i<n; i++) {
+		rv = gsl_matrix_const_submatrix (m, i, 1, i, d);
+		row = &(rv.matrix);
+		gsl_blas_dgemm (CblasNoTrans, CblasTrans, 1.0, row, row, 1.0, out);
+	}
+
+	gsl_blas_dgemm (CblasNoTrans, CblasTrans, (double) -n, mean, mean, 1.0, out);
+
+	gsl_matrix_scale(1.0 / (double) n, out);
+
+	gsl_matrix_free(mean);
+}
