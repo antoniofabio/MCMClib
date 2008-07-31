@@ -47,3 +47,6 @@ for {set i 0} {$i < 10000} {incr i} {
 	stopifnot [expr ($lx >= 0) & ($lx <= 1)]
 	lappend chain $lx
 }
+
+##Adaptive Metropolis (Haario et al., 2001)
+

@@ -18,15 +18,17 @@
 #include "common.h"
 #include "vector_list.h"
 #include "vector_stats.h"
+#include "gauss_rw.h"
 #include "gauss_am.h"
 #include "mvnorm.h"
 
 double mcmclib_test_dunif(gsl_vector* px, const void* ignore) {
-	double x = gsl_vector_get(px, 0);
-	if((x >= 0.0) && (x <= 1.0))
-		return 0;
-	else
-		return log(0);
+	for(int i=0; i<px->size; i++) {
+		double x = gsl_vector_get(px, i);
+		if((x < 0.0) || (x > 1.0))
+			return log(0);
+	}
+	return 0;
 }
 
 %}
