@@ -1,4 +1,5 @@
 #include "gauss_am.h"
+#include "vector_stats.h"
 
 mcmclib_gauss_am_data* mcmclib_gauss_am_alloc(const gsl_matrix* sigma_zero, int t0) {
 	mcmclib_gauss_am_data* ans = (mcmclib_gauss_am_data*) malloc(sizeof(mcmclib_gauss_am_data));
@@ -66,12 +67,8 @@ int mcmclib_gauss_am(const gsl_rng* r,
 	gsl_vector_free(old);
 
 	/*adapt extra parameters*/
-	/*update mean:*/
-	gsl_vector_scale(mean, (double) (*t));
-	gsl_vector_add(mean, x);
-	gsl_vector_scale(mean, 1.0 / (double) (*t));
-	/*end update mean*/
-	//TODO: recursively update sample covariance matrix 'cov'
+	(*t)--;
+	mcmclib_covariance_update(cov, mean, t, x);
 
 	return 0;
 }
