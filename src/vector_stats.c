@@ -43,3 +43,25 @@ void mcmclib_matrix_covariance(gsl_matrix* m, gsl_matrix* out) {
 
 	gsl_matrix_free(mean);
 }
+
+void mcmclib_covariance_update(gsl_matrix* cov, gsl_vector* mean, int* n, gsl_vector* x) {
+	int d = cov->size1;
+	gsl_matrix_view colmean_view = gsl_matrix_view_array(mean->data, d, 1);
+	gsl_matrix* colmean = &(colmean_view.matrix);
+	gsl_matrix_view colx_view = gsl_matrix_view_array(x->data, d, 1);
+	gsl_matrix* colx = &(colx_view.matrix);
+
+	/*update X %*% t(X) value:*/
+	gsl_blas_dgemm(CblasNoTrans, CblasTrans, (double) (*n), colmean, colmean, (double) (*n), cov);
+	gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, colx, colx, 1.0, cov);
+
+	/*update mean value*/
+	gsl_vector_scale(mean, (double) (*n));
+	gsl_vector_add(mean, x);
+	(*n)++;
+	gsl_vector_scale(mean, 1.0 / (double) (*n));
+
+	/*update covariance value*/
+	gsl_blas_dgemm(CblasNoTrans, CblasTrans, (double) -(*n), colmean, colmean, 1.0, cov);
+	gsl_matrix_scale(cov, 1.0 / (double) (*n));
+}

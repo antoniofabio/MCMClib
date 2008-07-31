@@ -14,4 +14,13 @@ void mcmclib_matrix_rowmeans(gsl_matrix* m, gsl_vector* out);
 */
 void mcmclib_matrix_covariance(gsl_matrix* m, gsl_matrix* out);
 
+/** update covariance value 'recursively'
+@param cov current covariance matrix
+@param mean current mean
+@param n current sample size
+@param x new value
+@return nothing. 'cov', 'mean' and 'n' values will be updated as a side-effect
+*/
+void mcmclib_covariance_update(gsl_matrix* cov, gsl_vector* mean, int* n, gsl_vector* x);
+
 #endif
