@@ -13,11 +13,16 @@ typedef struct vector_list_str vector_list;
 */
 vector_list* mcmclib_vector_list_alloc();
 
+/** get last list element
+*/
+vector_list* mcmclib_vector_list_last(vector_list* i);
+
 /** append a new vector to the list
 @param v pointer to the vector to be added
 @param last pointer to last list element
+@return the new appended list element
 */
-void mcmclib_vector_list_add(gsl_vector* v, vector_list* last);
+vector_list* mcmclib_vector_list_append(gsl_vector* v, vector_list* last);
 
 /** compute list length
 @param first	pointer to list head

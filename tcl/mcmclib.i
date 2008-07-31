@@ -39,7 +39,8 @@ struct vector_list_str {
 };
 typedef struct vector_list_str vector_list;
 vector_list* mcmclib_vector_list_alloc();
-void mcmclib_vector_list_add(gsl_vector* v, vector_list* last);
+vector_list* mcmclib_vector_list_last(vector_list* i);
+vector_list* mcmclib_vector_list_append(gsl_vector* v, vector_list* last);
 int mcmclib_vector_list_length(vector_list* first);
 void mcmclib_vector_list_free(vector_list* first);
 

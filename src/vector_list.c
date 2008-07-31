@@ -6,11 +6,17 @@ vector_list* mcmclib_vector_list_alloc() {
 	return ans;
 }
 
-void mcmclib_vector_list_add(gsl_vector* v, vector_list* last) {
+vector_list* mcmclib_vector_list_last(vector_list* i) {
+	while(i->next) i = i->next;
+	return i;
+}
+
+vector_list* mcmclib_vector_list_append(gsl_vector* v, vector_list* element) {
 	vector_list* item = (vector_list*) malloc(sizeof(vector_list));
 	item->v = v;
 	item->next = NULL;
-	last->next = item;
+	mcmclib_vector_list_last(element)->next = item;
+	return item;
 }
 
 int mcmclib_vector_list_length(vector_list* first) {
