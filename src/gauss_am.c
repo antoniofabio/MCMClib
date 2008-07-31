@@ -10,9 +10,10 @@ mcmclib_gauss_am_data* mcmclib_gauss_am_alloc(const gsl_matrix* sigma_zero, int 
 	ans->cov = gsl_matrix_alloc(d, d);
 	ans->t = 0;
 	ans->old = gsl_vector_alloc(d);
+	gsl_matrix_memcpy(ans->sigma_zero, sigma_zero);
 
 	gsl_vector_set_zero(ans->mean);
-	gsl_matrix_set_identity(ans->cov);
+	gsl_matrix_set_zero(ans->cov);
 	return ans;
 }
 
