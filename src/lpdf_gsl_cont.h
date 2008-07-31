@@ -2,8 +2,10 @@
 #define __LPDF_GSL_CONT_H__
 
 /* INTERNAL UTILITY MACROS*/
+#undef TYPE_PAR
 #define TYPE_PAR(prefix) prefix ## _lpdf_p
 
+#undef DECLARE_2PAR
 #define DECLARE_2PAR(prefix, par1, par2) \
 typedef struct {\
 	double* par1;\
@@ -13,6 +15,7 @@ TYPE_PAR(prefix)* mcmclib_ ## prefix ## _lpdf_alloc(double* par1, double* par2);
 void mcmclib_ ## prefix ## _lpdf_free(TYPE_PAR(prefix)* p);\
 double mcmclib_ ## prefix ## _lpdf(gsl_vector* x, void* in_p);
 
+#undef DECLARE_1PAR
 #define DECLARE_1PAR(prefix, par1) \
 typedef struct {\
 	double* par1;\
