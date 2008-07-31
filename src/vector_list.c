@@ -37,3 +37,29 @@ void mcmclib_vector_list_free(vector_list* first) {
 		free(save);
 	}
 }
+
+vector_list* mcmclib_vector_list_transpose(vector_list* first) {
+	int d = first->v->size;
+	int n = mcmclib_vector_list_length(first);
+	vector_list* head = mcmclib_vector_list_alloc();
+	vector_list *last, *current;
+	head->v = gsl_vector_alloc(n);
+	last = head;
+	for(int i=0; i<d; i++)
+		last = mcmclib_vector_list_append(gsl_vector_alloc(n), last);
+
+	int i=0;
+	while(first->next) {
+		current = head;
+		int j=0;
+		while(current->next) {
+			gsl_vector_set(current->v, i, gsl_vector_get(first->v, j));
+			current = current->next;
+			j++;
+		}
+		first = first->next;
+		i++;
+	}
+
+	return head;
+}

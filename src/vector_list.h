@@ -33,3 +33,7 @@ int mcmclib_vector_list_length(vector_list* first);
 @param first pointer to list head
 */
 void mcmclib_vector_list_free(vector_list* first);
+
+/** 'transpose' a list of vectors
+*/
+vector_list* mcmclib_vector_list_transpose(vector_list* first);
