@@ -32,7 +32,7 @@ void mcmclib_matrix_covariance(gsl_matrix* m, gsl_matrix* out) {
 
 	gsl_matrix_set_zero(out);
 	for(int i=0; i<n; i++) {
-		rv = gsl_matrix_submatrix (m, i, 1, i, d);
+		rv = gsl_matrix_submatrix (m, i, 0, 1, d);
 		row = &(rv.matrix);
 		gsl_blas_dgemm (CblasTrans, CblasNoTrans, 1.0, row, row, 1.0, out);
 	}
