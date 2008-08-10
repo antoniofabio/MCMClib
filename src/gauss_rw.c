@@ -13,7 +13,7 @@ void mcmclib_gauss_rw_free(mcmclib_gauss_rw_data* p) {
 }
 
 int mcmclib_gauss_rw(const gsl_rng* r,
-	double (*loglik) (gsl_vector* x, const void* data), gsl_vector* x, const void* data,
+	distrfun_p loglik, gsl_vector* x, const void* data,
 	mcmclib_gauss_rw_data* e) {
 	int n = e->old->size;
 	double step_size = e->step_size;
