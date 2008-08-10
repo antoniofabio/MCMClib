@@ -9,6 +9,8 @@
 #include <gsl/gsl_blas.h>
 #include <gsl/gsl_linalg.h>
 
-//#define isfinite(x) !(isnan((x)) || isinf((x)))
+/** pointer to a distribution function
+*/
+typedef double (*distrfun_p) (gsl_vector* x, const void* data);
 
 #endif
