@@ -17,7 +17,9 @@ typedef struct {
 
 [TYPE_PAR $prefix]* mcmclib_$prefix$tmp_alloc (double* $par1, double* $par2);
 void mcmclib_$prefix$tmp_free ([TYPE_PAR $prefix]* p);
-%constant double mcmclib_$prefix$tmp_lpdf (gsl_vector* x, void* in_p);
+%callback("%s_cb");
+double mcmclib_$prefix$tmp_lpdf (gsl_vector* x, void* in_p);
+%nocallback;
 }
 	puts [subst $ans]
 }
@@ -33,12 +35,13 @@ typedef struct {
 
 [TYPE_PAR $prefix]* mcmclib_$prefix$tmp_alloc (double* $par1);
 void mcmclib_$prefix$tmp_free ([TYPE_PAR $prefix]* p);
-%constant double mcmclib_$prefix$tmp_lpdf (gsl_vector* x, void* in_p);
+%callback("%s_cb");
+double mcmclib_$prefix$tmp_lpdf (gsl_vector* x, void* in_p);
+%nocallback;
 }
 	puts [subst $ans]
 }
 
-puts {%callback("%s_cb");}
 DECLARE_1PAR gaussian  sd
 DECLARE_1PAR exponential  mean
 DECLARE_1PAR laplace  a
@@ -58,4 +61,3 @@ DECLARE_2PAR pareto  a  b
 DECLARE_2PAR weibull  a  b
 DECLARE_2PAR gumbel1  a  b
 DECLARE_2PAR gumbel2  a  b
-puts {%nocallback;}

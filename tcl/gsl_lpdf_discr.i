@@ -1,4 +1,3 @@
-%callback("%s_cb");
 
 typedef struct {
 	double * mu;
@@ -6,7 +5,9 @@ typedef struct {
 
 poisson_lpdf_p* mcmclib_poisson_lpdf_alloc (double * mu);
 void mcmclib_poisson_lpdf_free (poisson_lpdf_p* p);
-%constant double mcmclib_poisson_lpdf (gsl_vector* x, void* in_p);
+%callback("%s_cb");
+double mcmclib_poisson_lpdf (gsl_vector* x, void* in_p);
+%nocallback;
 
 
 typedef struct {
@@ -15,7 +16,9 @@ typedef struct {
 
 bernoulli_lpdf_p* mcmclib_bernoulli_lpdf_alloc (double * p);
 void mcmclib_bernoulli_lpdf_free (bernoulli_lpdf_p* p);
-%constant double mcmclib_bernoulli_lpdf (gsl_vector* x, void* in_p);
+%callback("%s_cb");
+double mcmclib_bernoulli_lpdf (gsl_vector* x, void* in_p);
+%nocallback;
 
 
 typedef struct {
@@ -25,7 +28,9 @@ typedef struct {
 
 binomial_lpdf_p* mcmclib_binomial_lpdf_alloc (double * p, int * n);
 void mcmclib_binomial_lpdf_free (binomial_lpdf_p* p);
-%constant double mcmclib_binomial_lpdf (gsl_vector* x, void* in_p);
+%callback("%s_cb");
+double mcmclib_binomial_lpdf (gsl_vector* x, void* in_p);
+%nocallback;
 
 
 typedef struct {
@@ -35,7 +40,9 @@ typedef struct {
 
 negative_binomial_lpdf_p* mcmclib_negative_binomial_lpdf_alloc (double * p, int * n);
 void mcmclib_negative_binomial_lpdf_free (negative_binomial_lpdf_p* p);
-%constant double mcmclib_negative_binomial_lpdf (gsl_vector* x, void* in_p);
+%callback("%s_cb");
+double mcmclib_negative_binomial_lpdf (gsl_vector* x, void* in_p);
+%nocallback;
 
 
 typedef struct {
@@ -45,7 +52,9 @@ typedef struct {
 
 pascal_lpdf_p* mcmclib_pascal_lpdf_alloc (double * p, int * n);
 void mcmclib_pascal_lpdf_free (pascal_lpdf_p* p);
-%constant double mcmclib_pascal_lpdf (gsl_vector* x, void* in_p);
+%callback("%s_cb");
+double mcmclib_pascal_lpdf (gsl_vector* x, void* in_p);
+%nocallback;
 
 
 typedef struct {
@@ -54,7 +63,9 @@ typedef struct {
 
 geometric_lpdf_p* mcmclib_geometric_lpdf_alloc (double * p);
 void mcmclib_geometric_lpdf_free (geometric_lpdf_p* p);
-%constant double mcmclib_geometric_lpdf (gsl_vector* x, void* in_p);
+%callback("%s_cb");
+double mcmclib_geometric_lpdf (gsl_vector* x, void* in_p);
+%nocallback;
 
 
 typedef struct {
@@ -63,6 +74,7 @@ typedef struct {
 
 logarithmic_lpdf_p* mcmclib_logarithmic_lpdf_alloc (double * p);
 void mcmclib_logarithmic_lpdf_free (logarithmic_lpdf_p* p);
-%constant double mcmclib_logarithmic_lpdf (gsl_vector* x, void* in_p);
-
+%callback("%s_cb");
+double mcmclib_logarithmic_lpdf (gsl_vector* x, void* in_p);
 %nocallback;
+
