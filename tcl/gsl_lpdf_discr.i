@@ -1,3 +1,4 @@
+%callback("%s_cb");
 
 typedef struct {
 	double * mu;
@@ -64,3 +65,4 @@ logarithmic_lpdf_p* mcmclib_logarithmic_lpdf_alloc (double * p);
 void mcmclib_logarithmic_lpdf_free (logarithmic_lpdf_p* p);
 %constant double mcmclib_logarithmic_lpdf (gsl_vector* x, void* in_p);
 
+%nocallback;

@@ -38,6 +38,7 @@ void mcmclib_$prefix$tmp_free ([TYPE_PAR $prefix]* p);
 	puts [subst $ans]
 }
 
+puts {%callback("%s_cb");}
 DECLARE_1PAR poisson double mu
 DECLARE_1PAR bernoulli double p
 DECLARE_2PAR binomial double p int n
@@ -45,3 +46,4 @@ DECLARE_2PAR negative_binomial double p int n
 DECLARE_2PAR pascal double p int n
 DECLARE_1PAR geometric double p
 DECLARE_1PAR logarithmic double p
+puts {%nocallback;}

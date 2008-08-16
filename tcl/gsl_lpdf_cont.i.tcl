@@ -38,6 +38,7 @@ void mcmclib_$prefix$tmp_free ([TYPE_PAR $prefix]* p);
 	puts [subst $ans]
 }
 
+puts {%callback("%s_cb");}
 DECLARE_1PAR gaussian  sd
 DECLARE_1PAR exponential  mean
 DECLARE_1PAR laplace  a
@@ -57,3 +58,4 @@ DECLARE_2PAR pareto  a  b
 DECLARE_2PAR weibull  a  b
 DECLARE_2PAR gumbel1  a  b
 DECLARE_2PAR gumbel2  a  b
+puts {%nocallback;}

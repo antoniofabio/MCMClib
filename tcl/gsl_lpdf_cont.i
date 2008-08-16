@@ -1,3 +1,4 @@
+%callback("%s_cb");
 
 typedef struct {
 	double* sd;
@@ -180,3 +181,4 @@ gumbel2_lpdf_p* mcmclib_gumbel2_lpdf_alloc (double* a, double* b);
 void mcmclib_gumbel2_lpdf_free (gumbel2_lpdf_p* p);
 %constant double mcmclib_gumbel2_lpdf (gsl_vector* x, void* in_p);
 
+%nocallback;
