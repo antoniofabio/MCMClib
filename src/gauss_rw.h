@@ -27,7 +27,7 @@ void mcmclib_gauss_rw_free(mcmclib_gauss_rw_data* p);
 @param step_size gaussian proposal width (s.d.)
 */
 int mcmclib_gauss_rw(const gsl_rng* r,
-	distrfun_p loglik, gsl_vector* x, const void* data,
+	distrfun_p loglik, gsl_vector* x, void* data,
 	mcmclib_gauss_rw_data* e);
 
 #endif

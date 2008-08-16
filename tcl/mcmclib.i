@@ -35,6 +35,8 @@ double mcmclib_test_dunif(gsl_vector* px, const void* ignore) {
 
 %}
 
+typedef double (*distrfun_p) (gsl_vector* x, void* data);
+
 %constant double mcmclib_test_dunif(gsl_vector*, const void*);
 
 /*vector_list methods*/
@@ -65,7 +67,7 @@ void mcmclib_mvnorm_chol(const gsl_rng* r, const gsl_matrix* sigma_chol, gsl_vec
 mcmclib_gauss_rw_data* mcmclib_gauss_rw_alloc(double step_size, int dim);
 void mcmclib_gauss_rw_free(mcmclib_gauss_rw_data* p);
 int mcmclib_gauss_rw(const gsl_rng* r,
-	double (*loglik) (gsl_vector* x, const void* data), gsl_vector* x, const void* data,
+	distrfun_p loglik, gsl_vector* x, void* data,
 	mcmclib_gauss_rw_data* e);
 
 /*Adaptive Metropolis algorithm*/
@@ -80,7 +82,7 @@ typedef struct {
 mcmclib_gauss_am_data* mcmclib_gauss_am_alloc(const gsl_matrix* sigma_zero, int t0);
 void mcmclib_gauss_am_free(mcmclib_gauss_am_data* p);
 int mcmclib_gauss_am(const gsl_rng* r,
-	double (*loglik) (gsl_vector* x, const void* data), gsl_vector* x, const void* data,
+	distrfun_p loglik, gsl_vector* x, void* data,
 	mcmclib_gauss_am_data* e);
 
 %include "gsl_lpdf_cont.i"

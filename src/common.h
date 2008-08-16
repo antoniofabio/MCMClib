@@ -11,6 +11,6 @@
 
 /** pointer to a distribution function
 */
-typedef double (*distrfun_p) (gsl_vector* x, const void* data);
+typedef double (*distrfun_p) (gsl_vector* x, void* data);
 
 #endif

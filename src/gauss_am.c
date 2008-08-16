@@ -26,7 +26,7 @@ void mcmclib_gauss_am_free(mcmclib_gauss_am_data* p) {
 }
 
 int mcmclib_gauss_am(const gsl_rng* r,
-	distrfun_p loglik, gsl_vector* x, const void* data,
+	distrfun_p loglik, gsl_vector* x, void* data,
 	mcmclib_gauss_am_data* e) {
 
 	int d = x->size;
