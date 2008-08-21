@@ -24,3 +24,19 @@ void mcmclib_mvnorm_chol(const gsl_rng* r,
 	/*rotate them according to the cholesky 'square root' of sigma*/
 	gsl_blas_dtrmv(CblasLower, CblasNoTrans, CblasNonUnit, sigma_chol, out);
 }
+
+mvnorm_lpdf_p* mcmclib_mvnorm_lpdf_alloc(gsl_vector* mean, gsl_matrix* vcov) {
+	mvnorm_lpdf_p* ans = (mvnorm_lpdf_p*) malloc(sizeof(mvnorm_lpdf_p));
+	ans->mean = mean;
+	ans->vcov = vcov;
+	return ans;
+}
+
+void mcmclib_mvnorm_lpdf_free(mvnorm_lpdf_p* p) {
+	free(p);
+}
+
+double mcmclib_mvnorm_lpdf(gsl_vector* x, void* in_p) {
+	//TODO
+	return 0.0;
+}
