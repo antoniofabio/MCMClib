@@ -5,7 +5,7 @@
 
 #define IMPLEMENT_1PAR_ALLOCFREE(prefix, type1, par1) \
 TYPE_PAR(prefix)* mcmclib_ ## prefix ## _lpdf_alloc(type1 * par1){\
-	TYPE_PAR(prefix)* ans = ( TYPE_PAR(prefix)* ) malloc(sizeof( TYPE_PAR(prefix)* ));\
+	TYPE_PAR(prefix)* ans = ( TYPE_PAR(prefix)* ) malloc(sizeof( TYPE_PAR(prefix) ));\
 	ans->par1 = par1;\
 	return ans;\
 }\
@@ -28,7 +28,7 @@ double mcmclib_ ## prefix ## _lpdf(gsl_vector* x, void* in_p) {\
 
 #define IMPLEMENT_2PAR_ALLOCFREE(prefix, type1, par1, type2, par2) \
 TYPE_PAR(prefix)* mcmclib_ ## prefix ## _lpdf_alloc(type1 * par1, type2 * par2){\
-	TYPE_PAR(prefix)* ans = ( TYPE_PAR(prefix)* ) malloc(sizeof( TYPE_PAR(prefix)* ));\
+	TYPE_PAR(prefix)* ans = ( TYPE_PAR(prefix)* ) malloc(sizeof( TYPE_PAR(prefix) ));\
 	ans->par1 = par1;\
 	ans->par2 = par2;\
 	return ans;\
