@@ -35,35 +35,40 @@ mvnorm_lpdf_p* mcmclib_mvnorm_lpdf_alloc(gsl_vector* mean, gsl_matrix* vcov) {
 	ans->vcov = vcov;
 	ans->rooti = gsl_matrix_alloc(d, d);
 	ans->x_mu = gsl_vector_alloc(d);
+	ans->mahal = gsl_vector_alloc(d);
 	return ans;
 }
 
 void mcmclib_mvnorm_lpdf_free(mvnorm_lpdf_p* p) {
 	gsl_matrix_free(p->rooti);
 	gsl_vector_free(p->x_mu);
+	gsl_vector_free(p->mahal);
 	free(p);
 }
 
 double mcmclib_mvnorm_lpdf(gsl_vector* x, void* in_p) {
 	int d = x->size;
 	mvnorm_lpdf_p* p = (mvnorm_lpdf_p*) in_p;
+
+	/*compute cholesky decomposition of var/cov matrix*/
 	gsl_matrix_memcpy(p->rooti, p->vcov);
 	gsl_linalg_cholesky_decomp(p->rooti);
 
+	/*compute mahlanobis distance between 'x' and 'mu'*/
 	gsl_vector* x_mu = p->x_mu;
 	gsl_vector_memcpy(x_mu, x);
 	gsl_vector_sub(x_mu, p->mean);
-	/*read the following as: z = as.vector(t(solve(rooti)) %*% (x - mu))*/
+	gsl_vector_memcpy(p->mahal, x_mu);
 	gsl_linalg_cholesky_svx(p->rooti, x_mu);
 
-	/*read the following block as:
-		-(length(x)/2) * log(2 * pi) - 0.5 * (z %*% z) + sum(log(diag(rooti))) */
+	/*compute log-density as:
+		-0.5 * (mahaldist + log(2*pi)*d + logdet) */
 	double ans = 0.0;
-	gsl_blas_ddot(x_mu, x_mu, &ans);
-	ans *= -0.5;
-	ans -= log(2.0 * PI) * ((double) d) / 2.0;
+	gsl_blas_ddot(p->mahal, x_mu, &ans);
+	ans += log(2.0 * PI) * ((double) d);
 	for(int i=0; i<d; i++)
-		ans += log(gsl_matrix_get(p->rooti, i, i));
+		ans += log(gsl_matrix_get(p->rooti, i, i)) * 2.0;
+	ans *= -5.0;
 
 	return ans;
 }

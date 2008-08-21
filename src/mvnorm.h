@@ -28,6 +28,7 @@ typedef struct {
 	gsl_matrix* vcov;
 	gsl_matrix* rooti;
 	gsl_vector* x_mu;
+	gsl_vector* mahal;
 } mvnorm_lpdf_p;
 
 /** alloc extra data for a multivariate gaussian distribution
