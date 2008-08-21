@@ -10,6 +10,9 @@ set ll [list\
 set vl [ll2vl $ll]
 stopifne [mcmclib_vector_list_length $vl] 4
 stopifne [vl2ll $vl] $ll
+stopifne [llength [vl2ll [mcmclib_vector_list_transpose $vl]]] 3
+vl2ll [mcmclib_vector_list_transpose $vl]
+stopifne [vl2ll [mcmclib_vector_list_transpose [mcmclib_vector_list_transpose $vl]]] [vl2ll $vl]
 
 ##list<->matrix
 set ll {{1.0 2.0 3.0} {2.0 4.0 6.0} {3.0 6.0 9.0} {4.0 8.0 12.0}}
