@@ -24,7 +24,7 @@
 #include "lpdf_gsl_cont.h"
 #include "lpdf_gsl_discr.h"
 
-double mcmclib_test_dunif(gsl_vector* px, const void* ignore) {
+double mcmclib_test_dunif(gsl_vector* px, void* ignore) {
 	for(int i=0; i<px->size; i++) {
 		double x = gsl_vector_get(px, i);
 		if((x < 0.0) || (x > 1.0))
@@ -37,7 +37,7 @@ double mcmclib_test_dunif(gsl_vector* px, const void* ignore) {
 
 typedef double (*distrfun_p) (gsl_vector* x, void* data);
 
-%constant double mcmclib_test_dunif(gsl_vector*, const void*);
+%constant double mcmclib_test_dunif(gsl_vector*, void*);
 
 /*vector_list methods*/
 struct vector_list_str {
