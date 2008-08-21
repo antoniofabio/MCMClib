@@ -26,6 +26,8 @@ void mcmclib_mvnorm_chol(const gsl_rng* r,
 typedef struct {
 	gsl_vector* mean;
 	gsl_matrix* vcov;
+	gsl_matrix* rooti;
+	gsl_vector* x_mu;
 } mvnorm_lpdf_p;
 
 /** alloc extra data for a multivariate gaussian distribution
