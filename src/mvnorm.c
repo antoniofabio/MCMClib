@@ -49,11 +49,12 @@ double mcmclib_mvnorm_lpdf(gsl_vector* x, void* in_p) {
 	mvnorm_lpdf_p* p = (mvnorm_lpdf_p*) in_p;
 	gsl_matrix_memcpy(p->rooti, p->vcov);
 	gsl_linalg_cholesky_decomp(p->rooti);
+
 	gsl_vector* x_mu = p->x_mu;
 	gsl_vector_memcpy(x_mu, x);
 	gsl_vector_sub(x_mu, p->mean);
-	/*read the following as: z = as.vector(t(rooti) %*% (x - mu))*/
-	gsl_blas_dtrmv(CblasLower, CblasNoTrans, CblasNonUnit, p->rooti, x_mu);
+	/*read the following as: z = as.vector(t(solve(rooti)) %*% (x - mu))*/
+	gsl_linalg_cholesky_svx(p->rooti, x_mu);
 
 	/*read the following block as:
 		-(length(x)/2) * log(2 * pi) - 0.5 * (z %*% z) + sum(log(diag(rooti))) */
