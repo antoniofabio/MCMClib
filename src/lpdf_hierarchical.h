@@ -6,21 +6,24 @@
 /** extra data for log-posterior function
 */
 typedef struct {
+	gsl_vector* x;
 	distrfun_p prior;
 	void* parms;
 	distrfun_p loglik;
 	gsl_vector** childs;
 	void** child_parms;
+	gsl_vector* workspace;
 } post_lpdf_p;
 
 /** alloc logposterior extra data
+@param x pointer to vector node 'current' value
 @param prior	prior distribution
 @param parms	prior distr parameters
 @param loglik (common) likelihood function
 @param childs null-terminated array of pointers to child vectors
 @param child_parms vector of parameters for each child vector
 */
-post_lpdf_p* mcmclib_lpdf_post_alloc(distrfun_p prior, void* parms,
+post_lpdf_p* mcmclib_lpdf_post_alloc(gsl_vector* x, distrfun_p prior, void* parms,
 	distrfun_p loglik, gsl_vector** childs, void** child_parms);
 
 /** free logposterior extra data
