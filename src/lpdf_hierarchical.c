@@ -14,6 +14,7 @@ post_lpdf_p* mcmclib_lpdf_post_alloc(gsl_vector* x, distrfun_p prior, void* parm
 }
 
 void mcmclib_lpdf_post_free(post_lpdf_p* p) {
+	gsl_vector_free(p->workspace);
 	free(p);
 }
 
