@@ -27,14 +27,14 @@ double mcmclib_lpdf_post(void* data, gsl_vector* x) {
 	/*set new value*/
 	gsl_vector_memcpy(d->x, x);
 
-	ans += d->prior(d->x, d->parms);
+	ans += d->prior(d->parms, d->x);
 	if(!isfinite(ans)) {
 		/*restore old value*/
 		gsl_vector_memcpy(d->x, d->workspace);
 		return(ans);
 	}
 	for(int i=0; d->childs[i] != NULL; i++) {
-		ans += d->loglik(d->childs[i], d->child_parms[i]);
+		ans += d->loglik(d->child_parms[i], d->childs[i]);
 		if(!isfinite(ans))
 			break;
 	}
