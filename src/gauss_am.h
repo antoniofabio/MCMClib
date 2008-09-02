@@ -18,25 +18,25 @@ typedef struct {
 	gsl_matrix* cov;
 	int t;
 	gsl_vector* old;
-} mcmclib_gauss_am_data;
+} mcmclib_gauss_am;
 
 /** alloc (and init) extra AM data
 @param sigma_zero starting proposal covariance matrix
 @param t0 burn-in length before starting adaptation
 */
-mcmclib_gauss_am_data* mcmclib_gauss_am_alloc(const gsl_matrix* sigma_zero, int t0);
+mcmclib_gauss_am* mcmclib_gauss_am_alloc(const gsl_matrix* sigma_zero, int t0);
 /** free extra AM data
 */
-void mcmclib_gauss_am_free(mcmclib_gauss_am_data* p);
+void mcmclib_gauss_am_free(mcmclib_gauss_am* p);
 
 /** Adaptive Metropolis Gaussian random walk
+@param extra pointer to extra AM data
 @param r RNG state
 @param logdistr pointer to a log-likelihood function
 @param x current point value
 @param data extra data to be passed to the log-likelihood function
-@param extra pointer to extra AM data
 */
-int mcmclib_gauss_am(mcmclib_gauss_am_data* extra, const gsl_rng* r,
+int mcmclib_gauss_am_update(mcmclib_gauss_am* extra, const gsl_rng* r,
 	distrfun_p logdistr, gsl_vector* x, void* data);
 
 #endif

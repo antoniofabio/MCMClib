@@ -8,16 +8,16 @@
 typedef struct {
 	double step_size;
 	gsl_vector* old;
-} mcmclib_gauss_rw_data;
+} mcmclib_gauss_rw;
 
 /** alloc (and init) extra Gaussian RW data
 @param step_size gaussian proposal width (s.d.)
 @param dim ambient space dimension
 */
-mcmclib_gauss_rw_data* mcmclib_gauss_rw_alloc(double step_size, int dim);
+mcmclib_gauss_rw* mcmclib_gauss_rw_alloc(double step_size, int dim);
 /** free extra Gaussian RW data
 */
-void mcmclib_gauss_rw_free(mcmclib_gauss_rw_data* p);
+void mcmclib_gauss_rw_free(mcmclib_gauss_rw* p);
 
 /** Gaussian random walk
 @param r RNG state
@@ -25,7 +25,7 @@ void mcmclib_gauss_rw_free(mcmclib_gauss_rw_data* p);
 @param x current point value
 @param data extra data to be passed to the distribution function
 */
-int mcmclib_gauss_rw(mcmclib_gauss_rw_data* e, const gsl_rng* r,
+int mcmclib_gauss_rw_update(mcmclib_gauss_rw* e, const gsl_rng* r,
 	distrfun_p logdistr, gsl_vector* x, void* data);
 
 #endif

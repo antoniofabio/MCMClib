@@ -1,8 +1,8 @@
 #include "gauss_am.h"
 #include "vector_stats.h"
 
-mcmclib_gauss_am_data* mcmclib_gauss_am_alloc(const gsl_matrix* sigma_zero, int t0) {
-	mcmclib_gauss_am_data* ans = (mcmclib_gauss_am_data*) malloc(sizeof(mcmclib_gauss_am_data));
+mcmclib_gauss_am* mcmclib_gauss_am_alloc(const gsl_matrix* sigma_zero, int t0) {
+	mcmclib_gauss_am* ans = (mcmclib_gauss_am*) malloc(sizeof(mcmclib_gauss_am));
 	int d = sigma_zero->size1;
 	ans->sigma_zero = gsl_matrix_alloc(d, d);
 	ans->t0 = t0;
@@ -17,7 +17,7 @@ mcmclib_gauss_am_data* mcmclib_gauss_am_alloc(const gsl_matrix* sigma_zero, int 
 	return ans;
 }
 
-void mcmclib_gauss_am_free(mcmclib_gauss_am_data* p) {
+void mcmclib_gauss_am_free(mcmclib_gauss_am* p) {
 	gsl_matrix_free(p->sigma_zero);
 	gsl_vector_free(p->mean);
 	gsl_matrix_free(p->cov);
@@ -25,7 +25,7 @@ void mcmclib_gauss_am_free(mcmclib_gauss_am_data* p) {
 	free(p);
 }
 
-int mcmclib_gauss_am(mcmclib_gauss_am_data* e, const gsl_rng* r,
+int mcmclib_gauss_am_update(mcmclib_gauss_am* e, const gsl_rng* r,
 	distrfun_p logdistr, gsl_vector* x, void* data) {
 
 	int d = x->size;

@@ -1,18 +1,18 @@
 #include "gauss_rw.h"
 
-mcmclib_gauss_rw_data* mcmclib_gauss_rw_alloc(double step_size, int dim) {
-	mcmclib_gauss_rw_data* ans = (mcmclib_gauss_rw_data*) malloc(sizeof(mcmclib_gauss_rw_data));
+mcmclib_gauss_rw* mcmclib_gauss_rw_alloc(double step_size, int dim) {
+	mcmclib_gauss_rw* ans = (mcmclib_gauss_rw*) malloc(sizeof(mcmclib_gauss_rw));
 	ans->old = gsl_vector_alloc(dim);
 	ans->step_size = step_size;
 	return ans;
 }
 
-void mcmclib_gauss_rw_free(mcmclib_gauss_rw_data* p) {
+void mcmclib_gauss_rw_free(mcmclib_gauss_rw* p) {
 	gsl_vector_free(p->old);
 	free(p);
 }
 
-int mcmclib_gauss_rw(mcmclib_gauss_rw_data* e, const gsl_rng* r,
+int mcmclib_gauss_rw_update(mcmclib_gauss_rw* e, const gsl_rng* r,
 	distrfun_p logdistr, gsl_vector* x, void* data) {
 	int n = e->old->size;
 	double step_size = e->step_size;
