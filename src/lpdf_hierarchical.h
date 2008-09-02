@@ -13,7 +13,7 @@ typedef struct {
 	gsl_vector** childs;
 	void** child_parms;
 	gsl_vector* workspace;
-} post_lpdf_p;
+} mcmclib_post_lpdf;
 
 /** alloc logposterior extra data
 @param x pointer to vector node 'current' value
@@ -23,15 +23,15 @@ typedef struct {
 @param childs null-terminated array of pointers to child vectors
 @param child_parms vector of parameters for each child vector
 */
-post_lpdf_p* mcmclib_lpdf_post_alloc(gsl_vector* x, distrfun_p prior, void* parms,
+mcmclib_post_lpdf* mcmclib_post_lpdf_alloc(gsl_vector* x, distrfun_p prior, void* parms,
 	distrfun_p loglik, gsl_vector** childs, void** child_parms);
 
 /** free logposterior extra data
 */
-void mcmclib_lpdf_post_free(post_lpdf_p* p);
+void mcmclib_post_lpdf_free(mcmclib_post_lpdf* p);
 
 /** log-posterior distribution function
 */
-double mcmclib_lpdf_post(void* data, gsl_vector* x);
+double mcmclib_post_lpdf_compute(void* data, gsl_vector* x);
 
 #endif

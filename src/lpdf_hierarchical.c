@@ -1,8 +1,8 @@
 #include "lpdf_hierarchical.h"
 
-post_lpdf_p* mcmclib_lpdf_post_alloc(gsl_vector* x, distrfun_p prior, void* parms,
+mcmclib_post_lpdf* mcmclib_post_lpdf_alloc(gsl_vector* x, distrfun_p prior, void* parms,
 	distrfun_p loglik, gsl_vector** childs, void** child_parms) {
-	post_lpdf_p* ans = (post_lpdf_p*) malloc(sizeof(post_lpdf_p));
+	mcmclib_post_lpdf* ans = (mcmclib_post_lpdf*) malloc(sizeof(mcmclib_post_lpdf));
 	ans->x = x;
 	ans->prior = prior;
 	ans->parms = parms;
@@ -13,13 +13,13 @@ post_lpdf_p* mcmclib_lpdf_post_alloc(gsl_vector* x, distrfun_p prior, void* parm
 	return ans;
 }
 
-void mcmclib_lpdf_post_free(post_lpdf_p* p) {
+void mcmclib_post_lpdf_free(mcmclib_post_lpdf* p) {
 	gsl_vector_free(p->workspace);
 	free(p);
 }
 
-double mcmclib_lpdf_post(void* data, gsl_vector* x) {
-	post_lpdf_p* d = (post_lpdf_p*) data;
+double mcmclib_post_lpdf_compute(void* data, gsl_vector* x) {
+	mcmclib_post_lpdf* d = (mcmclib_post_lpdf*) data;
 	double ans = 0.0;
 	int i=0;
 	/*store old value*/
