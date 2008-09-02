@@ -3,7 +3,8 @@
 
 /* INTERNAL UTILITY MACROS*/
 #undef TYPE_PAR
-#define TYPE_PAR(prefix) prefix ## _lpdf_p
+#define TYPE_PAR(prefix) mcmclib_ ## prefix ## _lpdf
+#define TYPE_METHOD(prefix, method) mcmclib_ ## prefix ## _lpdf_ ## method
 
 #undef DECLARE_2PAR
 #define DECLARE_2PAR(prefix, par1, par2) \
@@ -11,18 +12,18 @@ typedef struct {\
 	double* par1;\
 	double* par2;\
 } TYPE_PAR(prefix);\
-TYPE_PAR(prefix)* mcmclib_ ## prefix ## _lpdf_alloc(double* par1, double* par2);\
-void mcmclib_ ## prefix ## _lpdf_free(TYPE_PAR(prefix)* p);\
-double mcmclib_ ## prefix ## _lpdf(void* in_p, gsl_vector* x);
+TYPE_PAR(prefix)* TYPE_METHOD(prefix, alloc)(double* par1, double* par2);\
+void TYPE_METHOD(prefix, free)(TYPE_PAR(prefix)* p);\
+double TYPE_METHOD(prefix, compute)(void* in_p, gsl_vector* x);
 
 #undef DECLARE_1PAR
 #define DECLARE_1PAR(prefix, par1) \
 typedef struct {\
 	double* par1;\
 } TYPE_PAR(prefix);\
-TYPE_PAR(prefix)* mcmclib_ ## prefix ## _lpdf_alloc(double* par1);\
-void mcmclib_ ## prefix ## _lpdf_free(TYPE_PAR(prefix)* p);\
-double mcmclib_ ## prefix ## _lpdf(void* in_p, gsl_vector* x);
+TYPE_PAR(prefix)* TYPE_METHOD(prefix, alloc) (double* par1);\
+void TYPE_METHOD(prefix, free)(TYPE_PAR(prefix)* p);\
+double TYPE_METHOD(prefix, compute)(void* in_p, gsl_vector* x);
 /*END OF INTERNAL UTILITY MACROS*/
 
 #include <gsl/gsl_vector.h>

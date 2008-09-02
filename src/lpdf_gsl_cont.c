@@ -4,20 +4,20 @@
 #include "lpdf_gsl_cont.h"
 
 #define IMPLEMENT_1PAR_ALLOCFREE(prefix, par1) \
-TYPE_PAR(prefix)* mcmclib_ ## prefix ## _lpdf_alloc(double* par1){\
+TYPE_PAR(prefix)* TYPE_METHOD(prefix, alloc)(double* par1){\
 	TYPE_PAR(prefix)* ans = ( TYPE_PAR(prefix)* ) malloc(sizeof( TYPE_PAR(prefix) ));\
 	ans->par1 = par1;\
 	return ans;\
 }\
 \
-void mcmclib_ ## prefix ## _lpdf_free(TYPE_PAR(prefix)* p){\
+void TYPE_METHOD(prefix, free)(TYPE_PAR(prefix)* p){\
 	free(p);\
 }
 
 #define IMPLEMENT_1PAR(prefix, par1) \
 IMPLEMENT_1PAR_ALLOCFREE(prefix, par1)\
 \
-double mcmclib_ ## prefix ## _lpdf(void* in_p, gsl_vector* x) {\
+double TYPE_METHOD(prefix, compute)(void* in_p, gsl_vector* x) {\
 	TYPE_PAR(prefix)* p = ( TYPE_PAR(prefix)* ) in_p;\
 	double ans = 0;\
 	double par1 = *(p->par1);\
@@ -27,21 +27,21 @@ double mcmclib_ ## prefix ## _lpdf(void* in_p, gsl_vector* x) {\
 }
 
 #define IMPLEMENT_2PAR_ALLOCFREE(prefix, par1, par2) \
-TYPE_PAR(prefix)* mcmclib_ ## prefix ## _lpdf_alloc(double* par1, double* par2){\
+TYPE_PAR(prefix)* TYPE_METHOD(prefix, alloc)(double* par1, double* par2){\
 	TYPE_PAR(prefix)* ans = ( TYPE_PAR(prefix)* ) malloc(sizeof( TYPE_PAR(prefix) ));\
 	ans->par1 = par1;\
 	ans->par2 = par2;\
 	return ans;\
 }\
 \
-void mcmclib_ ## prefix ## _lpdf_free(TYPE_PAR(prefix)* p){\
+void TYPE_METHOD(prefix, free) (TYPE_PAR(prefix)* p){\
 	free(p);\
 }
 
 #define IMPLEMENT_2PAR(prefix, par1, par2) \
 IMPLEMENT_2PAR_ALLOCFREE(prefix, par1, par2)\
 \
-double mcmclib_ ## prefix ## _lpdf(void* in_p, gsl_vector* x) {\
+double TYPE_METHOD(prefix, compute)(void* in_p, gsl_vector* x) {\
 	TYPE_PAR(prefix)* p = ( TYPE_PAR(prefix)* ) in_p;\
 	double ans = 0;\
 	double par1 = *(p->par1);\
