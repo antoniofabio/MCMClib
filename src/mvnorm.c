@@ -28,9 +28,9 @@ void mcmclib_mvnorm_chol(const gsl_rng* r,
 	gsl_blas_dtrmv(CblasLower, CblasNoTrans, CblasNonUnit, sigma_chol, out);
 }
 
-mvnorm_lpdf_p* mcmclib_mvnorm_lpdf_alloc(gsl_vector* mean, gsl_matrix* vcov) {
+mcmclib_mvnorm_lpdf* mcmclib_mvnorm_lpdf_alloc(gsl_vector* mean, gsl_matrix* vcov) {
 	int d = mean->size;
-	mvnorm_lpdf_p* ans = (mvnorm_lpdf_p*) malloc(sizeof(mvnorm_lpdf_p));
+	mcmclib_mvnorm_lpdf* ans = (mcmclib_mvnorm_lpdf*) malloc(sizeof(mcmclib_mvnorm_lpdf));
 	ans->mean = mean;
 	ans->vcov = vcov;
 	ans->rooti = gsl_matrix_alloc(d, d);
@@ -39,16 +39,16 @@ mvnorm_lpdf_p* mcmclib_mvnorm_lpdf_alloc(gsl_vector* mean, gsl_matrix* vcov) {
 	return ans;
 }
 
-void mcmclib_mvnorm_lpdf_free(mvnorm_lpdf_p* p) {
+void mcmclib_mvnorm_lpdf_free(mcmclib_mvnorm_lpdf* p) {
 	gsl_matrix_free(p->rooti);
 	gsl_vector_free(p->x_mu);
 	gsl_vector_free(p->mahal);
 	free(p);
 }
 
-double mcmclib_mvnorm_lpdf(void* in_p, gsl_vector* x) {
+double mcmclib_mvnorm_lpdf_compute(void* in_p, gsl_vector* x) {
 	int d = x->size;
-	mvnorm_lpdf_p* p = (mvnorm_lpdf_p*) in_p;
+	mcmclib_mvnorm_lpdf* p = (mcmclib_mvnorm_lpdf*) in_p;
 
 	/*compute cholesky decomposition of var/cov matrix*/
 	gsl_matrix_memcpy(p->rooti, p->vcov);

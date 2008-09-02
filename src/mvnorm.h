@@ -29,23 +29,23 @@ typedef struct {
 	gsl_matrix* rooti;
 	gsl_vector* x_mu;
 	gsl_vector* mahal;
-} mvnorm_lpdf_p;
+} mcmclib_mvnorm_lpdf;
 
 /** alloc extra data for a multivariate gaussian distribution
 @param mean mean
 @param vcov variance/covariance matrix
 */
-mvnorm_lpdf_p* mcmclib_mvnorm_lpdf_alloc(gsl_vector* mean, gsl_matrix* vcov);
+mcmclib_mvnorm_lpdf* mcmclib_mvnorm_lpdf_alloc(gsl_vector* mean, gsl_matrix* vcov);
 
 /** free extra data for a multivariate gaussian distribution
 @param p pointer to distrib extra data
 */
-void mcmclib_mvnorm_lpdf_free(mvnorm_lpdf_p* p);
+void mcmclib_mvnorm_lpdf_free(mcmclib_mvnorm_lpdf* p);
 
 /** multivariate gassian log-distribution
 @param in_p extra data, allocated via 'mcmclib_mvnorm_lpdf_alloc'
 @return log-pdf
 */
-double mcmclib_mvnorm_lpdf(void* in_p, gsl_vector* x);
+double mcmclib_mvnorm_lpdf_compute(void* in_p, gsl_vector* x);
 
 #endif
