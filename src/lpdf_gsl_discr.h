@@ -13,7 +13,7 @@ typedef struct {\
 } TYPE_PAR(prefix);\
 TYPE_PAR(prefix)* mcmclib_ ## prefix ## _lpdf_alloc(type1 * par1, type2 * par2);\
 void mcmclib_ ## prefix ## _lpdf_free(TYPE_PAR(prefix)* p);\
-double mcmclib_ ## prefix ## _lpdf(gsl_vector* x, void* in_p);
+double mcmclib_ ## prefix ## _lpdf(void* in_p, gsl_vector* x);
 
 #undef DECLARE_1PAR
 #define DECLARE_1PAR(prefix, type1, par1) \
@@ -22,7 +22,7 @@ typedef struct {\
 } TYPE_PAR(prefix);\
 TYPE_PAR(prefix)* mcmclib_ ## prefix ## _lpdf_alloc(type1 * par1);\
 void mcmclib_ ## prefix ## _lpdf_free(TYPE_PAR(prefix)* p);\
-double mcmclib_ ## prefix ## _lpdf(gsl_vector* x, void* in_p);
+double mcmclib_ ## prefix ## _lpdf(void* in_p, gsl_vector* x);
 /*END OF INTERNAL UTILITY MACROS*/
 
 DECLARE_1PAR(poisson, double, mu)

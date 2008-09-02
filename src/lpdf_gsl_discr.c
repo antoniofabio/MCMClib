@@ -17,7 +17,7 @@ void mcmclib_ ## prefix ## _lpdf_free(TYPE_PAR(prefix)* p){\
 #define IMPLEMENT_1PAR(prefix, type1, par1) \
 IMPLEMENT_1PAR_ALLOCFREE(prefix, type1, par1)\
 \
-double mcmclib_ ## prefix ## _lpdf(gsl_vector* x, void* in_p) {\
+double mcmclib_ ## prefix ## _lpdf(void* in_p, gsl_vector* x) {\
 	TYPE_PAR(prefix)* __p = ( TYPE_PAR(prefix)* ) in_p;\
 	double ans = 0;\
 	type1 par1 = *(__p->par1);\
@@ -41,7 +41,7 @@ void mcmclib_ ## prefix ## _lpdf_free(TYPE_PAR(prefix)* p){\
 #define IMPLEMENT_2PAR(prefix, type1, par1, type2, par2) \
 IMPLEMENT_2PAR_ALLOCFREE(prefix, type1, par1, type2, par2)\
 \
-double mcmclib_ ## prefix ## _lpdf(gsl_vector* x, void* in_p) {\
+double mcmclib_ ## prefix ## _lpdf(void* in_p, gsl_vector* x) {\
 	TYPE_PAR(prefix)* __p = ( TYPE_PAR(prefix)* ) in_p;\
 	double ans = 0;\
 	type1 par1 = *(__p->par1);\

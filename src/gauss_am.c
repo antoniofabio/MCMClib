@@ -25,9 +25,8 @@ void mcmclib_gauss_am_free(mcmclib_gauss_am_data* p) {
 	free(p);
 }
 
-int mcmclib_gauss_am(const gsl_rng* r,
-	distrfun_p loglik, gsl_vector* x, void* data,
-	mcmclib_gauss_am_data* e) {
+int mcmclib_gauss_am(mcmclib_gauss_am_data* e, const gsl_rng* r,
+	distrfun_p logdistr, gsl_vector* x, void* data) {
 
 	int d = x->size;
 	gsl_vector* old = e->old;
@@ -41,7 +40,7 @@ int mcmclib_gauss_am(const gsl_rng* r,
 	gsl_vector_memcpy(old, x);
 	double loglik_old, loglik_new, lik_ratio;
 
-	loglik_old = loglik(x, data);
+	loglik_old = logdistr(data, x);
 
 	/*sample a new value for 'x', with mean 'old' and assigned covariance matrix*/
 	mcmclib_mvnorm(r, (*t) < t0 ? sigma_zero : cov, x);
@@ -50,7 +49,7 @@ int mcmclib_gauss_am(const gsl_rng* r,
 	if(!isfinite(loglik_old))
 		return 0;
 
-	loglik_new = loglik(x, data);
+	loglik_new = logdistr(data, x);
 	if(loglik_new >= loglik_old)
 		return 0;
 

@@ -46,6 +46,6 @@ void mcmclib_mvnorm_lpdf_free(mvnorm_lpdf_p* p);
 @param in_p extra data, allocated via 'mcmclib_mvnorm_lpdf_alloc'
 @return log-pdf
 */
-double mcmclib_mvnorm_lpdf(gsl_vector* x, void* in_p);
+double mcmclib_mvnorm_lpdf(void* in_p, gsl_vector* x);
 
 #endif

@@ -31,13 +31,12 @@ void mcmclib_gauss_am_free(mcmclib_gauss_am_data* p);
 
 /** Adaptive Metropolis Gaussian random walk
 @param r RNG state
-@param loglik pointer to a log-likelihood function
+@param logdistr pointer to a log-likelihood function
 @param x current point value
 @param data extra data to be passed to the log-likelihood function
 @param extra pointer to extra AM data
 */
-int mcmclib_gauss_am(const gsl_rng* r,
-	distrfun_p loglik, gsl_vector* x, void* data,
-	mcmclib_gauss_am_data* extra);
+int mcmclib_gauss_am(mcmclib_gauss_am_data* extra, const gsl_rng* r,
+	distrfun_p logdistr, gsl_vector* x, void* data);
 
 #endif

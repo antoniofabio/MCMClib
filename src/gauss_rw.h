@@ -21,13 +21,11 @@ void mcmclib_gauss_rw_free(mcmclib_gauss_rw_data* p);
 
 /** Gaussian random walk
 @param r RNG state
-@param loglik pointer to a log-likelihood function
+@param logdistr pointer to a log-likelihood function
 @param x current point value
-@param data extra data to be passed to the log-likelihood function
-@param step_size gaussian proposal width (s.d.)
+@param data extra data to be passed to the distribution function
 */
-int mcmclib_gauss_rw(const gsl_rng* r,
-	distrfun_p loglik, gsl_vector* x, void* data,
-	mcmclib_gauss_rw_data* e);
+int mcmclib_gauss_rw(mcmclib_gauss_rw_data* e, const gsl_rng* r,
+	distrfun_p logdistr, gsl_vector* x, void* data);
 
 #endif

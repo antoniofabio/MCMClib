@@ -32,6 +32,6 @@ void mcmclib_lpdf_post_free(post_lpdf_p* p);
 
 /** log-posterior distribution function
 */
-double mcmclib_lpdf_post(gsl_vector* x, void* data);
+double mcmclib_lpdf_post(void* data, gsl_vector* x);
 
 #endif

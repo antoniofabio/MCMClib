@@ -18,7 +18,7 @@ void mcmclib_lpdf_post_free(post_lpdf_p* p) {
 	free(p);
 }
 
-double mcmclib_lpdf_post(gsl_vector* x, void* data) {
+double mcmclib_lpdf_post(void* data, gsl_vector* x) {
 	post_lpdf_p* d = (post_lpdf_p*) data;
 	double ans = 0.0;
 	int i=0;

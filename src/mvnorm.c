@@ -46,7 +46,7 @@ void mcmclib_mvnorm_lpdf_free(mvnorm_lpdf_p* p) {
 	free(p);
 }
 
-double mcmclib_mvnorm_lpdf(gsl_vector* x, void* in_p) {
+double mcmclib_mvnorm_lpdf(void* in_p, gsl_vector* x) {
 	int d = x->size;
 	mvnorm_lpdf_p* p = (mvnorm_lpdf_p*) in_p;
 
