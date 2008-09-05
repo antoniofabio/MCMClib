@@ -25,7 +25,7 @@ void mcmclib_mvnorm_chol(const gsl_rng* r,
 */
 typedef struct {
 	gsl_vector* mean;
-	gsl_matrix* vcov;
+	double* vcov;
 	gsl_matrix* rooti;
 	gsl_vector* x_mu;
 	gsl_vector* mahal;

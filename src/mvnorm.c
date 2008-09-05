@@ -32,8 +32,7 @@ mcmclib_mvnorm_lpdf* mcmclib_mvnorm_lpdf_alloc(gsl_vector* mean, double* vcov) {
 	int d = mean->size;
 	mcmclib_mvnorm_lpdf* ans = (mcmclib_mvnorm_lpdf*) malloc(sizeof(mcmclib_mvnorm_lpdf));
 	ans->mean = mean;
-	gsl_matrix_view mv = gsl_matrix_view_array(vcov, d, d);
-	ans->vcov = & (mv.matrix);
+	ans->vcov = vcov;
 	ans->rooti = gsl_matrix_alloc(d, d);
 	ans->x_mu = gsl_vector_alloc(d);
 	ans->mahal = gsl_vector_alloc(d);
@@ -50,9 +49,11 @@ void mcmclib_mvnorm_lpdf_free(mcmclib_mvnorm_lpdf* p) {
 double mcmclib_mvnorm_lpdf_compute(void* in_p, gsl_vector* x) {
 	int d = x->size;
 	mcmclib_mvnorm_lpdf* p = (mcmclib_mvnorm_lpdf*) in_p;
+	gsl_matrix_view mv = gsl_matrix_view_array(p->vcov, d, d);
+	gsl_matrix* vcov = &(mv.matrix);
 
 	/*compute cholesky decomposition of var/cov matrix*/
-	gsl_matrix_memcpy(p->rooti, p->vcov);
+	gsl_matrix_memcpy(p->rooti, vcov);
 	gsl_linalg_cholesky_decomp(p->rooti);
 
 	/*compute mahlanobis distance between 'x' and 'mu'*/
