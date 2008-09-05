@@ -28,11 +28,12 @@ void mcmclib_mvnorm_chol(const gsl_rng* r,
 	gsl_blas_dtrmv(CblasLower, CblasNoTrans, CblasNonUnit, sigma_chol, out);
 }
 
-mcmclib_mvnorm_lpdf* mcmclib_mvnorm_lpdf_alloc(gsl_vector* mean, gsl_matrix* vcov) {
+mcmclib_mvnorm_lpdf* mcmclib_mvnorm_lpdf_alloc(gsl_vector* mean, double* vcov) {
 	int d = mean->size;
 	mcmclib_mvnorm_lpdf* ans = (mcmclib_mvnorm_lpdf*) malloc(sizeof(mcmclib_mvnorm_lpdf));
 	ans->mean = mean;
-	ans->vcov = vcov;
+	gsl_matrix_view mv = gsl_matrix_view_array(vcov, d, d);
+	ans->vcov = & (mv.matrix);
 	ans->rooti = gsl_matrix_alloc(d, d);
 	ans->x_mu = gsl_vector_alloc(d);
 	ans->mahal = gsl_vector_alloc(d);

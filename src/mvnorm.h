@@ -33,9 +33,9 @@ typedef struct {
 
 /** alloc extra data for a multivariate gaussian distribution
 @param mean mean
-@param vcov variance/covariance matrix
+@param vcov variance/covariance matrix (raw data)
 */
-mcmclib_mvnorm_lpdf* mcmclib_mvnorm_lpdf_alloc(gsl_vector* mean, gsl_matrix* vcov);
+mcmclib_mvnorm_lpdf* mcmclib_mvnorm_lpdf_alloc(gsl_vector* mean, double* vcov);
 
 /** free extra data for a multivariate gaussian distribution
 @param p pointer to distrib extra data
