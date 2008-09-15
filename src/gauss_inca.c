@@ -1,5 +1,6 @@
 #include "gauss_inca.h"
 #include "vector_stats.h"
+#include "metropolis.h"
 
 /** INCA chains shared data structure allocator
 @param Sigma_zero starting covariance guess
@@ -63,32 +64,6 @@ void mcmclib_gauss_inca_free(mcmclib_gauss_inca* p) {
 		gsl_vector_free(p->old);
 		free(p);
 	}
-}
-
-/**returns 1 for accept, 0 for reject
-@param r GSL RNG
-@param old old value
-@param x vector holding current value (will be eventually updated!)
-@param logdistr ptr to log-distribution function
-@param data extra data for 'logdistr'
-*/
-int metropolis_symmetric_step(const gsl_rng* r, gsl_vector* old, gsl_vector* x, distrfun_p logdistr, void* data) {
-	double loglik_old, loglik_new, lik_ratio;
-
-	loglik_old = logdistr(data, old);
-	if(!isfinite(loglik_old))
-		return 1;
-
-	loglik_new = logdistr(data, x);
-	if(loglik_new >= loglik_old)
-		return 1;
-
-	lik_ratio = exp(loglik_new - loglik_old);
-	if(isfinite(lik_ratio) && (gsl_rng_uniform(r) <= lik_ratio))
-		return 1;
-
-	gsl_vector_memcpy(x, old);
-	return 0;
 }
 
 /*FIXME: currently just ignoring other chains*/
