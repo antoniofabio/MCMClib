@@ -61,7 +61,7 @@ int main(int argc, char** argv) {
 		mcmclib_gauss_inca_update(sampler[k], r, target_logdensity, xx[k], NULL);
 		for(int j=0; j<(d-1); j++)
 			fprintf(out[k], "%f, ", gsl_vector_get(xx[k], j));
-		fprintf(out[k], "%f", gsl_vector_get(xx[k], d-1));
+		fprintf(out[k], "%f\n", gsl_vector_get(xx[k], d-1));
 	}
 
 	for(int k=0; k<K; k++) {
