@@ -53,9 +53,11 @@ void mcmclib_gauss_inca_pool_free(mcmclib_gauss_inca_pool* p) {
 static void mcmclib_gauss_inca_pool_update_variance(mcmclib_gauss_inca_pool* p) {
 	gsl_vector* mean = p->mean_global;
 	gsl_vector** means = p->mean;
+	int d = mean->size;
 	gsl_matrix* var = p->variance_global;
 	gsl_matrix** variances = p->variance;
-	gsl_vector* tmp = gsl_vector_alloc(mean->size);
+	gsl_vector* tmpv = gsl_vector_alloc(d);
+	gsl_matrix* tmpm = gsl_matrix_alloc(d, d);
 	int* t = p->t;
 	int K = p->K;
 	int n;
@@ -63,21 +65,23 @@ static void mcmclib_gauss_inca_pool_update_variance(mcmclib_gauss_inca_pool* p) 
 	/**compute weighted average*/
 	gsl_vector_set_all(mean, 0.0);
 	for(int i=0; i<K; i++) {
-		gsl_vector_memcpy(tmp, means[i]);
-		gsl_vector_scale(tmp, t[i]);
-		gsl_vector_add(mean, tmp);
+		gsl_vector_memcpy(tmpv, means[i]);
+		gsl_vector_scale(tmpv, t[i]);
+		gsl_vector_add(mean, tmpv);
 		n += t[i];
 	}
 	gsl_vector_scale(mean, 1.0 / (double) n);
 
-	/**compute within deviance*/
-	//TODO
+	/*compute weighted variance*/
+	gsl_matrix_set_all(var, 0.0);
+	for(int i=0; i<K; i++) {
+		gsl_matrix_view colmean_view = gsl_matrix_view_array(means[i]->data, d, 1);
+		gsl_matrix* colmean = &(colmean_view.matrix);
 
-	/**compute between deviance*/
-	//TODO
-
-	/**compute global variance*/
-	//TODO
+		gsl_blas_dgemm(CblasNoTrans, CblasTrans, (double) t[i], colmean, colmean, t[i], tmpm);
+		gsl_matrix_add(var, tmpm);
+	}
+	gsl_matrix_scale(var, 1.0 / (double) n);
 }
 
 mcmclib_gauss_inca* mcmclib_gauss_inca_alloc(mcmclib_gauss_inca_pool* p) {
