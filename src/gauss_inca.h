@@ -20,6 +20,7 @@ typedef struct {
 	int* t; /**number of iterates for each chain (on which mean and variance h.b. computed*/
 	gsl_vector* mean_global;
 	gsl_matrix* variance_global;
+	int id; /**current chain id*/
 } mcmclib_gauss_inca_pool;
 
 /** INCA chains shared data structure allocator
@@ -34,14 +35,9 @@ void mcmclib_gauss_inca_pool_free(mcmclib_gauss_inca_pool* p);
 /** INter-Chain Adaptive Gaussian random walk extra data
 */
 typedef struct {
-	gsl_matrix* sigma_zero;
-	int t0;
-	gsl_vector** x_values;
-	int id;
-	gsl_vector** mean;
-	gsl_matrix** cov;
-	int t;
+	mcmclib_gauss_inca_pool* p;
 	gsl_vector* old;
+	int id;
 } mcmclib_gauss_inca;
 
 /** alloc (and init) extra INCA data

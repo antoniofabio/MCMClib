@@ -27,6 +27,7 @@ mcmclib_gauss_inca_pool* mcmclib_gauss_inca_pool_alloc(gsl_matrix* Sigma_zero, i
 	gsl_vector_set_all(ans->mean_global, 0);
 	ans->variance_global = gsl_matrix_alloc(d, d);
 	gsl_matrix_set_identity(ans->variance_global);
+	ans->id = 0;
 	return NULL;
 }
 
@@ -46,14 +47,22 @@ void mcmclib_gauss_inca_pool_free(mcmclib_gauss_inca_pool* p) {
 	}
 }
 
-/*FIXME*/
-mcmclib_gauss_inca* mcmclib_gauss_inca_alloc(mcmclib_gauss_inca_pool* pool) {
-	return NULL;
+mcmclib_gauss_inca* mcmclib_gauss_inca_alloc(mcmclib_gauss_inca_pool* p) {
+	if(p->id == p->K)
+		return NULL;
+	mcmclib_gauss_inca* ans = (mcmclib_gauss_inca*) malloc(sizeof(mcmclib_gauss_inca));
+	int d = (p->Sigma_zero)->size1;
+	ans->old = gsl_vector_alloc(d);
+	ans->id = p->id;
+	(p->id)++;
+	return ans;
 }
 
 void mcmclib_gauss_inca_free(mcmclib_gauss_inca* p) {
-	if(p)
+	if(p) {
+		gsl_vector_free(p->old);
 		free(p);
+	}
 }
 
 /*FIXME*/
