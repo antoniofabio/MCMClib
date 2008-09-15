@@ -48,6 +48,38 @@ void mcmclib_gauss_inca_pool_free(mcmclib_gauss_inca_pool* p) {
 	}
 }
 
+/** update global mean and variance infos of INCA pool data structure
+*/
+static void mcmclib_gauss_inca_pool_update_variance(mcmclib_gauss_inca_pool* p) {
+	gsl_vector* mean = p->mean_global;
+	gsl_vector** means = p->mean;
+	gsl_matrix* var = p->variance_global;
+	gsl_matrix** variances = p->variance;
+	gsl_vector* tmp = gsl_vector_alloc(mean->size);
+	int* t = p->t;
+	int K = p->K;
+	int n;
+
+	/**compute weighted average*/
+	gsl_vector_set_all(mean, 0.0);
+	for(int i=0; i<K; i++) {
+		gsl_vector_memcpy(tmp, means[i]);
+		gsl_vector_scale(tmp, t[i]);
+		gsl_vector_add(mean, tmp);
+		n += t[i];
+	}
+	gsl_vector_scale(mean, 1.0 / (double) n);
+
+	/**compute within deviance*/
+	//TODO
+
+	/**compute between deviance*/
+	//TODO
+
+	/**compute global variance*/
+	//TODO
+}
+
 mcmclib_gauss_inca* mcmclib_gauss_inca_alloc(mcmclib_gauss_inca_pool* p) {
 	if(p->id == p->K)
 		return NULL;
@@ -85,8 +117,10 @@ int mcmclib_gauss_inca_update(mcmclib_gauss_inca* e, const gsl_rng* r,
 
 	mcmclib_metropolis_symmetric_step(r, old, x, logdistr, data);
 
-	/*adapt extra parameters*/
+	/*adapt current chain extra parameters*/
 	mcmclib_covariance_update(cov, mean, t, x);
+	/*update global infos on target density geography*/
+	mcmclib_gauss_inca_pool_update_variance(e->p);
 
 	return 0;
 }
