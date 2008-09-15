@@ -65,8 +65,53 @@ void mcmclib_gauss_inca_free(mcmclib_gauss_inca* p) {
 	}
 }
 
-/*FIXME*/
+/**returns 1 for accept, 0 for reject
+@param r GSL RNG
+@param old old value
+@param x vector holding current value (will be eventually updated!)
+@param logdistr ptr to log-distribution function
+@param data extra data for 'logdistr'
+*/
+int metropolis_symmetric_step(const gsl_rng* r, gsl_vector* old, gsl_vector* x, distrfun_p logdistr, void* data) {
+	double loglik_old, loglik_new, lik_ratio;
+
+	loglik_old = logdistr(data, old);
+	if(!isfinite(loglik_old))
+		return 1;
+
+	loglik_new = logdistr(data, x);
+	if(loglik_new >= loglik_old)
+		return 1;
+
+	lik_ratio = exp(loglik_new - loglik_old);
+	if(isfinite(lik_ratio) && (gsl_rng_uniform(r) <= lik_ratio))
+		return 1;
+
+	gsl_vector_memcpy(x, old);
+	return 0;
+}
+
+/*FIXME: currently just ignoring other chains*/
 int mcmclib_gauss_inca_update(mcmclib_gauss_inca* e, const gsl_rng* r,
 	distrfun_p logdistr, gsl_vector* x, void* data) {
+
+	int d = x->size;
+	gsl_vector* old = e->old;
+	gsl_matrix* sigma_zero = e->p->Sigma_zero;
+	int id = e->id;
+	gsl_matrix* cov = (e->p->variance)[id];
+	gsl_vector* mean = (e->p->mean)[id];
+	int t0 = e->p->t0;
+	int *t = (e->p->t) + id;
+
+	gsl_vector_memcpy(old, x);
+	mcmclib_mvnorm(r, ((*t)+1) < t0 ? sigma_zero : cov, x);
+	gsl_vector_add(x, old);
+
+	metropolis_symmetric_step(r, old, x, logdistr, data);
+
+	/*adapt extra parameters*/
+	mcmclib_covariance_update(cov, mean, t, x);
+
 	return 0;
 }
