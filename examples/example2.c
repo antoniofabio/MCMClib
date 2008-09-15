@@ -1,5 +1,6 @@
 /**
 INCA example
+ Takes 5.4sec on 800Mhz AMD Linux
 */
 #include <stdio.h>
 #include <gsl/gsl_rng.h>
@@ -7,11 +8,15 @@ INCA example
 #include <gsl/gsl_matrix.h>
 #include <gauss_inca.h>
 
-#define OUTPUT_FILE_PATTERN data
+/*target space dimension*/
 #define DIM 3
+/*total number of iterations*/
 #define N 100000
+/*HCL burn in*/
 #define T0 20
+/*starting variance guess*/
 #define V0 0.1
+/*number of parallel chains to run*/
 #define K 3
 
 /*target distribution: uniform in the unit cube (side length=10)*/
@@ -56,7 +61,7 @@ int main(int argc, char** argv) {
 		fprintf(out[i], "x1, x2, x3\n");
 	}
 
-	/*main MCMC loop*/
+	/*main MCMC loop: for each time step iterate troughout the K chains*/
 	for(int i=0; i<N; i++) for(int k=0; k<K; k++) {
 		mcmclib_gauss_inca_update(sampler[k], r, target_logdensity, xx[k], NULL);
 		for(int j=0; j<(d-1); j++)
@@ -64,6 +69,7 @@ int main(int argc, char** argv) {
 		fprintf(out[k], "%f\n", gsl_vector_get(xx[k], d-1));
 	}
 
+	/*release system resources*/
 	for(int k=0; k<K; k++) {
 		fclose(out[k]);
 		mcmclib_gauss_inca_free(sampler[k]);
