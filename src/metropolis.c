@@ -1,6 +1,6 @@
 #include "metropolis.h"
 
-int metropolis_symmetric_step(const gsl_rng* r, gsl_vector* old, gsl_vector* x, distrfun_p logdistr, void* data) {
+int mcmclib_metropolis_symmetric_step(const gsl_rng* r, gsl_vector* old, gsl_vector* x, distrfun_p logdistr, void* data) {
 	double loglik_old, loglik_new, lik_ratio;
 
 	loglik_old = logdistr(data, old);

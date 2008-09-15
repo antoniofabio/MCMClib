@@ -11,6 +11,6 @@
 @param logdistr ptr to log-distribution function
 @param data extra data for 'logdistr'
 */
-int metropolis_symmetric_step(const gsl_rng* r, gsl_vector* old, gsl_vector* x, distrfun_p logdistr, void* data);
+int mcmclib_metropolis_symmetric_step(const gsl_rng* r, gsl_vector* old, gsl_vector* x, distrfun_p logdistr, void* data);
 
 #endif

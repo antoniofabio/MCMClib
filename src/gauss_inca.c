@@ -83,7 +83,7 @@ int mcmclib_gauss_inca_update(mcmclib_gauss_inca* e, const gsl_rng* r,
 	mcmclib_mvnorm(r, ((*t)+1) < t0 ? sigma_zero : cov, x);
 	gsl_vector_add(x, old);
 
-	metropolis_symmetric_step(r, old, x, logdistr, data);
+	mcmclib_metropolis_symmetric_step(r, old, x, logdistr, data);
 
 	/*adapt extra parameters*/
 	mcmclib_covariance_update(cov, mean, t, x);
