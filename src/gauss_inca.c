@@ -100,7 +100,6 @@ void mcmclib_gauss_inca_free(mcmclib_gauss_inca* p) {
 	}
 }
 
-/*FIXME: currently just ignoring other chains*/
 int mcmclib_gauss_inca_update(mcmclib_gauss_inca* e, const gsl_rng* r,
 	distrfun_p logdistr, gsl_vector* x, void* data) {
 
@@ -108,8 +107,8 @@ int mcmclib_gauss_inca_update(mcmclib_gauss_inca* e, const gsl_rng* r,
 	gsl_vector* old = e->old;
 	gsl_matrix* sigma_zero = e->p->Sigma_zero;
 	int id = e->id;
-	gsl_matrix* cov = (e->p->variance)[id];
-	gsl_vector* mean = (e->p->mean)[id];
+	gsl_matrix* cov = e->p->variance_global;
+	gsl_vector* mean = e->p->mean_global;
 	int t0 = e->p->t0;
 	int *t = (e->p->t) + id;
 
@@ -120,7 +119,7 @@ int mcmclib_gauss_inca_update(mcmclib_gauss_inca* e, const gsl_rng* r,
 	mcmclib_metropolis_symmetric_step(r, old, x, logdistr, data);
 
 	/*adapt current chain extra parameters*/
-	mcmclib_covariance_update(cov, mean, t, x);
+	mcmclib_covariance_update((e->p->variance)[id], (e->p->mean)[id], t, x);
 	/*update global infos on target density geography*/
 	mcmclib_gauss_inca_pool_update_variance(e->p);
 
