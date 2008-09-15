@@ -29,7 +29,7 @@ mcmclib_gauss_inca_pool* mcmclib_gauss_inca_pool_alloc(gsl_matrix* Sigma_zero, i
 	ans->variance_global = gsl_matrix_alloc(d, d);
 	gsl_matrix_set_identity(ans->variance_global);
 	ans->id = 0;
-	return NULL;
+	return ans;
 }
 
 void mcmclib_gauss_inca_pool_free(mcmclib_gauss_inca_pool* p) {
