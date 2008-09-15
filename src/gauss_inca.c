@@ -87,6 +87,7 @@ mcmclib_gauss_inca* mcmclib_gauss_inca_alloc(mcmclib_gauss_inca_pool* p) {
 		return NULL;
 	mcmclib_gauss_inca* ans = (mcmclib_gauss_inca*) malloc(sizeof(mcmclib_gauss_inca));
 	int d = (p->Sigma_zero)->size1;
+	ans->p = p;
 	ans->old = gsl_vector_alloc(d);
 	ans->id = p->id;
 	(p->id)++;
