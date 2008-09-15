@@ -80,6 +80,9 @@ static void mcmclib_gauss_inca_pool_update_variance(mcmclib_gauss_inca_pool* p) 
 		gsl_matrix_add(var, tmpm);
 	}
 	gsl_matrix_scale(var, 1.0 / (double) n);
+
+	gsl_vector_free(tmpv);
+	gsl_matrix_free(tmpm);
 }
 
 mcmclib_gauss_inca* mcmclib_gauss_inca_alloc(mcmclib_gauss_inca_pool* p) {
