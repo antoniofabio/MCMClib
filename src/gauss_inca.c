@@ -2,8 +2,7 @@
 #include "vector_stats.h"
 
 /*FIXME*/
-mcmclib_gauss_inca* mcmclib_gauss_inca_alloc(const gsl_matrix* sigma_zero, int t0,
-	gsl_vector** x_values, int id) {
+mcmclib_gauss_inca* mcmclib_gauss_inca_alloc(mcmclib_gauss_inca_pool* pool) {
 	return NULL;
 }
 
