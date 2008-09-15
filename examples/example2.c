@@ -38,12 +38,12 @@ int main(int argc, char** argv) {
 	mcmclib_gauss_inca_pool* pool = mcmclib_gauss_inca_pool_alloc(Sigma_zero, T0, K);
 	gsl_vector* xx[K];
 	mcmclib_gauss_inca* sampler[K];
-	for(int i=0; i<K; i++) {
-		sampler[i] = mcmclib_gauss_inca_alloc(pool);
-		xx[i] = gsl_vector_alloc(d);
+	for(int k=0; k<K; k++) {
+		sampler[k] = mcmclib_gauss_inca_alloc(pool);
+		xx[k] = gsl_vector_alloc(d);
 		/*set starting value at random*/
 		for(int j=0; j<d; j++)
-			gsl_vector_set(xx[i], j, (gsl_rng_uniform(r) * 10.0) - 5.0);
+			gsl_vector_set(xx[k], j, (gsl_rng_uniform(r) * 10.0) - 5.0);
 	}
 
 	/*open output files*/
