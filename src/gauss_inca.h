@@ -54,6 +54,9 @@ void mcmclib_gauss_inca_free(mcmclib_gauss_inca* p);
 @param logdistr pointer to a log-distribution function
 @param x current point value
 @param data extra data to be passed to the log-distribution function
+@note You're supposed to call all the chains referring to the same pool in sequence.
+Update of global mean and variance/covariance values automatically occurs upon calling
+this function on the last chain!
 */
 int mcmclib_gauss_inca_update(mcmclib_gauss_inca* extra, const gsl_rng* r,
 	distrfun_p logdistr, gsl_vector* x, void* data);

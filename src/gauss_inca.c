@@ -125,7 +125,8 @@ int mcmclib_gauss_inca_update(mcmclib_gauss_inca* e, const gsl_rng* r,
 	/*adapt current chain extra parameters*/
 	mcmclib_covariance_update((e->p->variance)[id], (e->p->mean)[id], t, x);
 	/*update global infos on target density geography*/
-	mcmclib_gauss_inca_pool_update_variance(e->p);
+	if(id == (e->p->K - 1)) /*update only after last chain step*/
+		mcmclib_gauss_inca_pool_update_variance(e->p);
 
 	return 0;
 }
