@@ -52,8 +52,12 @@ void mcmclib_covariance_update(gsl_matrix* cov, gsl_vector* mean, int* n, gsl_ve
 	gsl_matrix* colx = &(colx_view.matrix);
 
 	/*update X %*% t(X) value:*/
-	gsl_blas_dgemm(CblasNoTrans, CblasTrans, (double) (*n), colmean, colmean, (double) (*n), cov);
-	gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, colx, colx, 1.0, cov);
+	if((*n) > 0) {
+		gsl_blas_dgemm(CblasNoTrans, CblasTrans, (double) (*n), colmean, colmean, (double) (*n), cov);
+		gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, colx, colx, 1.0, cov);
+	} else {
+		gsl_matrix_set_all(cov, 0.0);
+	}
 
 	/*update mean value*/
 	gsl_vector_scale(mean, (double) (*n));
@@ -62,6 +66,8 @@ void mcmclib_covariance_update(gsl_matrix* cov, gsl_vector* mean, int* n, gsl_ve
 	gsl_vector_scale(mean, 1.0 / (double) (*n));
 
 	/*update covariance value*/
-	gsl_blas_dgemm(CblasNoTrans, CblasTrans, (double) -(*n), colmean, colmean, 1.0, cov);
-	gsl_matrix_scale(cov, 1.0 / (double) (*n));
+	if((*n) > 1) {
+		gsl_blas_dgemm(CblasNoTrans, CblasTrans, (double) -(*n), colmean, colmean, 1.0, cov);
+		gsl_matrix_scale(cov, 1.0 / (double) (*n));
+	}
 }
