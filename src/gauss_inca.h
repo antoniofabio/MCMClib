@@ -29,6 +29,8 @@ typedef struct {
 @param K number of parallel chains to account for
 */
 mcmclib_gauss_inca_pool* mcmclib_gauss_inca_pool_alloc(gsl_matrix* Sigma_zero,int t0,int K);
+/** update global mean and variance infos of INCA pool data structure */
+void mcmclib_gauss_inca_pool_update_variance(mcmclib_gauss_inca_pool* p);
 /** free INCA chains shared memory space */
 void mcmclib_gauss_inca_pool_free(mcmclib_gauss_inca_pool* p);
 

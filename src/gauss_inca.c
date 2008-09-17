@@ -48,9 +48,7 @@ void mcmclib_gauss_inca_pool_free(mcmclib_gauss_inca_pool* p) {
 	}
 }
 
-/** update global mean and variance infos of INCA pool data structure
-*/
-static void mcmclib_gauss_inca_pool_update_variance(mcmclib_gauss_inca_pool* p) {
+void mcmclib_gauss_inca_pool_update_variance(mcmclib_gauss_inca_pool* p) {
 	gsl_vector* mean = p->mean_global;
 	gsl_vector** means = p->mean;
 	int d = mean->size;
@@ -72,13 +70,22 @@ static void mcmclib_gauss_inca_pool_update_variance(mcmclib_gauss_inca_pool* p) 
 	}
 	gsl_vector_scale(mean, 1.0 / (double) n);
 
-	/**compute weighted variance*/
+	/**compute weighted sum of squares*/
+	gsl_matrix_view colmean_view;
+	gsl_matrix* colmean;
 	gsl_matrix_set_all(var, 0.0);
 	for(int i=0; i<K; i++) {
+		colmean_view = gsl_matrix_view_array(means[i]->data, d, 1);
+		colmean = &(colmean_view.matrix);
 		gsl_matrix_memcpy(tmpm, variances[i]);
-		gsl_matrix_scale(tmpm, t[i]);
+		gsl_blas_dgemm(CblasNoTrans, CblasTrans, (double) t[i], colmean, colmean, (double) t[i], tmpm);
 		gsl_matrix_add(var, tmpm);
 	}
+
+	/**compute global variance*/
+	colmean_view = gsl_matrix_view_array(mean->data, d, 1);
+	colmean = &(colmean_view.matrix);
+	gsl_blas_dgemm(CblasNoTrans, CblasTrans, (double) -(n*n), colmean, colmean, 1.0, var);
 	gsl_matrix_scale(var, 1.0 / (double) n);
 
 	gsl_vector_free(tmpv);
