@@ -85,7 +85,7 @@ void mcmclib_gauss_inca_pool_update_variance(mcmclib_gauss_inca_pool* p) {
 	/**compute global variance*/
 	colmean_view = gsl_matrix_view_array(mean->data, d, 1);
 	colmean = &(colmean_view.matrix);
-	gsl_blas_dgemm(CblasNoTrans, CblasTrans, (double) -(n*n), colmean, colmean, 1.0, var);
+	gsl_blas_dgemm(CblasNoTrans, CblasTrans, (double) -n, colmean, colmean, 1.0, var);
 	gsl_matrix_scale(var, 1.0 / (double) n);
 
 	gsl_vector_free(tmpv);
