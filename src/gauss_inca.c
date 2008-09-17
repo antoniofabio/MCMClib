@@ -58,7 +58,7 @@ void mcmclib_gauss_inca_pool_update_variance(mcmclib_gauss_inca_pool* p) {
 	gsl_matrix* tmpm = gsl_matrix_alloc(d, d);
 	int* t = p->t;
 	int K = p->K;
-	int n;
+	int n = 0;
 
 	/**compute weighted average*/
 	gsl_vector_set_all(mean, 0.0);
