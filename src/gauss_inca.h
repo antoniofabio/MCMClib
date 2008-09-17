@@ -29,6 +29,8 @@ typedef struct {
 @param K number of parallel chains to account for
 */
 mcmclib_gauss_inca_pool* mcmclib_gauss_inca_pool_alloc(gsl_matrix* Sigma_zero,int t0,int K);
+/** update global mean and variance infos of INCA pool data structure */
+void mcmclib_gauss_inca_pool_update_variance(mcmclib_gauss_inca_pool* p);
 /** free INCA chains shared memory space */
 void mcmclib_gauss_inca_pool_free(mcmclib_gauss_inca_pool* p);
 
@@ -54,6 +56,9 @@ void mcmclib_gauss_inca_free(mcmclib_gauss_inca* p);
 @param logdistr pointer to a log-distribution function
 @param x current point value
 @param data extra data to be passed to the log-distribution function
+@note You're supposed to call all the chains referring to the same pool in sequence.
+Update of global mean and variance/covariance values automatically occurs upon calling
+this function on the last chain!
 */
 int mcmclib_gauss_inca_update(mcmclib_gauss_inca* extra, const gsl_rng* r,
 	distrfun_p logdistr, gsl_vector* x, void* data);
