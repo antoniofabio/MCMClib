@@ -107,9 +107,11 @@ int main(int argc, char** argv) {
 		sampler[k] = mcmclib_gauss_inca_alloc(pool);
 		xx[k] = gsl_vector_alloc(d);
 		/*set starting values at random*/
-		for(int j=0; j<(d-1); j++)
-			gsl_vector_set(xx[k], j, gsl_rng_uniform(r));
-		gsl_vector_set(xx[k], d-1, gsl_rng_uniform(r)*60.0 - 30.0);
+		do {
+			for(int j=0; j<(d-1); j++)
+				gsl_vector_set(xx[k], j, gsl_rng_uniform(r));
+			gsl_vector_set(xx[k], d-1, gsl_rng_uniform(r)*60.0 - 30.0);
+		} while(!isfinite(target_logdensity(NULL, xx[k])));
 	}
 
 	/*open output files*/
@@ -123,6 +125,8 @@ int main(int argc, char** argv) {
 		for(int j=0; j<(d-1); j++)
 			fprintf(out[i], "%f, ", gsl_vector_get(xx[i], j));
 		fprintf(out[i], "%f\n", gsl_vector_get(xx[i], d-1));
+
+		printf("lpi(%d) = %f\n", i, target_logdensity(NULL, xx[i]));
 	}
 
 	/*main MCMC loop: for each time step iterate troughout the K chains*/
