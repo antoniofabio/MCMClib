@@ -30,6 +30,7 @@ mcmclib_gauss_inca_pool* mcmclib_gauss_inca_pool_alloc(gsl_matrix* Sigma_zero, i
 	gsl_matrix_set_identity(ans->variance_global);
 	ans->id = 0;
 	ans->sf = (2.38 * 2.38) / (double) d;
+	ans->sigma_proposal = (gsl_matrix**) malloc(K * sizeof(gsl_matrix*));
 	return ans;
 }
 
@@ -45,6 +46,7 @@ void mcmclib_gauss_inca_pool_free(mcmclib_gauss_inca_pool* p) {
 		free(p->variance);
 		free(p->mean);
 		gsl_matrix_free(p->Sigma_zero);
+		free(p->sigma_proposal);
 		free(p);
 	}
 }
@@ -89,6 +91,12 @@ void mcmclib_gauss_inca_pool_update_variance(mcmclib_gauss_inca_pool* p) {
 	gsl_blas_dgemm(CblasNoTrans, CblasTrans, (double) -n, colmean, colmean, 1.0, var);
 	gsl_matrix_scale(var, 1.0 / (double) n);
 
+	/**update proposal variances*/
+	for(int k = 0; k < K; k++) {
+		gsl_matrix_memcpy(p->sigma_proposal[k], var);
+		gsl_matrix_scale(p->sigma_proposal[k], p->sf);
+	}
+
 	gsl_vector_free(tmpv);
 	gsl_matrix_free(tmpm);
 }
@@ -103,6 +111,7 @@ mcmclib_gauss_inca* mcmclib_gauss_inca_alloc(mcmclib_gauss_inca_pool* p) {
 	ans->id = p->id;
 	(p->id)++;
 	ans->sigma = gsl_matrix_alloc(d,d);
+	p->sigma_proposal[ans->id] = ans->sigma;
 	return ans;
 }
 
@@ -136,11 +145,8 @@ int mcmclib_gauss_inca_update(mcmclib_gauss_inca* e, const gsl_rng* r,
 	/*adapt current chain extra parameters*/
 	mcmclib_covariance_update((e->p->variance)[id], (e->p->mean)[id], t, x);
 	/*update global infos on target density geography*/
-	if(id == (e->p->K - 1)) {/*update only after last chain step*/
+	if(id == (e->p->K - 1)) /*update only after last chain step*/
 		mcmclib_gauss_inca_pool_update_variance(e->p);
-		gsl_matrix_memcpy(sigma, cov);
-		gsl_matrix_scale(sigma, e->p->sf);
-	}
 
 	return 0;
 }
