@@ -8,7 +8,7 @@ int mcmclib_metropolis_symmetric_step(const gsl_rng* r, gsl_vector* old, gsl_vec
 		return 1;
 
 	loglik_new = logdistr(data, x);
-	if(loglik_new >= loglik_old)
+	if(isfinite(loglik_new) && (loglik_new >= loglik_old))
 		return 1;
 
 	lik_ratio = exp(loglik_new - loglik_old);
