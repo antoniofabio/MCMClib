@@ -18,6 +18,8 @@ typedef struct {
 	gsl_matrix* cov;
 	int t;
 	gsl_vector* old;
+	double sf;
+	gsl_matrix* sigma_prop;
 } mcmclib_gauss_am;
 
 /** alloc (and init) extra AM data
