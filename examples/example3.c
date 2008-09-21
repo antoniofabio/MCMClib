@@ -67,6 +67,8 @@ double target_logdensity(void* ignore, gsl_vector* x) {
 	double pi1 = gsl_vector_get(x, 1);
 	double pi2 = gsl_vector_get(x, 2);
 	double gamma = gsl_vector_get(x, 3);
+	if(abs(gamma) > 30.0)
+		return(log(0.0));
 	double ans = 0.0;
 	for(int i=0; i<NR; i++)
 		ans += f(gsl_vector_get(xx,i), gsl_vector_get(nn,i), eta, pi1, pi2, gamma);
