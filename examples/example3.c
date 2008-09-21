@@ -15,9 +15,9 @@ INCA example, Barretts LOH data
 /*number of parallel chains to run*/
 #define K 5
 /*HCL burn in*/
-#define T0 100
+#define T0 1000
 /*starting variance guess*/
-#define V0 0.1
+#define V0 1.0
 /*target space dimension*/
 #define DIM 4
 /*data filenamee*/
@@ -25,8 +25,8 @@ INCA example, Barretts LOH data
 /*no. of rows*/
 #define NR 40
 
-static gsl_vector* xx;
-static gsl_vector* nn;
+gsl_vector* xx;
+gsl_vector* nn;
 
 /*no. of combinations of 'n' over 'r'*/
 double choose(int n, int r){
@@ -45,14 +45,11 @@ double my_gamma(double x) {
 	if(status == GSL_SUCCESS)
 		return(result.val);
 	else
-		return(0.0);
+		return(1.0 / 0.0);
 }
 
 double f(int x, int n, double eta, double pi1, double pi2, double gamma) {
-	eta = gsl_cdf_logistic_P(eta, 1.0);
-	pi1 = gsl_cdf_logistic_P(pi1, 1.0);
-	pi2 = gsl_cdf_logistic_P(pi2, 1.0);
-	double omega2 = exp(gamma) / (2 * (1 + exp(gamma)));
+	double omega2 = exp(gamma) / (2.0 * (1.0 + exp(gamma)));
 	double a = 0.0;
 	double b = 0.0;
 	a = choose(n, x) * pow(pi1, x) * pow(1 - pi1, n - x);
@@ -68,8 +65,11 @@ double target_logdensity(void* ignore, gsl_vector* x) {
 	double pi1 = gsl_vector_get(x, 1);
 	double pi2 = gsl_vector_get(x, 2);
 	double gamma = gsl_vector_get(x, 3);
-	if(abs(gamma) > 30.0)
-		return(log(0.0));
+	if((eta < 0.0)  || (pi1 < 0.0) || (pi2 < 0.0) ||
+			(eta > 1.0) || (pi1 > 1.0) || (pi2 > 1.0) ||
+			(abs(gamma) >= 30.0)) {
+		return log(0.0);
+	}
 	double ans = 0.0;
 	for(int i=0; i<NR; i++)
 		ans += f(gsl_vector_get(xx,i), gsl_vector_get(nn,i), eta, pi1, pi2, gamma);
@@ -108,7 +108,7 @@ int main(int argc, char** argv) {
 		xx[k] = gsl_vector_alloc(d);
 		/*set starting values at random*/
 		for(int j=0; j<(d-1); j++)
-			gsl_vector_set(xx[k], j, gsl_cdf_logistic_Q(gsl_rng_uniform(r), 1.0));
+			gsl_vector_set(xx[k], j, gsl_rng_uniform(r));
 		gsl_vector_set(xx[k], d-1, gsl_rng_uniform(r)*60.0 - 30.0);
 	}
 
