@@ -120,6 +120,9 @@ int main(int argc, char** argv) {
 		out[i] = fopen(filename, "w");
 		/*print out csv header*/
 		fprintf(out[i], "eta, pi1, pi2, gamma\n");
+		for(int j=0; j<(d-1); j++)
+			fprintf(out[i], "%f, ", gsl_vector_get(xx[i], j));
+		fprintf(out[i], "%f\n", gsl_vector_get(xx[i], d-1));
 	}
 
 	/*main MCMC loop: for each time step iterate troughout the K chains*/
