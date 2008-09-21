@@ -25,9 +25,10 @@ INCA example, Barretts LOH data
 /*no. of rows*/
 #define NR 40
 
-gsl_vector* xx;
-gsl_vector* nn;
+static gsl_vector* xx;
+static gsl_vector* nn;
 
+/*no. of combinations of 'n' over 'r'*/
 double choose(int n, int r){
 	double num = 1.0;
 	double den = 1.0;
@@ -61,7 +62,7 @@ double f(int x, int n, double eta, double pi1, double pi2, double gamma) {
 	return log(ans);
 }
 
-/*target distribution: uniform in the unit cube (side length=10)*/
+/*target distribution*/
 double target_logdensity(void* ignore, gsl_vector* x) {
 	double eta = gsl_vector_get(x, 0);
 	double pi1 = gsl_vector_get(x, 1);
