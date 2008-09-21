@@ -29,6 +29,7 @@ mcmclib_gauss_inca_pool* mcmclib_gauss_inca_pool_alloc(gsl_matrix* Sigma_zero, i
 	ans->variance_global = gsl_matrix_alloc(d, d);
 	gsl_matrix_set_identity(ans->variance_global);
 	ans->id = 0;
+	ans->sf = (2.38 * 2.38) / (double) d;
 	return ans;
 }
 
@@ -101,12 +102,14 @@ mcmclib_gauss_inca* mcmclib_gauss_inca_alloc(mcmclib_gauss_inca_pool* p) {
 	ans->old = gsl_vector_alloc(d);
 	ans->id = p->id;
 	(p->id)++;
+	ans->sigma = gsl_matrix_alloc(d,d);
 	return ans;
 }
 
 void mcmclib_gauss_inca_free(mcmclib_gauss_inca* p) {
 	if(p) {
 		gsl_vector_free(p->old);
+		gsl_matrix_free(p->sigma);
 		free(p);
 	}
 }
@@ -120,11 +123,12 @@ int mcmclib_gauss_inca_update(mcmclib_gauss_inca* e, const gsl_rng* r,
 	int id = e->id;
 	gsl_matrix* cov = e->p->variance_global;
 	gsl_vector* mean = e->p->mean_global;
+	gsl_matrix* sigma = e->sigma;
 	int t0 = e->p->t0;
 	int *t = (e->p->t) + id;
 
 	gsl_vector_memcpy(old, x);
-	mcmclib_mvnorm(r, ((*t)+1) < t0 ? sigma_zero : cov, x);
+	mcmclib_mvnorm(r, ((*t)+1) < t0 ? sigma_zero : sigma, x);
 	gsl_vector_add(x, old);
 
 	mcmclib_metropolis_symmetric_step(r, old, x, logdistr, data);
@@ -132,8 +136,11 @@ int mcmclib_gauss_inca_update(mcmclib_gauss_inca* e, const gsl_rng* r,
 	/*adapt current chain extra parameters*/
 	mcmclib_covariance_update((e->p->variance)[id], (e->p->mean)[id], t, x);
 	/*update global infos on target density geography*/
-	if(id == (e->p->K - 1)) /*update only after last chain step*/
+	if(id == (e->p->K - 1)) {/*update only after last chain step*/
 		mcmclib_gauss_inca_pool_update_variance(e->p);
+		gsl_matrix_memcpy(sigma, cov);
+		gsl_matrix_scale(sigma, e->p->sf);
+	}
 
 	return 0;
 }

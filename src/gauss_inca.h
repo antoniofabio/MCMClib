@@ -21,6 +21,7 @@ typedef struct {
 	gsl_vector* mean_global;
 	gsl_matrix* variance_global;
 	int id; /**current chain id*/
+	double sf;
 } mcmclib_gauss_inca_pool;
 
 /** INCA chains shared data structure allocator
@@ -40,6 +41,7 @@ typedef struct {
 	mcmclib_gauss_inca_pool* p;
 	gsl_vector* old;
 	int id;
+	gsl_matrix* sigma;
 } mcmclib_gauss_inca;
 
 /** alloc (and init) extra INCA data
