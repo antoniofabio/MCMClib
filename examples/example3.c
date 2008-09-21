@@ -11,9 +11,9 @@ INCA example, Barretts LOH data
 #include <gauss_inca.h>
 
 /*total number of iterations*/
-#define N 100000
+#define N 50000
 /*number of parallel chains to run*/
-#define K 3
+#define K 5
 /*HCL burn in*/
 #define T0 100
 /*starting variance guess*/
@@ -38,6 +38,15 @@ double choose(int n, int r){
 	return num/den;
 }
 
+double my_gamma(double x) {
+	gsl_sf_result result;
+	int status = gsl_sf_gamma_e (x, &result);
+	if(status == GSL_SUCCESS)
+		return(result.val);
+	else
+		return(0.0);
+}
+
 double f(int x, int n, double eta, double pi1, double pi2, double gamma) {
 	eta = gsl_cdf_logistic_P(eta, 1.0);
 	pi1 = gsl_cdf_logistic_P(pi1, 1.0);
@@ -46,8 +55,8 @@ double f(int x, int n, double eta, double pi1, double pi2, double gamma) {
 	double a = 0.0;
 	double b = 0.0;
 	a = choose(n, x) * pow(pi1, x) * pow(1 - pi1, n - x);
-	b = choose(n, x) * gsl_sf_gamma(1/omega2) * gsl_sf_gamma(x + pi2 / omega2);
-	b /= gsl_sf_gamma(pi2 / omega2) * gsl_sf_gamma((1-pi2)/omega2) * gsl_sf_gamma(n-x+(1-pi2) / omega2) * gsl_sf_gamma(n + 1/omega2);
+	b = choose(n, x) * my_gamma(1/omega2) * my_gamma(x + pi2 / omega2);
+	b /= my_gamma(pi2 / omega2) * my_gamma((1-pi2)/omega2) * my_gamma(n-x+(1-pi2) / omega2) * my_gamma(n + 1/omega2);
 	double ans = eta * a + (1.0 - eta) * b;
 	return log(ans);
 }
@@ -65,6 +74,8 @@ double target_logdensity(void* ignore, gsl_vector* x) {
 }
 
 int main(int argc, char** argv) {
+	gsl_set_error_handler_off ();
+
 	/*load and setup input data*/
 	gsl_matrix* data = gsl_matrix_alloc(NR, 2);
 	FILE* fdata = fopen(DATA_FNAME, "r");
