@@ -84,6 +84,7 @@ int main(int argc, char** argv) {
 	if(!fdata)
 		return(1);
 	gsl_matrix_fscanf(fdata, data);
+	fclose(fdata);
 	gsl_vector_view cv = gsl_matrix_column(data, 0);
 	xx = &(cv.vector);
 	cv = gsl_matrix_column(data, 1);
@@ -138,6 +139,5 @@ int main(int argc, char** argv) {
 	gsl_rng_free(r);
 	gsl_matrix_free(Sigma_zero);
 
-	fclose(fdata);
 	return 0;
 }
