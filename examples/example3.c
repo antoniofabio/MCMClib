@@ -15,7 +15,7 @@ INCA example, Barretts LOH data
 /*number of parallel chains to run*/
 #define K 5
 /*HCL burn in*/
-#define T0 1000
+#define T0 100
 /*starting variance guess*/
 #define V0 1.0
 /*target space dimension*/
@@ -28,34 +28,36 @@ INCA example, Barretts LOH data
 gsl_vector* xx;
 gsl_vector* nn;
 
-/*no. of combinations of 'n' over 'r'*/
-double choose(int n, int r){
-	double num = 1.0;
-	double den = 1.0;
-	while(r-1) {
-		num *= n--;
-		den *= r--;
+/*no. of combinations of 'n' over 'r' (log)*/
+double lnchoose(int n, int r){
+	double num = 0.0;
+	double den = 0.0;
+	while(r) {
+		num += log(n--);
+		den += log(r--);
 	}
-	return num/den;
+	return num-den;
 }
 
-double my_gamma(double x) {
+double my_lngamma(double x) {
 	gsl_sf_result result;
-	int status = gsl_sf_gamma_e (x, &result);
+	int status = gsl_sf_lngamma_e (x, &result);
 	if(status == GSL_SUCCESS)
 		return(result.val);
 	else
 		return(1.0 / 0.0);
 }
 
-double f(int x, int n, double eta, double pi1, double pi2, double gamma) {
+double f(int in_x, int in_n, double eta, double pi1, double pi2, double gamma) {
 	double omega2 = exp(gamma) / (2.0 * (1.0 + exp(gamma)));
 	double a = 0.0;
 	double b = 0.0;
-	a = choose(n, x) * pow(pi1, x) * pow(1 - pi1, n - x);
-	b = choose(n, x) * my_gamma(1/omega2) * my_gamma(x + pi2 / omega2);
-	b /= my_gamma(pi2 / omega2) * my_gamma((1-pi2)/omega2) * my_gamma(n-x+(1-pi2) / omega2) * my_gamma(n + 1/omega2);
-	double ans = eta * a + (1.0 - eta) * b;
+	double x = in_x;
+	double n = in_n;
+	a = lnchoose(n, x) + x * log(pi1) + (n-x) * log(1.0 - pi1);
+	b = lnchoose(n, x) + my_lngamma(1.0 / omega2) + my_lngamma(x + pi2 / omega2);
+	b -= my_lngamma(pi2 / omega2) + my_lngamma((1.0 - pi2) / omega2) + my_lngamma(n - x + (1.0 - pi2) / omega2) + my_lngamma(n + 1.0 / omega2);
+	double ans = eta * exp(a) + (1.0 - eta) * exp(b);
 	return log(ans);
 }
 
@@ -86,10 +88,10 @@ int main(int argc, char** argv) {
 		return(1);
 	gsl_matrix_fscanf(fdata, data);
 	fclose(fdata);
-	gsl_vector_view cv = gsl_matrix_column(data, 0);
-	xx = &(cv.vector);
-	cv = gsl_matrix_column(data, 1);
-	nn = &(cv.vector);
+	gsl_vector_view xv = gsl_matrix_column(data, 0);
+	xx = &(xv.vector);
+	gsl_vector_view nv = gsl_matrix_column(data, 1);
+	nn = &(nv.vector);
 
 	int d = DIM;
 	/*set starting guess covariance matrix*/
