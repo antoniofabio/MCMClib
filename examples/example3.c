@@ -12,13 +12,13 @@ INCA example, Barretts LOH data
 #include <gauss_inca.h>
 
 /*total number of iterations*/
-#define N 10000
+#define N 50000
 /*number of parallel chains to run*/
-#define K 5
+#define K 20
 /*HCL burn in*/
-#define T0 100
+#define T0 1000
 /*starting variance guess*/
-#define V0 1.0
+#define V0 0.5
 /*target space dimension*/
 #define DIM 4
 /*data filenamee*/
