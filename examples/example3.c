@@ -7,11 +7,12 @@ INCA example, Barretts LOH data
 #include <gsl/gsl_cdf.h>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
+#include <gsl/gsl_randist.h>
 #include <gsl/gsl_sf.h>
 #include <gauss_inca.h>
 
 /*total number of iterations*/
-#define N 50000
+#define N 10000
 /*number of parallel chains to run*/
 #define K 5
 /*HCL burn in*/
@@ -25,73 +26,62 @@ INCA example, Barretts LOH data
 /*no. of rows*/
 #define NR 40
 
-gsl_vector* xx;
-gsl_vector* nn;
+gsl_matrix* LOH;
+gsl_vector* LOH_x;
+gsl_vector* LOH_n;
 
-/*no. of combinations of 'n' over 'r' (log)*/
-double lnchoose(int n, int r){
-	double num = 0.0;
-	double den = 0.0;
-	while(r) {
-		num += log(n--);
-		den += log(r--);
-	}
-	return num-den;
+static double ldbb2(int x, int size, double prob, double omega) {
+	if(omega < 1e-5)
+		return(log(gsl_ran_binomial_pdf(x, prob, size)));
+	
+	double theta = 1.0 / omega;
+	double ans = gsl_sf_lnchoose(size, x) - gsl_sf_lnbeta(theta * (1-prob), theta * prob) +
+		gsl_sf_lnbeta(size - x + theta * (1-prob), x + theta * prob);
+	return(ans);
 }
 
-double my_lngamma(double x) {
-	gsl_sf_result result;
-	int status = gsl_sf_lngamma_e (x, &result);
-	if(status == GSL_SUCCESS)
-		return(result.val);
-	else
-		return(1.0 / 0.0);
-}
-
-double f(int in_x, int in_n, double eta, double pi1, double pi2, double gamma) {
+static double my_lf(int x, int n, double eta, double pi1, double pi2, double gamma) {
 	double omega2 = exp(gamma) / (2.0 * (1.0 + exp(gamma)));
-	double a = 0.0;
-	double b = 0.0;
-	double x = in_x;
-	double n = in_n;
-	a = lnchoose(n, x) + x * log(pi1) + (n-x) * log(1.0 - pi1);
-	b = lnchoose(n, x) + my_lngamma(1.0 / omega2) + my_lngamma(x + pi2 / omega2);
-	b -= my_lngamma(pi2 / omega2) + my_lngamma((1.0 - pi2) / omega2) + my_lngamma(n - x + (1.0 - pi2) / omega2) + my_lngamma(n + 1.0 / omega2);
-	double ans = eta * exp(a) + (1.0 - eta) * exp(b);
+	double ans = eta * gsl_ran_binomial_pdf(x, pi1, n) +
+		(1.0 - eta) * exp(ldbb2(x, n, pi2, omega2));
 	return log(ans);
+}
+
+static void log_pi(double* theta, double* ans) {
+	double eta = theta[0];
+	double pi1 = theta[1];
+	double pi2 = theta[2];
+	double gamma = theta[3];
+	if((eta < 0.01)  || (pi1 < 0.01) || (pi2 < 0.01) ||
+			(eta > 0.99) || (pi1 > 0.99) || (pi2 > 0.99) ||
+			(abs(gamma) >= 30.0)) {
+		ans[0] = log(0.0);
+		return;
+	}
+	ans[0] = 0.0;
+	for(int i=0; i<NR; i++)
+		ans[0] += my_lf(gsl_matrix_get(LOH, i, 0), gsl_matrix_get(LOH, i, 1), theta[0], theta[1], theta[2], theta[3]);
 }
 
 /*target distribution*/
 double target_logdensity(void* ignore, gsl_vector* x) {
-	double eta = gsl_vector_get(x, 0);
-	double pi1 = gsl_vector_get(x, 1);
-	double pi2 = gsl_vector_get(x, 2);
-	double gamma = gsl_vector_get(x, 3);
-	if((eta < 0.0)  || (pi1 < 0.0) || (pi2 < 0.0) ||
-			(eta > 1.0) || (pi1 > 1.0) || (pi2 > 1.0) ||
-			(abs(gamma) >= 30.0)) {
-		return log(0.0);
-	}
-	double ans = 0.0;
-	for(int i=0; i<NR; i++)
-		ans += f(gsl_vector_get(xx,i), gsl_vector_get(nn,i), eta, pi1, pi2, gamma);
+	double ans;
+	log_pi(x->data, &ans);
 	return ans;
 }
 
 int main(int argc, char** argv) {
-	gsl_set_error_handler_off ();
-
 	/*load and setup input data*/
-	gsl_matrix* data = gsl_matrix_alloc(NR, 2);
+	LOH = gsl_matrix_alloc(NR, 2);
 	FILE* fdata = fopen(DATA_FNAME, "r");
 	if(!fdata)
 		return(1);
-	gsl_matrix_fscanf(fdata, data);
+	gsl_matrix_fscanf(fdata, LOH);
 	fclose(fdata);
-	gsl_vector_view xv = gsl_matrix_column(data, 0);
-	xx = &(xv.vector);
+/*	gsl_vector_view xv = gsl_matrix_column(data, 0);
+	LOH_x = &(xv.vector);
 	gsl_vector_view nv = gsl_matrix_column(data, 1);
-	nn = &(nv.vector);
+	LOH_n = &(nv.vector);*/
 
 	int d = DIM;
 	/*set starting guess covariance matrix*/
