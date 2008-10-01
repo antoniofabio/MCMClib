@@ -1,3 +1,4 @@
+/**Adaptive Gaussian Random Walk example*/
 #include <stdio.h>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_vector.h>
