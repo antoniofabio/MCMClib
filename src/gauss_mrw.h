@@ -24,8 +24,8 @@ typedef struct {
 @param data extra data to be passed to the distribution function
 @param sigma_prop gaussian proposal covariance matrix
 */
-mcmclib_gauss_mrw* mcmclib_gauss_rw_alloc(gsl_rng* r,
-	distrfun_p logdistr, void* data, gsl_vector* start_x, gsl_matrix* sigma_prop);
+mcmclib_gauss_mrw* mcmclib_gauss_mrw_alloc(gsl_rng* r,
+	distrfun_p logdistr, void* data, gsl_vector* start_x, const gsl_matrix* sigma_prop);
 /** free extra Gaussian RW data
 */
 void mcmclib_gauss_mrw_free(mcmclib_gauss_mrw* p);

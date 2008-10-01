@@ -7,7 +7,7 @@
 #include <gsl/gsl_randist.h>
 
 #include "common.h"
-#include "mvnorm.h"
+#include "gauss_mrw.h"
 
 /** Adaptive Metropolis Gaussian random walk extra data
 */
@@ -18,14 +18,15 @@ typedef struct {
 	void* logdistr_data;
 	gsl_vector* current_x;
 	gsl_vector* old;
+
 	/**AM specific fields*/
+	mcmclib_gauss_mrw* mrw;
 	gsl_matrix* sigma_zero;
 	int t0;
 	gsl_vector* mean;
 	gsl_matrix* cov;
 	int t;
 	double sf;
-	gsl_matrix* sigma_prop;
 } mcmclib_gauss_am;
 
 /** alloc (and init) extra AM data

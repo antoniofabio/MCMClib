@@ -4,7 +4,7 @@
 #include "mvnorm.h"
 
 mcmclib_gauss_mrw* mcmclib_gauss_mrw_alloc(gsl_rng* r,
-	distrfun_p logdistr, void* logdistr_data, gsl_vector* start_x, gsl_matrix* sigma_prop) {
+	distrfun_p logdistr, void* logdistr_data, gsl_vector* start_x, const gsl_matrix* sigma_prop) {
 	int dim = start_x->size;
 	mcmclib_gauss_mrw* ans = (mcmclib_gauss_mrw*) malloc(sizeof(mcmclib_gauss_mrw));
 	ans->r = r;
@@ -18,7 +18,7 @@ mcmclib_gauss_mrw* mcmclib_gauss_mrw_alloc(gsl_rng* r,
 	return ans;
 }
 
-void mcmclib_gauss_rw_free(mcmclib_gauss_mrw* p) {
+void mcmclib_gauss_mrw_free(mcmclib_gauss_mrw* p) {
 	gsl_matrix_free(p->sigma_prop);
 	gsl_vector_free(p->current_x);
 	gsl_vector_free(p->old);
@@ -28,6 +28,7 @@ void mcmclib_gauss_rw_free(mcmclib_gauss_mrw* p) {
 int mcmclib_gauss_mrw_update(mcmclib_gauss_mrw* p) {
 	gsl_vector_memcpy(p->old, p->current_x);
 	mcmclib_mvnorm(p->r, p->sigma_prop, p->current_x);
+	gsl_vector_add(p->current_x, p->old);
 	int ans = mcmclib_metropolis_symmetric_step(p->r,
 		p->old, p->current_x, p->logdistr, p->logdistr_data);
 	return ans;
