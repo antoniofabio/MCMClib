@@ -69,7 +69,7 @@ double mcmclib_mvnorm_lpdf_compute(void* in_p, gsl_vector* x) {
 	ans += log(2.0 * M_PI) * ((double) d);
 	for(int i=0; i<d; i++)
 		ans += log(gsl_matrix_get(p->rooti, i, i)) * 2.0;
-	ans *= -5.0;
+	ans *= -0.5;
 
 	return ans;
 }
