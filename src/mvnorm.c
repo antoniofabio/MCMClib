@@ -1,7 +1,6 @@
 #include <math.h>
+#include <gsl/gsl_math.h>
 #include "mvnorm.h"
-
-#define PI 3.14159265
 
 void mcmclib_mvnorm(const gsl_rng* r,
 	const gsl_matrix* sigma,
@@ -67,7 +66,7 @@ double mcmclib_mvnorm_lpdf_compute(void* in_p, gsl_vector* x) {
 		-0.5 * (mahaldist + log(2*pi)*d + logdet) */
 	double ans = 0.0;
 	gsl_blas_ddot(p->mahal, x_mu, &ans);
-	ans += log(2.0 * PI) * ((double) d);
+	ans += log(2.0 * M_PI) * ((double) d);
 	for(int i=0; i<d; i++)
 		ans += log(gsl_matrix_get(p->rooti, i, i)) * 2.0;
 	ans *= -5.0;
