@@ -30,7 +30,7 @@ mcmclib_gauss_inca_pool* mcmclib_gauss_inca_pool_alloc(gsl_matrix* Sigma_zero, i
 	gsl_matrix_set_identity(ans->variance_global);
 	ans->id = 0;
 	ans->sf = (2.38 * 2.38) / (double) d;
-	ans->sigma_proposal = (gsl_matrix**) malloc(K * sizeof(gsl_matrix*));
+	ans->sigma_proposal = gsl_matrix_alloc(d, d);
 	return ans;
 }
 
@@ -46,7 +46,7 @@ void mcmclib_gauss_inca_pool_free(mcmclib_gauss_inca_pool* p) {
 		free(p->variance);
 		free(p->mean);
 		gsl_matrix_free(p->Sigma_zero);
-		free(p->sigma_proposal);
+		gsl_matrix_free(p->sigma_proposal);
 		free(p);
 	}
 }
@@ -91,11 +91,9 @@ void mcmclib_gauss_inca_pool_update_variance(mcmclib_gauss_inca_pool* p) {
 	gsl_blas_dgemm(CblasNoTrans, CblasTrans, (double) -n, colmean, colmean, 1.0, var);
 	gsl_matrix_scale(var, 1.0 / (double) n);
 
-	/**update proposal variances*/
-	for(int k = 0; k < K; k++) {
-		gsl_matrix_memcpy(p->sigma_proposal[k], var);
-		gsl_matrix_scale(p->sigma_proposal[k], p->sf);
-	}
+	/**update proposal variance*/
+	gsl_matrix_memcpy(p->sigma_proposal, var);
+	gsl_matrix_scale(p->sigma_proposal, p->sf);
 
 	gsl_vector_free(tmpv);
 	gsl_matrix_free(tmpm);
@@ -110,15 +108,12 @@ mcmclib_gauss_inca* mcmclib_gauss_inca_alloc(mcmclib_gauss_inca_pool* p) {
 	ans->old = gsl_vector_alloc(d);
 	ans->id = p->id;
 	(p->id)++;
-	ans->sigma = gsl_matrix_alloc(d,d);
-	p->sigma_proposal[ans->id] = ans->sigma;
 	return ans;
 }
 
 void mcmclib_gauss_inca_free(mcmclib_gauss_inca* p) {
 	if(p) {
 		gsl_vector_free(p->old);
-		gsl_matrix_free(p->sigma);
 		free(p);
 	}
 }
@@ -132,7 +127,7 @@ int mcmclib_gauss_inca_update(mcmclib_gauss_inca* e, const gsl_rng* r,
 	int id = e->id;
 	gsl_matrix* cov = e->p->variance_global;
 	gsl_vector* mean = e->p->mean_global;
-	gsl_matrix* sigma = e->sigma;
+	gsl_matrix* sigma = e->p->sigma_proposal;
 	int t0 = e->p->t0;
 	int *t = (e->p->t) + id;
 
