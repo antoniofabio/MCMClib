@@ -27,15 +27,17 @@ int main(int argc, char** argv) {
 	gsl_matrix* Sigma_zero = gsl_matrix_alloc(d, d);
 	gsl_matrix_set_identity(Sigma_zero);
 	gsl_matrix_scale(Sigma_zero, V0);
-	
-	/*alloc a new adaptive sampler*/
-	mcmclib_gauss_am* sampler = mcmclib_gauss_am_alloc(Sigma_zero, T0);
+
 	/*alloc a new RNG*/
 	gsl_rng *r = gsl_rng_alloc(gsl_rng_default);
-	/*alloc current chain value space*/
-	gsl_vector* x = gsl_vector_alloc(d);
-	/*set starting value*/
-	gsl_vector_set_all(x, 0.5);
+	/*starting chain value*/
+	gsl_vector* start_x = gsl_vector_alloc(d);
+	gsl_vector_set_all(start_x, 0.5);
+
+	/*alloc a new adaptive sampler*/
+	mcmclib_gauss_am* sampler = mcmclib_gauss_am_alloc(r,
+		target_logdensity, NULL, start_x, Sigma_zero, T0);
+	gsl_vector_free(start_x);
 
 	/*open output file*/
 	FILE* out = fopen(OUTPUT_FILE, "w");
@@ -44,10 +46,10 @@ int main(int argc, char** argv) {
 
 	/*main MCMC loop*/
 	for(int i=0; i<N; i++) {
-		mcmclib_gauss_am_update(sampler, r, target_logdensity, x, NULL);
+		mcmclib_gauss_am_update(sampler);
 		for(int j=0; j<(d-1); j++)
-			fprintf(out, "%f, ", gsl_vector_get(x, j));
-		fprintf(out, "%f\n", gsl_vector_get(x, d-1));
+			fprintf(out, "%f, ", gsl_vector_get(sampler->current_x, j));
+		fprintf(out, "%f\n", gsl_vector_get(sampler->current_x, d-1));
 	}
 
 	fclose(out);
