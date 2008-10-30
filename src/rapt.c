@@ -43,5 +43,10 @@ void mcmclib_rapt_free(mcmclib_rapt* p) {
 
 int mcmclib_rapt_update(mcmclib_rapt* p) {
   /*TODO*/
+
+  /*step 1: regional metropolis*/
+  /*step 2: update means and variances*/
+  /*step 3: update proposal covariance matrices*/
+
   return 1;
 }
