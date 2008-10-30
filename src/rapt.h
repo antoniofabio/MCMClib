@@ -16,6 +16,7 @@ typedef struct {
   gsl_vector* old;
   
   /**rapt specific fields*/
+  int t0; /*burn-in length*/
   gsl_matrix* sigma_whole; /*global proposal covariance matrix*/
   int K; /*number of regions*/
   gsl_matrix** sigma_local; /*array of local proposal covariance matrices*/
@@ -34,8 +35,9 @@ typedef struct {
 /** alloc (and init) extra Gaussian RW data
 @param r RNG state
 @param logdistr pointer to a log-likelihood function
-@param data extra data to be passed to the distribution function
+@param logdistr_data extra data to be passed to the distribution function
 @param x current chain value
+@param t0 burn-in length before starting adaptation
 @param sigma_whole global proposal covariance matrix
 @param K number of regions
 @param sigma_local array of local proposal covariance matrices
@@ -44,8 +46,9 @@ typedef struct {
 */
 mcmclib_rapt* mcmclib_rapt_alloc(
 				 gsl_rng* r,
-				 distrfun_p logdistr, void* data,
+				 distrfun_p logdistr, void* logdistr_data,
 				 gsl_vector* x,
+				 int t0,
 				 const gsl_matrix* sigma_whole,
 				 int K,
 				 gsl_matrix** sigma_local,

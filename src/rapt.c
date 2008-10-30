@@ -7,6 +7,7 @@ mcmclib_rapt* mcmclib_rapt_alloc(
 				 gsl_rng* r,
 				 distrfun_p logdistr, void* logdistr_data,
 				 gsl_vector* x,
+				 int t0,
 				 const gsl_matrix* sigma_whole,
 				 int K,
 				 gsl_matrix** sigma_local,
@@ -20,6 +21,7 @@ mcmclib_rapt* mcmclib_rapt_alloc(
   ans->current_x = x;
   ans->old = gsl_vector_alloc(dim);
 
+  ans->t0 = t0;
   ans->sigma_whole = gsl_matrix_alloc(dim, dim);
   gsl_matrix_memcpy(ans->sigma_whole, sigma_whole);
   ans->K = K;
