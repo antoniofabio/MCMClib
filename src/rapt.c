@@ -90,11 +90,25 @@ static int sample(gsl_rng* r, gsl_vector* probs) {
   return(K-1);
 }
 
+/*parametrized log-density of the (mixture) proposal function.
+  To be used for computing M-H ratio correctly when doing the metropolis step
+ */
+static double q(void* data, gsl_vector* x, gsl_vector* y) {
+  mcmclib_rapt* p = (mcmclib_rapt*) data;
+  int region_x = p->which_region(p->which_region_data, x);
+  mcmclib_mvnorm_lpdf* distr_obj =
+    mcmclib_mvnorm_lpdf_alloc(x, (p->sigma_local[region_x])->data);
+  double ans = mcmclib_mvnorm_lpdf_compute(distr_obj, y);
+  mcmclib_mvnorm_lpdf_free(distr_obj);
+  return ans;
+}
+
 /*TODO*/
 int mcmclib_rapt_update(mcmclib_rapt* p) {
   gsl_rng* r = p->r;
   int *t = &(p->t);
   int t0 = p->t0;
+  gsl_vector* old = p->old;
   gsl_vector* x = p->current_x;
   distrfun_p logdistr = p->logdistr;
   void* logdistr_data = p->logdistr_data;
@@ -104,12 +118,13 @@ int mcmclib_rapt_update(mcmclib_rapt* p) {
   gsl_matrix* sigma_whole = p->sigma_whole;
 
   /*step 1: update current state*/
-  gsl_vector_memcpy(p->old, x); /*save old state*/
+  gsl_vector_memcpy(old, x); /*save old state*/
   int which_proposal = sample(r, lambda); /*sample an integer between 0 and K, with given probabilities*/
   mcmclib_mvnorm(r,
 		 (which_proposal < K) ? sigma_local[which_proposal] : sigma_whole,
 		 x);
-  /*TODO: compute (correctly...) Metropolis ratio*/
+
+  mcmclib_metropolis_generic_step(r, old, x, logdistr, logdistr_data, q, p);
 
   /*step 2: update means and variances*/
   /*step 3: update proposal covariance matrices*/
