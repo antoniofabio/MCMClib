@@ -24,6 +24,7 @@ typedef struct {
   void* which_region_data; /*ptr to extra 'which_region' data*/
 
   /*internal data*/
+  int t; /*number of iterations done so far*/
   gsl_vector** means; /*array of regions means*/
   gsl_matrix** variances; /*array of regions variances*/
   gsl_matrix* whole_variance; /*whole variance*/

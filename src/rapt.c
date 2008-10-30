@@ -34,6 +34,7 @@ mcmclib_rapt* mcmclib_rapt_alloc(
   ans->which_region_data = which_region_data;
 
   /*internal data alloc*/
+  ans->t = 0;
   ans->whole_variance = gsl_matrix_alloc(dim, dim);
   ans->means = (gsl_vector**) malloc(K * sizeof(gsl_vector*));
   ans->variances = (gsl_matrix**) malloc(K * sizeof(gsl_matrix*));
@@ -75,6 +76,7 @@ void mcmclib_rapt_free(mcmclib_rapt* p) {
 
 int mcmclib_rapt_update(mcmclib_rapt* p) {
   /*TODO*/
+
 
   /*step 1: regional metropolis*/
   /*step 2: update means and variances*/
