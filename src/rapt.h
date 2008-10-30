@@ -22,6 +22,7 @@ typedef struct {
   gsl_matrix** sigma_local; /*array of local proposal covariance matrices*/
   region_fun_t which_region; /*boundary computing function*/
   void* which_region_data; /*ptr to extra 'which_region' data*/
+  gsl_vector* lambda; /*K+1 weights for local and global proposals*/
 
   /*internal data*/
   int t; /*number of iterations done so far*/
