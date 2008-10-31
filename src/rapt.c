@@ -176,7 +176,10 @@ int mcmclib_rapt_update(mcmclib_rapt* p) {
 		     gsl_matrix_get(jd, k, j) / sumjd);
   }
 
-  /*update proposal covariance matrices*/
+  /*update local covariance matrices*/
+  gsl_matrix_memcpy(sigma_local[which_region_x], variances[which_region_x]);
+  gsl_matrix_scale(sigma_local[which_region_x], 2.38 * 2.38 / ((double) x->size));
+  /*update global covariance matrix*/
   /*TODO*/
 
   return 1;
