@@ -31,7 +31,7 @@ typedef struct {
   gsl_matrix* whole_variance; /*whole variance*/
   gsl_vector* n; /*number of visits in each region*/
   gsl_matrix* visits; /*number of visits to each region, from each proposal*/
-  gsl_vector* jd; /*vector of jumping distances -within- each region, from each proposal*/
+  gsl_matrix* jd; /*matrix of jumping distances -within- each region, from each proposal*/
 } mcmclib_rapt;
 
 /** alloc (and init) extra Gaussian RW data
