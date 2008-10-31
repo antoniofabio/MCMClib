@@ -96,7 +96,7 @@ static int sample(gsl_rng* r, gsl_vector* probs) {
  */
 static double q(void* data, gsl_vector* x, gsl_vector* y) {
   mcmclib_rapt* p = (mcmclib_rapt*) data;
-  int region_x = p->which_region(p->which_region_data, x);
+  int region_x = p->which_region(x, p->which_region_data);
   mcmclib_mvnorm_lpdf* distr_obj =
     mcmclib_mvnorm_lpdf_alloc(x, (p->sigma_local[region_x])->data);
   double ans = mcmclib_mvnorm_lpdf_compute(distr_obj, y);
