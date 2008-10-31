@@ -27,7 +27,8 @@ typedef struct {
   int t; /*number of iterations done so far*/
   gsl_vector** means; /*array of regions means*/
   gsl_matrix** variances; /*array of regions variances*/
-  gsl_matrix* whole_variance; /*whole variance*/
+  gsl_vector* global_mean;
+  gsl_matrix* global_variance;
   gsl_vector* n; /*number of visits in each region*/
   gsl_matrix* visits; /*number of visits to each region, from each proposal*/
   gsl_matrix* jd; /*matrix of jumping distances -within- each region, from each proposal*/
