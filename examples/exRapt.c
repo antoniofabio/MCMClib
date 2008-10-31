@@ -14,7 +14,7 @@
 #define V0 1.0
 
 /*state space dimension*/
-#define DIM 2
+#define DIM 3
 
 /*target distribution: uniform in the unit cube*/
 double target_logdensity(void* ignore, gsl_vector* x) {
