@@ -39,7 +39,7 @@ int mcmclib_metropolis_generic_step(const gsl_rng* r, gsl_vector* old,
     return 0;
   }
 
-  mh_ratio = q(q_data, x, old) - q_old_new + loglik_new + loglik_old;
+  mh_ratio = q(q_data, x, old) - q_old_new + loglik_new - loglik_old;
   if(mh_ratio > 0)
     return 1;
 
