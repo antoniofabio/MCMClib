@@ -10,8 +10,7 @@ mcmclib_gauss_mrw* mcmclib_gauss_mrw_alloc(gsl_rng* r,
 	ans->r = r;
 	ans->logdistr = logdistr;
 	ans->logdistr_data = logdistr_data;
-	ans->current_x = gsl_vector_alloc(dim);
-	gsl_vector_memcpy(ans->current_x, start_x);
+	ans->current_x = start_x;
 	ans->old = gsl_vector_alloc(dim);
 	ans->sigma_prop = gsl_matrix_alloc(dim, dim);
 	gsl_matrix_memcpy(ans->sigma_prop, sigma_prop);
@@ -20,7 +19,6 @@ mcmclib_gauss_mrw* mcmclib_gauss_mrw_alloc(gsl_rng* r,
 
 void mcmclib_gauss_mrw_free(mcmclib_gauss_mrw* p) {
 	gsl_matrix_free(p->sigma_prop);
-	gsl_vector_free(p->current_x);
 	gsl_vector_free(p->old);
 	free(p);
 }
