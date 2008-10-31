@@ -93,7 +93,8 @@ static int sample(gsl_rng* r, gsl_vector* probs) {
   double who = gsl_rng_uniform(r);
   for(int which=0; which<K; which++) {
     cum_sum += gsl_vector_get(probs, which);
-    if(who > cum_sum)
+    if((who > cum_sum) &&
+       (who <= (cum_sum + gsl_vector_get(probs, which+1))))
       return(which);
   }
   return(K-1);
