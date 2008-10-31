@@ -54,12 +54,16 @@ mcmclib_rapt* mcmclib_rapt_alloc(
   gsl_vector_set_all(ans->n, 0.0);
   ans->lambda = gsl_matrix_alloc(K, K+1);
   gsl_matrix_set_all(ans->lambda, 1.0 / (double) (K+1.0));
+  ans->Sigma_eps = gsl_matrix_alloc(dim, dim);
+  gsl_matrix_set_identity(ans->Sigma_eps);
+  gsl_matrix_scale(ans->Sigma_eps, 0.001);
 
   return ans;
 }
 
 void mcmclib_rapt_free(mcmclib_rapt* p) {
   /*internal data free*/
+  gsl_matrix_free(p->Sigma_eps);
   gsl_matrix_free(p->lambda);
   gsl_matrix_free(p->visits);
   gsl_matrix_free(p->jd);
@@ -167,27 +171,32 @@ int mcmclib_rapt_update(mcmclib_rapt* p) {
 		    (newvisits - 1) + newjd) / newvisits);
   }
 
-  /*if jd changed, update lambda weights*/
-  int all_visited = 1;
-  for(int j=0; j<=K; j++)
-    if(gsl_matrix_get(visits, k, j)==0) {
-      all_visited = 0;
-      break;
+  /*adaptation code*/
+  if((*t) > t0) {
+    /*if jd changed, update lambda weights*/
+    int all_visited = 1;
+    for(int j=0; j<=K; j++)
+      if(gsl_matrix_get(visits, k, j)==0) {
+	all_visited = 0;
+	break;
+      }
+    if((which_region_old == which_region_x) && all_visited) {
+      double sumjd = 0.0;
+      for(int j=0; j<=K; j++)
+	sumjd += gsl_matrix_get(jd, k, j);
+      for(int j=0; j<=K; j++)
+	gsl_matrix_set(lambda, k, j,
+		       gsl_matrix_get(jd, k, j) / sumjd);
     }
-  if((which_region_old == which_region_x) && all_visited) {
-    double sumjd = 0.0;
-    for(int j=0; j<=K; j++)
-      sumjd += gsl_matrix_get(jd, k, j);
-    for(int j=0; j<=K; j++)
-      gsl_matrix_set(lambda, k, j,
-		     gsl_matrix_get(jd, k, j) / sumjd);
-  }
 
-  /*update local and global proposals covariance matrices*/
-  gsl_matrix_memcpy(sigma_local[which_region_x], variances[which_region_x]);
-  gsl_matrix_scale(sigma_local[which_region_x], 2.38 * 2.38 / ((double) x->size));
-  gsl_matrix_memcpy(sigma_whole, p->global_variance);
-  gsl_matrix_scale(sigma_whole, 2.38 * 2.38 / ((double) x->size));
+    /*update local and global proposals covariance matrices*/
+    gsl_matrix_memcpy(sigma_local[which_region_x], variances[which_region_x]);
+    gsl_matrix_add(sigma_local[which_region_x], p->Sigma_eps);
+    gsl_matrix_scale(sigma_local[which_region_x], 2.38 * 2.38 / ((double) x->size));
+    gsl_matrix_memcpy(sigma_whole, p->global_variance);
+    gsl_matrix_add(sigma_whole, p->Sigma_eps);
+    gsl_matrix_scale(sigma_whole, 2.38 * 2.38 / ((double) x->size));
+  }
 
   return 1;
 }
