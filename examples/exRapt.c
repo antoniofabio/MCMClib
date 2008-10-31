@@ -11,7 +11,7 @@
 /*burn in length*/
 #define T0 200
 /*initial covariance guess*/
-#define V0 1.0
+#define V0 0.1
 
 /*state space dimension*/
 #define DIM 3
@@ -63,11 +63,15 @@ int main(int argc, char** argv) {
   /*open output file*/
   FILE* out = fopen(OUTPUT_FILE, "w");
   /*print out csv header*/
-  fprintf(out, "x1, x2, x3\n");
+  for(int j=0; j<(d-1); j++)
+    fprintf(out, "x%d, ", j);
+  fprintf(out, "x%d\n", d-1);
   
   /*main MCMC loop*/
   for(int i=0; i<N; i++) {
     mcmclib_rapt_update(sampler);
+    if((i % 10) == 0)
+      mcmclib_rapt_update_lambda(sampler);
     for(int j=0; j<(d-1); j++)
       fprintf(out, "%f, ", gsl_vector_get(x, j));
     fprintf(out, "%f\n", gsl_vector_get(x, d-1));
