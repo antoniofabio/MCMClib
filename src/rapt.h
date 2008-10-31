@@ -22,7 +22,6 @@ typedef struct {
   gsl_matrix** sigma_local; /*array of local proposal covariance matrices*/
   region_fun_t which_region; /*boundary computing function*/
   void* which_region_data; /*ptr to extra 'which_region' data*/
-  gsl_vector* lambda; /*K+1 weights for local and global proposals*/
 
   /*internal data*/
   int t; /*number of iterations done so far*/
@@ -32,6 +31,8 @@ typedef struct {
   gsl_vector* n; /*number of visits in each region*/
   gsl_matrix* visits; /*number of visits to each region, from each proposal*/
   gsl_matrix* jd; /*matrix of jumping distances -within- each region, from each proposal*/
+  gsl_matrix* lambda; /*K+1 weights for local and global proposals, in each region*/
+
 } mcmclib_rapt;
 
 /** alloc (and init) extra Gaussian RW data

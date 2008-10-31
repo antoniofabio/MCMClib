@@ -49,15 +49,15 @@ mcmclib_rapt* mcmclib_rapt_alloc(
   gsl_matrix_set_all(ans->jd, 0.0);
   ans->n = gsl_vector_alloc(K);
   gsl_vector_set_all(ans->n, 0.0);
-  ans->lambda = gsl_vector_alloc(K+1);
-  gsl_vector_set_all(ans->lambda, 1.0 / (double) (K+1.0));
+  ans->lambda = gsl_matrix_alloc(K, K+1);
+  gsl_matrix_set_all(ans->lambda, 1.0 / (double) (K+1.0));
 
   return ans;
 }
 
 void mcmclib_rapt_free(mcmclib_rapt* p) {
   /*internal data free*/
-  gsl_vector_free(p->lambda);
+  gsl_matrix_free(p->lambda);
   gsl_matrix_free(p->visits);
   gsl_matrix_free(p->jd);
   gsl_vector_free(p->n);
@@ -113,7 +113,7 @@ int mcmclib_rapt_update(mcmclib_rapt* p) {
   gsl_vector* x = p->current_x;
   distrfun_p logdistr = p->logdistr;
   void* logdistr_data = p->logdistr_data;
-  gsl_vector* lambda = p->lambda;
+  gsl_matrix* lambda = p->lambda;
   int K = p->K;
   gsl_matrix** sigma_local = p->sigma_local;
   gsl_matrix* sigma_whole = p->sigma_whole;
@@ -127,26 +127,57 @@ int mcmclib_rapt_update(mcmclib_rapt* p) {
 
   /*step 1: update current state*/
   gsl_vector_memcpy(old, x); /*save old state*/
-  int which_proposal = sample(r, lambda); /*sample an integer between 0 and K, with given probabilities*/
+  int which_region_old = which_region(old, which_region_data);
+  gsl_vector_view lambda_vw = gsl_matrix_row(lambda, which_region_old);
+  gsl_vector* lambda_p = &(lambda_vw.vector);
+
+  int which_proposal = sample(r, lambda_p); /*sample an integer between 0 and K, with given probabilities*/
   mcmclib_mvnorm(r,
 		 (which_proposal < K) ? sigma_local[which_proposal] : sigma_whole,
 		 x);
   int accepted = mcmclib_metropolis_generic_step(r, old, x, logdistr, logdistr_data, q, p);
+  int which_region_x = accepted ? which_region(x, which_region_data) : which_region_old;
+  int k = which_region_x;
 
-  /*update visits counts and jumping distances*/
-  int which_region_x = which_region(x, which_region_data);
-  int which_region_old = accepted ? which_region(old, which_region_data) : which_region_x;
+  /*step 2: update means and variances*/
+  int fake_n = gsl_vector_get(n, k);
+  mcmclib_covariance_update(variances[k], means[k], &fake_n, x);
+
+  /*update visits counts*/
   gsl_vector_set(n, which_region_x, gsl_vector_get(n, which_region_x) + 1);
   gsl_matrix_set(visits, which_region_x, which_proposal,
 		 gsl_matrix_get(visits, which_region_x, which_proposal) + 1);
 
-  /*step 2: update means and variances*/
-  int k = which_region_x;
-  int fake_n = gsl_vector_get(n, k);
-  mcmclib_covariance_update(variances[k], means[k], &fake_n, x);
+  /*if newreg == oldreg, update jumping distances*/
+  if(which_region_old == which_region_x) {
+    gsl_vector_sub(old, x);
+    double newjd = 0.0;
+    for(int i=0; i< x->size; i++)
+      newjd += (gsl_vector_get(old, i) * gsl_vector_get(old, i));
+    double newvisits = gsl_matrix_get(visits, k, which_proposal);
+    gsl_matrix_set(jd, k, which_proposal,
+		   (gsl_matrix_get(jd, k, which_proposal) *
+		    (newvisits - 1) + newjd) / newvisits);
+  }
 
-  /*step 3: update proposal covariance matrices*/
-  /*step 4: update lambda weights*/
+  /*if jd changed, update lambda weights*/
+  int all_visited = 1;
+  for(int j=0; j<=K; j++)
+    if(gsl_matrix_get(visits, k, j)==0) {
+      all_visited = 0;
+      break;
+    }
+  if((which_region_old == which_region_x) && all_visited) {
+    double sumjd = 0.0;
+    for(int j=0; j<=K; j++)
+      sumjd += gsl_matrix_get(jd, k, j);
+    for(int j=0; j<=K; j++)
+      gsl_matrix_set(lambda, k, j,
+		     gsl_matrix_get(jd, k, j) / sumjd);
+  }
+
+  /*update proposal covariance matrices*/
+  /*TODO*/
 
   return 1;
 }
