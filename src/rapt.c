@@ -112,6 +112,26 @@ static double q(void* data, gsl_vector* x, gsl_vector* y) {
   return ans;
 }
 
+void mcmclib_rapt_update_lambda(mcmclib_rapt* p) {
+  if(p->t <= p->t0)
+    return;
+
+  for(int k=0; k< p->K; k++) { /*for each region*/
+    gsl_vector_view vrv = gsl_matrix_row(p->visits, k);
+    gsl_vector* visits_k = &(vrv.vector);
+    if(!gsl_vector_ispos(visits_k))
+      continue;
+
+    double beta = gsl_matrix_get(p->lambda, k, p->K);
+    double sumjd = 0.0;
+    for(int j=0; j< p->K; j++) /*get 'total' jumping distance*/
+      sumjd += gsl_matrix_get(p->jd, k, j);
+    for(int j=0; j< p->K; j++) /*for each proposal*/
+      gsl_matrix_set(p->lambda, k, j,
+		     (gsl_matrix_get(p->jd, k, j) / sumjd) * (1.0 - beta));
+  }
+}
+
 int mcmclib_rapt_update(mcmclib_rapt* p) {
   gsl_rng* r = p->r;
   int *t = &(p->t);
@@ -173,22 +193,6 @@ int mcmclib_rapt_update(mcmclib_rapt* p) {
 
   /*adaptation code*/
   if((*t) > t0) {
-    /*if jd changed, update lambda weights*/
-    int all_visited = 1;
-    for(int j=0; j<=K; j++)
-      if(gsl_matrix_get(visits, k, j)==0) {
-	all_visited = 0;
-	break;
-      }
-    if((which_region_old == which_region_x) && all_visited) {
-      double sumjd = 0.0;
-      for(int j=0; j<=K; j++)
-	sumjd += gsl_matrix_get(jd, k, j);
-      for(int j=0; j<=K; j++)
-	gsl_matrix_set(lambda, k, j,
-		       gsl_matrix_get(jd, k, j) / sumjd);
-    }
-
     /*update local and global proposals covariance matrices*/
     gsl_matrix_memcpy(sigma_local[which_region_x], variances[which_region_x]);
     gsl_matrix_add(sigma_local[which_region_x], p->Sigma_eps);
