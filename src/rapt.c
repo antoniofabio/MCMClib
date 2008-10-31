@@ -36,13 +36,16 @@ mcmclib_rapt* mcmclib_rapt_alloc(
 
   /*internal data alloc*/
   ans->t = 0;
-  ans->whole_variance = gsl_matrix_alloc(dim, dim);
   ans->means = (gsl_vector**) malloc(K * sizeof(gsl_vector*));
   ans->variances = (gsl_matrix**) malloc(K * sizeof(gsl_matrix*));
   for(int k=0; k<K; k++) {
     ans->means[k] = gsl_vector_alloc(dim);
     ans->variances[k] = gsl_matrix_alloc(dim, dim);
   }
+  ans->global_mean = gsl_vector_alloc(dim);
+  gsl_vector_set_all(ans->global_mean, 0.0);
+  ans->global_variance = gsl_matrix_alloc(dim, dim);
+  gsl_matrix_set_all(ans->global_variance, 0.0);
   ans->visits = gsl_matrix_alloc(K, K+1);
   gsl_matrix_set_all(ans->visits, 0.0);
   ans->jd = gsl_matrix_alloc(K, K+1);
@@ -61,11 +64,12 @@ void mcmclib_rapt_free(mcmclib_rapt* p) {
   gsl_matrix_free(p->visits);
   gsl_matrix_free(p->jd);
   gsl_vector_free(p->n);
-  gsl_matrix_free(p->whole_variance);
   for(int k=0; k< p->K; k++) {
     gsl_vector_free(p->means[k]);
     gsl_matrix_free(p->variances[k]);
   }
+  gsl_vector_free(p->global_mean);
+  gsl_matrix_free(p->global_variance);
   free(p->means);
   free(p->variances);
 
@@ -96,7 +100,7 @@ static int sample(gsl_rng* r, gsl_vector* probs) {
  */
 static double q(void* data, gsl_vector* x, gsl_vector* y) {
   mcmclib_rapt* p = (mcmclib_rapt*) data;
-  int region_x = p->which_region(p->which_region_data, x);
+  int region_x = p->which_region(x, p->which_region_data);
   mcmclib_mvnorm_lpdf* distr_obj =
     mcmclib_mvnorm_lpdf_alloc(x, (p->sigma_local[region_x])->data);
   double ans = mcmclib_mvnorm_lpdf_compute(distr_obj, y);
@@ -104,7 +108,6 @@ static double q(void* data, gsl_vector* x, gsl_vector* y) {
   return ans;
 }
 
-/*TODO*/
 int mcmclib_rapt_update(mcmclib_rapt* p) {
   gsl_rng* r = p->r;
   int *t = &(p->t);
@@ -125,12 +128,12 @@ int mcmclib_rapt_update(mcmclib_rapt* p) {
   void* which_region_data = p->which_region_data;
   gsl_matrix* jd = p->jd;
 
-  /*step 1: update current state*/
   gsl_vector_memcpy(old, x); /*save old state*/
   int which_region_old = which_region(old, which_region_data);
   gsl_vector_view lambda_vw = gsl_matrix_row(lambda, which_region_old);
   gsl_vector* lambda_p = &(lambda_vw.vector);
 
+  /*update current chain value*/
   int which_proposal = sample(r, lambda_p); /*sample an integer between 0 and K, with given probabilities*/
   mcmclib_mvnorm(r,
 		 (which_proposal < K) ? sigma_local[which_proposal] : sigma_whole,
@@ -139,11 +142,14 @@ int mcmclib_rapt_update(mcmclib_rapt* p) {
   int which_region_x = accepted ? which_region(x, which_region_data) : which_region_old;
   int k = which_region_x;
 
-  /*step 2: update means and variances*/
+  /*update means and variances*/
   int fake_n = gsl_vector_get(n, k);
   mcmclib_covariance_update(variances[k], means[k], &fake_n, x);
+  fake_n = (*t);
+  mcmclib_covariance_update(p->global_variance, p->global_mean, &fake_n, x);
 
   /*update visits counts*/
+  (*t)++;
   gsl_vector_set(n, which_region_x, gsl_vector_get(n, which_region_x) + 1);
   gsl_matrix_set(visits, which_region_x, which_proposal,
 		 gsl_matrix_get(visits, which_region_x, which_proposal) + 1);
@@ -176,11 +182,11 @@ int mcmclib_rapt_update(mcmclib_rapt* p) {
 		     gsl_matrix_get(jd, k, j) / sumjd);
   }
 
-  /*update local covariance matrices*/
+  /*update local and global proposals covariance matrices*/
   gsl_matrix_memcpy(sigma_local[which_region_x], variances[which_region_x]);
   gsl_matrix_scale(sigma_local[which_region_x], 2.38 * 2.38 / ((double) x->size));
-  /*update global covariance matrix*/
-  /*TODO*/
+  gsl_matrix_memcpy(sigma_whole, p->global_variance);
+  gsl_matrix_scale(sigma_whole, 2.38 * 2.38 / ((double) x->size));
 
   return 1;
 }
