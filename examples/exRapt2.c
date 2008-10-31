@@ -5,9 +5,12 @@
 #include <gsl/gsl_matrix.h>
 #include <rapt.h>
 
+/*trace program execution to stdout?*/
+#define TRACE_ME
+
 #define OUTPUT_FILE "data_rapt2.csv"
 /*chain length*/
-#define N 100000
+#define N 1e5
 /*burn in length*/
 #define T0 200
 /*initial covariance guess*/
@@ -36,6 +39,48 @@ int which_region(gsl_vector* x, void* ignore) {
     return 0;
   else
     return 1;
+}
+
+static void dump_vector(gsl_vector* x) {
+  printf("(");
+  for(int i=0; i< (x->size - 1); i++)
+    printf("%.3f, ", gsl_vector_get(x, i));
+  printf("%.3f)\n", gsl_vector_get(x, x->size -1));
+}
+static void dump_matrix(gsl_matrix* x) {
+  for(int j=0; j< x->size1; j++) {
+    gsl_vector_view rv = gsl_matrix_row(x, j);
+    dump_vector(&(rv.vector));
+  }
+}
+
+/*dump current sampler state to stdout*/
+static void dump_rapt(mcmclib_rapt* s) {
+  printf("#current_x: ");  dump_vector(s->current_x);
+  printf("#old: "); dump_vector(s->old);
+  printf("#sigma_whole:\n"); dump_matrix(s->sigma_whole);
+  printf("#sigma_local[...]:\n");
+  for(int k=0; k< s->K; k++) {
+    printf(" [%d]:\n", k);
+    dump_matrix(s->sigma_local[k]);
+  }
+  printf("#t: %d\n", s->t);
+  printf("#global_mean: "); dump_vector(s->global_mean);
+  printf("#global_variance:\n"); dump_matrix(s->global_variance);
+  printf("#means[...]:\n");
+  for(int k=0; k< s->K; k++) {
+    printf(" [%d]: ", k);
+    dump_vector(s->means[k]);
+  }  
+  printf("#variances[...]:\n");
+  for(int k=0; k< s->K; k++) {
+    printf(" [%d]:\n", k);
+    dump_matrix(s->variances[k]);
+  }
+  printf("#n: "); dump_vector(s->n);
+  printf("#visits:\n"); dump_matrix(s->visits);
+  printf("#jd:\n"); dump_matrix(s->jd);
+  printf("#lambda:\n"); dump_matrix(s->lambda);
 }
 
 int main(int argc, char** argv) {
@@ -72,6 +117,10 @@ int main(int argc, char** argv) {
   
   /*main MCMC loop*/
   for(int i=0; i<N; i++) {
+#ifdef TRACE_ME
+    printf("\n-----\niteration %d\nsampler:\n", i);
+    dump_rapt(sampler);
+#endif
     mcmclib_rapt_update(sampler);
     /*    if((i % 10) == 0)
 	  mcmclib_rapt_update_lambda(sampler);*/
