@@ -60,7 +60,7 @@ double mcmclib_mvnorm_lpdf_compute(void* in_p, gsl_vector* x) {
 	gsl_vector_memcpy(x_mu, x);
 	gsl_vector_sub(x_mu, p->mean);
 	gsl_vector_memcpy(p->mahal, x_mu);
-	gsl_linalg_cholesky_svx(p->rooti, x_mu);
+	gsl_linalg_cholesky_svx(p->rooti, p->mahal);
 
 	/*compute log-density as:
 		-0.5 * (mahaldist + log(2*pi)*d + logdet) */

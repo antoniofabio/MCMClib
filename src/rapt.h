@@ -33,6 +33,7 @@ typedef struct {
   gsl_matrix* visits; /*number of visits to each region, from each proposal*/
   gsl_matrix* jd; /*matrix of jumping distances -within- each region, from each proposal*/
   gsl_matrix* lambda; /*K+1 weights for local and global proposals, in each region*/
+  gsl_matrix* Sigma_eps; /*additive perturbation factor for variances updating*/
 
 } mcmclib_rapt;
 
