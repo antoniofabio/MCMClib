@@ -108,7 +108,6 @@ static double q(void* data, gsl_vector* x, gsl_vector* y) {
   return ans;
 }
 
-/*TODO*/
 int mcmclib_rapt_update(mcmclib_rapt* p) {
   gsl_rng* r = p->r;
   int *t = &(p->t);
