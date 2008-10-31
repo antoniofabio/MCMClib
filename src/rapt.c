@@ -138,6 +138,7 @@ int mcmclib_rapt_update(mcmclib_rapt* p) {
   mcmclib_mvnorm(r,
 		 (which_proposal < K) ? sigma_local[which_proposal] : sigma_whole,
 		 x);
+  gsl_vector_add(x, old);
   int accepted = mcmclib_metropolis_generic_step(r, old, x, logdistr, logdistr_data, q, p);
   int which_region_x = accepted ? which_region(x, which_region_data) : which_region_old;
   int k = which_region_x;
