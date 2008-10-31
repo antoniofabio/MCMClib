@@ -64,9 +64,12 @@ mcmclib_rapt* mcmclib_rapt_alloc(
 */
 void mcmclib_rapt_free(mcmclib_rapt* p);
 
-/** Gaussian random walk
-@param p a MRW object
+/** Update current value of a RAPT chain
+@param p a RAPT object
 */
 int mcmclib_rapt_update(mcmclib_rapt* p);
+
+/*update 'lambda' values of RAPT obj. basing on current jumping distances averages*/
+void mcmclib_rapt_update_lambda(mcmclib_rapt* p);
 
 #endif
