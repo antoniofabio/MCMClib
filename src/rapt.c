@@ -2,6 +2,7 @@
 #include "metropolis.h"
 #include "rapt.h"
 #include "mvnorm.h"
+#include "vector_stats.h"
 
 mcmclib_rapt* mcmclib_rapt_alloc(
 				 gsl_rng* r,
@@ -116,6 +117,12 @@ int mcmclib_rapt_update(mcmclib_rapt* p) {
   int K = p->K;
   gsl_matrix** sigma_local = p->sigma_local;
   gsl_matrix* sigma_whole = p->sigma_whole;
+  gsl_matrix** variances = p->variances;
+  gsl_vector** means = p->means;
+  gsl_vector* n = p->n;
+  gsl_matrix* visits = p->visits;
+  region_fun_t which_region = p->which_region;
+  void* which_region_data = p->which_region_data;
 
   /*step 1: update current state*/
   gsl_vector_memcpy(old, x); /*save old state*/
@@ -123,10 +130,20 @@ int mcmclib_rapt_update(mcmclib_rapt* p) {
   mcmclib_mvnorm(r,
 		 (which_proposal < K) ? sigma_local[which_proposal] : sigma_whole,
 		 x);
+  int accepted = mcmclib_metropolis_generic_step(r, old, x, logdistr, logdistr_data, q, p);
 
-  mcmclib_metropolis_generic_step(r, old, x, logdistr, logdistr_data, q, p);
+  /*update visits counts*/
+  int which_region_x = which_region(x, which_region_data);
+  int which_region_old = accepted ? which_region(old, which_region_data) : which_region_x;
+  gsl_vector_set(n, which_region_x, gsl_vector_get(n, which_region_x) + 1);
+  gsl_matrix_set(visits, which_region_x, which_proposal,
+		 gsl_matrix_get(visits, which_region_x, which_proposal) + 1);
 
   /*step 2: update means and variances*/
+  int k = which_region_x;
+  int fake_n = gsl_vector_get(n, k);
+  mcmclib_covariance_update(variances[k], means[k], &fake_n, x);
+
   /*step 3: update proposal covariance matrices*/
   /*step 4: update weights*/
 
