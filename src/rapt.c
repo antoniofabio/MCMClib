@@ -155,6 +155,7 @@ int mcmclib_rapt_update(mcmclib_rapt* p) {
 
   gsl_vector_memcpy(old, x); /*save old state*/
   int which_region_old = which_region(old, which_region_data);
+  p->which_region_old = which_region_old;
   gsl_vector_view lambda_vw = gsl_matrix_row(lambda, which_region_old);
   gsl_vector* lambda_p = &(lambda_vw.vector);
 
@@ -166,6 +167,7 @@ int mcmclib_rapt_update(mcmclib_rapt* p) {
   gsl_vector_add(x, old);
   p->accepted = mcmclib_metropolis_generic_step(r, old, x, logdistr, logdistr_data, q, p);
   int which_region_x = p->accepted ? which_region(x, which_region_data) : which_region_old;
+  p->which_region_x = which_region_x;
   int k = which_region_x;
 
   /*update means and variances*/
