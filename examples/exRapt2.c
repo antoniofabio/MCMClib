@@ -41,11 +41,16 @@ int which_region(gsl_vector* x, void* ignore) {
     return 1;
 }
 
+static void print_vector(FILE* stream, gsl_vector* x) {
+  for(int i=0; i< (x->size - 1); i++)
+    fprintf(stream, "%.3f, ", gsl_vector_get(x, i));
+  fprintf(stream, "%.3f", gsl_vector_get(x, x->size -1));
+}
+
 static void dump_vector(gsl_vector* x) {
   printf("(");
-  for(int i=0; i< (x->size - 1); i++)
-    printf("%.3f, ", gsl_vector_get(x, i));
-  printf("%.3f)\n", gsl_vector_get(x, x->size -1));
+  print_vector(stdout, x);
+  printf(")\n");
 }
 static void dump_matrix(gsl_matrix* x) {
   for(int j=0; j< x->size1; j++) {
@@ -123,10 +128,7 @@ int main(int argc, char** argv) {
     dump_rapt(sampler);
 #endif
     mcmclib_rapt_update(sampler);
-    /*    if((i % 10) == 0)
-	  mcmclib_rapt_update_lambda(sampler);*/
-    for(int j=0; j<d; j++)
-      fprintf(out, "%f, ", gsl_vector_get(x, j));
+    print_vector(out, x);
     fprintf(out, "%d\n", sampler->which_proposal);
   }
   
@@ -134,4 +136,9 @@ int main(int argc, char** argv) {
   gsl_rng_free(r);
   mcmclib_rapt_free(sampler);
   gsl_matrix_free(Sigma_zero);
+}
+
+int update_row(mcmclib_rapt* s, gsl_vector* ntries, int* proposal, double* jd) {
+  int K = ntries->size;
+  return 0;
 }
