@@ -6,7 +6,7 @@
 #include <rapt.h>
 
 /*trace program execution to stdout?*/
-#define TRACE_ME
+//#define TRACE_ME
 
 #define OUTPUT_FILE "data_rapt2.csv"
 /*chain length*/
@@ -78,6 +78,7 @@ static void dump_rapt(mcmclib_rapt* s) {
     dump_matrix(s->variances[k]);
   }
   printf("#n: "); dump_vector(s->n);
+  printf("#which_proposal: %d\n", s->which_proposal);
   printf("#visits:\n"); dump_matrix(s->visits);
   printf("#jd:\n"); dump_matrix(s->jd);
   printf("#lambda:\n"); dump_matrix(s->lambda);
@@ -111,9 +112,9 @@ int main(int argc, char** argv) {
   /*open output file*/
   FILE* out = fopen(OUTPUT_FILE, "w");
   /*print out csv header*/
-  for(int j=0; j<(d-1); j++)
+  for(int j=0; j<d; j++)
     fprintf(out, "x%d, ", j);
-  fprintf(out, "x%d\n", d-1);
+  fprintf(out, "proposal\n");
   
   /*main MCMC loop*/
   for(int i=0; i<N; i++) {
@@ -124,9 +125,9 @@ int main(int argc, char** argv) {
     mcmclib_rapt_update(sampler);
     /*    if((i % 10) == 0)
 	  mcmclib_rapt_update_lambda(sampler);*/
-    for(int j=0; j<(d-1); j++)
+    for(int j=0; j<d; j++)
       fprintf(out, "%f, ", gsl_vector_get(x, j));
-    fprintf(out, "%f\n", gsl_vector_get(x, d-1));
+    fprintf(out, "%d\n", sampler->which_proposal);
   }
   
   fclose(out);
