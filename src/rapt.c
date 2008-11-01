@@ -159,9 +159,9 @@ int mcmclib_rapt_update(mcmclib_rapt* p) {
   gsl_vector* lambda_p = &(lambda_vw.vector);
 
   /*update current chain value*/
-  int which_proposal = sample(r, lambda_p); /*sample an integer between 0 and K, with given probabilities*/
+  p->which_proposal = sample(r, lambda_p); /*sample an integer between 0 and K, with given probabilities*/
   mcmclib_mvnorm(r,
-		 (which_proposal < K) ? sigma_local[which_proposal] : sigma_whole,
+		 (p->which_proposal < K) ? sigma_local[p->which_proposal] : sigma_whole,
 		 x);
   gsl_vector_add(x, old);
   int accepted = mcmclib_metropolis_generic_step(r, old, x, logdistr, logdistr_data, q, p);
@@ -177,8 +177,8 @@ int mcmclib_rapt_update(mcmclib_rapt* p) {
   /*update visits counts*/
   (*t)++;
   gsl_vector_set(n, which_region_x, gsl_vector_get(n, which_region_x) + 1);
-  gsl_matrix_set(visits, which_region_x, which_proposal,
-		 gsl_matrix_get(visits, which_region_x, which_proposal) + 1);
+  gsl_matrix_set(visits, which_region_x, p->which_proposal,
+		 gsl_matrix_get(visits, which_region_x, p->which_proposal) + 1);
 
   /*if newreg == oldreg, update jumping distances*/
   if(which_region_old == which_region_x) {
@@ -186,9 +186,9 @@ int mcmclib_rapt_update(mcmclib_rapt* p) {
     double newjd = 0.0;
     for(int i=0; i< x->size; i++)
       newjd += (gsl_vector_get(old, i) * gsl_vector_get(old, i));
-    double newvisits = gsl_matrix_get(visits, k, which_proposal);
-    gsl_matrix_set(jd, k, which_proposal,
-		   (gsl_matrix_get(jd, k, which_proposal) *
+    double newvisits = gsl_matrix_get(visits, k, p->which_proposal);
+    gsl_matrix_set(jd, k, p->which_proposal,
+		   (gsl_matrix_get(jd, k, p->which_proposal) *
 		    (newvisits - 1) + newjd) / newvisits);
   }
 
