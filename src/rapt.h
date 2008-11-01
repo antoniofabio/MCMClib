@@ -35,6 +35,7 @@ typedef struct {
   gsl_matrix* lambda; /*K+1 weights for local and global proposals, in each region*/
   gsl_matrix* Sigma_eps; /*additive perturbation factor for variances updating*/
   int which_proposal; /*which proposal have been used in last step*/
+  int accepted; /*last step was an acceptance or a rejection?*/
 } mcmclib_rapt;
 
 /** alloc (and init) extra Gaussian RW data
