@@ -36,6 +36,7 @@ typedef struct {
   gsl_matrix* Sigma_eps; /*additive perturbation factor for variances updating*/
   int which_proposal; /*which proposal have been used in last step*/
   int accepted; /*last step was an acceptance or a rejection?*/
+  double last_jd; /*last observed jumping distance*/
 } mcmclib_rapt;
 
 /** alloc (and init) extra Gaussian RW data

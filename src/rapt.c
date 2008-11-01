@@ -186,6 +186,7 @@ int mcmclib_rapt_update(mcmclib_rapt* p) {
     double newjd = 0.0;
     for(int i=0; i< x->size; i++)
       newjd += (gsl_vector_get(old, i) * gsl_vector_get(old, i));
+    p->last_jd = newjd;
     double newvisits = gsl_matrix_get(visits, k, p->which_proposal);
     gsl_matrix_set(jd, k, p->which_proposal,
 		   (gsl_matrix_get(jd, k, p->which_proposal) *
