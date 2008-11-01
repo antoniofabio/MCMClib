@@ -37,6 +37,7 @@ typedef struct {
   int which_proposal; /*which proposal have been used in last step*/
   int accepted; /*last step was an acceptance or a rejection?*/
   double last_jd; /*last observed jumping distance*/
+  int which_region_x, which_region_old; /*region info*/
 } mcmclib_rapt;
 
 /** alloc (and init) extra Gaussian RW data
