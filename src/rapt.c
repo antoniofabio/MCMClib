@@ -58,10 +58,18 @@ mcmclib_rapt* mcmclib_rapt_alloc(
   gsl_matrix_set_identity(ans->Sigma_eps);
   gsl_matrix_scale(ans->Sigma_eps, 0.001);
 
+  ans->ntries = gsl_vector_alloc(K+1);
+  gsl_vector_set_all(ans->ntries, 0.0);
+  ans->workspace = gsl_vector_alloc(dim);
+
   return ans;
 }
 
 void mcmclib_rapt_free(mcmclib_rapt* p) {
+  /*extra data free*/
+  gsl_vector_free(p->workspace);
+  gsl_vector_free(p->ntries);
+
   /*internal data free*/
   gsl_matrix_free(p->Sigma_eps);
   gsl_matrix_free(p->lambda);

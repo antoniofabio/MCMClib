@@ -23,7 +23,7 @@ typedef struct {
   region_fun_t which_region; /*boundary computing function*/
   void* which_region_data; /*ptr to extra 'which_region' data*/
 
-  /*internal data*/
+  /**extra infos*/
   int t; /*number of iterations done so far*/
   gsl_vector** means; /*array of regions means*/
   gsl_matrix** variances; /*array of regions variances*/
@@ -33,11 +33,15 @@ typedef struct {
   gsl_matrix* visits; /*number of visits to each region, from each proposal*/
   gsl_matrix* jd; /*matrix of jumping distances -within- each region, from each proposal*/
   gsl_matrix* lambda; /*K+1 weights for local and global proposals, in each region*/
-  gsl_matrix* Sigma_eps; /*additive perturbation factor for variances updating*/
   int which_proposal; /*which proposal have been used in last step*/
   int accepted; /*last step was an acceptance or a rejection?*/
   double last_jd; /*last observed jumping distance*/
   int which_region_x, which_region_old; /*region info*/
+  gsl_vector* ntries; /*number of trials from each proposal from point 'old'*/
+
+  /*internal data*/
+  gsl_matrix* Sigma_eps; /*additive perturbation factor for variances updating*/
+  gsl_vector* workspace; /*utility workspace memory*/
 } mcmclib_rapt;
 
 /** alloc (and init) extra Gaussian RW data
