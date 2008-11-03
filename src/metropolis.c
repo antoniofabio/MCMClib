@@ -23,7 +23,7 @@ int mcmclib_metropolis_generic_step(const gsl_rng* r, gsl_vector* old,
 				    gsl_vector* x, distrfun_p logdistr, void* data,
 				    proposal_distr_t q, void* q_data) {
   double loglik_old, loglik_new;
-  double q_old_new;
+  double q_old_new, q_new_old;
   double mh_ratio;
 
   loglik_old = logdistr(data, old);
@@ -38,12 +38,14 @@ int mcmclib_metropolis_generic_step(const gsl_rng* r, gsl_vector* old,
     gsl_vector_memcpy(x, old);
     return 0;
   }
+  q_new_old = q(q_data, x, old);
+  if(!isfinite(q_new_old)) {
+    gsl_vector_memcpy(x, old);
+    return 0;
+  }
 
-  mh_ratio = q(q_data, x, old) - q_old_new + loglik_new - loglik_old;
-  if(mh_ratio > 0)
-    return 1;
-
-  if(isfinite(mh_ratio) && (gsl_rng_uniform(r) <= exp(mh_ratio)))
+  mh_ratio = loglik_new - loglik_old +  q_new_old - q_old_new;
+  if((mh_ratio > 0) || (gsl_rng_uniform(r) <= exp(mh_ratio)))
     return 1;
 
   gsl_vector_memcpy(x, old);
