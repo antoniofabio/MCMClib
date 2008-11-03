@@ -121,12 +121,9 @@ void mcmclib_gauss_inca_free(mcmclib_gauss_inca* p) {
 int mcmclib_gauss_inca_update(mcmclib_gauss_inca* e, const gsl_rng* r,
 	distrfun_p logdistr, gsl_vector* x, void* data) {
 
-	int d = x->size;
 	gsl_vector* old = e->old;
 	gsl_matrix* sigma_zero = e->p->Sigma_zero;
 	int id = e->id;
-	gsl_matrix* cov = e->p->variance_global;
-	gsl_vector* mean = e->p->mean_global;
 	gsl_matrix* sigma = e->p->sigma_proposal;
 	int t0 = e->p->t0;
 	int *t = (e->p->t) + id;

@@ -23,7 +23,7 @@ int mcmclib_metropolis_generic_step(const gsl_rng* r, gsl_vector* old,
 				    gsl_vector* x, distrfun_p logdistr, void* data,
 				    proposal_distr_t q, void* q_data) {
   double loglik_old, loglik_new;
-  double q_old_new, q_new_old;
+  double q_old_new;
   double mh_ratio;
 
   loglik_old = logdistr(data, old);

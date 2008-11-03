@@ -41,7 +41,6 @@ int mcmclib_gauss_am_update(mcmclib_gauss_am* p) {
 	int *t = &(p->t);
 	mcmclib_gauss_mrw* mrw = p->mrw;
 	gsl_matrix* cov = p->cov;
-	gsl_vector* mean = p->mean;
 
 	/*sample a new value for 'x', with mean 'old' and assigned covariance matrix*/
 	mcmclib_gauss_mrw_update(mrw);
