@@ -62,6 +62,7 @@ mcmclib_rapt* mcmclib_rapt_alloc(
   ans->ntries = gsl_vector_alloc(K+1);
   gsl_vector_set_all(ans->ntries, 0.0);
   ans->workspace = gsl_vector_alloc(dim);
+  ans->which_region_x = which_region(x, which_region_data);
 
   return ans;
 }
@@ -174,7 +175,7 @@ static void rapt_update_ntries(mcmclib_rapt* p) {
 static void rapt_update_current_value(mcmclib_rapt* p) {
   /*save old state, old region*/
   gsl_vector_memcpy(p->old, p->current_x);
-  p->which_region_old = p->which_region(p->old, p->which_region_data);
+  p->which_region_old = p->which_region_x;
 
   gsl_vector_view lambda_vw = gsl_matrix_row(p->lambda, p->which_region_old);
   gsl_vector* lambda_p = &(lambda_vw.vector);
