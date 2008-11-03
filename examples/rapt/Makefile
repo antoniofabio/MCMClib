@@ -9,7 +9,7 @@ run: ex1
 ex1: ex1.o $(SRCDIR)/libmcmclib.a
 
 clean:
-	rm -rf *.o $(EX_LIST)
+	rm -rf *.o *~ $(EX_LIST)
 
 clean_all: clean
 	rm -rf *.csv
