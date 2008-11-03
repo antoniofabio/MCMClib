@@ -76,6 +76,9 @@ void mcmclib_rapt_free(mcmclib_rapt* p);
 */
 int mcmclib_rapt_update(mcmclib_rapt* p);
 
+/*update local and global proposals covariance matrices*/
+void mcmclib_rapt_update_proposals(mcmclib_rapt* p);
+
 /*update 'lambda' values of RAPT obj. basing on current jumping distances averages*/
 void mcmclib_rapt_update_lambda(mcmclib_rapt* p);
 
