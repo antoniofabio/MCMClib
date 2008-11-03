@@ -16,21 +16,22 @@ w <- subset(w, proposal != 2)
 library(lattice)
 xyplot(ntries0~x0 | factor(proposal), data=w)
 
+w <- read.csv("ex1_extra_out.csv")
 wx <- w[,1:2]
-wd <- c(apply(apply(wx, 2, diff)^2, 1, sum), NA)
-wn <- ifelse(w$proposal == 0, w$ntries0, w$ntries1)
-w$w <- wd / wn
+w$n <- with(w, ifelse(proposal == 0, ntries0, ntries1))
+w$w <- with(w, jump / n)
 coplot(w ~ x0 | factor(proposal), data=w)
+
+coplot(wd ~ wn | factor(proposal), data=w)
 
 ##doesn't work!
 m <- list()
 library(nnet)
-m[[1]] <- nnet(w ~ x0 + x1, data=w, subset= proposal==0, size=3, linout=TRUE)
-m[[2]] <- nnet(w ~ x0 + x1, data=w, subset= proposal==1, size=3, linout=TRUE)
+m[[1]] <- nnet(w ~ x0 + x1, data=w, subset= proposal==0, size=4, linout=TRUE, maxit=1e3)
+m[[2]] <- nnet(w ~ x0 + x1, data=w, subset= proposal==1, size=4, linout=TRUE, maxit=1e3)
 y <- lapply(m, predict, newdata=w)
-y <- do.call("-", y)
-w$y <- y
-plot(y ~ x0, col=(y>0)+1, data=w)
+w$y <- do.call("-", y)
+plot(y ~ x0, col=(y<0)+1, data=w)
 ###
 
 wp <- w$proposal
