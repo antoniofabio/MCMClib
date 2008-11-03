@@ -142,7 +142,7 @@ int main(int argc, char** argv) {
     mcmclib_rapt_update(sampler);
     mcmclib_rapt_update_proposals(sampler);
     print_vector(out, x);
-    fprintf(out, "%d\n", sampler->which_proposal);
+    fprintf(out, ", %d\n", sampler->which_proposal);
     if(sampler->accepted) {
       for(int j=0; j< sampler->old->size; j++)
 	fprintf(out_extra, "%f, ", gsl_vector_get(sampler->old, j));
