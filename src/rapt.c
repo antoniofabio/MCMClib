@@ -260,7 +260,7 @@ static double rapt_q(void* data, gsl_vector* x, gsl_vector* y) {
   ans += mcmclib_mvnorm_lpdf_compute(distr_obj, y) * gsl_vector_get(lambda_p, p->K);
   mcmclib_mvnorm_lpdf_free(distr_obj);
 
-  return ans;
+  return log(ans);
 }
 
 static int sample(gsl_rng* r, gsl_vector* probs) {
