@@ -12,17 +12,13 @@ plot(ch2, type="p", pch=16, cex=0.2)
 
 #load local performance infos
 w <- read.csv("ex1_extra_out.csv")
-w <- subset(w, proposal != 2)
-library(lattice)
-xyplot(ntries0~x0 | factor(proposal), data=w)
-
-w <- read.csv("ex1_extra_out.csv")
 wx <- w[,1:2]
-w$n <- with(w, ifelse(proposal == 0, ntries0, ntries1))
+w$n <- with(w, ifelse(proposal == 0, ntries0, ifelse(proposal == 1, ntries1, ntries2)))
 w$w <- with(w, jump / n)
-coplot(w ~ x0 | factor(proposal), data=w)
-
-coplot(wd ~ wn | factor(proposal), data=w)
+coplot(jump ~ x0 | factor(proposal), data=w, rows=1)
+coplot(n ~ x0 | factor(proposal), data=w, rows=1)
+coplot(I(jump/n) ~ x0 | factor(proposal), data=w, rows=1)
+coplot(wd ~ wn | factor(proposal), data=w, rows=1)
 
 ##doesn't work!
 m <- list()
