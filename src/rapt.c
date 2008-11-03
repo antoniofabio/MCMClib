@@ -4,6 +4,8 @@
 #include "mvnorm.h"
 #include "vector_stats.h"
 
+static void rapt_init(mcmclib_rapt*);
+
 mcmclib_rapt* mcmclib_rapt_alloc(
 				 gsl_rng* r,
 				 distrfun_p logdistr, void* logdistr_data,
@@ -22,7 +24,6 @@ mcmclib_rapt* mcmclib_rapt_alloc(
   ans->current_x = x;
   ans->old = gsl_vector_alloc(dim);
 
-  ans->accepted = 1;
   ans->t0 = t0;
   ans->sigma_whole = gsl_matrix_alloc(dim, dim);
   gsl_matrix_memcpy(ans->sigma_whole, sigma_whole);
@@ -36,7 +37,6 @@ mcmclib_rapt* mcmclib_rapt_alloc(
   ans->which_region_data = which_region_data;
 
   /*internal data alloc*/
-  ans->t = 0;
   ans->means = (gsl_vector**) malloc(K * sizeof(gsl_vector*));
   ans->variances = (gsl_matrix**) malloc(K * sizeof(gsl_matrix*));
   for(int k=0; k<K; k++) {
@@ -44,27 +44,35 @@ mcmclib_rapt* mcmclib_rapt_alloc(
     ans->variances[k] = gsl_matrix_alloc(dim, dim);
   }
   ans->global_mean = gsl_vector_alloc(dim);
-  gsl_vector_set_all(ans->global_mean, 0.0);
   ans->global_variance = gsl_matrix_alloc(dim, dim);
-  gsl_matrix_set_all(ans->global_variance, 0.0);
   ans->visits = gsl_matrix_alloc(K, K+1);
-  gsl_matrix_set_all(ans->visits, 0.0);
   ans->jd = gsl_matrix_alloc(K, K+1);
-  gsl_matrix_set_all(ans->jd, 0.0);
   ans->n = gsl_vector_alloc(K);
-  gsl_vector_set_all(ans->n, 0.0);
   ans->lambda = gsl_matrix_alloc(K, K+1);
-  gsl_matrix_set_all(ans->lambda, 1.0 / (double) (K+1.0));
   ans->Sigma_eps = gsl_matrix_alloc(dim, dim);
-  gsl_matrix_set_identity(ans->Sigma_eps);
-  gsl_matrix_scale(ans->Sigma_eps, 0.001);
 
   ans->ntries = gsl_vector_alloc(K+1);
-  gsl_vector_set_all(ans->ntries, 0.0);
   ans->workspace = gsl_vector_alloc(dim);
-  ans->which_region_x = which_region(x, which_region_data);
+
+  rapt_init(ans);
 
   return ans;
+}
+
+static void rapt_init(mcmclib_rapt* p) {
+  p->accepted = 1;
+  p->t = 0;
+  gsl_vector_set_all(p->global_mean, 0.0);
+  gsl_matrix_set_all(p->global_variance, 0.0);
+  gsl_matrix_set_all(p->visits, 0.0);
+  gsl_matrix_set_all(p->jd, 0.0);
+  gsl_vector_set_all(p->n, 0.0);
+  gsl_matrix_set_all(p->lambda, 1.0 / (double) (p->K + 1.0));
+  gsl_matrix_set_identity(p->Sigma_eps);
+  gsl_matrix_scale(p->Sigma_eps, 0.001);
+
+  gsl_vector_set_all(p->ntries, 0.0);
+  p->which_region_x = p->which_region(p->current_x, p->which_region_data);
 }
 
 void mcmclib_rapt_free(mcmclib_rapt* p) {
