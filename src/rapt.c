@@ -145,14 +145,16 @@ int mcmclib_rapt_update(mcmclib_rapt* p) {
 }
 
 void mcmclib_rapt_update_proposals(mcmclib_rapt* p) {
-  if((p->t) > p->t0) {
-    gsl_matrix_memcpy(p->sigma_local[p->which_region_x], p->variances[p->which_region_x]);
-    gsl_matrix_add(p->sigma_local[p->which_region_x], p->Sigma_eps);
-    gsl_matrix_scale(p->sigma_local[p->which_region_x], 2.38 * 2.38 / ((double) p->old->size));
-    gsl_matrix_memcpy(p->sigma_whole, p->global_variance);
-    gsl_matrix_add(p->sigma_whole, p->Sigma_eps);
-    gsl_matrix_scale(p->sigma_whole, 2.38 * 2.38 / ((double) p->old->size));
+  if((p->t) <= p->t0)
+    return;
+  for(int k=0; k< p->K; k++) {
+    gsl_matrix_memcpy(p->sigma_local[k], p->variances[k]);
+    gsl_matrix_add(p->sigma_local[k], p->Sigma_eps);
+    gsl_matrix_scale(p->sigma_local[k], 2.38 * 2.38 / ((double) p->old->size));
   }
+  gsl_matrix_memcpy(p->sigma_whole, p->global_variance);
+  gsl_matrix_add(p->sigma_whole, p->Sigma_eps);
+  gsl_matrix_scale(p->sigma_whole, 2.38 * 2.38 / ((double) p->old->size));
 }
 
 void mcmclib_rapt_update_lambda(mcmclib_rapt* p) {
