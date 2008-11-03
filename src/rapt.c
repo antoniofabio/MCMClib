@@ -121,15 +121,21 @@ static int sample(gsl_rng* r, gsl_vector* probs);
 static double rapt_q(void* data, gsl_vector* x, gsl_vector* y);
 static void rapt_update_current_value(mcmclib_rapt* p);
 static void rapt_update_means_variances(mcmclib_rapt* p);
+static void rapt_update_ntries(mcmclib_rapt* p);
 static void rapt_update_visits_counts(mcmclib_rapt* p);
 static void rapt_update_jumping_distances(mcmclib_rapt* p);
 static void rapt_update_proposals(mcmclib_rapt* p);
 
 int mcmclib_rapt_update(mcmclib_rapt* p) {
+  if(p->accepted == 1)
+    gsl_vector_set_all(p->ntries, 0.0);
+
   /*update current chain value*/
   rapt_update_current_value(p);
   /*update means and variances*/
   rapt_update_means_variances(p);
+  /*update ntries*/
+  rapt_update_ntries(p);
   /*update visits counts*/
   rapt_update_visits_counts(p);
   /*update jumping distances*/
@@ -138,6 +144,11 @@ int mcmclib_rapt_update(mcmclib_rapt* p) {
   rapt_update_proposals(p);
 
   return 1;
+}
+
+static void rapt_update_ntries(mcmclib_rapt* p) {
+  gsl_vector_set(p->ntries, p->which_proposal,
+		 gsl_vector_get(p->ntries, p->which_proposal) + 1);
 }
 
 static void rapt_update_current_value(mcmclib_rapt* p) {
