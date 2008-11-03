@@ -244,10 +244,20 @@ static void rapt_update_jumping_distances(mcmclib_rapt* p) {
 static double rapt_q(void* data, gsl_vector* x, gsl_vector* y) {
   mcmclib_rapt* p = (mcmclib_rapt*) data;
   int region_x = p->which_region(x, p->which_region_data);
-  mcmclib_mvnorm_lpdf* distr_obj =
-    mcmclib_mvnorm_lpdf_alloc(x, (p->sigma_local[region_x])->data);
-  double ans = mcmclib_mvnorm_lpdf_compute(distr_obj, y);
+  gsl_vector_view lambda_vw = gsl_matrix_row(p->lambda, region_x);
+  gsl_vector* lambda_p = &(lambda_vw.vector);
+
+  mcmclib_mvnorm_lpdf* distr_obj;
+  double ans = 0.0;
+  for(int k=0; k < p->K; k++) {
+    distr_obj = mcmclib_mvnorm_lpdf_alloc(x, (p->sigma_local[k])->data);
+    ans += mcmclib_mvnorm_lpdf_compute(distr_obj, y) * gsl_vector_get(lambda_p, k);
+    mcmclib_mvnorm_lpdf_free(distr_obj);
+  }
+  distr_obj = mcmclib_mvnorm_lpdf_alloc(x, (p->sigma_local[p->K])->data);
+  ans += mcmclib_mvnorm_lpdf_compute(distr_obj, y) * gsl_vector_get(lambda_p, p->K);
   mcmclib_mvnorm_lpdf_free(distr_obj);
+
   return ans;
 }
 
