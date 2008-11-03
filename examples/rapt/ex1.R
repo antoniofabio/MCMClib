@@ -13,15 +13,43 @@ plot(ch2, type="p", pch=16, cex=0.2)
 #load local performance infos
 w <- read.csv("ex1_extra_out.csv")
 w <- subset(w, proposal != 2)
+library(lattice)
+xyplot(ntries0~x0 | factor(proposal), data=w)
+
 wx <- w[,1:2]
+wd <- c(apply(apply(wx, 2, diff)^2, 1, sum), NA)
+wn <- ifelse(w$proposal == 0, w$ntries0, w$ntries1)
+w$w <- wd / wn
+coplot(w ~ x0 | factor(proposal), data=w)
+
+##doesn't work!
+m <- list()
+library(nnet)
+m[[1]] <- nnet(w ~ x0 + x1, data=w, subset= proposal==0, size=3, linout=TRUE)
+m[[2]] <- nnet(w ~ x0 + x1, data=w, subset= proposal==1, size=3, linout=TRUE)
+y <- lapply(m, predict, newdata=w)
+y <- do.call("-", y)
+w$y <- y
+plot(y ~ x0, col=(y>0)+1, data=w)
+###
+
 wp <- w$proposal
-wn0 <- 1-rank(w$ntries0[wp==0])/sum(wp==0)
+wn0 <- w$ntries0[wp==0]
+wn0 <- 1-rank(wn0)/length(wn0)
 wn1 <- 1-rank(w$ntries1[wp==1])/sum(wp==1)
 plot(wn0 ~ wx[wp==0,1], type="n", ylim=c(0, 1))
 lines(lowess(wx[wp==0,1], wn0))
 abline(h=0.5, lty=2)
 
-w$tag <- apply(w[,c("ntries0", "ntries1")], 1, which.min)
+w$w <- ifelse(wp==0, wn0, wn1)
+m <- list()
+library(mgcv)
+m[[1]] <- gam(w ~ s(x0) + s(x1), data=w, subset= proposal==0)
+m[[2]] <- gam(w ~ s(x0) + s(x1), data=w, subset= proposal==1)
+w$w0 <- predict(m[[1]], newdata=w)
+w$w1 <- predict(m[[2]], newdata=w)
+
+w$tag <- apply(w[,c("w0", "w1")], 1, which.min)
 table(w$tag)
 plot(x1~x0, col=tag, pch=16, cex=0.2, data=w)
 library(MASS)
@@ -33,28 +61,4 @@ x0 <- w[sample(nrow(w), size=5000),c("x0", "x1")]
 tag.hat <- as.numeric(predict(m.nnet, x0, type="class"))
 plot(x0[,1], x0[,2], col=tag.hat, pch=16, cex=0.2)
 plot(x0[,1], x0[,2], col=predict(m.lda, x0)$class, pch=16, cex=0.2)
-
-library(lattice)
-xyplot(ntries0~x0 | factor(proposal), data=w)
-
-nrow(w)
-w <- subset(w, is.finite(w))
-nrow(w)
-#library(nnet)
-#m0 <- nnet(w ~ x0 + x1, data=w, subset= proposal==0, size=2, linout=TRUE)
-#m1 <- nnet(w ~ x0 + x1, data=w, subset= proposal==1, size=2, linout=TRUE)
-library(mgcv)
-m0 <- gam(w ~ s(x0) + s(x1), data=w, subset= proposal==0)
-m1 <- gam(w ~ s(x0) + s(x1), data=w, subset= proposal==1)
-
-y0 <- matrix(, 5000, 2)
-y0[, 1] <- predict(m0, newdata=x0)
-y0[, 2] <- predict(m1, newdata=x0)
-summary(y0)
-tags <- apply(y0, 1, which.max)
-table(tags)
-plot(x0[,1], y0[,1], col=tags, pch=16, cex=0.2)
-plot(x0[,2], y0[,1], col=tags, pch=16, cex=0.2)
-plot(x0[,1], y0[,2], col=tags, pch=16, cex=0.2)
-plot(x0[,2], y0[,2], col=tags, pch=16, cex=0.2)
-
+#uh, unexpected result
