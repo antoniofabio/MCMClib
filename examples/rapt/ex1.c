@@ -131,7 +131,7 @@ int main(int argc, char** argv) {
   /*print out csv header*/
   for(int j=0; j<d; j++)
     fprintf(out_extra, "x%d, ", j);
-  fprintf(out_extra, "proposal, ntries0, ntries1, ntries2\n");
+  fprintf(out_extra, "proposal, ntries0, ntries1, ntries2, jump\n");
 
   /*main MCMC loop*/
   for(int i=0; i<N; i++) {
@@ -148,7 +148,10 @@ int main(int argc, char** argv) {
 	fprintf(out_extra, "%f, ", gsl_vector_get(sampler->old, j));
       fprintf(out_extra, "%d, ", sampler->which_proposal);
       print_vector(out_extra, sampler->ntries);
-      fprintf(out_extra, "\n");
+      double jd = 0.0;
+      for(int j=0; j< sampler->old->size; j++)
+	jd += pow(gsl_vector_get(sampler->old, j) - gsl_vector_get(sampler->current_x, j), 2.0);
+      fprintf(out_extra, ", %f\n", jd);
     }
   }
   
