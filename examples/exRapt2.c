@@ -35,7 +35,7 @@ double target_logdensity(void* ignore, gsl_vector* vx) {
 
 /*boundary function*/
 int which_region(gsl_vector* x, void* ignore) {
-  if(gsl_vector_get(x, 0) < 0.0)
+  if(gsl_vector_get(x, 0) < -0.5)
     return 0;
   else
     return 1;
