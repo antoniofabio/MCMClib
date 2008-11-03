@@ -137,6 +137,7 @@ int main(int argc, char** argv) {
     dump_rapt(sampler);
 #endif
     mcmclib_rapt_update(sampler);
+    mcmclib_rapt_update_proposals(sampler);
     print_vector(out, x);
     fprintf(out, "%d\n", sampler->which_proposal);
     if(sampler->accepted) {
