@@ -63,6 +63,9 @@ static void dump_matrix(gsl_matrix* x) {
 static void dump_rapt(mcmclib_rapt* s) {
   printf("#current_x: ");  dump_vector(s->current_x);
   printf("#old: "); dump_vector(s->old);
+  printf("#accepted: %d\n", s->accepted);
+  printf("#which_proposal: %d\n", s->which_proposal);
+  printf("#ntries: "), dump_vector(s->ntries);
   printf("#sigma_whole:\n"); dump_matrix(s->sigma_whole);
   printf("#sigma_local[...]:\n");
   for(int k=0; k< s->K; k++) {
@@ -83,40 +86,9 @@ static void dump_rapt(mcmclib_rapt* s) {
     dump_matrix(s->variances[k]);
   }
   printf("#n: "); dump_vector(s->n);
-  printf("#which_proposal: %d\n", s->which_proposal);
   printf("#visits:\n"); dump_matrix(s->visits);
   printf("#jd:\n"); dump_matrix(s->jd);
   printf("#lambda:\n"); dump_matrix(s->lambda);
-}
-
-typedef struct {
-  mcmclib_rapt* s;
-  int proposal;
-  gsl_vector* ntries;
-  double jd;
-} row_t;
-
-int update_row(row_t* r) {
-  gsl_vector_set(r->ntries, r->s->which_proposal,
-		 gsl_vector_get(r->ntries, r->s->which_proposal) + 1);
-  if(r->s->accepted) {
-    /*check if jump was within the same region*/
-    if(r->s->which_region_old != r->s->which_region_x) {
-      gsl_vector_set_all(r->ntries, 0.0);
-      return -1;
-    }
-    r->jd = r->s->last_jd;
-    r->proposal = r->s->which_proposal;    
-    return 1;
-  }
-  return 0;
-}
-
-void print_row(FILE* f, row_t* r) {
-  print_vector(f, r->s->current_x);
-  fprintf(f, ", %d, ", r->proposal);
-  print_vector(f, r->ntries);
-  fprintf(f, ", %f\n", r->jd);
 }
 
 int main(int argc, char** argv) {
@@ -156,11 +128,7 @@ int main(int argc, char** argv) {
   /*print out csv header*/
   for(int j=0; j<d; j++)
     fprintf(out_extra, "x%d, ", j);
-  fprintf(out_extra, "proposal, ntries1, ntries2, jd\n");
-
-  row_t row;
-  row.s = sampler;
-  row.ntries = gsl_vector_alloc(3);
+  fprintf(out_extra, "proposal, ntries0, ntries1, ntries2\n");
 
   /*main MCMC loop*/
   for(int i=0; i<N; i++) {
@@ -171,16 +139,15 @@ int main(int argc, char** argv) {
     mcmclib_rapt_update(sampler);
     print_vector(out, x);
     fprintf(out, "%d\n", sampler->which_proposal);
-
-    if(update_row(&row)==1) {
-      print_row(out_extra, &row);
-      gsl_vector_set_all(row.ntries, 0.0);
+    if(sampler->accepted) {
+      print_vector(out_extra, sampler->old);
+      fprintf(out_extra, ", %d, ", sampler->which_proposal);
+      print_vector(out_extra, sampler->ntries);
+      fprintf(out_extra, "\n");
     }
-
   }
   
   fclose(out_extra);
-  gsl_vector_free(row.ntries);
   fclose(out);
   gsl_rng_free(r);
   mcmclib_rapt_free(sampler);
