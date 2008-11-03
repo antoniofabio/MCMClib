@@ -47,6 +47,7 @@ static void print_vector(FILE* stream, gsl_vector* x) {
   fprintf(stream, "%.3f", gsl_vector_get(x, x->size -1));
 }
 
+#ifdef TRACE_ME
 static void dump_vector(gsl_vector* x) {
   printf("(");
   print_vector(stdout, x);
@@ -90,6 +91,7 @@ static void dump_rapt(mcmclib_rapt* s) {
   printf("#jd:\n"); dump_matrix(s->jd);
   printf("#lambda:\n"); dump_matrix(s->lambda);
 }
+#endif
 
 int main(int argc, char** argv) {
   int d = DIM;
