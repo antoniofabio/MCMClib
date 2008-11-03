@@ -8,7 +8,8 @@
 /*trace program execution to stdout?*/
 //#define TRACE_ME
 
-#define OUTPUT_FILE "data_rapt2.csv"
+#define OUTPUT_FILE "ex1_out.csv"
+#define EXTRA_OUTPUT_FILE "ex1_extra_out.csv"
 /*chain length*/
 #define N 1e5
 /*burn in length*/
@@ -126,7 +127,7 @@ int main(int argc, char** argv) {
   fprintf(out, "proposal\n");
 
   /*open extra output file*/
-  FILE* out_extra = fopen("out_rapt_extra.csv", "w");
+  FILE* out_extra = fopen(EXTRA_OUTPUT_FILE, "w");
   /*print out csv header*/
   for(int j=0; j<d; j++)
     fprintf(out_extra, "x%d, ", j);
@@ -143,8 +144,9 @@ int main(int argc, char** argv) {
     print_vector(out, x);
     fprintf(out, "%d\n", sampler->which_proposal);
     if(sampler->accepted) {
-      print_vector(out_extra, sampler->old);
-      fprintf(out_extra, ", %d, ", sampler->which_proposal);
+      for(int j=0; j< sampler->old->size; j++)
+	fprintf(out_extra, "%f, ", gsl_vector_get(sampler->old, j));
+      fprintf(out_extra, "%d, ", sampler->which_proposal);
       print_vector(out_extra, sampler->ntries);
       fprintf(out_extra, "\n");
     }
