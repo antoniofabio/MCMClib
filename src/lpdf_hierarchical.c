@@ -21,7 +21,6 @@ void mcmclib_post_lpdf_free(mcmclib_post_lpdf* p) {
 double mcmclib_post_lpdf_compute(void* data, gsl_vector* x) {
 	mcmclib_post_lpdf* d = (mcmclib_post_lpdf*) data;
 	double ans = 0.0;
-	int i=0;
 	/*store old value*/
 	gsl_vector_memcpy(d->workspace, d->x);
 	/*set new value*/
