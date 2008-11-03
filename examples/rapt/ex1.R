@@ -1,4 +1,4 @@
-dat <- read.csv("data_rapt2.csv")
+dat <- read.csv("ex1_out.csv")
 table(dat$proposal)
 chain <- dat[,1:2]
 chu <- unique(chain)
@@ -11,14 +11,15 @@ ch2 <- chu[-seq_len(nu/2),]
 plot(ch2, type="p", pch=16, cex=0.2)
 
 #load local performance infos
-w <- read.csv("out_rapt_extra.csv")
+w <- read.csv("ex1_extra_out.csv")
 w <- subset(w, proposal != 2)
 wx <- w[,1:2]
 wp <- w$proposal
 wn0 <- 1-rank(w$ntries0[wp==0])/sum(wp==0)
 wn1 <- 1-rank(w$ntries1[wp==1])/sum(wp==1)
-plot(wn0 ~ wx[wp==0,1], type="n")
+plot(wn0 ~ wx[wp==0,1], type="n", ylim=c(0, 1))
 lines(lowess(wx[wp==0,1], wn0))
+abline(h=0.5, lty=2)
 
 w$tag <- apply(w[,c("ntries0", "ntries1")], 1, which.min)
 table(w$tag)
