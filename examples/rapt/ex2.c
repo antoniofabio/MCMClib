@@ -7,15 +7,12 @@
 
 #include "ex2_extra.c"
 
-/*trace program execution to stdout?*/
-//#define TRACE_ME
-
 #define OUTPUT_FILE "ex2_out.csv"
 #define EXTRA_OUTPUT_FILE "ex2_extra_out.csv"
 /*chain blocks length*/
-#define B0 3e4
+#define B0 1e5
 /*chain length as number of blocks*/
-#define N 20
+#define N 10
 /*burn in length as number of its.*/
 #define T0 200
 /*initial variance guess*/
@@ -92,17 +89,13 @@ int main(int argc, char** argv) {
     fprintf(out, "x%d, ", j);
   fprintf(out, "proposal\n");
 
-  /*open extra output file*/
-  FILE* out_extra = fopen(EXTRA_OUTPUT_FILE, "w");
-  /*print out csv header*/
-  for(int j=0; j<d; j++)
-    fprintf(out_extra, "x%d, ", j);
-  fprintf(out_extra, "proposal, ntries0, ntries1, ntries2, jump\n");
-
   /*alloc block info data*/
   block_info* bi = block_info_alloc(sampler, B0);
 
   /*main MCMC loop*/
+  double score=1e6;
+  double newscore;
+  double oldth=th;
   for(int b=0; b<N; b++) {
     for(int nb=0; nb< B0; nb++) {
       mcmclib_rapt_update(sampler);
@@ -111,15 +104,17 @@ int main(int argc, char** argv) {
 	      fprintf(out, ", %d\n", sampler->which_proposal);*/
       block_info_update(bi);
     }
-    sampler->t = 0;
+    newscore = block_info_score(bi);
     printf("th = %f; ", th);
     print_vector(stdout, bi->den);
     printf("; "); print_vector(stdout, bi->num);
-    printf(" -> %f\n", block_info_score(bi));
-    th += 1.0 / ((double) N);
+    printf(" -> %f\n", score);
+    score = newscore;
+    oldth = th;
+    //th += (0.1 / (b + 1.0)) * ( (gsl_rng_uniform(r) < 0.5) ? -1.0 : 1.0 );
+    th += 0.1;
   }
-  
-  fclose(out_extra);
+
   fclose(out);
   block_info_free(bi);
   gsl_rng_free(r);
