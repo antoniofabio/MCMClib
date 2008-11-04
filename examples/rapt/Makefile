@@ -1,12 +1,16 @@
 SRCDIR= ../../src
 CFLAGS+=  --std=gnu99 -O0 -g -Wall -I$(SRCDIR)
-LDFLAGS+= -lgsl -lgslcblas -lm
-EX_LIST= ex1
+LDFLAGS+= $(SRCDIR)/libmcmclib.a -lgsl -lgslcblas -lm
+EX_LIST= ex1 ex2
 
-run: ex1
+all: $(EX_LIST)
+
+run: $(EX_LIST)
 	./ex1
+	./ex2
 
-ex1: ex1.o $(SRCDIR)/libmcmclib.a
+%: %.c $(SRCDIR)/libmcmclib.a
+	$(CC) $(CFLAGS) $< $(LDFLAGS) -o $@
 
 clean:
 	rm -rf *.o *~ $(EX_LIST)
