@@ -10,9 +10,9 @@
 #define OUTPUT_FILE "ex2_out.csv"
 #define EXTRA_OUTPUT_FILE "ex2_extra_out.csv"
 /*chain blocks length*/
-#define B0 1e5
+#define B0 1e4
 /*chain length as number of blocks*/
-#define N 10
+#define N 100
 /*burn in length as number of its.*/
 #define T0 200
 /*initial variance guess*/
@@ -108,11 +108,17 @@ int main(int argc, char** argv) {
     printf("th = %f; ", th);
     print_vector(stdout, bi->den);
     printf("; "); print_vector(stdout, bi->num);
-    printf(" -> %f\n", score);
+    printf(" -> %f\n", newscore);
+    if(newscore > score) {
+      printf("oops! go back to %f...\n", oldth);
+      th = oldth;
+      newscore = score;
+    }
     score = newscore;
     oldth = th;
-    //th += (0.1 / (b + 1.0)) * ( (gsl_rng_uniform(r) < 0.5) ? -1.0 : 1.0 );
-    th += 0.1;
+    double width = 0.4;
+    th += gsl_rng_uniform(r) * width - width/2.0;
+    if(fabs(th)>1) th = -0.9;
   }
 
   fclose(out);
