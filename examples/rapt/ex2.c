@@ -10,9 +10,9 @@
 #define OUTPUT_FILE "ex2_out.csv"
 #define EXTRA_OUTPUT_FILE "ex2_extra_out.csv"
 /*chain blocks length*/
-#define B0 1e4
+#define B0 1e3
 /*chain length as number of blocks*/
-#define N 100
+#define N 1000
 /*burn in length as number of its.*/
 #define T0 200
 /*initial variance guess*/
@@ -67,8 +67,8 @@ int main(int argc, char** argv) {
   /*current chain value*/
   gsl_vector* x = gsl_vector_alloc(d);
   gsl_vector_set_all(x, 0.0);
-  /*current threshold value*/
-  double th = -0.5;
+  /*starting threshold value*/
+  double th = -0.8;
 
   /*alloc a new RAPT sampler*/
   mcmclib_rapt* sampler = mcmclib_rapt_alloc(r,
@@ -82,12 +82,14 @@ int main(int argc, char** argv) {
     gsl_matrix_set(sampler->lambda, k, 2, 0.5);
   }
 
-  /*open output file*/
+  /*open output files*/
   FILE* out = fopen(OUTPUT_FILE, "w");
   /*print out csv header*/
   for(int j=0; j<d; j++)
     fprintf(out, "x%d, ", j);
   fprintf(out, "proposal\n");
+  FILE* out_extra = fopen(EXTRA_OUTPUT_FILE, "w");
+  fprintf(out_extra, "th, score\n");
 
   /*alloc block info data*/
   block_info* bi = block_info_alloc(sampler, B0);
@@ -104,11 +106,13 @@ int main(int argc, char** argv) {
 	      fprintf(out, ", %d\n", sampler->which_proposal);*/
       block_info_update(bi);
     }
+    //sampler->t = 0;
     newscore = block_info_score(bi);
     printf("th = %f; ", th);
     print_vector(stdout, bi->den);
     printf("; "); print_vector(stdout, bi->num);
     printf(" -> %f\n", newscore);
+    fprintf(out_extra, "%f, %f\n", th, newscore);
     if(newscore > score) {
       printf("oops! go back to %f...\n", oldth);
       th = oldth;
@@ -116,11 +120,12 @@ int main(int argc, char** argv) {
     }
     score = newscore;
     oldth = th;
-    double width = 0.4;
+    double width = 1.0 / pow((10 * b / ((double) N) + 1.0), 2);
     th += gsl_rng_uniform(r) * width - width/2.0;
-    if(fabs(th)>1) th = -0.9;
+    if(fabs(th)>0.95) th = -0.95;
   }
 
+  fclose(out_extra);
   fclose(out);
   block_info_free(bi);
   gsl_rng_free(r);
