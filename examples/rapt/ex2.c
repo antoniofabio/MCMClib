@@ -1,26 +1,30 @@
-/**RAPT example 2*/
+/**RAPT example 2: moving the boundary*/
 #include <stdio.h>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 #include <rapt.h>
 
+#include "ex2_extra.c"
+
 /*trace program execution to stdout?*/
 //#define TRACE_ME
 
-#define OUTPUT_FILE "ex1_out.csv"
-#define EXTRA_OUTPUT_FILE "ex1_extra_out.csv"
-/*chain length*/
-#define N 1e5
-/*burn in length*/
+#define OUTPUT_FILE "ex2_out.csv"
+#define EXTRA_OUTPUT_FILE "ex2_extra_out.csv"
+/*chain blocks length*/
+#define B0 3e4
+/*chain length as number of blocks*/
+#define N 20
+/*burn in length as number of its.*/
 #define T0 200
-/*initial covariance guess*/
+/*initial variance guess*/
 #define V0 0.5
 
 /*state space dimension*/
 #define DIM 2
 
-/*target distribution: 'V' shape*/
+/*target distribution: uniform with 'V' shape*/
 double target_logdensity(void* ignore, gsl_vector* vx) {
   double x = gsl_vector_get(vx, 0);
   double y = gsl_vector_get(vx, 1);
@@ -35,8 +39,9 @@ double target_logdensity(void* ignore, gsl_vector* vx) {
 }
 
 /*boundary function*/
-int which_region(gsl_vector* x, void* ignore) {
-  if(gsl_vector_get(x, 0) < -0.5)
+int which_region(gsl_vector* x, void* in_th) {
+  double th = *((double*) in_th);
+  if(gsl_vector_get(x, 0) < th)
     return 0;
   else
     return 1;
@@ -47,52 +52,6 @@ static void print_vector(FILE* stream, gsl_vector* x) {
     fprintf(stream, "%.3f, ", gsl_vector_get(x, i));
   fprintf(stream, "%.3f", gsl_vector_get(x, x->size -1));
 }
-
-#ifdef TRACE_ME
-static void dump_vector(gsl_vector* x) {
-  printf("(");
-  print_vector(stdout, x);
-  printf(")\n");
-}
-static void dump_matrix(gsl_matrix* x) {
-  for(int j=0; j< x->size1; j++) {
-    gsl_vector_view rv = gsl_matrix_row(x, j);
-    dump_vector(&(rv.vector));
-  }
-}
-
-/*dump current sampler state to stdout*/
-static void dump_rapt(mcmclib_rapt* s) {
-  printf("#current_x: ");  dump_vector(s->current_x);
-  printf("#old: "); dump_vector(s->old);
-  printf("#accepted: %d\n", s->accepted);
-  printf("#which_proposal: %d\n", s->which_proposal);
-  printf("#ntries: "), dump_vector(s->ntries);
-  printf("#sigma_whole:\n"); dump_matrix(s->sigma_whole);
-  printf("#sigma_local[...]:\n");
-  for(int k=0; k< s->K; k++) {
-    printf(" [%d]:\n", k);
-    dump_matrix(s->sigma_local[k]);
-  }
-  printf("#t: %d\n", s->t);
-  printf("#global_mean: "); dump_vector(s->global_mean);
-  printf("#global_variance:\n"); dump_matrix(s->global_variance);
-  printf("#means[...]:\n");
-  for(int k=0; k< s->K; k++) {
-    printf(" [%d]: ", k);
-    dump_vector(s->means[k]);
-  }  
-  printf("#variances[...]:\n");
-  for(int k=0; k< s->K; k++) {
-    printf(" [%d]:\n", k);
-    dump_matrix(s->variances[k]);
-  }
-  printf("#n: "); dump_vector(s->n);
-  printf("#visits:\n"); dump_matrix(s->visits);
-  printf("#jd:\n"); dump_matrix(s->jd);
-  printf("#lambda:\n"); dump_matrix(s->lambda);
-}
-#endif
 
 int main(int argc, char** argv) {
   int d = DIM;
@@ -111,13 +70,20 @@ int main(int argc, char** argv) {
   /*current chain value*/
   gsl_vector* x = gsl_vector_alloc(d);
   gsl_vector_set_all(x, 0.0);
+  /*current threshold value*/
+  double th = -0.5;
 
   /*alloc a new RAPT sampler*/
   mcmclib_rapt* sampler = mcmclib_rapt_alloc(r,
 					     target_logdensity, NULL,
 					     x, T0, Sigma_zero,
 					     2, Sigma_local,
-					     which_region, NULL);
+					     which_region, &th);
+  for(int k=0; k<2; k++) {
+    for(int k1=0; k1<2; k1++)
+      gsl_matrix_set(sampler->lambda, k, k1, k==k1 ? 0.5 : 0.0);
+    gsl_matrix_set(sampler->lambda, k, 2, 0.5);
+  }
 
   /*open output file*/
   FILE* out = fopen(OUTPUT_FILE, "w");
@@ -133,30 +99,29 @@ int main(int argc, char** argv) {
     fprintf(out_extra, "x%d, ", j);
   fprintf(out_extra, "proposal, ntries0, ntries1, ntries2, jump\n");
 
+  /*alloc block info data*/
+  block_info* bi = block_info_alloc(sampler, B0);
+
   /*main MCMC loop*/
-  for(int i=0; i<N; i++) {
-#ifdef TRACE_ME
-    printf("\n-----\niteration %d\nsampler:\n", i);
-    dump_rapt(sampler);
-#endif
-    mcmclib_rapt_update(sampler);
-    mcmclib_rapt_update_proposals(sampler);
-    print_vector(out, x);
-    fprintf(out, ", %d\n", sampler->which_proposal);
-    if(sampler->accepted) {
-      for(int j=0; j< sampler->old->size; j++)
-	fprintf(out_extra, "%f, ", gsl_vector_get(sampler->old, j));
-      fprintf(out_extra, "%d, ", sampler->which_proposal);
-      print_vector(out_extra, sampler->ntries);
-      double jd = 0.0;
-      for(int j=0; j< sampler->old->size; j++)
-	jd += pow(gsl_vector_get(sampler->old, j) - gsl_vector_get(sampler->current_x, j), 2.0);
-      fprintf(out_extra, ", %f\n", jd);
+  for(int b=0; b<N; b++) {
+    for(int nb=0; nb< B0; nb++) {
+      mcmclib_rapt_update(sampler);
+      mcmclib_rapt_update_proposals(sampler);
+      /*      print_vector(out, x);
+	      fprintf(out, ", %d\n", sampler->which_proposal);*/
+      block_info_update(bi);
     }
+    sampler->t = 0;
+    printf("th = %f; ", th);
+    print_vector(stdout, bi->den);
+    printf("; "); print_vector(stdout, bi->num);
+    printf(" -> %f\n", block_info_score(bi));
+    th += 1.0 / ((double) N);
   }
   
   fclose(out_extra);
   fclose(out);
+  block_info_free(bi);
   gsl_rng_free(r);
   mcmclib_rapt_free(sampler);
   gsl_matrix_free(Sigma_zero);

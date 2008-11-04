@@ -1,4 +1,4 @@
-/**RAPT example 2*/
+/**RAPT example 1*/
 #include <stdio.h>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_vector.h>
