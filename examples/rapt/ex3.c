@@ -11,10 +11,9 @@
 #define OUTPUT_FILE "ex3_out.csv"
 #define EXTRA_OUTPUT_FILE "ex3_extra_out.csv"
 /*chain blocks length*/
-//#define B0 ( 400 * (DIM + DIM * (DIM-1) / 2) )
-#define B0 1000
+#define B0 ( 400 * (DIM + DIM * (DIM-1) / 2) )
 /*chain length as number of blocks*/
-#define N 1000
+#define N 100
 /*burn in length as number of its.*/
 #define T0 B0/2
 /*initial variance guess*/
