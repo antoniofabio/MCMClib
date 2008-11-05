@@ -144,6 +144,64 @@ int mcmclib_rapt_update(mcmclib_rapt* p) {
   return 1;
 }
 
+static void rapt_update_current_value(mcmclib_rapt* p) {
+  /*save old state, old region*/
+  gsl_vector_memcpy(p->old, p->current_x);
+  p->which_region_old = p->which_region_x;
+
+  gsl_vector_view lambda_vw = gsl_matrix_row(p->lambda, p->which_region_old);
+  gsl_vector* lambda_p = &(lambda_vw.vector);
+
+  /*sample an integer between 0 and K, with given probabilities:*/
+  p->which_proposal = sample(p->r, lambda_p);
+
+  /*sample an error term from the corresponding prob. distrib.*/
+  mcmclib_mvnorm(p->r, (p->which_proposal < p->K) ?
+		 p->sigma_local[p->which_proposal] : p->sigma_whole,
+		 p->current_x);
+  gsl_vector_add(p->current_x, p->old);
+  p->accepted = mcmclib_metropolis_generic_step(p->r,
+						p->old,
+						p->current_x,
+						p->logdistr, p->logdistr_data,
+						rapt_q, p);
+  p->which_region_x = p->accepted ? p->which_region(p->current_x, p->which_region_data) : p->which_region_old;
+}
+
+/*parametrized log-density of the (mixture) proposal function.
+  To be used for computing M-H ratio correctly when doing the metropolis step
+ */
+static double rapt_q(void* data, gsl_vector* x, gsl_vector* y) {
+  mcmclib_rapt* p = (mcmclib_rapt*) data;
+  int region_x = p->which_region(x, p->which_region_data);
+  gsl_vector_view lambda_vw = gsl_matrix_row(p->lambda, region_x);
+  gsl_vector* lambda_p = &(lambda_vw.vector);
+
+  mcmclib_mvnorm_lpdf* distr_obj;
+  double ans = 0.0;
+  for(int k=0; k < p->K; k++) {
+    distr_obj = mcmclib_mvnorm_lpdf_alloc(x, (p->sigma_local[k])->data);
+    ans += exp(mcmclib_mvnorm_lpdf_compute(distr_obj, y)) * gsl_vector_get(lambda_p, k);
+    mcmclib_mvnorm_lpdf_free(distr_obj);
+  }
+  distr_obj = mcmclib_mvnorm_lpdf_alloc(x, (p->sigma_whole)->data);
+  ans += exp(mcmclib_mvnorm_lpdf_compute(distr_obj, y)) * gsl_vector_get(lambda_p, p->K);
+  mcmclib_mvnorm_lpdf_free(distr_obj);
+
+  return log(ans);
+}
+
+static int sample(gsl_rng* r, gsl_vector* probs) {
+  int K = probs->size;
+  double cum_sum = 0.0;
+  double who = gsl_rng_uniform(r);
+  for(int which=0; which<K; which++) {
+    if(who < (cum_sum += gsl_vector_get(probs, which)))
+      return(which);
+  }
+  return(K-1);
+}
+
 void mcmclib_rapt_update_proposals(mcmclib_rapt* p) {
   if((p->t) <= p->t0)
     return;
@@ -182,30 +240,6 @@ static void rapt_update_ntries(mcmclib_rapt* p) {
 		 gsl_vector_get(p->ntries, p->which_proposal) + 1);
 }
 
-static void rapt_update_current_value(mcmclib_rapt* p) {
-  /*save old state, old region*/
-  gsl_vector_memcpy(p->old, p->current_x);
-  p->which_region_old = p->which_region_x;
-
-  gsl_vector_view lambda_vw = gsl_matrix_row(p->lambda, p->which_region_old);
-  gsl_vector* lambda_p = &(lambda_vw.vector);
-
-  /*sample an integer between 0 and K, with given probabilities:*/
-  p->which_proposal = sample(p->r, lambda_p);
-
-  /*sample an error term from the corresponding prob. distrib.*/
-  mcmclib_mvnorm(p->r, (p->which_proposal < p->K) ?
-		 p->sigma_local[p->which_proposal] : p->sigma_whole,
-		 p->current_x);
-  gsl_vector_add(p->current_x, p->old);
-  p->accepted = mcmclib_metropolis_generic_step(p->r,
-						p->old,
-						p->current_x,
-						p->logdistr, p->logdistr_data,
-						rapt_q, p);
-  p->which_region_x = p->accepted ? p->which_region(p->current_x, p->which_region_data) : p->which_region_old;
-}
-
 static void rapt_update_means_variances(mcmclib_rapt* p) {
   int k = p->which_region_x;
   int fake_n = gsl_vector_get(p->n, k);
@@ -238,38 +272,4 @@ static void rapt_update_jumping_distances(mcmclib_rapt* p) {
   gsl_matrix_set(p->jd, k, p->which_proposal,
 		 (gsl_matrix_get(p->jd, k, p->which_proposal) *
 		  (newvisits - 1) + newjd) / newvisits);
-}
-
-/*parametrized log-density of the (mixture) proposal function.
-  To be used for computing M-H ratio correctly when doing the metropolis step
- */
-static double rapt_q(void* data, gsl_vector* x, gsl_vector* y) {
-  mcmclib_rapt* p = (mcmclib_rapt*) data;
-  int region_x = p->which_region(x, p->which_region_data);
-  gsl_vector_view lambda_vw = gsl_matrix_row(p->lambda, region_x);
-  gsl_vector* lambda_p = &(lambda_vw.vector);
-
-  mcmclib_mvnorm_lpdf* distr_obj;
-  double ans = 0.0;
-  for(int k=0; k < p->K; k++) {
-    distr_obj = mcmclib_mvnorm_lpdf_alloc(x, (p->sigma_local[k])->data);
-    ans += exp(mcmclib_mvnorm_lpdf_compute(distr_obj, y)) * gsl_vector_get(lambda_p, k);
-    mcmclib_mvnorm_lpdf_free(distr_obj);
-  }
-  distr_obj = mcmclib_mvnorm_lpdf_alloc(x, (p->sigma_whole)->data);
-  ans += exp(mcmclib_mvnorm_lpdf_compute(distr_obj, y)) * gsl_vector_get(lambda_p, p->K);
-  mcmclib_mvnorm_lpdf_free(distr_obj);
-
-  return log(ans);
-}
-
-static int sample(gsl_rng* r, gsl_vector* probs) {
-  int K = probs->size;
-  double cum_sum = 0.0;
-  double who = gsl_rng_uniform(r);
-  for(int which=0; which<K; which++) {
-    if(who < (cum_sum += gsl_vector_get(probs, which)))
-      return(which);
-  }
-  return(K-1);
 }
