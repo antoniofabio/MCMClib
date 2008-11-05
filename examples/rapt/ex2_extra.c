@@ -42,6 +42,9 @@ double block_info_score(block_info* p) {
   gsl_vector* num = p->num;
   gsl_vector* den = p->den;
   for(int k=0; k< p->s->K; k++)
-    ans += pow(gsl_vector_get(num, k) / gsl_vector_get(den, k) - 0.234, 2);
+    if(gsl_vector_get(den, k) > 0)
+      ans += pow(gsl_vector_get(num, k) / gsl_vector_get(den, k) - 0.234, 2);
+    else
+      printf("still no visits to region %d!", k);
   return ans;
 }
