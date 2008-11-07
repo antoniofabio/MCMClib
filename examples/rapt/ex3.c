@@ -97,25 +97,26 @@ int main(int argc, char** argv) {
   FILE* out_extra = fopen(EXTRA_OUTPUT_FILE, "w");
   for(int i=0; i<DIM; i++)
     fprintf(out_extra, "x%d, ", i);
-  fprintf(out_extra, "ntries0, ntries1, jump, proposal\n");
+  fprintf(out_extra, "ntries0, ntries1, ntries2, jump, proposal\n");
 
   /*main MCMC loop*/
   for(int n=0; n<N; n++) {
+    if(n>0 && sampler->accepted) {
+      for(int i=0; i<DIM; i++)
+	fprintf(out_extra, "%f, ", gsl_vector_get(sampler->old, i));
+      fprintf(out_extra, "%f, %f, %f, %f, %d\n",
+	      gsl_vector_get(sampler->ntries, 0),
+	      gsl_vector_get(sampler->ntries, 1),
+	      gsl_vector_get(sampler->ntries, 2),
+	      sampler->last_jd, sampler->which_proposal);
+    }
+
     mcmclib_rapt_update(sampler);
     mcmclib_rapt_update_proposals(sampler);
 
     for(int i=0; i<DIM; i++)
       fprintf(out, "%f, ", gsl_vector_get(x, i));
     fprintf(out, "%d\n", sampler->which_proposal);
-
-    if(sampler->accepted) {
-      for(int i=0; i<DIM; i++)
-	fprintf(out_extra, "%f, ", gsl_vector_get(x, i));
-      fprintf(out_extra, "%f, %f, %f, %d\n",
-	      gsl_vector_get(sampler->ntries, 0),
-	      gsl_vector_get(sampler->ntries, 1),
-	      sampler->last_jd, sampler->which_proposal);
-    }
   }
 
   fclose(out_extra);
