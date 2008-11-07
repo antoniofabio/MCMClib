@@ -1,4 +1,4 @@
-/**RAPT example 3: user-specified mu, boundary, dimensions*/
+/**RAPT example 3: user-specified mu, boundary, dimensions, no. iterations*/
 #include <stdio.h>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_vector.h>
@@ -100,7 +100,11 @@ int main(int argc, char** argv) {
   fprintf(out_extra, "ntries0, ntries1, ntries2, jump, proposal\n");
 
   /*main MCMC loop*/
+  int naccept=0;
+  gsl_matrix* naccept_m = gsl_matrix_alloc(2, 3);
   for(int n=0; n<N; n++) {
+
+#ifndef NO_SAVE
     if(n>0 && sampler->accepted) {
       for(int i=0; i<DIM; i++)
 	fprintf(out_extra, "%f, ", gsl_vector_get(sampler->old, i));
@@ -110,15 +114,29 @@ int main(int argc, char** argv) {
 	      gsl_vector_get(sampler->ntries, 2),
 	      sampler->last_jd, sampler->which_proposal);
     }
+#endif
 
     mcmclib_rapt_update(sampler);
     mcmclib_rapt_update_proposals(sampler);
 
+    if(sampler->accepted) {
+      naccept++;
+      gsl_matrix_set(naccept_m, sampler->which_region_x, sampler->which_proposal,
+		     gsl_matrix_get(naccept_m, sampler->which_region_x, sampler->which_proposal) + 1.0);
+    }
+#ifndef NO_SAVE
     for(int i=0; i<DIM; i++)
       fprintf(out, "%f, ", gsl_vector_get(x, i));
     fprintf(out, "%d\n", sampler->which_proposal);
+#endif
   }
 
+  /*print out final summary*/
+  printf("%f\n",
+	 (gsl_matrix_get(naccept_m, 0, 0) + gsl_matrix_get(naccept_m, 1, 1)) /
+	 (gsl_matrix_get(sampler->visits, 0, 0) + gsl_matrix_get(sampler->visits, 1, 1)));
+
+  gsl_matrix_free(naccept_m);
   fclose(out_extra);
   fclose(out);
   target_distrib_free();
