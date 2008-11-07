@@ -258,15 +258,15 @@ static void rapt_update_visits_counts(mcmclib_rapt* p) {
 }
 
 static void rapt_update_jumping_distances(mcmclib_rapt* p) {
-  if(p->which_region_old != p->which_region_x)
-    return;
-
   gsl_vector_memcpy(p->workspace, p->old);
   gsl_vector_sub(p->workspace, p->current_x);
   double newjd = 0.0;
   for(int i=0; i< p->current_x->size; i++)
     newjd += (gsl_vector_get(p->workspace, i) * gsl_vector_get(p->workspace, i));
   p->last_jd = newjd;
+
+  if(p->which_region_old != p->which_region_x)
+    return;
   int k = p->which_region_x;
   double newvisits = gsl_matrix_get(p->visits, k, p->which_proposal);
   gsl_matrix_set(p->jd, k, p->which_proposal,
