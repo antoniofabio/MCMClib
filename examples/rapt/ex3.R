@@ -1,7 +1,3 @@
-d <- read.csv("ex3_extra_out.csv")
-plot(d$score, type="b", xlab="batch number", ylab=expression(theta))
-abline(h=0, lty=2)
-
 ths <- seq(-3.0, 3.0, by=0.5)
 score <- numeric()
 system.time(
