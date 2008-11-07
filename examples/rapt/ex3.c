@@ -1,4 +1,4 @@
-/**RAPT example 3: moving the boundary, high dimensionality*/
+/**RAPT example 3: user-specified mu, boundary, dimensions*/
 #include <stdio.h>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_vector.h>
@@ -6,89 +6,53 @@
 #include <rapt.h>
 #include <mvnorm.h>
 
-#include "ex2_extra.c"
-
 #define OUTPUT_FILE "ex3_out.csv"
 #define EXTRA_OUTPUT_FILE "ex3_extra_out.csv"
-/*chain blocks length*/
-#define B0 ( 400 * (DIM + DIM * (DIM-1) / 2) )
-/*chain length as number of blocks*/
-#define N 100
-/*burn in length as number of its.*/
-#define T0 B0/2
+
+/*burn in length*/
+#define T0 ((DIM + DIM * (DIM-1) / 2) * 100)
 /*initial variance guess*/
 #define V0 1.0
-/*initial threshold guess*/
-#define TH0 0.0
 
-/*state space dimension*/
-#define DIM 100
-
-/*definitions for the target distribution*/
-#define ABS_MU 1.5
-static gsl_vector* mu1;
-static gsl_vector* mu2;
-static gsl_matrix* Sigma1;
-static gsl_matrix* Sigma2;
-static mcmclib_mvnorm_lpdf* pi1;
-static mcmclib_mvnorm_lpdf* pi2;
-/*target log-distribution: mixture of two normals*/
-double target_logdensity(void* ignore, gsl_vector* x) {
-  return log(exp(mcmclib_mvnorm_lpdf_compute(pi1, x)) +
-	     exp(mcmclib_mvnorm_lpdf_compute(pi2, x)));
-}
-static void target_distrib_init() {
-  mu1 = gsl_vector_alloc(DIM);
-  mu2 = gsl_vector_alloc(DIM);
-  Sigma1 = gsl_matrix_alloc(DIM, DIM);
-  Sigma2 = gsl_matrix_alloc(DIM, DIM);
-  gsl_vector_set_all(mu1, ABS_MU);
-  gsl_vector_set_all(mu2, - ABS_MU);
-
-  gsl_matrix_set_identity(Sigma1);
-  gsl_matrix_scale(Sigma1, V0);
-  gsl_matrix_memcpy(Sigma2, Sigma1);
-  /*  gsl_rng* r = gsl_rng_alloc(gsl_rng_default);
-  gsl_matrix* tmp1 = gsl_matrix_alloc(DIM, DIM);
-  gsl_matrix* tmp2 = gsl_matrix_alloc(DIM, DIM);
-  for(int i=0; i<DIM; i++) for(int j=0; j<DIM; j++) {
-      gsl_matrix_set(tmp1, i, j, gsl_ran_gaussian(r, 1.0));
-      gsl_matrix_set(tmp2, i, j, gsl_ran_gaussian(r, 1.0));
-    }
-  gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, tmp1, tmp1, 0.0, Sigma1);
-  gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, tmp2, tmp2, 0.0, Sigma2);
-  gsl_matrix_free(tmp1);
-  gsl_matrix_free(tmp2);
-  gsl_rng_free(r);*/
-  pi1 = mcmclib_mvnorm_lpdf_alloc(mu1, Sigma1->data);
-  pi2 = mcmclib_mvnorm_lpdf_alloc(mu2, Sigma2->data);
-}
-static void target_distrib_free() {
-  gsl_vector_free(mu1);
-  gsl_vector_free(mu2);
-  gsl_matrix_free(Sigma1);
-  gsl_matrix_free(Sigma2);
-  mcmclib_mvnorm_lpdf_free(pi1);
-  mcmclib_mvnorm_lpdf_free(pi2);
+/*input arguments*/
+static double TH;
+static int N = 100000;
+static int DIM = 2;
+static double MU0 = 1.5;
+static void scan_arguments(int argc, char** argv) {
+  sscanf(argv[1], "%lf", &TH);
+  if(argc==2) return;
+  sscanf(argv[2], "%d", &N);
+  if(argc==3) return;
+  sscanf(argv[3], "%d", &DIM);
+  if(argc == 4) return;
+  sscanf(argv[4], "%lf", &MU0);
 }
 
 /*boundary function*/
-int which_region(gsl_vector* x, void* in_th) {
-  double th = *((double*) in_th);
+int which_region(gsl_vector* x, void* ignore) {
   double tmp = 0.0;
   for(int i=0; i<DIM; i++)
     tmp += gsl_vector_get(x, i);
-  //  tmp = gsl_vector_get(x, 0);
-  //  printf("sum(x) = %f\n", tmp);
-  if(tmp < th)
+  if(tmp < TH)
     return 0;
   else
     return 1;
 }
 
+#include "ex3_target_distrib.c"
+
 int main(int argc, char** argv) {
+  /*scan input arguments*/
+  if(argc < 2) {
+    fprintf(stderr, "expecting arguments: th, N(=%d), dim(=%d), mu0(=%f)\n",
+	    N, DIM, MU0);
+    exit(1);
+  }
+  scan_arguments(argc, argv);
   int d = DIM;
-  /*set starting guess covariance matrix*/
+
+  /*set starting guess covariance matrices*/
   gsl_matrix* Sigma_zero = gsl_matrix_alloc(d, d);
   gsl_matrix_set_identity(Sigma_zero);
   gsl_matrix_scale(Sigma_zero, V0 * 2.38 * 2.38 / DIM);
@@ -96,76 +60,70 @@ int main(int argc, char** argv) {
   for(int k=0; k<2; k++){
     Sigma_local[k] = gsl_matrix_alloc(d,d);
     gsl_matrix_memcpy(Sigma_local[k], Sigma_zero);
+    gsl_matrix_scale(Sigma_local[k], 0.25);
   }
-  gsl_matrix_scale(Sigma_zero, 1.0 * DIM);
 
+  /**********************/
+  /*INIT data structures*/
+  /**********************/
   /*alloc a new RNG*/
   gsl_rng *r = gsl_rng_alloc(gsl_rng_default);
   /*current chain value*/
   gsl_vector* x = gsl_vector_alloc(d);
   gsl_vector_set_all(x, 0.0);
-  /*starting threshold value*/
-  double th = TH0;
+
+  /*init target distribution data*/
+  target_distrib_init();
 
   /*alloc a new RAPT sampler*/
-  mcmclib_rapt* sampler = mcmclib_rapt_alloc(r,
-					     target_logdensity, NULL,
-					     x, T0, Sigma_zero,
-					     2, Sigma_local,
-					     which_region, &th);
+  mcmclib_rapt* sampler =
+    mcmclib_rapt_alloc(r, /*RNG*/
+		       target_logdensity, NULL,
+		       x, T0, /*current chain value, burnin*/
+		       Sigma_zero, 2, Sigma_local, /*startng guesses*/
+		       which_region, NULL);
+  /*set custom proposal weights*/
   for(int k=0; k<2; k++) {
     for(int k1=0; k1<2; k1++)
       gsl_matrix_set(sampler->lambda, k, k1, k==k1 ? 0.5 : 0.0);
     gsl_matrix_set(sampler->lambda, k, 2, 0.5);
   }
 
-  /*open output files*/
+  /*open output files, write headers*/
   FILE* out = fopen(OUTPUT_FILE, "w");
+  for(int i=0; i<DIM; i++)
+    fprintf(out, "x%d, ", i);
+  fprintf(out, "proposal\n");
   FILE* out_extra = fopen(EXTRA_OUTPUT_FILE, "w");
-  fprintf(out_extra, "th, score\n");
-
-  /*alloc block info data*/
-  block_info* bi = block_info_alloc(sampler, B0);
-
-  target_distrib_init();
+  for(int i=0; i<DIM; i++)
+    fprintf(out_extra, "x%d, ", i);
+  fprintf(out_extra, "ntries0, ntries1, jump, proposal\n");
 
   /*main MCMC loop*/
-  double score=1e6;
-  double newscore;
-  double oldth=th;
-  for(int b=0; b<N; b++) {
-    for(int nb=0; nb< B0; nb++) {
-      mcmclib_rapt_update(sampler);
-      mcmclib_rapt_update_proposals(sampler);
-      block_info_update(bi);
+  for(int n=0; n<N; n++) {
+    mcmclib_rapt_update(sampler);
+    mcmclib_rapt_update_proposals(sampler);
+
+    for(int i=0; i<DIM; i++)
+      fprintf(out, "%f, ", gsl_vector_get(x, i));
+    fprintf(out, "%d\n", sampler->which_proposal);
+
+    if(sampler->accepted) {
       for(int i=0; i<DIM; i++)
-	fprintf(out, "%f ", gsl_vector_get(x, i));
-      fprintf(out, "\n");
+	fprintf(out_extra, "%f, ", gsl_vector_get(x, i));
+      fprintf(out_extra, "%f, %f, %f, %d\n",
+	      gsl_vector_get(sampler->ntries, 0),
+	      gsl_vector_get(sampler->ntries, 1),
+	      sampler->last_jd, sampler->which_proposal);
     }
-    newscore = block_info_score(bi);
-    //printf("th = %f -> %f\n", th, newscore);
-    fprintf(out_extra, "%f, %f\n", th, newscore);
-    if(newscore > score) {
-      //printf("oops! go back to %f...\n", oldth);
-      th = oldth;
-      newscore = score;
-    }
-    /*    printf(".");
-    if((b % 10) == 0)
-      printf("\n%d\n", b);
-      fflush(stdout);*/
-    score = newscore;
-    oldth = th;
-    /*    double width = 0.2 / pow((10 * (b + 1)/ (double) N), 2);
-    th += gsl_rng_uniform(r) * width - width/2.0;
-    if(th < -ABS_MU) th = -ABS_MU;
-    else if(th > ABS_MU) th = ABS_MU;*/
   }
 
-  target_distrib_free();
   fclose(out_extra);
-  block_info_free(bi);
+  fclose(out);
+  target_distrib_free();
   gsl_rng_free(r);
   mcmclib_rapt_free(sampler);
+  for(int k=0; k<2; k++)
+    gsl_matrix_free(Sigma_local[k]);
   gsl_matrix_free(Sigma_zero);
 }
