@@ -62,6 +62,8 @@ int main(int argc, char** argv) {
     gsl_matrix_memcpy(Sigma_local[k], Sigma_zero);
     gsl_matrix_scale(Sigma_local[k], 0.25);
   }
+  gsl_matrix_set_identity(Sigma_zero);
+  gsl_matrix_scale(Sigma_zero, pow(2.0 * MU0, 2.0) * 2.38 * 2.38 / DIM);
 
   /**********************/
   /*INIT data structures*/
