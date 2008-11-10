@@ -10,19 +10,18 @@
 */
 void mcmclib_mixem_fit(gsl_matrix* X, int K,
 		       gsl_vector** mu, gsl_matrix** Sigma,
-		       gsl_matrix* P, gsl_vector* w, double eps) {
+		       gsl_matrix* P, gsl_vector* w, int NITER) {
   mcmclib_mvnorm_lpdf** pi_k = (mcmclib_mvnorm_lpdf**) malloc(K * sizeof(mcmclib_mvnorm_lpdf*));
   for(int k=0; k<K; k++) {
     pi_k[k] = mcmclib_mvnorm_lpdf_alloc(mu[k], Sigma[k]->data);
     mcmclib_mvnorm_lpdf_chol(pi_k[k]);
   }
-  mcmclib_mixnorm_lpdf* pi_lpdf = mcmclib_mixnorm_lpdf_alloc(w, pi_k);
   int N = X->size1;
   int d = X->size2;
   gsl_vector* wn = w;
   gsl_vector* tmp_X_n = gsl_vector_alloc(d);
 
-  for(int ITER=0; ITER < MIXEM_MAXITER; ITER++) {
+  for(int ITER=0; ITER < NITER; ITER++) {
     /*get weight prediction for each point*/
     gsl_vector_set_all(wn, 0.0);
     for(int n=0; n<N; n++) {
@@ -66,17 +65,9 @@ void mcmclib_mixem_fit(gsl_matrix* X, int K,
     }
     gsl_vector_scale(w, 1.0 / (double) N);
 
-    /*commpute log-likelihood of current parameters values*/
-    double loglik = 0.0;
-    for(int n=0; n<N; n++) {
-      gsl_vector_view rv = gsl_matrix_row(X, n);
-      loglik += mcmclib_mixnorm_lpdf_compute(pi_lpdf, &(rv.vector));
-    }
-
   }
 
   gsl_vector_free(tmp_X_n);
-  mcmclib_mixnorm_lpdf_free(pi_lpdf);
   for(int k=0; k<K; k++)
     mcmclib_mvnorm_lpdf_free(pi_k[k]);
   free(pi_k);

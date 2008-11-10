@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
   }
   gsl_matrix* P = gsl_matrix_alloc(N, K);
   gsl_vector* w_hat = gsl_vector_alloc(K);
-  mcmclib_mixem_fit(X, K, mu_hat, Sigma_hat, P, w_hat, 0.001);
+  mcmclib_mixem_fit(X, K, mu_hat, Sigma_hat, P, w_hat, 10);
 
   /*print out estimation results*/
   gsl_vector_fprintf(stdout, w_hat, "%f");
