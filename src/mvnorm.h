@@ -48,4 +48,10 @@ void mcmclib_mvnorm_lpdf_free(mcmclib_mvnorm_lpdf* p);
 */
 double mcmclib_mvnorm_lpdf_compute(void* in_p, gsl_vector* x);
 
+/**update cholesky decomposition info*/
+void mcmclib_mvnorm_lpdf_chol(mcmclib_mvnorm_lpdf* p);
+
+/**compute log-distrib without recomputing cholesky decomposition*/
+double mcmclib_mvnorm_lpdf_compute_nochol(mcmclib_mvnorm_lpdf* p, gsl_vector* x);
+
 #endif
