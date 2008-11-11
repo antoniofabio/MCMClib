@@ -31,6 +31,10 @@ int main(int argc, char** argv) {
   gsl_vector_set_all(mu, MU0);
 
   mcmclib_mvnorm_lpdf* p = mcmclib_mvnorm_lpdf_alloc(mu, Sigma->data);
+  mcmclib_mvnorm_lpdf* p_nochol = mcmclib_mvnorm_lpdf_alloc(mu, Sigma->data);
+  mcmclib_mvnorm_lpdf_chol(p_nochol);
+  mcmclib_mvnorm_lpdf* p_noinv = mcmclib_mvnorm_lpdf_alloc(mu, Sigma->data);
+  mcmclib_mvnorm_lpdf_inverse(p_noinv);
   gsl_vector* x = gsl_vector_alloc(DIM);
 
   gsl_matrix* check_m = gsl_matrix_alloc(20, 2);
@@ -43,10 +47,14 @@ int main(int argc, char** argv) {
     double lpdf = mcmclib_mvnorm_lpdf_compute(p, x);
     double lpdf_check = gsl_matrix_get(check_m, i, 1);
     assert(check_dequal(lpdf, lpdf_check));
+    assert(check_dequal(mcmclib_mvnorm_lpdf_compute_nochol(p_nochol, x), lpdf_check));
+    assert(check_dequal(mcmclib_mvnorm_lpdf_compute_noinv(p_noinv, x), lpdf_check));
   }
 
   gsl_matrix_free(check_m);
   gsl_vector_free(x);
+  mcmclib_mvnorm_lpdf_free(p_noinv);
+  mcmclib_mvnorm_lpdf_free(p_nochol);
   mcmclib_mvnorm_lpdf_free(p);
   gsl_vector_free(mu);
   gsl_matrix_free(Sigma);

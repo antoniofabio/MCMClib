@@ -24,11 +24,12 @@ void mcmclib_mvnorm_chol(const gsl_rng* r,
 /** multivariate gaussian distribution parameters
 */
 typedef struct {
-	gsl_vector* mean;
-	double* vcov;
-	gsl_matrix* rooti;
-	gsl_vector* x_mu;
-	gsl_vector* mahal;
+  gsl_vector* mean;
+  double* vcov;
+  gsl_matrix* rooti;
+  gsl_vector* x_mu;
+  gsl_vector* mahal;
+  double determinant;
 } mcmclib_mvnorm_lpdf;
 
 /** alloc extra data for a multivariate gaussian distribution
@@ -53,5 +54,10 @@ void mcmclib_mvnorm_lpdf_chol(mcmclib_mvnorm_lpdf* p);
 
 /**compute log-distrib without recomputing cholesky decomposition*/
 double mcmclib_mvnorm_lpdf_compute_nochol(mcmclib_mvnorm_lpdf* p, gsl_vector* x);
+
+/**update inverse covariance matrix info*/
+void mcmclib_mvnorm_lpdf_inverse(mcmclib_mvnorm_lpdf* p);
+/**compute log-distrib by exploiting previously computed inverse*/
+double mcmclib_mvnorm_lpdf_compute_noinv(mcmclib_mvnorm_lpdf* p, gsl_vector* x);
 
 #endif
