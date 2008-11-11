@@ -19,3 +19,4 @@ clean_all: clean
 	rm -rf *.csv
 
 ex3: ex3_target_distrib.c
+ex4: ex4_target_distrib.c

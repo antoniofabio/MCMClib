@@ -8,35 +8,33 @@
 #include <mixem.h>
 #include <mvnorm.h>
 
-#define OUTPUT_FILE "ex3_out.csv"
-#define EXTRA_OUTPUT_FILE "ex3_extra_out.csv"
-
+/** Following arguments can be (almost) freely customized */
+/*chain length*/
+#define N 100000
+/*state space dimension*/
+#define DIM 2
+/*absolute local mean value*/
+#define MU0 1.5
+/*local variance*/
+#define V0 1.0
 /*burn in length*/
 #define T0 ((DIM + DIM * (DIM-1) / 2) * 100)
-/*initial variance guess*/
-#define V0 1.0
 /*update boundary every N0 iterations*/
-static int N0 = 10000;
+#define N0 (N / 10)
+/*scaling factor*/
+#define SCALING_FACTOR (2.38 * 2.38 / (double) DIM)
+/*starting local variance guess*/
+#define SIGMA0_LOCAL (V0 * 0.25)
+/*starting global variance guess*/
+#define SIGMA0_GLOBAL pow(MU0 * 2, 2.0)
+/***/
 
-
-/*input arguments*/
-static int N = 100000;
-static int DIM = 2;
-static double MU0 = 1.5;
-static void scan_arguments(int argc, char** argv) {
-  if(argc==1) return;
-  sscanf(argv[1], "%d", &N);
-  if(argc==2) return;
-  sscanf(argv[2], "%d", &DIM);
-  if(argc == 3) return;
-  sscanf(argv[3], "%lf", &MU0);
-}
-
+/*number of regions*/
 #define K 2
+/*boundary function and support data*/
 static gsl_vector* mu_hat[K];
 static gsl_matrix* Sigma_hat[K];
 static mcmclib_mvnorm_lpdf* pi_hat[K];
-/*boundary function*/
 int which_region(gsl_vector* x, void* ignore) {
   static double pik[K];
   int ans = 0;
@@ -51,28 +49,19 @@ int which_region(gsl_vector* x, void* ignore) {
   return ans;
 }
 
-#include "ex3_target_distrib.c"
+#include "ex4_target_distrib.c"
 
 int main(int argc, char** argv) {
-  /*scan input arguments*/
-  if(argc > 4) {
-    fprintf(stderr, "expecting arguments: N(=%d), dim(=%d), mu0(=%f)\n", N, DIM, MU0);
-    exit(1);
+  /*set starting guess metropolis covariance matrices*/
+  gsl_matrix* Sigma_local[K];
+  for(int k=0; k < K; k++){
+    Sigma_local[k] = gsl_matrix_alloc(DIM, DIM);
+    gsl_matrix_set_identity(Sigma_local[k]);
+    gsl_matrix_scale(Sigma_local[k], SIGMA0_LOCAL * SCALING_FACTOR);
   }
-  scan_arguments(argc, argv);
-
-  /*set starting guess covariance matrices*/
   gsl_matrix* Sigma_zero = gsl_matrix_alloc(DIM, DIM);
   gsl_matrix_set_identity(Sigma_zero);
-  gsl_matrix_scale(Sigma_zero, V0 * 2.38 * 2.38 / DIM);
-  gsl_matrix** Sigma_local = (gsl_matrix**) malloc(2 * sizeof(gsl_matrix*));
-  for(int k=0; k<2; k++){
-    Sigma_local[k] = gsl_matrix_alloc(DIM, DIM);
-    gsl_matrix_memcpy(Sigma_local[k], Sigma_zero);
-    gsl_matrix_scale(Sigma_local[k], 0.25);
-  }
-  gsl_matrix_set_identity(Sigma_zero);
-  gsl_matrix_scale(Sigma_zero, pow(2.0 * MU0, 2.0) * 2.38 * 2.38 / DIM);
+  gsl_matrix_scale(Sigma_zero, SIGMA0_GLOBAL * SCALING_FACTOR);
 
   /**********************/
   /*INIT data structures*/
@@ -100,49 +89,26 @@ int main(int argc, char** argv) {
     mcmclib_rapt_alloc(r, /*RNG*/
 		       target_logdensity, NULL,
 		       x, T0, /*current chain value, burnin*/
-		       Sigma_zero, 2, Sigma_local, /*startng guesses*/
+		       Sigma_zero, K, Sigma_local, /*startng guesses*/
 		       which_region, NULL);
   /*set custom proposal weights*/
-  for(int k=0; k<2; k++) {
-    for(int k1=0; k1<2; k1++)
+  for(int k=0; k < K; k++) {
+    for(int k1=0; k1 < K; k1++)
       gsl_matrix_set(sampler->lambda, k, k1, k==k1 ? 0.5 : 0.0);
-    gsl_matrix_set(sampler->lambda, k, 2, 0.5);
+    gsl_matrix_set(sampler->lambda, k, K, 0.5);
   }
-
-  /*open output files, write headers*/
-  FILE* out = fopen(OUTPUT_FILE, "w");
-  for(int i=0; i<DIM; i++)
-    fprintf(out, "x%d, ", i);
-  fprintf(out, "proposal\n");
-  FILE* out_extra = fopen(EXTRA_OUTPUT_FILE, "w");
-  for(int i=0; i<DIM; i++)
-    fprintf(out_extra, "x%d, ", i);
-  fprintf(out_extra, "ntries0, ntries1, ntries2, jump, proposal\n");
 
   /*main MCMC loop*/
   int naccept=0;
   gsl_matrix* naccept_m = gsl_matrix_alloc(K, K+1);
   gsl_matrix* X = gsl_matrix_alloc(N, DIM);
   for(int n=0; n<N; n++) {
-
-#ifndef NO_SAVE
-    if(n>0 && sampler->accepted) {
-      for(int i=0; i<DIM; i++)
-	fprintf(out_extra, "%f, ", gsl_vector_get(sampler->old, i));
-      fprintf(out_extra, "%f, %f, %f, %f, %d\n",
-	      gsl_vector_get(sampler->ntries, 0),
-	      gsl_vector_get(sampler->ntries, 1),
-	      gsl_vector_get(sampler->ntries, 2),
-	      sampler->last_jd, sampler->which_proposal);
-    }
-#endif
-
     mcmclib_rapt_update(sampler);
     mcmclib_rapt_update_proposals(sampler);
     gsl_vector_view Xn = gsl_matrix_row(X, n);
     gsl_vector_memcpy(&(Xn.vector), x);
     if(((n+1) % N0)==0) {
-      gsl_matrix_view Xv = gsl_matrix_submatrix(X, 0, 0, n, DIM);
+      gsl_matrix_view Xv = gsl_matrix_submatrix(X, 0, 0, n+1, DIM);
       mcmclib_mixem_fit(&(Xv.matrix), K, mu_hat, Sigma_hat, P_hat, w_hat, 10);
       for(int k=0; k<K; k++)
 	mcmclib_mvnorm_lpdf_chol(pi_hat[k]);
@@ -154,30 +120,34 @@ int main(int argc, char** argv) {
 		     gsl_matrix_get(naccept_m, sampler->which_region_x, sampler->which_proposal) + 1.0);
     }
   }
-
   /*print out final summary*/
   printf("Acceptance rate: %f\n",
 	 (gsl_matrix_get(naccept_m, 0, 0) + gsl_matrix_get(naccept_m, 1, 1)) /
 	 (gsl_matrix_get(sampler->visits, 0, 0) + gsl_matrix_get(sampler->visits, 1, 1)));
 
-  printf("Means estimates:\n");
+  /*store sampled values*/
+  FILE* out_X = fopen("ex4_X.csv", "w");
+  gsl_matrix_fprintf(out_X, X, "%f");
+  fclose(out_X);
+  /*store means and variances estimates*/
+  FILE* out_mu = fopen("ex4_mu_hat.csv", "w");
+  FILE* out_Sigma = fopen("ex4_Sigma_hat.csv", "w");
   for(int k=0; k<K; k++){
-    printf("mu[%d]:\n", k);
-    gsl_vector_fprintf(stdout, mu_hat[k], "%f");
+    gsl_vector_fprintf(out_mu, mu_hat[k], "%f");
+    gsl_matrix_fprintf(out_Sigma, Sigma_hat[k], "%f");
   }
-  printf("Variances estimates:\n");
-  for(int k=0; k<K; k++){
-    printf("Sigma[%d]:\n", k);
-    gsl_matrix_fprintf(stdout, Sigma_hat[k], "%f");
-  }
+  fclose(out_mu);
+  fclose(out_Sigma);
+  /*store mixture weights estimates*/
+  FILE* out_w = fopen("ex4_w_hat.csv", "w");
+  gsl_vector_fprintf(out_w, w_hat, "%f");
+  fclose(out_w);
 
   gsl_matrix_free(naccept_m);
-  fclose(out_extra);
-  fclose(out);
   target_distrib_free();
   gsl_rng_free(r);
   mcmclib_rapt_free(sampler);
-  for(int k=0; k<2; k++)
+  for(int k=0; k<K; k++)
     gsl_matrix_free(Sigma_local[k]);
   gsl_matrix_free(Sigma_zero);
 }
