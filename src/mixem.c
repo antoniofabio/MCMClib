@@ -14,7 +14,7 @@ void mcmclib_mixem_fit(gsl_matrix* X, int K,
   mcmclib_mvnorm_lpdf** pi_k = (mcmclib_mvnorm_lpdf**) malloc(K * sizeof(mcmclib_mvnorm_lpdf*));
   for(int k=0; k<K; k++) {
     pi_k[k] = mcmclib_mvnorm_lpdf_alloc(mu[k], Sigma[k]->data);
-    mcmclib_mvnorm_lpdf_chol(pi_k[k]);
+    mcmclib_mvnorm_lpdf_inverse(pi_k[k]);
   }
   int N = X->size1;
   int d = X->size2;
@@ -29,7 +29,7 @@ void mcmclib_mixem_fit(gsl_matrix* X, int K,
       gsl_vector* r = &(rv.vector);
       double rowsum = 0.0;
       for(int k=0; k<K; k++) {
-	double p_nk = exp(mcmclib_mvnorm_lpdf_compute_nochol(pi_k[k], r));
+	double p_nk = exp(mcmclib_mvnorm_lpdf_compute_noinv(pi_k[k], r));
 	gsl_matrix_set(P, n, k, p_nk);
 	rowsum += p_nk;
       }
