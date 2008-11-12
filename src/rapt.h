@@ -2,6 +2,7 @@
 #define __RAPT_H__
 
 #include "common.h"
+#include "mvnorm.h"
 
 typedef int (*region_fun_t) (gsl_vector*, void*);
 
@@ -42,6 +43,8 @@ typedef struct {
   /*internal data*/
   gsl_matrix* Sigma_eps; /*additive perturbation factor for variances updating*/
   gsl_vector* workspace; /*utility workspace memory*/
+  gsl_vector* q_mean; /*extra data for (mixture) proposal densities comp.*/
+  mcmclib_mvnorm_lpdf** q_k;/*extra data for (mixture) proposal densities comp.*/
 } mcmclib_rapt;
 
 /** alloc (and init) extra Gaussian RW data

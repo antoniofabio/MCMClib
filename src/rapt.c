@@ -51,12 +51,25 @@ mcmclib_rapt* mcmclib_rapt_alloc(
   ans->lambda = gsl_matrix_alloc(K, K+1);
   ans->Sigma_eps = gsl_matrix_alloc(dim, dim);
 
+  /*alloc extra data for mixture proposal density computation*/
+  ans->q_mean = gsl_vector_alloc(dim);
+  ans->q_k = (mcmclib_mvnorm_lpdf**) malloc(K * sizeof(mcmclib_mvnorm_lpdf*));
+  for(int k=0; k<K; k++)
+      ans->q_k[k] = mcmclib_mvnorm_lpdf_alloc(ans->q_mean, ans->sigma_local[k]->data);
+  ans->q_k[K] = mcmclib_mvnorm_lpdf_alloc(ans->q_mean, ans->sigma_whole->data);
+
   ans->ntries = gsl_vector_alloc(K+1);
   ans->workspace = gsl_vector_alloc(dim);
 
   rapt_init(ans);
 
   return ans;
+}
+
+/*update covariance matrix inverse info for prop. dens. computation*/
+static void rapt_update_q_data(mcmclib_rapt* p) {
+  for(int k=0; k <= p->K; k++)
+    mcmclib_mvnorm_lpdf_inverse(p->q_k[k]);
 }
 
 static void rapt_init(mcmclib_rapt* p) {
@@ -70,6 +83,8 @@ static void rapt_init(mcmclib_rapt* p) {
   gsl_matrix_set_all(p->lambda, 1.0 / (double) (p->K + 1.0));
   gsl_matrix_set_identity(p->Sigma_eps);
   gsl_matrix_scale(p->Sigma_eps, 0.001);
+
+  rapt_update_q_data(p);
 
   gsl_vector_set_all(p->ntries, 0.0);
   p->which_region_x = p->which_region(p->current_x, p->which_region_data);
@@ -95,6 +110,12 @@ void mcmclib_rapt_free(mcmclib_rapt* p) {
   free(p->means);
   free(p->variances);
 
+  /*free proposal mixture density extra data*/
+  gsl_vector_free(p->q_mean);
+  for(int k=0; k <= p->K; k++)
+    mcmclib_mvnorm_lpdf_free(p->q_k[k]);
+  free(p->q_k);
+
   gsl_matrix_free(p->sigma_whole);
   for(int k=0; k < p->K; k++)
     gsl_matrix_free(p->sigma_local[k]);
@@ -103,8 +124,6 @@ void mcmclib_rapt_free(mcmclib_rapt* p) {
   gsl_vector_free(p->old);
   free(p);
 }
-
-
 
 /**
 Follows a bunch of prototypes of internal funcs. used by rapt_update
@@ -177,16 +196,10 @@ static double rapt_q(void* data, gsl_vector* x, gsl_vector* y) {
   gsl_vector_view lambda_vw = gsl_matrix_row(p->lambda, region_x);
   gsl_vector* lambda_p = &(lambda_vw.vector);
 
-  mcmclib_mvnorm_lpdf* distr_obj;
   double ans = 0.0;
-  for(int k=0; k < p->K; k++) {
-    distr_obj = mcmclib_mvnorm_lpdf_alloc(x, (p->sigma_local[k])->data);
-    ans += exp(mcmclib_mvnorm_lpdf_compute(distr_obj, y)) * gsl_vector_get(lambda_p, k);
-    mcmclib_mvnorm_lpdf_free(distr_obj);
-  }
-  distr_obj = mcmclib_mvnorm_lpdf_alloc(x, (p->sigma_whole)->data);
-  ans += exp(mcmclib_mvnorm_lpdf_compute(distr_obj, y)) * gsl_vector_get(lambda_p, p->K);
-  mcmclib_mvnorm_lpdf_free(distr_obj);
+  gsl_vector_memcpy(p->q_mean, x);
+  for(int k=0; k <= p->K; k++)
+    ans += exp(mcmclib_mvnorm_lpdf_compute_noinv(p->q_k[k], y)) * gsl_vector_get(lambda_p, k);
 
   return log(ans);
 }
@@ -213,6 +226,8 @@ void mcmclib_rapt_update_proposals(mcmclib_rapt* p) {
   gsl_matrix_memcpy(p->sigma_whole, p->global_variance);
   gsl_matrix_add(p->sigma_whole, p->Sigma_eps);
   gsl_matrix_scale(p->sigma_whole, 2.38 * 2.38 / ((double) p->old->size));
+
+  rapt_update_q_data(p);
 }
 
 void mcmclib_rapt_update_lambda(mcmclib_rapt* p) {
