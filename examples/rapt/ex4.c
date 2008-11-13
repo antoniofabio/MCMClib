@@ -15,16 +15,16 @@
 #define DIM 2
 /*absolute local mean value*/
 #define MU0 1.5
-/*local variance*/
-#define V0 1.0
+/*local variances multipliers*/
+static double V0[] = {1.0, 1.0};
 /*burn in length*/
 #define T0 ((DIM + DIM * (DIM-1) / 2) * 100)
 /*update boundary every N0 iterations*/
 #define N0 (N / 10)
 /*scaling factor*/
 #define SCALING_FACTOR (2.38 * 2.38 / (double) DIM)
-/*starting local variance guess*/
-#define SIGMA0_LOCAL (V0 * 0.25)
+/*starting local variance guess as scaling factor w.r.t. true value*/
+#define SIGMA0_LOCAL 0.25
 /*starting global variance guess*/
 #define SIGMA0_GLOBAL pow(MU0 * 2, 2.0)
 /***/
@@ -57,7 +57,7 @@ int main(int argc, char** argv) {
   for(int k=0; k < K; k++){
     Sigma_local[k] = gsl_matrix_alloc(DIM, DIM);
     gsl_matrix_set_identity(Sigma_local[k]);
-    gsl_matrix_scale(Sigma_local[k], SIGMA0_LOCAL * SCALING_FACTOR);
+    gsl_matrix_scale(Sigma_local[k], SIGMA0_LOCAL * SCALING_FACTOR * V0[k]);
   }
   gsl_matrix* Sigma_zero = gsl_matrix_alloc(DIM, DIM);
   gsl_matrix_set_identity(Sigma_zero);
@@ -109,7 +109,7 @@ int main(int argc, char** argv) {
     gsl_vector_memcpy(&(Xn.vector), x);
     if(((n+1) % N0)==0) {
       gsl_matrix_view Xv = gsl_matrix_submatrix(X, 0, 0, n+1, DIM);
-      mcmclib_mixem_fit(&(Xv.matrix), K, mu_hat, Sigma_hat, P_hat, w_hat, 10);
+      mcmclib_mixem_fit(&(Xv.matrix), K, mu_hat, Sigma_hat, P_hat, w_hat, 1);
       for(int k=0; k<K; k++)
 	mcmclib_mvnorm_lpdf_inverse(pi_hat[k]);
     }
