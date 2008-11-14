@@ -10,17 +10,21 @@
 
 /** Following arguments can be (almost) freely customized */
 /*chain length*/
-#define N 100000
+static int N = 100000;
 /*state space dimension*/
-#define DIM 2
+static int DIM = 2;
 /*absolute local mean value*/
-#define MU0 1.5
+static double MU0 = 1.5;
 /*local variances multipliers*/
 static double V0[] = {1.0, 1.0};
+/*local pairwise correlations*/
+static double RHO[] = {0.0, 0.0};
+/*mixture proportion of component 1*/
+static double BETA = 0.5;
 /*burn in length*/
 #define T0 ((DIM + DIM * (DIM-1) / 2) * 100)
 /*update boundary every N0 iterations*/
-#define N0 (N / 10)
+#define N0 (N / 50)
 /*scaling factor*/
 #define SCALING_FACTOR (2.38 * 2.38 / (double) DIM)
 /*starting local variance guess as scaling factor w.r.t. true value*/
@@ -52,6 +56,31 @@ int which_region(gsl_vector* x, void* ignore) {
 #include "ex4_target_distrib.c"
 
 int main(int argc, char** argv) {
+  /*******************************/
+  /*read input data from cmd line*/
+  /*******************************/
+  if(argc != 8) {
+    printf("Passed %d arguments. Usage:\n", argc-1);
+    printf("%s N DIM S1 S2 RHO1 RHO2 BETA\n", argv[0]);
+    exit(1);
+  }
+  sscanf(argv[1], "%d", &N);
+  sscanf(argv[2], "%d", &DIM);
+  sscanf(argv[3], "%lf", V0);
+  sscanf(argv[4], "%lf", V0+1);
+  sscanf(argv[5], "%lf", RHO);
+  sscanf(argv[6], "%lf", RHO+1);
+  sscanf(argv[7], "%lf", &BETA);
+
+  printf("=Simulation settings=\n");
+  printf("N = %d\tDIM = %d\n", N, DIM);
+  printf("S1 = %f\tS2 = %f\n", V0[0], V0[1]);
+  printf("RHO1 = %f\tRHO2 = %f\n", RHO[0], RHO[1]);
+  printf("BETA = %f\n", BETA);
+  printf("T0 = %d\tN0 = %d\n", T0, N0);
+  printf("=====================\n");
+  /*******************************/
+
   /*set starting guess metropolis covariance matrices*/
   gsl_matrix* Sigma_local[K];
   for(int k=0; k < K; k++){
@@ -63,9 +92,6 @@ int main(int argc, char** argv) {
   gsl_matrix_set_identity(Sigma_zero);
   gsl_matrix_scale(Sigma_zero, SIGMA0_GLOBAL * SCALING_FACTOR);
 
-  /**********************/
-  /*INIT data structures*/
-  /**********************/
   /*alloc a new RNG*/
   gsl_rng *r = gsl_rng_alloc(gsl_rng_default);
   /*current chain value*/
@@ -81,16 +107,17 @@ int main(int argc, char** argv) {
     gsl_vector_set_all(mu_hat[k], gsl_rng_uniform(r) * MU0);
     Sigma_hat[k] = gsl_matrix_alloc(DIM, DIM);
     gsl_matrix_set_identity(Sigma_hat[k]);
+    gsl_matrix_scale(Sigma_hat[k], SIGMA0_LOCAL);
     pi_hat[k] = mcmclib_mvnorm_lpdf_alloc(mu_hat[k], Sigma_hat[k]->data);
   }
 
   /*alloc a new RAPT sampler*/
   mcmclib_rapt* sampler =
     mcmclib_rapt_alloc(r, /*RNG*/
-		       target_logdensity, NULL,
+		       target_logdensity, NULL, /*target distribution*/
 		       x, T0, /*current chain value, burnin*/
-		       Sigma_zero, K, Sigma_local, /*startng guesses*/
-		       which_region, NULL);
+		       Sigma_zero, K, Sigma_local, /*starting guesses*/
+		       which_region, NULL); /*boundary function*/
   /*set custom proposal weights*/
   for(int k=0; k < K; k++) {
     for(int k1=0; k1 < K; k1++)
@@ -99,14 +126,18 @@ int main(int argc, char** argv) {
   }
 
   /*main MCMC loop*/
-  int naccept=0;
-  gsl_matrix* naccept_m = gsl_matrix_alloc(K, K+1);
-  gsl_matrix* X = gsl_matrix_alloc(N, DIM);
+  int naccept=0; /*number of acceptances*/
+  gsl_matrix* naccept_m = gsl_matrix_alloc(K, K+1); /*# accept. x region & proposal*/
+  gsl_matrix* X = gsl_matrix_alloc(N, DIM); /*matrix of all sampled values*/
   for(int n=0; n<N; n++) {
+    /*update chain value*/
     mcmclib_rapt_update(sampler);
+    /*update RAPT proposals variances*/
     mcmclib_rapt_update_proposals(sampler);
+    /*store new value in matrix X*/
     gsl_vector_view Xn = gsl_matrix_row(X, n);
     gsl_vector_memcpy(&(Xn.vector), x);
+    /*update boundary estimation*/
     if(((n+1) % N0)==0) {
       gsl_matrix_view Xv = gsl_matrix_submatrix(X, 0, 0, n+1, DIM);
       mcmclib_mixem_fit(&(Xv.matrix), K, mu_hat, Sigma_hat, P_hat, w_hat, 1);
@@ -114,6 +145,7 @@ int main(int argc, char** argv) {
 	mcmclib_mvnorm_lpdf_inverse(pi_hat[k]);
     }
 
+    /*update acceptance rate informations*/
     if(sampler->accepted) {
       naccept++;
       gsl_matrix_set(naccept_m, sampler->which_region_x, sampler->which_proposal,
@@ -124,6 +156,17 @@ int main(int argc, char** argv) {
   printf("Acceptance rate: %f\n",
 	 (gsl_matrix_get(naccept_m, 0, 0) + gsl_matrix_get(naccept_m, 1, 1)) /
 	 (gsl_matrix_get(sampler->visits, 0, 0) + gsl_matrix_get(sampler->visits, 1, 1)));
+  double td = 0.0;
+  for(int k=0; k<K; k++) {
+    for(int i=0; i<DIM; i++) {
+      td += fabs(gsl_vector_get(mu_hat[k], i) - gsl_vector_get(mu[k], i));
+      for(int j=0; j<i; j++)
+	td += fabs(gsl_matrix_get(Sigma_hat[k], i, j) - gsl_matrix_get(Sigma[k], i, j));
+    }
+  }
+  td += fabs(gsl_vector_get(w_hat, 0) - BETA) + fabs(gsl_vector_get(w_hat,1) - (1-BETA));
+  td /= (2 * DIM + (DIM * (DIM-1) / 2) + 1) * 2.0;
+  printf("Distance between true and estimated boundary: %f\n", td);
 
   /*store sampled values*/
   FILE* out_X = fopen("ex4_X.csv", "w");

@@ -5,8 +5,8 @@ static mcmclib_mvnorm_lpdf* pi[K];
 
 /*target log-distribution: mixture of two normals*/
 double target_logdensity(void* ignore, gsl_vector* x) {
-  return log(exp(mcmclib_mvnorm_lpdf_compute(pi[0], x)) +
-	     exp(mcmclib_mvnorm_lpdf_compute(pi[1], x)));
+  return log(BETA * exp(mcmclib_mvnorm_lpdf_compute(pi[0], x)) +
+	     (1-BETA) * exp(mcmclib_mvnorm_lpdf_compute(pi[1], x)));
 }
 static void target_distrib_init() {
   for(int k=0; k<K; k++) {
