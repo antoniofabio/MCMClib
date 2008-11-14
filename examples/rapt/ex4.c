@@ -59,18 +59,19 @@ int main(int argc, char** argv) {
   /*******************************/
   /*read input data from cmd line*/
   /*******************************/
-  if(argc != 8) {
+  if(argc > 8) {
     printf("Passed %d arguments. Usage:\n", argc-1);
     printf("%s N DIM S1 S2 RHO1 RHO2 BETA\n", argv[0]);
     exit(1);
   }
-  sscanf(argv[1], "%d", &N);
-  sscanf(argv[2], "%d", &DIM);
-  sscanf(argv[3], "%lf", V0);
-  sscanf(argv[4], "%lf", V0+1);
-  sscanf(argv[5], "%lf", RHO);
-  sscanf(argv[6], "%lf", RHO+1);
-  sscanf(argv[7], "%lf", &BETA);
+#define scanfif(i, fmt, target) if(argc > (i)) sscanf(argv[(i)], fmt, target)
+  scanfif(1, "%d", &N);
+  scanfif(2, "%d", &DIM);
+  scanfif(3, "%lf", V0);
+  scanfif(4, "%lf", V0+1);
+  scanfif(5, "%lf", RHO);
+  scanfif(6, "%lf", RHO+1);
+  scanfif(7, "%lf", &BETA);
 
   printf("=Simulation settings=\n");
   printf("N = %d\tDIM = %d\n", N, DIM);
@@ -104,7 +105,7 @@ int main(int argc, char** argv) {
   gsl_vector* w_hat = gsl_vector_alloc(K);
   for(int k=0; k<K; k++) {
     mu_hat[k] = gsl_vector_alloc(DIM);
-    gsl_vector_set_all(mu_hat[k], gsl_rng_uniform(r) * MU0);
+    gsl_vector_set_all(mu_hat[k], gsl_rng_uniform(r) * MU0 * pow(-1.0, k+1));
     Sigma_hat[k] = gsl_matrix_alloc(DIM, DIM);
     gsl_matrix_set_identity(Sigma_hat[k]);
     gsl_matrix_scale(Sigma_hat[k], SIGMA0_LOCAL);
@@ -156,16 +157,7 @@ int main(int argc, char** argv) {
   printf("Acceptance rate: %f\n",
 	 (gsl_matrix_get(naccept_m, 0, 0) + gsl_matrix_get(naccept_m, 1, 1)) /
 	 (gsl_matrix_get(sampler->visits, 0, 0) + gsl_matrix_get(sampler->visits, 1, 1)));
-  double td = 0.0;
-  for(int k=0; k<K; k++) {
-    for(int i=0; i<DIM; i++) {
-      td += fabs(gsl_vector_get(mu_hat[k], i) - gsl_vector_get(mu[k], i));
-      for(int j=0; j<i; j++)
-	td += fabs(gsl_matrix_get(Sigma_hat[k], i, j) - gsl_matrix_get(Sigma[k], i, j));
-    }
-  }
-  td += fabs(gsl_vector_get(w_hat, 0) - BETA) + fabs(gsl_vector_get(w_hat,1) - (1-BETA));
-  td /= (2 * DIM + (DIM * (DIM-1) / 2) + 1) * 2.0;
+  double td = fabs(gsl_vector_get(w_hat, 0) - BETA);
   printf("Distance between true and estimated boundary: %f\n", td);
 
   /*store sampled values*/
