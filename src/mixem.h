@@ -12,8 +12,8 @@
 @param w mixture weights
 @param NITER desired number of iterations
 */
-void mcmclib_mixem_fit(gsl_matrix* X, int K,
+void mcmclib_mixem_fit(gsl_matrix* X,
 		       gsl_vector** mu, gsl_matrix** Sigma,
-		       gsl_matrix* P, gsl_vector* w, int NITER);
+		       gsl_vector* w, int NITER);
 
 #endif

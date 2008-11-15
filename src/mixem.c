@@ -8,9 +8,10 @@
 
 /**Fitting a gaussian mixture distribution by the EM algorithm
 */
-void mcmclib_mixem_fit(gsl_matrix* X, int K,
+void mcmclib_mixem_fit(gsl_matrix* X,
 		       gsl_vector** mu, gsl_matrix** Sigma,
-		       gsl_matrix* P, gsl_vector* w, int NITER) {
+		       gsl_vector* w, int NITER) {
+  int K = w->size;
   int N = X->size1;
 
   for(int ITER=0; ITER < NITER; ITER++) {
