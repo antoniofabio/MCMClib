@@ -1,13 +1,13 @@
 CFLAGS+=  --std=gnu99 -O0 -g -Wall -fpic
 LDFLAGS+= -lgsl -lgslcblas -lm
 
-MODULES := src examples
+MODULES := src test examples
 
 SRC :=
 TOCLEAN :=
 include $(MODULES:%=%/module.mk)
 
-.PHONY : all lib examples clean
+.PHONY : all lib test examples clean
 
 all: lib examples
 
