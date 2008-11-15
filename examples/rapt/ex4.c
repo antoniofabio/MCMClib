@@ -57,33 +57,6 @@ int which_region(gsl_vector* x, void* ignore) {
 
 #include "ex4_target_distrib.c"
 
-void burnin(gsl_rng* r, gsl_vector* x,
-	    gsl_matrix* Sigma_zero,
-	    gsl_vector** mu_hat,
-	    gsl_matrix** Sigma_hat,
-	    gsl_vector* w_hat) {
-  gsl_matrix* X = gsl_matrix_alloc(T0, DIM);
-  mcmclib_gauss_mrw* s = mcmclib_gauss_mrw_alloc(r,
-						 target_logdensity, NULL,
-						 x, Sigma_zero);
-  gsl_vector_set_all(x, MU0 * 2.0);
-  for(int n=0; n<(T0/2); n++) {
-    mcmclib_gauss_mrw_update(s);
-    memcpy(X->data + n * DIM, x->data, DIM * sizeof(double));
-  }
-  gsl_vector_set_all(x, MU0 * -2.0);
-  for(int n=(T0/2); n<T0; n++) {
-    mcmclib_gauss_mrw_update(s);
-    memcpy(X->data + n * DIM, x->data, DIM * sizeof(double));
-  }
-  FILE* tmpf = fopen("ex4_burnin.dat", "w");
-  gsl_matrix_fprintf(tmpf, X, "%f");
-  fclose(tmpf);
-  mcmclib_gauss_mrw_free(s);
-  mcmclib_mixem_fit(X, mu_hat, Sigma_hat, w_hat, 10);
-  gsl_matrix_free(X);
-}
-
 int main(int argc, char** argv) {
   /*******************************/
   /*read input data from cmd line*/
@@ -153,9 +126,6 @@ int main(int argc, char** argv) {
       gsl_matrix_set(sampler->lambda, k, k1, k==k1 ? 0.5 : 0.0);
     gsl_matrix_set(sampler->lambda, k, K, 0.5);
   }
-
-  /*run burnin*/
-  //  burnin(r, x, Sigma_zero, mu_hat, Sigma_hat, w_hat);
 
   /*main MCMC loop*/
   int naccept=0; /*number of acceptances*/
