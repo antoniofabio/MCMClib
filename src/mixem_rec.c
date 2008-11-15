@@ -74,6 +74,8 @@ void mcmclib_mixem_rec_add(mcmclib_mixem_rec* p, gsl_vector* y) {
 /*update theta estimates basing on current accumulated values*/
 void mcmclib_mixem_rec_update(mcmclib_mixem_rec* p) {
   int K = p->beta->size;
+  if(p->n < 2)
+    return;
   for(int k=0; k<K; k++) {
     double wik = 1.0 / gsl_vector_get(p->beta_sum, k);
 
