@@ -141,7 +141,7 @@ int main(int argc, char** argv) {
     /*accumulate data in mixture fitter object*/
     mcmclib_mixem_rec_add(m, x);
     /*update boundary estimation*/
-    if(((n+1) % N0)==0)
+    if((N > T0) && ((n+1) % N0)==0)
       mcmclib_mixem_rec_update(m);
 
     /*update acceptance rate informations*/
