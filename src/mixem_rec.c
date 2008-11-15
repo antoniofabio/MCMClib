@@ -87,5 +87,5 @@ void mcmclib_mixem_rec_update(mcmclib_mixem_rec* p) {
     gsl_blas_dgemm(CblasNoTrans, CblasTrans, -1.0, mmu, mmu, wik, p->Sigma[k]);
   }
   gsl_vector_memcpy(p->beta, p->beta_sum);
-  gsl_vector_scale(p->beta, (double) p->n);
+  gsl_vector_scale(p->beta, 1.0 / (double) p->n);
 }
