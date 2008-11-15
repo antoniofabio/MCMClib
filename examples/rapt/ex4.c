@@ -4,8 +4,10 @@
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
+#include <gauss_mrw.h>
 #include <rapt.h>
 #include <mixem_rec.h>
+#include <mixem.h>
 #include <mvnorm.h>
 
 /** Following arguments can be (almost) freely customized */
@@ -22,7 +24,7 @@ static double RHO[] = {0.0, 0.0};
 /*mixture proportion of component 1*/
 static double BETA = 0.5;
 /*burn in length*/
-#define T0 ((DIM + DIM * (DIM-1) / 2) * 100)
+#define T0 ((DIM + DIM * (DIM-1) / 2) * 200)
 /*update boundary every N0 iterations*/
 #define N0 (N / 100)
 /*scaling factor*/
@@ -30,7 +32,7 @@ static double BETA = 0.5;
 /*starting local variance guess as scaling factor w.r.t. true value*/
 #define SIGMA0_LOCAL 0.25
 /*starting global variance guess*/
-#define SIGMA0_GLOBAL pow(MU0 * 2, 2.0)
+#define SIGMA0_GLOBAL pow(MU0 * 2.0, 2.0)
 /***/
 
 /*number of regions*/
@@ -54,6 +56,33 @@ int which_region(gsl_vector* x, void* ignore) {
 }
 
 #include "ex4_target_distrib.c"
+
+void burnin(gsl_rng* r, gsl_vector* x,
+	    gsl_matrix* Sigma_zero,
+	    gsl_vector** mu_hat,
+	    gsl_matrix** Sigma_hat,
+	    gsl_vector* w_hat) {
+  gsl_matrix* X = gsl_matrix_alloc(T0, DIM);
+  mcmclib_gauss_mrw* s = mcmclib_gauss_mrw_alloc(r,
+						 target_logdensity, NULL,
+						 x, Sigma_zero);
+  gsl_vector_set_all(x, MU0 * 2.0);
+  for(int n=0; n<(T0/2); n++) {
+    mcmclib_gauss_mrw_update(s);
+    memcpy(X->data + n * DIM, x->data, DIM * sizeof(double));
+  }
+  gsl_vector_set_all(x, MU0 * -2.0);
+  for(int n=(T0/2); n<T0; n++) {
+    mcmclib_gauss_mrw_update(s);
+    memcpy(X->data + n * DIM, x->data, DIM * sizeof(double));
+  }
+  FILE* tmpf = fopen("ex4_burnin.dat", "w");
+  gsl_matrix_fprintf(tmpf, X, "%f");
+  fclose(tmpf);
+  mcmclib_gauss_mrw_free(s);
+  mcmclib_mixem_fit(X, mu_hat, Sigma_hat, w_hat, 10);
+  gsl_matrix_free(X);
+}
 
 int main(int argc, char** argv) {
   /*******************************/
@@ -125,6 +154,9 @@ int main(int argc, char** argv) {
     gsl_matrix_set(sampler->lambda, k, K, 0.5);
   }
 
+  /*run burnin*/
+  //  burnin(r, x, Sigma_zero, mu_hat, Sigma_hat, w_hat);
+
   /*main MCMC loop*/
   int naccept=0; /*number of acceptances*/
   gsl_matrix* naccept_m = gsl_matrix_alloc(K, K+1); /*# accept. x region & proposal*/
@@ -133,16 +165,17 @@ int main(int argc, char** argv) {
   for(int n=0; n<N; n++) {
     /*update chain value*/
     mcmclib_rapt_update(sampler);
-    /*update RAPT proposals variances*/
-    mcmclib_rapt_update_proposals(sampler);
     /*store new value in matrix X*/
     gsl_vector_view Xn = gsl_matrix_row(X, n);
     gsl_vector_memcpy(&(Xn.vector), x);
+
     /*accumulate data in mixture fitter object*/
     mcmclib_mixem_rec_add(m, x);
-    /*update boundary estimation*/
-    if((N > T0) && ((n+1) % N0)==0)
+    /*update boundary estimation and rapt proposal variances*/
+    if((n>T0) && (((n+1) % N0)==0)) {
+      mcmclib_rapt_update_proposals(sampler);
       mcmclib_mixem_rec_update(m);
+    }
 
     /*update acceptance rate informations*/
     if(sampler->accepted) {
