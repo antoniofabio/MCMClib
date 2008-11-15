@@ -5,7 +5,7 @@
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 #include <rapt.h>
-#include <mixem.h>
+#include <mixem_rec.h>
 #include <mvnorm.h>
 
 /** Following arguments can be (almost) freely customized */
@@ -24,7 +24,7 @@ static double BETA = 0.5;
 /*burn in length*/
 #define T0 ((DIM + DIM * (DIM-1) / 2) * 100)
 /*update boundary every N0 iterations*/
-#define N0 (N / 50)
+#define N0 (N / 100)
 /*scaling factor*/
 #define SCALING_FACTOR (2.38 * 2.38 / (double) DIM)
 /*starting local variance guess as scaling factor w.r.t. true value*/
@@ -101,7 +101,6 @@ int main(int argc, char** argv) {
   /*init target distribution data*/
   target_distrib_init();
   /*init EM algorithm data*/
-  gsl_matrix* P_hat = gsl_matrix_alloc(N, K);
   gsl_vector* w_hat = gsl_vector_alloc(K);
   for(int k=0; k<K; k++) {
     mu_hat[k] = gsl_vector_alloc(DIM);
@@ -130,6 +129,7 @@ int main(int argc, char** argv) {
   int naccept=0; /*number of acceptances*/
   gsl_matrix* naccept_m = gsl_matrix_alloc(K, K+1); /*# accept. x region & proposal*/
   gsl_matrix* X = gsl_matrix_alloc(N, DIM); /*matrix of all sampled values*/
+  mcmclib_mixem_rec* m = mcmclib_mixem_rec_alloc(mu_hat, Sigma_hat, w_hat);
   for(int n=0; n<N; n++) {
     /*update chain value*/
     mcmclib_rapt_update(sampler);
@@ -138,13 +138,11 @@ int main(int argc, char** argv) {
     /*store new value in matrix X*/
     gsl_vector_view Xn = gsl_matrix_row(X, n);
     gsl_vector_memcpy(&(Xn.vector), x);
+    /*accumulate data in mixture fitter object*/
+    mcmclib_mixem_rec_add(m, x);
     /*update boundary estimation*/
-    if(((n+1) % N0)==0) {
-      gsl_matrix_view Xv = gsl_matrix_submatrix(X, 0, 0, n+1, DIM);
-      mcmclib_mixem_fit(&(Xv.matrix), K, mu_hat, Sigma_hat, P_hat, w_hat, 1);
-      for(int k=0; k<K; k++)
-	mcmclib_mvnorm_lpdf_inverse(pi_hat[k]);
-    }
+    if(((n+1) % N0)==0)
+      mcmclib_mixem_rec_update(m);
 
     /*update acceptance rate informations*/
     if(sampler->accepted) {
