@@ -15,6 +15,10 @@ static void target_distrib_init() {
     Sigma[k] = gsl_matrix_alloc(DIM, DIM);
     gsl_matrix_set_identity(Sigma[k]);
     gsl_matrix_scale(Sigma[k], V0[k]);
+    for(int i=1; i<DIM; i++) for(int j=0; j<i; j++){
+	gsl_matrix_set(Sigma[k], i, j, RHO[k]);
+	gsl_matrix_set(Sigma[k], j, i, RHO[k]);
+    }
     pi[k] = mcmclib_mvnorm_lpdf_alloc(mu[k], Sigma[k]->data);
   }
 }
