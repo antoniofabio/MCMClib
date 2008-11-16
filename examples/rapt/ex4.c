@@ -46,7 +46,7 @@ int which_region(gsl_vector* x, void* ignore) {
   int ans = 0;
   double pimax = log(0.0);
   for(int k=0; k<K; k++) {
-    pik[k] = mcmclib_mvnorm_lpdf_compute_noinv(pi_hat[k], x);
+    pik[k] = mcmclib_mvnorm_lpdf_compute(pi_hat[k], x);
     if(pik[k] > pimax) {
       pimax = pik[k];
       ans = k;
