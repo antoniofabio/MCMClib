@@ -26,7 +26,7 @@ static double BETA = 0.5;
 /*burn in length*/
 #define T0 ((DIM + DIM * (DIM-1) / 2) * 200)
 /*update boundary every N0 iterations*/
-#define N0 (N / 100)
+#define N0 50
 /*scaling factor*/
 #define SCALING_FACTOR (2.38 * 2.38 / (double) DIM)
 /*starting local variance guess as scaling factor w.r.t. true value*/
@@ -106,11 +106,15 @@ int main(int argc, char** argv) {
   /*init EM algorithm data*/
   gsl_vector* beta_hat = gsl_vector_alloc(K);
   for(int k=0; k<K; k++) {
+    gsl_vector_set(beta_hat, k, 1.0 / (double) K);
+
     mu_hat[k] = gsl_vector_alloc(DIM);
-    gsl_vector_set_all(mu_hat[k], gsl_rng_uniform(r) * MU0 * pow(-1.0, k+1));
+    gsl_vector_set_all(mu_hat[k], MU0 * pow(-1.0, k+1) * (0.75 + 0.5 * gsl_rng_uniform(r)));
+
     Sigma_hat[k] = gsl_matrix_alloc(DIM, DIM);
     gsl_matrix_set_identity(Sigma_hat[k]);
-    gsl_matrix_scale(Sigma_hat[k], SIGMA0_LOCAL);
+    gsl_matrix_scale(Sigma_hat[k], SIGMA0_LOCAL * (0.75 + 0.5 * gsl_rng_uniform(r)));
+
     pi_hat[k] = mcmclib_mvnorm_lpdf_alloc(mu_hat[k], Sigma_hat[k]->data);
   }
 
