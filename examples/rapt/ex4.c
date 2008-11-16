@@ -61,7 +61,7 @@ int main(int argc, char** argv) {
   /*******************************/
   /*read input data from cmd line*/
   /*******************************/
-  if(argc > 8) {
+  if(argc > 9) {
     printf("Passed %d arguments. Usage:\n", argc-1);
     printf("%s N DIM S1 S2 RHO1 RHO2 BETA\n", argv[0]);
     exit(1);
@@ -74,12 +74,13 @@ int main(int argc, char** argv) {
   scanfif(5, "%lf", RHO);
   scanfif(6, "%lf", RHO+1);
   scanfif(7, "%lf", &BETA);
+  scanfif(8, "%lf", &MU0);
 
   printf("=Simulation settings=\n");
   printf("N = %d\tDIM = %d\n", N, DIM);
   printf("S1 = %f\tS2 = %f\n", V0[0], V0[1]);
   printf("RHO1 = %f\tRHO2 = %f\n", RHO[0], RHO[1]);
-  printf("BETA = %f\n", BETA);
+  printf("BETA = %f, MU0 = %f\n", BETA, MU0);
   printf("T0 = %d\tN0 = %d\n", T0, N0);
   printf("=====================\n");
   /*******************************/
@@ -103,7 +104,7 @@ int main(int argc, char** argv) {
   /*init target distribution data*/
   target_distrib_init();
   /*init EM algorithm data*/
-  gsl_vector* w_hat = gsl_vector_alloc(K);
+  gsl_vector* beta_hat = gsl_vector_alloc(K);
   for(int k=0; k<K; k++) {
     mu_hat[k] = gsl_vector_alloc(DIM);
     gsl_vector_set_all(mu_hat[k], gsl_rng_uniform(r) * MU0 * pow(-1.0, k+1));
@@ -131,7 +132,7 @@ int main(int argc, char** argv) {
   int naccept=0; /*number of acceptances*/
   gsl_matrix* naccept_m = gsl_matrix_alloc(K, K+1); /*# accept. x region & proposal*/
   gsl_matrix* X = gsl_matrix_alloc(N, DIM); /*matrix of all sampled values*/
-  mcmclib_mixem_rec* m = mcmclib_mixem_rec_alloc(mu_hat, Sigma_hat, w_hat);
+  mcmclib_mixem_rec* m = mcmclib_mixem_rec_alloc(mu_hat, Sigma_hat, beta_hat);
   for(int n=0; n<N; n++) {
     /*update chain value*/
     mcmclib_rapt_update(sampler);
@@ -158,7 +159,7 @@ int main(int argc, char** argv) {
   printf("Acceptance rate: %f\n",
 	 (gsl_matrix_get(naccept_m, 0, 0) + gsl_matrix_get(naccept_m, 1, 1)) /
 	 (gsl_matrix_get(sampler->visits, 0, 0) + gsl_matrix_get(sampler->visits, 1, 1)));
-  double td = fabs(gsl_vector_get(w_hat, 0) - BETA);
+  double td = fabs(gsl_vector_get(beta_hat, 0) - BETA);
   printf("Distance between true and estimated boundary: %f\n", td);
 
   /*store sampled values*/
@@ -175,9 +176,9 @@ int main(int argc, char** argv) {
   fclose(out_mu);
   fclose(out_Sigma);
   /*store mixture weights estimates*/
-  FILE* out_w = fopen("ex4_w_hat.csv", "w");
-  gsl_vector_fprintf(out_w, w_hat, "%f");
-  fclose(out_w);
+  FILE* out_beta = fopen("ex4_beta_hat.csv", "w");
+  gsl_vector_fprintf(out_beta, beta_hat, "%f");
+  fclose(out_beta);
 
   gsl_matrix_free(naccept_m);
   target_distrib_free();
