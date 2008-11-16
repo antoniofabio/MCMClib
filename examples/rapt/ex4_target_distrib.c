@@ -11,7 +11,7 @@ double target_logdensity(void* ignore, gsl_vector* x) {
 static void target_distrib_init() {
   for(int k=0; k<K; k++) {
     mu[k] = gsl_vector_alloc(DIM);
-    gsl_vector_set_all(mu[k], pow(-1.0, k + 2) * MU0);
+    gsl_vector_set_all(mu[k], pow(-1.0, k + 1) * MU0);
     Sigma[k] = gsl_matrix_alloc(DIM, DIM);
     gsl_matrix_set_identity(Sigma[k]);
     gsl_matrix_scale(Sigma[k], V0[k]);
