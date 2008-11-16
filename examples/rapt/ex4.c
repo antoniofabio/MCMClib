@@ -24,15 +24,13 @@ static double RHO[] = {0.0, 0.0};
 /*mixture proportion of component 1*/
 static double BETA = 0.5;
 /*burn in length*/
-#define T0 ((DIM + DIM * (DIM-1) / 2) * 200)
+#define T0 (100 + (int) pow(DIM, 2.5))
 /*update boundary every N0 iterations*/
 #define N0 50
 /*scaling factor*/
 #define SCALING_FACTOR (2.38 * 2.38 / (double) DIM)
-/*starting local variance guess as scaling factor w.r.t. true value*/
-#define SIGMA0_LOCAL 0.25
 /*starting global variance guess*/
-#define SIGMA0_GLOBAL pow(MU0 * 2.0, 2.0)
+#define SIGMA0_GLOBAL (pow(MU0 * 2.0, 2.0) + V0[0] + V0[1])
 /***/
 
 /*number of regions*/
@@ -85,17 +83,6 @@ int main(int argc, char** argv) {
   printf("=====================\n");
   /*******************************/
 
-  /*set starting guess metropolis covariance matrices*/
-  gsl_matrix* Sigma_local[K];
-  for(int k=0; k < K; k++){
-    Sigma_local[k] = gsl_matrix_alloc(DIM, DIM);
-    gsl_matrix_set_identity(Sigma_local[k]);
-    gsl_matrix_scale(Sigma_local[k], SIGMA0_LOCAL * SCALING_FACTOR * V0[k]);
-  }
-  gsl_matrix* Sigma_zero = gsl_matrix_alloc(DIM, DIM);
-  gsl_matrix_set_identity(Sigma_zero);
-  gsl_matrix_scale(Sigma_zero, SIGMA0_GLOBAL * SCALING_FACTOR);
-
   /*alloc a new RNG*/
   gsl_rng *r = gsl_rng_alloc(gsl_rng_default);
   /*current chain value*/
@@ -113,10 +100,21 @@ int main(int argc, char** argv) {
 
     Sigma_hat[k] = gsl_matrix_alloc(DIM, DIM);
     gsl_matrix_set_identity(Sigma_hat[k]);
-    gsl_matrix_scale(Sigma_hat[k], SIGMA0_LOCAL * (0.75 + 0.5 * gsl_rng_uniform(r)));
+    gsl_matrix_scale(Sigma_hat[k], V0[k] * (0.75 + 0.5 * gsl_rng_uniform(r)));
 
     pi_hat[k] = mcmclib_mvnorm_lpdf_alloc(mu_hat[k], Sigma_hat[k]->data);
   }
+
+  /*set starting guess metropolis covariance matrices*/
+  gsl_matrix* Sigma_local[K];
+  for(int k=0; k < K; k++){
+    Sigma_local[k] = gsl_matrix_alloc(DIM, DIM);
+    gsl_matrix_memcpy(Sigma_local[k], Sigma_hat[k]);
+    gsl_matrix_scale(Sigma_local[k], SCALING_FACTOR);
+  }
+  gsl_matrix* Sigma_zero = gsl_matrix_alloc(DIM, DIM);
+  gsl_matrix_set_identity(Sigma_zero);
+  gsl_matrix_scale(Sigma_zero, SIGMA0_GLOBAL * SCALING_FACTOR);
 
   /*alloc a new RAPT sampler*/
   mcmclib_rapt* sampler =
