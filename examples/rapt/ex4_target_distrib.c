@@ -1,14 +1,17 @@
 /*definitions for the target distribution*/
+static double beta[K];
 static gsl_vector* mu[K];
 static gsl_matrix* Sigma[K];
 static mcmclib_mvnorm_lpdf* pi[K];
 
 /*target log-distribution: mixture of two normals*/
 double target_logdensity(void* ignore, gsl_vector* x) {
-  return log(BETA * exp(mcmclib_mvnorm_lpdf_compute(pi[0], x)) +
-	     (1-BETA) * exp(mcmclib_mvnorm_lpdf_compute(pi[1], x)));
+  return log(beta[0] * exp(mcmclib_mvnorm_lpdf_compute(pi[0], x)) +
+	     beta[1] * exp(mcmclib_mvnorm_lpdf_compute(pi[1], x)));
 }
 static void target_distrib_init() {
+  beta[0] = BETA;
+  beta[1] = 1 - BETA;
   for(int k=0; k<K; k++) {
     mu[k] = gsl_vector_alloc(DIM);
     gsl_vector_set_all(mu[k], pow(-1.0, k + 1) * MU0);

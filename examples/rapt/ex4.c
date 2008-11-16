@@ -36,6 +36,7 @@ static double BETA = 0.5;
 /*number of regions*/
 #define K 2
 /*boundary function and support data*/
+static gsl_vector* beta_hat;
 static gsl_vector* mu_hat[K];
 static gsl_matrix* Sigma_hat[K];
 static mcmclib_mvnorm_lpdf* pi_hat[K];
@@ -54,7 +55,7 @@ int which_region(gsl_vector* x, void* ignore) {
 }
 
 #include "ex4_target_distrib.c"
-
+void fit_diagnostics();
 int main(int argc, char** argv) {
   /*******************************/
   /*read input data from cmd line*/
@@ -91,7 +92,7 @@ int main(int argc, char** argv) {
   /*init target distribution data*/
   target_distrib_init();
   /*init EM algorithm data*/
-  gsl_vector* beta_hat = gsl_vector_alloc(K);
+  beta_hat = gsl_vector_alloc(K);
   for(int k=0; k<K; k++) {
     gsl_vector_set(beta_hat, k, 1.0 / (double) K);
 
@@ -161,8 +162,9 @@ int main(int argc, char** argv) {
   printf("Acceptance rate: %f\n",
 	 (gsl_matrix_get(naccept_m, 0, 0) + gsl_matrix_get(naccept_m, 1, 1)) /
 	 (gsl_matrix_get(sampler->visits, 0, 0) + gsl_matrix_get(sampler->visits, 1, 1)));
-  double td = fabs(gsl_vector_get(beta_hat, 0) - BETA);
-  printf("Distance between true and estimated boundary: %f\n", td);
+  //double td = fabs(gsl_vector_get(beta_hat, 0) - BETA);
+  //  printf("Distance between true and estimated boundary: %f\n", td);
+  fit_diagnostics();
 
   /*store sampled values*/
   FILE* out_X = fopen("ex4_X.csv", "w");
@@ -189,4 +191,74 @@ int main(int argc, char** argv) {
   for(int k=0; k<K; k++)
     gsl_matrix_free(Sigma_local[k]);
   gsl_matrix_free(Sigma_zero);
+}
+
+/*Compare fitted and true parameters, report a summary on stdout*/
+#include<gsl/gsl_permutation.h>
+#include<gsl/gsl_sort_vector.h>
+void fit_diagnostics() {
+  /**
+   *Sort fitted values by sum(mu_hat[k])
+   */
+  gsl_permutation* perm = gsl_permutation_alloc(K);
+  gsl_permutation_init(perm);
+  gsl_vector* pivot = gsl_vector_alloc(K);
+  for(int k=0; k<K; k++) {
+    double tmp = 0.0;
+    for(int d=0; d<DIM; d++)
+      tmp += gsl_vector_get(mu_hat[k], d);
+    gsl_vector_set(pivot, k, tmp);
+  }
+  gsl_sort_vector_index(perm, pivot);
+  gsl_vector_free(pivot);
+  gsl_vector* beta_hat_s = gsl_vector_alloc(K);
+  gsl_vector** mu_hat_s = (gsl_vector**) malloc(K * sizeof(gsl_vector*));
+  gsl_matrix** Sigma_hat_s = (gsl_matrix**) malloc(K * sizeof(gsl_matrix*));
+  for(int k=0; k<K; k++) {
+    int ks = gsl_permutation_get(perm, k);
+    gsl_vector_set(beta_hat_s, k, gsl_vector_get(beta_hat, ks));
+    mu_hat_s[k] = mu_hat[ks];
+    Sigma_hat_s[k] = Sigma_hat[ks];
+  }
+  gsl_permutation_free(perm);
+  /**
+   * End sorting. Sorted values are in beta_hat_s, mu_hat_s, Sigma_hat_s
+   */
+
+  /*beta*/
+  double dst = 0.0;
+  for(int k=0; k<K; k++){
+    double tr = beta[k];
+    dst += fabs((gsl_vector_get(beta_hat_s, k) - tr) / tr);
+  }
+  dst /= (double) K;
+  printf("||beta - beta_hat|| = %f\n", dst);
+  /*mu_k*/
+  for(int k=0; k<K; k++){
+    gsl_vector* muk = mu[k];
+    gsl_vector* muhk = mu_hat_s[k];
+    double dst = 0.0;
+    for(int d=0; d<DIM; d++) {
+      double tr = gsl_vector_get(muk, d);
+      dst += fabs((gsl_vector_get(muhk, d) - tr) / tr);
+    }
+    dst /= (double) DIM;
+    printf("||mu[%d] - mu_hat[%d]|| = %f\n", k, k, dst);
+  }
+  /*Sigma_k*/
+  for(int k=0; k<K; k++){
+    gsl_matrix* Sigmak = Sigma[k];
+    gsl_matrix* Sigmahk = Sigma_hat_s[k];
+    double dst = 0.0;
+    for(int d=0; d<DIM; d++) for(int d1=0; d1<DIM; d1++){
+	double tr = gsl_matrix_get(Sigmak, d, d1);
+	dst += fabs(gsl_matrix_get(Sigmahk, d, d1) - tr);
+    }
+    dst /= (double) (DIM * DIM);
+    printf("||Sigma[%d] - Sigma_hat[%d]|| = %f\n", k, k, dst);
+  }
+
+  gsl_vector_free(beta_hat_s);
+  free(mu_hat_s);
+  free(Sigma_hat_s);
 }
