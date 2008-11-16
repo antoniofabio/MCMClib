@@ -24,7 +24,7 @@ static double RHO[] = {0.0, 0.0};
 /*mixture proportion of component 1*/
 static double BETA = 0.5;
 /*burn in length*/
-#define T0 (100 + (int) pow(DIM, 2.5))
+#define T0 ((int) pow(DIM, 2.0) * 25)
 /*update boundary every N0 iterations*/
 #define N0 50
 /*scaling factor*/
