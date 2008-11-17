@@ -10,7 +10,7 @@
 #include <mixem.h>
 #include <mvnorm.h>
 
-/** Following arguments can be (almost) freely customized */
+/** Input arguments */
 /*chain length*/
 static int N = 100000;
 /*state space dimension*/
@@ -23,6 +23,8 @@ static double V0[] = {1.0, 1.0};
 static double RHO[] = {0.0, 0.0};
 /*mixture proportion of component 1*/
 static double BETA = 0.5;
+/***/
+
 /*burn in length*/
 #define T0 ((int) pow(DIM, 2.0) * 25)
 /*update boundary every N0 iterations*/
@@ -31,10 +33,9 @@ static double BETA = 0.5;
 #define SCALING_FACTOR (2.38 * 2.38 / (double) DIM)
 /*starting global variance guess*/
 #define SIGMA0_GLOBAL (pow(MU0 * 2.0, 2.0) + V0[0] + V0[1])
-/***/
-
 /*number of regions*/
 #define K 2
+
 /*boundary function and support data*/
 static gsl_vector* beta_hat;
 static gsl_vector* mu_hat[K];
@@ -54,7 +55,11 @@ int which_region(gsl_vector* x, void* ignore) {
   return ans;
 }
 
+/*output files handlers*/
+FILE *out_X, *out_beta, *out_mu, *out_Sigma;
+
 #include "ex4_target_distrib.c"
+void save_gamma_hat();
 void fit_diagnostics();
 int main(int argc, char** argv) {
   /*******************************/
@@ -117,6 +122,12 @@ int main(int argc, char** argv) {
   gsl_matrix_set_identity(Sigma_zero);
   gsl_matrix_scale(Sigma_zero, SIGMA0_GLOBAL * SCALING_FACTOR);
 
+  /*open output files*/
+  out_X = fopen("ex4_X.csv", "w"); /*sampled data*/
+  out_beta = fopen("ex4_beta_hat.csv", "w"); /*beta_hat*/
+  out_mu = fopen("ex4_mu_hat.csv", "w"); /*mu_hat*/
+  out_Sigma = fopen("ex4_Sigma_hat.csv", "w"); /*Sigma_hat*/
+
   /*alloc a new RAPT sampler*/
   mcmclib_rapt* sampler =
     mcmclib_rapt_alloc(r, /*RNG*/
@@ -134,7 +145,6 @@ int main(int argc, char** argv) {
   /*main MCMC loop*/
   int naccept=0; /*number of acceptances*/
   gsl_matrix* naccept_m = gsl_matrix_alloc(K, K+1); /*# accept. x region & proposal*/
-  FILE* out_X = fopen("ex4_X.csv", "w"); /*file where to store sampled data*/
   mcmclib_mixem_rec* m = mcmclib_mixem_rec_alloc(mu_hat, Sigma_hat, beta_hat);
   for(int n=0; n<N; n++) {
     /*update chain value*/
@@ -145,9 +155,10 @@ int main(int argc, char** argv) {
     /*accumulate data in mixture fitter object*/
     mcmclib_mixem_rec_add(m, x);
     /*update boundary estimation and rapt proposal variances*/
-    if((n>T0) && (((n+1) % N0)==0)) {
+    if((n>=T0) && (((n+1) % N0)==0)) {
       mcmclib_rapt_update_proposals(sampler);
       mcmclib_mixem_rec_update(m);
+      save_gamma_hat(); /*store current parameters estimates*/
     }
 
     /*update acceptance rate informations*/
@@ -164,20 +175,9 @@ int main(int argc, char** argv) {
   fit_diagnostics();
 
   fclose(out_X);
-  /*store means and variances estimates*/
-  FILE* out_mu = fopen("ex4_mu_hat.csv", "w");
-  FILE* out_Sigma = fopen("ex4_Sigma_hat.csv", "w");
-  for(int k=0; k<K; k++){
-    gsl_vector_fprintf(out_mu, mu_hat[k], "%f");
-    gsl_matrix_fprintf(out_Sigma, Sigma_hat[k], "%f");
-  }
   fclose(out_mu);
   fclose(out_Sigma);
-  /*store mixture weights estimates*/
-  FILE* out_beta = fopen("ex4_beta_hat.csv", "w");
-  gsl_vector_fprintf(out_beta, beta_hat, "%f");
   fclose(out_beta);
-
   gsl_matrix_free(naccept_m);
   target_distrib_free();
   gsl_rng_free(r);
@@ -185,6 +185,15 @@ int main(int argc, char** argv) {
   for(int k=0; k<K; k++)
     gsl_matrix_free(Sigma_local[k]);
   gsl_matrix_free(Sigma_zero);
+}
+
+/*save currently estimated parameters*/
+void save_gamma_hat() {
+  gsl_vector_fprintf(out_beta, beta_hat, "%f");
+  for(int k=0; k<K; k++){
+    gsl_vector_fprintf(out_mu, mu_hat[k], "%f");
+    gsl_matrix_fprintf(out_Sigma, Sigma_hat[k], "%f");
+  }
 }
 
 /*Compare fitted and true parameters, report a summary on stdout*/
