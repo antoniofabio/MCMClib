@@ -134,14 +134,13 @@ int main(int argc, char** argv) {
   /*main MCMC loop*/
   int naccept=0; /*number of acceptances*/
   gsl_matrix* naccept_m = gsl_matrix_alloc(K, K+1); /*# accept. x region & proposal*/
-  gsl_matrix* X = gsl_matrix_alloc(N, DIM); /*matrix of all sampled values*/
+  FILE* out_X = fopen("ex4_X.csv", "w"); /*file where to store sampled data*/
   mcmclib_mixem_rec* m = mcmclib_mixem_rec_alloc(mu_hat, Sigma_hat, beta_hat);
   for(int n=0; n<N; n++) {
     /*update chain value*/
     mcmclib_rapt_update(sampler);
-    /*store new value in matrix X*/
-    gsl_vector_view Xn = gsl_matrix_row(X, n);
-    gsl_vector_memcpy(&(Xn.vector), x);
+    /*store sampled value*/
+    gsl_vector_fprintf(out_X, x, "%f");
 
     /*accumulate data in mixture fitter object*/
     mcmclib_mixem_rec_add(m, x);
@@ -162,13 +161,8 @@ int main(int argc, char** argv) {
   printf("Acceptance rate: %f\n",
 	 (gsl_matrix_get(naccept_m, 0, 0) + gsl_matrix_get(naccept_m, 1, 1)) /
 	 (gsl_matrix_get(sampler->visits, 0, 0) + gsl_matrix_get(sampler->visits, 1, 1)));
-  //double td = fabs(gsl_vector_get(beta_hat, 0) - BETA);
-  //  printf("Distance between true and estimated boundary: %f\n", td);
   fit_diagnostics();
 
-  /*store sampled values*/
-  FILE* out_X = fopen("ex4_X.csv", "w");
-  gsl_matrix_fprintf(out_X, X, "%f");
   fclose(out_X);
   /*store means and variances estimates*/
   FILE* out_mu = fopen("ex4_mu_hat.csv", "w");
