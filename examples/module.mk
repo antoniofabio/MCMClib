@@ -1,6 +1,8 @@
-EXES := ex1 ex2 ex3 ex4
+EXES := example1 example2 example3
+RAPT_EXES := ex1 ex2 ex3 ex4
 
-EXAMPLES_BIN := $(EXES:%=examples/rapt/%)
+EXAMPLES_RAPT_BIN := $(RAPT_EXES:%=examples/rapt/%)
+EXAMPLES_BIN := $(EXES:%=examples/%) $(EXAMPLES_RAPT_BIN)
 TOCLEAN += $(EXAMPLES_BIN)
 EXAMPLES_LDFLAGS := src/libmcmclib.a $(LDFLAGS)
 EXAMPLES_CFLAGS := $(CFLAGS) -I./src
