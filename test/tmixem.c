@@ -43,6 +43,7 @@ int main(int argc, char** argv) {
     mcmclib_mvnorm(rng, Sigma[k], r);
     gsl_vector_add(r, mu[k]);
   }
+  gsl_rng_free(rng);
   FILE* out_X = fopen("tmixem_X.dat", "w");
   gsl_matrix_fprintf(out_X, X, "%f");
   fclose(out_X);
@@ -58,6 +59,7 @@ int main(int argc, char** argv) {
   }
   gsl_vector* w_hat = gsl_vector_alloc(K);
   mcmclib_mixem_fit(X, mu_hat, Sigma_hat, w_hat, 10);
+  gsl_matrix_free(X);
 
   /*print out estimation results*/
   gsl_vector_fprintf(stdout, w_hat, "%f");
@@ -69,6 +71,15 @@ int main(int argc, char** argv) {
   }
   fclose(out_Sigma);
   fclose(out_mu);
+
+  /*free memory*/
+  for(int k=0; k<K; k++) {
+    gsl_matrix_free(Sigma[k]);
+    gsl_matrix_free(Sigma_hat[k]);
+    gsl_vector_free(mu[k]);
+    gsl_vector_free(mu_hat[k]);
+  }
+  gsl_vector_free(w_hat);
 
   return 0;
 }
