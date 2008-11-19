@@ -1,4 +1,4 @@
-/**Test mixture fitting em algorithm*/
+/**Test recursive mixture fitting algorithm*/
 #include <stdio.h>
 #include <assert.h>
 #include <gsl/gsl_rng.h>
@@ -43,6 +43,7 @@ int main(int argc, char** argv) {
     mcmclib_mvnorm(rng, Sigma[k], r);
     gsl_vector_add(r, mu[k]);
   }
+  gsl_rng_free(rng);
   FILE* out_X = fopen("tmixem_X.dat", "w");
   gsl_matrix_fprintf(out_X, X, "%f");
   fclose(out_X);
@@ -67,6 +68,7 @@ int main(int argc, char** argv) {
       mcmclib_mixem_rec_update(m);
   }
   mcmclib_mixem_rec_free(m);
+  gsl_matrix_free(X);
 
   /*print out estimation results*/
   gsl_vector_fprintf(stdout, w_hat, "%f");
@@ -78,6 +80,15 @@ int main(int argc, char** argv) {
   }
   fclose(out_Sigma);
   fclose(out_mu);
+
+  /*free memory*/
+  for(int k=0; k<K; k++) {
+    gsl_matrix_free(Sigma[k]);
+    gsl_matrix_free(Sigma_hat[k]);
+    gsl_vector_free(mu[k]);
+    gsl_vector_free(mu_hat[k]);
+  }
+  gsl_vector_free(w_hat);
 
   return 0;
 }
