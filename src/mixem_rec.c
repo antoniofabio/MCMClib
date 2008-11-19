@@ -40,8 +40,10 @@ void mcmclib_mixem_rec_free(mcmclib_mixem_rec* p) {
     gsl_matrix_free(p->X_sq_sum[k]);
     gsl_vector_free(p->X_sum[k]);
   }
-  free(p->beta_sum);
-  free(p->beta_i);
+  gsl_vector_free(p->beta_sum);
+  gsl_vector_free(p->beta_i);
+  free(p->X_sq_sum);
+  free(p->X_sum);
   free(p->pi_k);
   free(p);
 }
