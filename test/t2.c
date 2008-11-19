@@ -52,6 +52,7 @@ int main(int argc, char** argv) {
     assert(check_dequal(lpdf, lpdf_check));
   }
 
+  gsl_vector_free(w);
   gsl_vector_free(x);
   mcmclib_mixnorm_lpdf_free(p);
   mcmclib_mvnorm_lpdf_free(pis[1]);
