@@ -55,7 +55,7 @@ void mcmclib_mixem_rec_add(mcmclib_mixem_rec* p, gsl_vector* y) {
   /*store posterior class probs. of y in beta_i*/
   double pi_sum = 0.0;
   for(int k = 0; k<K; k++) {
-    double pik = exp(mcmclib_mvnorm_lpdf_compute(p->pi_k[k], y));
+    double pik = exp(mcmclib_mvnorm_lpdf_compute(p->pi_k[k], y)) * gsl_vector_get(p->beta, k);
     gsl_vector_set(p->beta_i, k, pik);
     pi_sum += pik;
   }

@@ -58,6 +58,7 @@ int main(int argc, char** argv) {
     gsl_matrix_set_identity(Sigma_hat[k]);
   }
   gsl_vector* w_hat = gsl_vector_alloc(K);
+  gsl_vector_set_all(w_hat, 1.0 / (double) K);
   mcmclib_mixem_fit(X, mu_hat, Sigma_hat, w_hat, 10);
   gsl_matrix_free(X);
 

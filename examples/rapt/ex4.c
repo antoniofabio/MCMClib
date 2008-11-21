@@ -98,6 +98,7 @@ int main(int argc, char** argv) {
   target_distrib_init();
   /*init EM algorithm data*/
   beta_hat = gsl_vector_alloc(K);
+  gsl_vector_set_all(beta_hat, 1.0 / (double) K);
   for(int k=0; k<K; k++) {
     gsl_vector_set(beta_hat, k, 1.0 / (double) K);
 

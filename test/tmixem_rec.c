@@ -59,6 +59,7 @@ int main(int argc, char** argv) {
     gsl_matrix_scale(Sigma_hat[k], 0.5);
   }
   gsl_vector* w_hat = gsl_vector_alloc(K);
+  gsl_vector_set_all(w_hat, 1.0 / (double) K);
 
   mcmclib_mixem_rec* m = mcmclib_mixem_rec_alloc(mu_hat, Sigma_hat, w_hat);
   for(int n=0; n<N; n++) {
