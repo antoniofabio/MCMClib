@@ -1,6 +1,8 @@
 #ifndef __MCMCLIB_MIXEM_REC_H__
 #define __MCMCLIB_MIXEM_REC_H__
-/**Fitting a gaussian mixture by a recursive EM algorithm*/
+/** \file
+\brief Fitting a gaussian mixture by a recursive EM algorithm
+*/
 
 #include<gsl/gsl_vector.h>
 #include<gsl/gsl_matrix.h>

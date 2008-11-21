@@ -1,6 +1,12 @@
 #ifndef __GAUSS_INCA_H__
 #define __GAUSS_INCA_H__
 
+/**\file
+\brief INter-Chain Adaptive MCMC
+
+Parallel-chains adaptive MCMC
+*/
+
 #include <math.h>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_vector.h>
@@ -9,18 +15,17 @@
 #include "common.h"
 #include "mvnorm.h"
 
-/** INCA chains shared data structure
-*/
+/** INCA chains shared data structure */
 typedef struct {
 	gsl_matrix* Sigma_zero;
 	int t0;
-	int K; /**number of parallel chains*/
+	int K; /*number of parallel chains*/
 	gsl_vector** mean;
 	gsl_matrix** variance;
-	int* t; /**number of iterates for each chain (on which mean and variance h.b. computed*/
+	int* t; /*number of iterates for each chain (on which mean and variance h.b. computed*/
 	gsl_vector* mean_global;
 	gsl_matrix* variance_global;
-	int id; /**current chain id*/
+	int id; /*current chain id*/
 	double sf;
 	gsl_matrix* sigma_proposal;
 } mcmclib_gauss_inca_pool;
@@ -36,8 +41,7 @@ void mcmclib_gauss_inca_pool_update_variance(mcmclib_gauss_inca_pool* p);
 /** free INCA chains shared memory space */
 void mcmclib_gauss_inca_pool_free(mcmclib_gauss_inca_pool* p);
 
-/** INter-Chain Adaptive Gaussian random walk extra data
-*/
+/** INter-Chain Adaptive Gaussian random walk extra data */
 typedef struct {
 	mcmclib_gauss_inca_pool* p;
 	gsl_vector* old;
@@ -48,8 +52,7 @@ typedef struct {
 @param pool already allocated INCA shared data
 */
 mcmclib_gauss_inca* mcmclib_gauss_inca_alloc(mcmclib_gauss_inca_pool* pool);
-/** free extra AM data
-*/
+/** free extra AM data*/
 void mcmclib_gauss_inca_free(mcmclib_gauss_inca* p);
 
 /** Adaptive Metropolis Gaussian random walk

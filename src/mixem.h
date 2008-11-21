@@ -1,5 +1,9 @@
 #ifndef __MCMCLIB_MIXEM_H__
 
+/**\file
+\brief Fitting a gaussian mixture distribution by the EM algorithm
+ */
+
 #include<gsl/gsl_vector.h>
 #include<gsl/gsl_matrix.h>
 

@@ -1,6 +1,10 @@
 #ifndef __MCMCLIB_MIXNORM__
 #define __MCMCLIB_MIXNORM__
 
+/**\file
+\brief multivariate Gaussian mixture distribution
+*/
+
 #include <gsl/gsl_vector.h>
 #include "mvnorm.h"
 

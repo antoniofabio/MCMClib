@@ -1,6 +1,10 @@
 #ifndef __RAPT_H__
 #define __RAPT_H__
 
+/**\file
+\brief Regional adAPTive MCMC
+*/
+
 #include "common.h"
 #include "mvnorm.h"
 
@@ -9,14 +13,14 @@ typedef int (*region_fun_t) (gsl_vector*, void*);
 /** Regional Adaptive sampler data
 */
 typedef struct {
-  /**common MCMC fields*/
+  /*common MCMC fields*/
   gsl_rng* r;
   distrfun_p logdistr;
   void* logdistr_data;
   gsl_vector* current_x;
   gsl_vector* old;
   
-  /**rapt specific fields*/
+  /*rapt specific fields*/
   int t0; /*burn-in length*/
   gsl_matrix* sigma_whole; /*global proposal covariance matrix*/
   int K; /*number of regions*/
@@ -24,7 +28,7 @@ typedef struct {
   region_fun_t which_region; /*boundary computing function*/
   void* which_region_data; /*ptr to extra 'which_region' data*/
 
-  /**extra infos*/
+  /*extra infos*/
   int t; /*number of iterations done so far*/
   gsl_vector** means; /*array of regions means*/
   gsl_matrix** variances; /*array of regions variances*/
@@ -75,14 +79,16 @@ mcmclib_rapt* mcmclib_rapt_alloc(
 void mcmclib_rapt_free(mcmclib_rapt* p);
 
 /** Update current value of a RAPT chain
-@param p a RAPT object
 */
 int mcmclib_rapt_update(mcmclib_rapt* p);
 
-/*update local and global proposals covariance matrices*/
+/** update local and global proposals covariance matrices
+
+basing on current (region-specific) sample variances
+*/
 void mcmclib_rapt_update_proposals(mcmclib_rapt* p);
 
-/*update 'lambda' values of RAPT obj. basing on current jumping distances averages*/
+/** update 'lambda' values of RAPT obj. basing on current jumping distances averages*/
 void mcmclib_rapt_update_lambda(mcmclib_rapt* p);
 
 #endif

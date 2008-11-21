@@ -1,5 +1,10 @@
 #ifndef __MCMCLIB_MVNORM_H__
 #define __MCMCLIB_MVNORM_H__
+/**\file
+\brief multivariate Gaussian distribution
+
+multivariate Gaussian distribution: random variates and log-density
+*/
 
 #include "common.h"
 

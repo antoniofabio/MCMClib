@@ -1,6 +1,10 @@
 #ifndef __GAUSS_RW_H__
 #define __GAUSS_RW_H__
 
+/**\file
+\brief Gaussian random walk
+*/
+
 #include "common.h"
 
 /** Gaussian random walk extra data
@@ -15,7 +19,7 @@ typedef struct {
 	gsl_vector* old;
 } mcmclib_gauss_rw;
 
-/** alloc (and init) extra Gaussian RW data
+/** alloc (and init) Gaussian RW object
 @param r RNG state
 @param logdistr pointer to a log-likelihood function
 @param start_x starting value
@@ -24,12 +28,12 @@ typedef struct {
 */
 mcmclib_gauss_rw* mcmclib_gauss_rw_alloc(gsl_rng* r,
 	distrfun_p logdistr, void* data, gsl_vector* start_x, double step_size);
-/** free extra Gaussian RW data
+
+/** free extra Gaussian RW object
 */
 void mcmclib_gauss_rw_free(mcmclib_gauss_rw* p);
 
-/** Gaussian random walk
-@param p a RW object
+/** Gaussian random walk step
 */
 int mcmclib_gauss_rw_update(mcmclib_gauss_rw* p);
 

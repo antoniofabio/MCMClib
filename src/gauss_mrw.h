@@ -1,19 +1,22 @@
 #ifndef __GAUSS_MRW_H__
 #define __GAUSS_MRW_H__
 
+/**\file
+\brief Multivariate Gaussian Random Walk
+*/
+
 #include "common.h"
 
-/** Multivariate Gaussian Random Walk extra data
-*/
+/** Multivariate Gaussian Random Walk object*/
 typedef struct {
-	/**common MCMC fields*/
+	/*common MCMC fields*/
 	gsl_rng* r;
 	distrfun_p logdistr;
 	void* logdistr_data;
 	gsl_vector* current_x;
 	gsl_vector* old;
 
-	/**MRW specific fields*/
+	/*MRW specific fields*/
 	gsl_matrix* sigma_prop;
 } mcmclib_gauss_mrw;
 
@@ -26,13 +29,11 @@ typedef struct {
 */
 mcmclib_gauss_mrw* mcmclib_gauss_mrw_alloc(gsl_rng* r,
 	distrfun_p logdistr, void* data, gsl_vector* start_x, const gsl_matrix* sigma_prop);
-/** free extra Gaussian RW data
-*/
+
+/** free extra Gaussian RW data*/
 void mcmclib_gauss_mrw_free(mcmclib_gauss_mrw* p);
 
-/** Gaussian random walk
-@param p a MRW object
-*/
+/** Gaussian random walk step*/
 int mcmclib_gauss_mrw_update(mcmclib_gauss_mrw* p);
 
 #endif
