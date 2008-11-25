@@ -12,6 +12,19 @@ Target distrib. given as a sample of obs, puts output to stdout
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_vector.h>
 
+/**Update vector of Fn values recursively*/
+void Fn_update(gsl_vector* Fn, gsl_vector* xn, int n, gsl_matrix* X0,
+	       gsl_vector* workspace) {
+  gsl_vector_scale(Fn, (double) n);
+  for(int i=0; i < X0->size1; i++) {
+    gsl_vector_memcpy(workspace, xn);
+    gsl_vector_view zv = gsl_matrix_row(X0, i);
+    gsl_vector_sub(workspace, &(zv.vector));
+    gsl_vector_set(Fn, i, gsl_vector_get(Fn, i) + (!gsl_vector_isneg(workspace)));
+  }
+  gsl_vector_scale(Fn, 1.0 / ((double) n + 1.0));
+}
+
 /**Compute Fn in point 'z', basing on sample 'X'*/
 double Fn(gsl_vector* z, gsl_matrix* X, gsl_vector* workspace) {
   int N = X->size1;
@@ -79,14 +92,21 @@ int main(int argc, char** argv) {
 
   /*main loop*/
   gsl_vector* Fn_Y = Fn_vector(Y, X0);
+  gsl_vector* Fn_X = gsl_vector_alloc(X0_N);
+  gsl_vector_set_all(Fn_X, 0.0);
+  gsl_vector* Fn_diff = gsl_vector_alloc(X0_N);
+  gsl_vector* workspace = gsl_vector_alloc(dim);
   for(int n=0; n < X_N; n++) {
-    gsl_matrix_view XXn = gsl_matrix_submatrix(X, 0, 0, n+1, dim);
-    gsl_vector* Fn_XXn = Fn_vector(&(XXn.matrix), X0);
-    gsl_vector_sub(Fn_XXn, Fn_Y);
-    vector_square(Fn_XXn);
-    printf("%f\n", gsl_stats_mean(Fn_XXn->data, Fn_XXn->stride, X0_N));
-    gsl_vector_free(Fn_XXn);
+    gsl_vector_view xnv = gsl_matrix_row(X, n);
+    Fn_update(Fn_X, &(xnv.vector), n, X0, workspace);
+    gsl_vector_memcpy(Fn_diff, Fn_X);
+    gsl_vector_sub(Fn_diff, Fn_Y);
+    vector_square(Fn_diff);
+    printf("%f\n", gsl_stats_mean(Fn_diff->data, Fn_diff->stride, Fn_diff->size));
   }
+  gsl_vector_free(workspace);
+  gsl_vector_free(Fn_diff);
+  gsl_vector_free(Fn_X);
   gsl_vector_free(Fn_Y);
   /*end main loop*/
 
