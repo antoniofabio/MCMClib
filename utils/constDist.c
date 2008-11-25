@@ -11,16 +11,16 @@ Reads target vector cmd line, input from file, puts output to stdout
 
 int main(int argc, char** argv) {
   if(argc<3) {
-    printf("usage: %s X_filename theta_1 theta_2 ... theta_d\n")
+    printf("usage: %s X_filename theta_1 theta_2 ... theta_d\n");
     return 1;
   }
   gsl_set_error_handler_off();
   FILE* in = fopen(argv[1], "r");
   int dim = argc - 2;
   gsl_vector* theta = gsl_vector_alloc(dim);
-  for(int i-0; i<dim; i++) {
+  for(int i=0; i<dim; i++) {
     double thetai;
-    sscanf(argv[i + 1], "%lf", &thetai);
+    sscanf(argv[i + 2], "%lf", &thetai);
     gsl_vector_set(theta, i, thetai);
   }
   gsl_vector* xi = gsl_vector_alloc(dim);
