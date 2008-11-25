@@ -16,7 +16,7 @@ Target distrib. given as a sample of obs, puts output to stdout
 double Fn(gsl_vector* z, gsl_matrix* X, gsl_vector* workspace) {
   int N = X->size1;
   double ans = 0.0;
-  for(int n=0; n<n; n++) {
+  for(int n=0; n < N; n++) {
     gsl_vector_memcpy(workspace, z);
     gsl_vector_view xv = gsl_matrix_row(X, n);
     gsl_vector* x = &(xv.vector);
@@ -64,8 +64,8 @@ int main(int argc, char** argv) {
   gsl_matrix* X = gsl_matrix_alloc(X_N, dim);
   gsl_matrix_fscanf(f, X);
   fclose(f);
-  f = fopen(argv[4], "r");
   int Y_N;
+  f = fopen(argv[4], "r");
   sscanf(argv[5], "%d", &Y_N);
   gsl_matrix* Y = gsl_matrix_alloc(Y_N, dim);
   gsl_matrix_fscanf(f, Y);
