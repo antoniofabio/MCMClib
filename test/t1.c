@@ -52,10 +52,25 @@ int main(int argc, char** argv) {
   }
 
   gsl_matrix_free(check_m);
-  gsl_vector_free(x);
   mcmclib_mvnorm_lpdf_free(p_noinv);
   mcmclib_mvnorm_lpdf_free(p_nochol);
   mcmclib_mvnorm_lpdf_free(p);
+
+  /*negative correlations*/
+  for(int i=0; i<DIM; i++) {
+    gsl_matrix_set(Sigma, i, i, 1.0);
+    for(int j=0; j<i; j++){
+      gsl_matrix_set(Sigma, i, j, -1.0 / (double)DIM);
+      gsl_matrix_set(Sigma, j, i, -1.0 / (double)DIM);
+    }
+  }
+  p = mcmclib_mvnorm_lpdf_alloc(mu, Sigma->data);
+  gsl_vector_set_all(x, -1.0);
+  assert(check_dequal(mcmclib_mvnorm_lpdf_compute(p, x), -320.966989));
+  for(int i=0; i<DIM; i++)
+    gsl_vector_set(x, i, pow(-1, i+1));
+  assert(check_dequal(mcmclib_mvnorm_lpdf_compute(p, x), -125.512443));
+  gsl_vector_free(x);
   gsl_vector_free(mu);
   gsl_matrix_free(Sigma);
 }
