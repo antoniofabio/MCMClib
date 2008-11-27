@@ -106,6 +106,8 @@ static void mixem_update_s(mcmclib_mixem_online* p, gsl_vector* y) {
 
 /*update ML estimate*/
 static void mixem_update_gamma(mcmclib_mixem_online* p) {
+  if(p->n <= p->n0)
+    return;
   gsl_vector_memcpy(p->beta, p->delta);
   for(int k=0; k < p->beta->size; k++) {
     double betak = 1.0 / gsl_vector_get(p->beta, k);
