@@ -1,5 +1,5 @@
 EXES := example1 example2 example3
-RAPT_EXES := ex1 ex2 ex3 ex4
+RAPT_EXES := ex1 ex2 ex3 ex4 ex5
 
 EXAMPLES_RAPT_BIN := $(RAPT_EXES:%=examples/rapt/%)
 EXAMPLES_BIN := $(EXES:%=examples/%) $(EXAMPLES_RAPT_BIN)
