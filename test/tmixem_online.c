@@ -11,7 +11,8 @@
 static const double beta = 0.8;
 static const double V[] = {1.0, 4.0};
 static const double MU[] = {-3.0, 3.0};
-static const int DIM = 3;
+static const double rho[] = {-0.6, -0.6};
+static const int DIM = 2;
 
 #define N 1000
 
@@ -28,6 +29,10 @@ int main(int argc, char** argv) {
   for(int k=0; k<K; k++) {
     Sigma[k] = gsl_matrix_alloc(DIM, DIM);
     gsl_matrix_set_identity(Sigma[k]);
+    for(int i=0; i<DIM; i++) for(int j=0; j<i; j++) {
+			       gsl_matrix_set(Sigma[k], i, j, rho[k]);
+			       gsl_matrix_set(Sigma[k], j, i, rho[k]);
+      }
     gsl_matrix_scale(Sigma[k], V[k]);
     mu[k] = gsl_vector_alloc(DIM);
     gsl_vector_set_all(mu[k], MU[k]);
