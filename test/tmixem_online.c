@@ -9,7 +9,7 @@
 #include <mixem_online.h>
 
 static const double beta = 0.8;
-static const double V[] = {4.0, 1.0};
+static const double V[] = {1.0, 4.0};
 static const double MU[] = {-3.0, 3.0};
 static const int DIM = 3;
 
