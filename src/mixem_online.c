@@ -113,8 +113,13 @@ static void mixem_update_gamma(mcmclib_mixem_online* p) {
     double betak = 1.0 / gsl_vector_get(p->beta, k);
     gsl_vector_memcpy(p->mu[k], p->delta_x[k]);
     gsl_vector_scale(p->mu[k], betak);
+
     gsl_matrix_memcpy(p->Sigma[k], p->delta_xx[k]);
     gsl_matrix_scale(p->Sigma[k], betak);
+    gsl_matrix_view mucv = gsl_matrix_view_array(p->mu[k]->data, p->mu[k]->size, 1);
+    gsl_matrix* muc = &(mucv.matrix);
+    gsl_blas_dgemm(CblasNoTrans, CblasTrans, -1.0, muc, muc,
+		   1.0, p->Sigma[k]);
   }
 }
 
