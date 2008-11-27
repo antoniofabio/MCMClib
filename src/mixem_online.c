@@ -118,8 +118,7 @@ static void mixem_update_gamma(mcmclib_mixem_online* p) {
     gsl_matrix_scale(p->Sigma[k], betak);
     gsl_matrix_view mucv = gsl_matrix_view_array(p->mu[k]->data, p->mu[k]->size, 1);
     gsl_matrix* muc = &(mucv.matrix);
-    gsl_blas_dgemm(CblasNoTrans, CblasTrans, -1.0, muc, muc,
-		   1.0, p->Sigma[k]);
+    gsl_blas_dgemm(CblasNoTrans, CblasTrans, -1.0, muc, muc, 1.0, p->Sigma[k]);
   }
 }
 
