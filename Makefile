@@ -16,4 +16,7 @@ lib: src/libmcmclib.a src/libmcmclib.so
 examples: $(EXAMPLES_BIN)
 
 clean:
-	rm -rf $(SRC:%.c=%.o) $(SRC:%=%~) $(TOCLEAN)
+	@rm -rf *~ $(SRC:%.c=%.o) $(SRC:%=%~) $(TOCLEAN)
+
+distrib:
+	./distrib.sh
