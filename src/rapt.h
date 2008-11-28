@@ -10,8 +10,7 @@
 
 typedef int (*region_fun_t) (gsl_vector*, void*);
 
-/** Regional Adaptive sampler data
-*/
+/** Regional Adaptive sampler data */
 typedef struct {
   /*common MCMC fields*/
   gsl_rng* r;
@@ -27,6 +26,7 @@ typedef struct {
   gsl_matrix** sigma_local; /*array of local proposal covariance matrices*/
   region_fun_t which_region; /*boundary computing function*/
   void* which_region_data; /*ptr to extra 'which_region' data*/
+  gsl_matrix* lambda; /*K+1 weights for local and global proposals, in each region*/
 
   /*extra infos*/
   int t; /*number of iterations done so far*/
@@ -35,14 +35,9 @@ typedef struct {
   gsl_vector* global_mean;
   gsl_matrix* global_variance;
   gsl_vector* n; /*number of visits in each region*/
-  gsl_matrix* visits; /*number of visits to each region, from each proposal*/
-  gsl_matrix* jd; /*matrix of jumping distances -within- each region, from each proposal*/
-  gsl_matrix* lambda; /*K+1 weights for local and global proposals, in each region*/
   int which_proposal; /*which proposal have been used in last step*/
   int accepted; /*last step was an acceptance or a rejection?*/
-  double last_jd; /*last observed jumping distance*/
   int which_region_x, which_region_old; /*region info*/
-  gsl_vector* ntries; /*number of trials from each proposal from point 'old'*/
 
   /*internal data*/
   gsl_matrix* Sigma_eps; /*additive perturbation factor for variances updating*/
@@ -74,21 +69,15 @@ mcmclib_rapt* mcmclib_rapt_alloc(
 				 region_fun_t which_region,
 				 void* which_region_data);
 
-/** free  data
-*/
+/** free  data*/
 void mcmclib_rapt_free(mcmclib_rapt* p);
 
-/** Update current value of a RAPT chain
-*/
+/** Update current value of a RAPT chain*/
 int mcmclib_rapt_update(mcmclib_rapt* p);
 
 /** update local and global proposals covariance matrices
 
-basing on current (region-specific) sample variances
-*/
+basing on current (region-specific) sample variances*/
 void mcmclib_rapt_update_proposals(mcmclib_rapt* p);
-
-/** update 'lambda' values of RAPT obj. basing on current jumping distances averages*/
-void mcmclib_rapt_update_lambda(mcmclib_rapt* p);
 
 #endif
