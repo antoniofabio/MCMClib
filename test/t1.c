@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
   gsl_vector* x = gsl_vector_alloc(DIM);
 
   gsl_matrix* check_m = gsl_matrix_alloc(20, 2);
-  FILE* check_f = fopen("t1.check.dat", "r");
+  FILE* check_f = fopen("t1.dat.check", "r");
   gsl_matrix_fscanf(check_f, check_m);
   fclose(check_f);
 
