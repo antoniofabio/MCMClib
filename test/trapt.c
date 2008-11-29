@@ -60,8 +60,10 @@ int main(int argc, char** argv) {
     sum_x2 += pow(gsl_vector_get(x, 0), 2);
   }
   /*check results*/
-  assert(check_dequal(sum_x, -57.336886));
-  assert(check_dequal(sum_x2, 912.202062));
+  assert(sampler->t == N);
+  assert(sampler->t0 == T0);
+  assert(check_dequal(sum_x, 81.404690));
+  assert(check_dequal(sum_x2, 704.889860));
 
   /*free memory*/
   for(int k=0; k<K; k++)

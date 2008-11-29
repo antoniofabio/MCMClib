@@ -152,6 +152,8 @@ static void rapt_update_current_value(mcmclib_rapt* p) {
 						p->logdistr, p->logdistr_data,
 						rapt_q, p);
   p->which_region_x = p->accepted ? p->which_region(p->current_x, p->which_region_data) : p->which_region_old;
+
+  (p->t)++;
 }
 
 /*parametrized log-density of the (mixture) proposal function.
