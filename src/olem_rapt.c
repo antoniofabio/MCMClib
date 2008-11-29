@@ -14,6 +14,9 @@ MOR* mcmclib_olemrapt_alloc(gsl_rng* r,
   int dim = x->size;
   MOR* a = (MOR*) malloc(sizeof(MOR));
   int K = beta_hat->size;
+  a->beta_hat = beta_hat;
+  a->mu_hat = mu_hat;
+  a->Sigma_hat = Sigma_hat;
 
   a->pik_hat = (mcmclib_mvnorm_lpdf**) malloc(K * sizeof(mcmclib_mvnorm_lpdf*));
   for(int k=0; k<K; k++)
@@ -22,6 +25,7 @@ MOR* mcmclib_olemrapt_alloc(gsl_rng* r,
 
   gsl_matrix** tmp = (gsl_matrix**) malloc(K * sizeof(gsl_matrix*));
   for(int k=0; k<K; k++) {
+    tmp[k] = gsl_matrix_alloc(dim, dim);
     gsl_matrix_memcpy(tmp[k], Sigma_hat[k]);
     gsl_matrix_scale(tmp[k], 2.38 * 2.38 / ((double) dim));
   }
@@ -49,7 +53,9 @@ void mcmclib_olemrapt_free(MOR* p) {
 }
 
 int mcmclib_olemrapt_update(MOR* p) {
-  return mcmclib_rapt_update(p->rapt);
+  int ans = mcmclib_rapt_update(p->rapt);
+  mcmclib_mixem_online_update(p->em, p->rapt->current_x);
+  return ans;
 }
 
 void mcmclib_olemrapt_update_proposals(MOR* p) {
