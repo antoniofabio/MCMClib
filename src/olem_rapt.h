@@ -3,6 +3,13 @@
 
 /**\file
 \brief OnLine EM-based RAPT
+
+\example
+mcmclib_olemrapt* s = mcmclib_olemrapt_alloc(...);
+for(int n=0; n<N; n++) {
+  mcmclib_olemrapt_update(s);
+  mcmclib_olemrapt_update_proposals(s);
+}
 */
 
 #include <gsl/gsl_rng.h>
