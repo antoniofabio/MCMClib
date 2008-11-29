@@ -6,6 +6,7 @@
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 #include <mixnorm.h>
+#include <region_mixnorm.h>
 #include <olem_rapt.h>
 
 static const double beta = 0.5;
@@ -88,6 +89,8 @@ int main(int argc, char** argv) {
   assert(check_dequal(sum_x, 404.451680));
   assert(check_dequal(sum_x2, 12486.461683));
   mcmclib_mixem_online* em = sampler->em;
+  //gsl_vector_fprintf(stdout, em->beta, "%f");
+  assert(check_dequal(em->beta->data[0], 0.489060));
   //printf("mu1 = %f\t, mu2=%f\n", em->mu[0]->data[0], em->mu[1]->data[0]);
   assert(check_dequal(em->mu[0]->data[0], -0.477812));
   assert(check_dequal(em->mu[1]->data[0], 0.536509));
@@ -99,6 +102,19 @@ int main(int argc, char** argv) {
   //printf("%f\t%f\n", rapt->sigma_local[0]->data[0], rapt->sigma_local[1]->data[0]);
   assert(check_dequal(rapt->sigma_local[0]->data[0], 6.316514));
   assert(check_dequal(rapt->sigma_local[1]->data[0], 4.939567));
+  /*check boundary function*/
+  gsl_vector_set_all(x, -1.0);
+  int rx = mcmclib_region_mixnorm_compute(x, sampler->pi_hat);
+  assert(rx == 0);
+  gsl_vector_set_all(x, 1.0);
+  rx = mcmclib_region_mixnorm_compute(x, sampler->pi_hat);
+  assert(rx == 1);
+  gsl_vector_set_all(x, -0.058);
+  rx = mcmclib_region_mixnorm_compute(x, sampler->pi_hat);
+  assert(rx == 0);
+  gsl_vector_set_all(x, -0.057);
+  rx = mcmclib_region_mixnorm_compute(x, sampler->pi_hat);
+  assert(rx == 1);
 
   /*free memory*/
   for(int k=0; k<K; k++)
