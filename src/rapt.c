@@ -63,12 +63,6 @@ mcmclib_rapt* mcmclib_rapt_alloc(
   return ans;
 }
 
-/*update covariance matrix inverse info for prop. dens. computation*/
-static void rapt_update_q_data(mcmclib_rapt* p) {
-  for(int k=0; k <= p->K; k++)
-    mcmclib_mvnorm_lpdf_inverse(p->q_k[k]);
-}
-
 static void rapt_init(mcmclib_rapt* p) {
   p->accepted = 1;
   p->t = 0;
@@ -81,8 +75,6 @@ static void rapt_init(mcmclib_rapt* p) {
   }
   gsl_matrix_set_identity(p->Sigma_eps);
   gsl_matrix_scale(p->Sigma_eps, 0.001);
-
-  rapt_update_q_data(p);
 
   p->which_region_x = p->which_region(p->current_x, p->which_region_data);
 }
@@ -174,7 +166,7 @@ static double rapt_q(void* data, gsl_vector* x, gsl_vector* y) {
   double ans = 0.0;
   gsl_vector_memcpy(p->q_mean, x);
   for(int k=0; k <= p->K; k++)
-    ans += exp(mcmclib_mvnorm_lpdf_compute_noinv(p->q_k[k], y)) * gsl_vector_get(lambda_p, k);
+    ans += exp(mcmclib_mvnorm_lpdf_compute(p->q_k[k], y)) * gsl_vector_get(lambda_p, k);
 
   return log(ans);
 }
@@ -201,8 +193,6 @@ void mcmclib_rapt_update_proposals(mcmclib_rapt* p) {
   gsl_matrix_memcpy(p->sigma_whole, p->global_variance);
   gsl_matrix_add(p->sigma_whole, p->Sigma_eps);
   gsl_matrix_scale(p->sigma_whole, 2.38 * 2.38 / ((double) p->old->size));
-
-  rapt_update_q_data(p);
 }
 
 static void rapt_update_means_variances(mcmclib_rapt* p) {
