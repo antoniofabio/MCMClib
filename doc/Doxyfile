@@ -90,9 +90,10 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = /media/disk/antonio/Dottorato/MCMClib/src
+INPUT                  = . ../src
 INPUT_ENCODING         = UTF-8
-FILE_PATTERNS          = *.c \
+FILE_PATTERNS          = *.doc \
+			 *.c \
                          *.cc \
                          *.cxx \
                          *.cpp \

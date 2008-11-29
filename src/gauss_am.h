@@ -1,9 +1,11 @@
 #ifndef __GAUSS_AM_H__
 #define __GAUSS_AM_H__
 
-/**\file
-\brief Adaptive Gaussian random walk
-*/
+/**\addtogroup adaptive
+@{*/
+/**\defgroup GAUSS_AM gauss_am
+\brief Gaussian Adaptive Metropolis
+@{*/
 
 #include <math.h>
 #include <gsl/gsl_rng.h>
@@ -13,16 +15,16 @@
 #include "common.h"
 #include "gauss_mrw.h"
 
-/** Adaptive Metropolis Gaussian random walk extra data*/
+/**\brief Adaptive Metropolis Gaussian random walk*/
 typedef struct {
-	/**common MCMC fields*/
+	/*common MCMC fields*/
 	gsl_rng* r;
 	distrfun_p logdistr;
 	void* logdistr_data;
 	gsl_vector* current_x;
 	gsl_vector* old;
 
-	/**AM specific fields*/
+	/*AM specific fields*/
 	mcmclib_gauss_mrw* mrw;
 	gsl_matrix* sigma_zero;
 	int t0;
@@ -49,4 +51,6 @@ void mcmclib_gauss_am_free(mcmclib_gauss_am* p);
 /** Adaptive Metropolis Gaussian random walk*/
 int mcmclib_gauss_am_update(mcmclib_gauss_am* p);
 
+/**@}*/
+/**@}*/
 #endif

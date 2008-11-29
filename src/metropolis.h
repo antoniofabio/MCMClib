@@ -2,8 +2,8 @@
 #define __METROPOLIS_H__
 #include "common.h"
 
-/**\file
-\brief Some common M-H support functions
+/**\addtogroup metropolis_samplers
+@{
 */
 
 /** pointer to a proposal log-distribution function
@@ -37,4 +37,5 @@ int mcmclib_metropolis_generic_step(const gsl_rng* r, gsl_vector* old,
 				    gsl_vector* x, distrfun_p logdistr, void* data,
 				    proposal_distr_t q, void* q_data);
 
+/**@}*/
 #endif

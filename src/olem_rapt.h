@@ -1,17 +1,6 @@
 #ifndef __OLEMRAPT_H__
 #define __OLEMRAPT_H__
 
-/**\file
-\brief OnLine EM-based RAPT
-
-\example
-mcmclib_olemrapt* s = mcmclib_olemrapt_alloc(...);
-for(int n=0; n<N; n++) {
-  mcmclib_olemrapt_update(s);
-  mcmclib_olemrapt_update_proposals(s);
-}
-*/
-
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
@@ -19,18 +8,24 @@ for(int n=0; n<N; n++) {
 #include "mixnorm.h"
 #include "rapt.h"
 
-/** OLEM-RAPT data */
+/**\addtogroup adaptive
+@{*/
+/**\defgroup OLEMRAPT olem_rapt
+\brief RAPT based on On-Line EM fitting of a Gaussian mixture
+@{*/
+
+/** \brief OLEM-RAPT data */
 typedef struct {
-  mcmclib_rapt* rapt;
+  mcmclib_rapt* rapt; /**< rapt sampler*/
 
-  gsl_vector* beta_hat;
-  gsl_vector** mu_hat;
-  gsl_matrix** Sigma_hat;
+  gsl_vector* beta_hat; /**< current mixture weights estimates*/
+  gsl_vector** mu_hat; /**< current mixture means estimates*/
+  gsl_matrix** Sigma_hat; /**< current mixture variances estimates*/
 
-  mcmclib_mvnorm_lpdf** pik_hat;
-  mcmclib_mixnorm_lpdf* pi_hat;
+  mcmclib_mvnorm_lpdf** pik_hat; /**< single mixture components densities*/
+  mcmclib_mixnorm_lpdf* pi_hat; /**< estimated mixture density*/
 
-  mcmclib_mixem_online* em;
+  mcmclib_mixem_online* em; /**< online-EM mixture fitter*/
 } mcmclib_olemrapt;
 
 /** alloc a new OLEM-RAPT sampler object
@@ -43,6 +38,7 @@ typedef struct {
 @param beta_hat starting weights estimates
 @param mu_hat starting means estimates
 @param Sigma_hat starting variances estimates
+@returns a new olemrapt object
 */
 mcmclib_olemrapt* mcmclib_olemrapt_alloc(gsl_rng* r,
 					 distrfun_p logdistr, void* logdistr_data,
@@ -57,9 +53,11 @@ void mcmclib_olemrapt_free(mcmclib_olemrapt* p);
 /** Update current value of an OLEM-RAPT chain*/
 int mcmclib_olemrapt_update(mcmclib_olemrapt* p);
 
-/** update local and global proposals covariance matrices
+/** update local and global RAPT proposals covariance matrices
 
 basing on current mixture parameters estimates*/
 void mcmclib_olemrapt_update_proposals(mcmclib_olemrapt* p);
 
+/**@}*/
+/**@}*/
 #endif

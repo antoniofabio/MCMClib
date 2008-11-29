@@ -9,8 +9,7 @@
 #include <gsl/gsl_blas.h>
 #include <gsl/gsl_linalg.h>
 
-/** pointer to a distribution function
-*/
+/** pointer to a distribution function */
 typedef double (*distrfun_p) (void* data, gsl_vector* x);
 
 #endif

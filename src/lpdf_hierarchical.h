@@ -3,16 +3,15 @@
 
 #include "common.h"
 
-/** extra data for log-posterior function
-*/
+/**\brief extra data for log-posterior function*/
 typedef struct {
-	gsl_vector* x;
-	distrfun_p prior;
-	void* parms;
-	distrfun_p loglik;
-	gsl_vector** childs;
-	void** child_parms;
-	gsl_vector* workspace;
+  gsl_vector* x;
+  distrfun_p prior;
+  void* parms;
+  distrfun_p loglik;
+  gsl_vector** childs;
+  void** child_parms;
+  gsl_vector* workspace;
 } mcmclib_post_lpdf;
 
 /** alloc logposterior extra data

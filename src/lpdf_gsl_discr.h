@@ -26,6 +26,23 @@ void TYPE_METHOD(prefix, free)(TYPE_PAR(prefix)* p);\
 double TYPE_METHOD(prefix, compute)(void* in_p, gsl_vector* x);
 /*END OF INTERNAL UTILITY MACROS*/
 
+/**\addtogroup distributions
+@{*/
+
+/**\defgroup discrete Discrete
+\brief Univariate discrete probability distributions
+
+The following probability distributions have been wrapped from the GSL:
+- poisson
+- bernoulli
+- binomial
+- negative binomial
+- pascal
+- geometric
+- logaritmic
+*/
+/**@}*/
+
 DECLARE_1PAR(poisson, double, mu)
 DECLARE_1PAR(bernoulli, double, p)
 DECLARE_2PAR(binomial, double, p, int, n)

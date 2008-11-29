@@ -1,0 +1,10 @@
+/** \mainpage 
+
+MCMClib is a plain C library for doing 'decent-speed'
+Monte-Carlo Markov Chain.
+
+The API design is object oriented, and should allow easy binding
+to higher level lnguages.
+
+\author Antonio, Fabio Di Narzo
+*/

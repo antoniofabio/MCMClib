@@ -1,13 +1,14 @@
 #ifndef __GAUSS_MRW_H__
 #define __GAUSS_MRW_H__
 
-/**\file
+/**\addtogroup metropolis_samplers
+@{*/
+/**\defgroup GAUSS_MRW gauss_mrw
 \brief Multivariate Gaussian Random Walk
 */
-
 #include "common.h"
 
-/** Multivariate Gaussian Random Walk object*/
+/**\brief Multivariate Gaussian Random Walk*/
 typedef struct {
 	/*common MCMC fields*/
 	gsl_rng* r;
@@ -36,4 +37,6 @@ void mcmclib_gauss_mrw_free(mcmclib_gauss_mrw* p);
 /** Gaussian random walk step*/
 int mcmclib_gauss_mrw_update(mcmclib_gauss_mrw* p);
 
+/**@}*/
+/**@}*/
 #endif

@@ -29,6 +29,32 @@ double TYPE_METHOD(prefix, compute)(void* in_p, gsl_vector* x);
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_randist.h>
 
+/**\addtogroup distributions
+@{*/
+/**\defgroup continuous Continuous
+\brief Univariate continuous probability distributions
+
+The following probability distributions have been wrapped from the GSL:
+- gaussian
+- laplace
+- exppow
+- cauchy
+- rayleigh
+- rayleigh tail
+- gamma
+- flat
+- lognormal
+- chisq
+- fdist
+- tdist
+- beta
+- pareto
+- weibull
+- gumbel1
+- gumbel2
+*/
+/**@}*/
+
 DECLARE_1PAR(gaussian, sd)
 DECLARE_1PAR(exponential, mean)
 DECLARE_1PAR(laplace, a)

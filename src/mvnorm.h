@@ -1,12 +1,18 @@
 #ifndef __MCMCLIB_MVNORM_H__
 #define __MCMCLIB_MVNORM_H__
+
+#include "common.h"
 /**\file
 \brief multivariate Gaussian distribution
 
 multivariate Gaussian distribution: random variates and log-density
 */
 
-#include "common.h"
+/**\addtogroup distributions
+ @{*/
+
+/**\addtogroup multivariate
+ @{*/
 
 /** multivariate gaussian variate
 @param r RNG state
@@ -26,11 +32,10 @@ void mcmclib_mvnorm_chol(const gsl_rng* r,
 	const gsl_matrix* sigma_chol,
 	gsl_vector* out);
 
-/** multivariate gaussian distribution parameters
-*/
+/**\brief Multivariate Gaussian distribution*/
 typedef struct {
-  gsl_vector* mean;
-  double* vcov;
+  gsl_vector* mean; /**< distribution mean*/
+  double* vcov; /**< distribution variance/covariance matrix*/
   gsl_matrix* rooti;
   gsl_vector* x_mu;
   gsl_vector* mahal;
@@ -65,4 +70,6 @@ void mcmclib_mvnorm_lpdf_inverse(mcmclib_mvnorm_lpdf* p);
 /**compute log-distrib by exploiting previously computed inverse*/
 double mcmclib_mvnorm_lpdf_compute_noinv(mcmclib_mvnorm_lpdf* p, gsl_vector* x);
 
+/**@}*/
+/**@}*/
 #endif

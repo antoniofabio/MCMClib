@@ -3,8 +3,8 @@
 #include <gsl/gsl_statistics_double.h>
 #include "common.h"
 
-/**\file
-\brief basic multivariate statistics */
+/**\addtogroup descriptive
+@{*/
 
 /** column means */
 void mcmclib_matrix_colmeans(gsl_matrix* m, gsl_vector* out);
@@ -22,5 +22,7 @@ void mcmclib_matrix_covariance(gsl_matrix* m, gsl_matrix* out);
 @return nothing. 'cov', 'mean' and 'n' values will be updated as a side-effect
 */
 void mcmclib_covariance_update(gsl_matrix* cov, gsl_vector* mean, int* n, gsl_vector* x);
+
+/**@}*/
 
 #endif
