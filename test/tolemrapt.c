@@ -12,7 +12,6 @@ static const double beta = 0.5;
 static const double V[] = {1.0, 1.0};
 static const double MU[] = {-0.5, 0.5};
 static const double rho[] = {-0.6, -0.6};
-static const int DIM = 2;
 
 #define N 10000
 #define DIM 1
@@ -85,13 +84,21 @@ int main(int argc, char** argv) {
     sum_x2 += pow(gsl_vector_get(x, 0), 2);
   }
   /*check results*/
-  printf("%f\t%f\n", sum_x, sum_x2);
-  assert(check_dequal(sum_x, -16.94049));
-  assert(check_dequal(sum_x2, 13348.093474));
+  //printf("%f\t%f\n", sum_x, sum_x2);
+  assert(check_dequal(sum_x, 404.451680));
+  assert(check_dequal(sum_x2, 12486.461683));
   mcmclib_mixem_online* em = sampler->em;
-  printf("mu1 = %f\t, mu2=%f\n", em->mu[0]->data[0], em->mu[1]->data[0]);
-  assert(check_dequal(em->mu[0]->data[0], -0.551998));
-  assert(check_dequal(em->mu[1]->data[0], 0.536395));
+  //printf("mu1 = %f\t, mu2=%f\n", em->mu[0]->data[0], em->mu[1]->data[0]);
+  assert(check_dequal(em->mu[0]->data[0], -0.477812));
+  assert(check_dequal(em->mu[1]->data[0], 0.536509));
+  //printf("V1 = %f\t, V2=%f\n", em->Sigma[0]->data[0], em->Sigma[1]->data[0]);
+  assert(check_dequal(em->Sigma[0]->data[0], 1.114125));
+  assert(check_dequal(em->Sigma[1]->data[0], 0.871037));
+  /*check correspondence between rapt proposal and em estimates*/
+  mcmclib_rapt* rapt = sampler->rapt;
+  //printf("%f\t%f\n", rapt->sigma_local[0]->data[0], rapt->sigma_local[1]->data[0]);
+  assert(check_dequal(rapt->sigma_local[0]->data[0], 6.316514));
+  assert(check_dequal(rapt->sigma_local[1]->data[0], 4.939567));
 
   /*free memory*/
   for(int k=0; k<K; k++)
