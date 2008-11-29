@@ -46,7 +46,7 @@ typedef struct {
   mcmclib_mvnorm_lpdf** q_k;/*extra data for (mixture) proposal densities comp.*/
 } mcmclib_rapt;
 
-/** alloc (and init) extra Gaussian RW data
+/** alloc a new RAPT sampler object
 @param r RNG state
 @param logdistr pointer to a log-likelihood function
 @param logdistr_data extra data to be passed to the distribution function
