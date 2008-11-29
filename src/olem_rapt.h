@@ -32,13 +32,14 @@ typedef struct {
 @param logdistr_data extra data to be passed to the distribution function
 @param x current chain value
 @param t0 burn-in length before starting adaptation
+@param Sigma_zero initial global proposal covariance matrix
 @param beta_hat starting weights estimates
 @param mu_hat starting means estimates
 @param Sigma_hat starting variances estimates
 */
 mcmclib_olemrapt* mcmclib_olemrapt_alloc(gsl_rng* r,
 					 distrfun_p logdistr, void* logdistr_data,
-					 gsl_vector* x, int t0,
+					 gsl_vector* x, int t0, gsl_matrix* Sigma_zero,
 					 gsl_vector* beta_hat,
 					 gsl_vector** mu_hat,
 					 gsl_matrix** Sigma_hat);

@@ -6,31 +6,32 @@
 #define MOR mcmclib_olemrapt
 
 MOR* mcmclib_olemrapt_alloc(gsl_rng* r,
-	       distrfun_p logdistr, void* logdistr_data,
-	       gsl_vector* x, int t0,
-	       gsl_vector* beta_hat,
-	       gsl_vector** mu_hat,
-	       gsl_matrix** Sigma_hat){
+			    distrfun_p logdistr, void* logdistr_data,
+			    gsl_vector* x, int t0, gsl_matrix* Sigma_zero,
+			    gsl_vector* beta_hat,
+			    gsl_vector** mu_hat,
+			    gsl_matrix** Sigma_hat){
   int dim = x->size;
   MOR* a = (MOR*) malloc(sizeof(MOR));
   int K = beta_hat->size;
-
-  gsl_matrix* Sigma_whole = gsl_matrix_alloc(dim, dim);
-  /**FIXME: compute global variance from group means and variances*/
-  gsl_matrix_set_identity(Sigma_whole);
 
   a->pik_hat = (mcmclib_mvnorm_lpdf**) malloc(K * sizeof(mcmclib_mvnorm_lpdf*));
   for(int k=0; k<K; k++)
     a->pik_hat[k] = mcmclib_mvnorm_lpdf_alloc(mu_hat[k], Sigma_hat[k]->data);
   a->pi_hat = mcmclib_mixnorm_lpdf_alloc(a->beta_hat, a->pik_hat);
 
+  gsl_matrix** tmp = (gsl_matrix**) malloc(K * sizeof(gsl_matrix*));
+  for(int k=0; k<K; k++) {
+    gsl_matrix_memcpy(tmp[k], Sigma_hat[k]);
+    gsl_matrix_scale(tmp[k], 2.38 * 2.38 / ((double) dim));
+  }
   a->rapt = mcmclib_rapt_alloc(r, logdistr, logdistr_data,
-			       x, t0,
-			       Sigma_whole,
-			       K,
-			       Sigma_hat,
+			       x, t0, Sigma_zero,
+			       K, tmp,
 			       mcmclib_region_mixnorm_compute, a->pi_hat);
-  gsl_matrix_free(Sigma_whole);
+  for(int k=0; k<K; k++)
+    gsl_matrix_free(tmp[k]);
+  free(tmp);
 
   a->em = mcmclib_mixem_online_alloc(mu_hat, Sigma_hat, beta_hat, 0.5, t0);
 
@@ -55,7 +56,7 @@ void mcmclib_olemrapt_update_proposals(MOR* p) {
   mcmclib_rapt* r = p->rapt;
   if((r->t) <= r->t0)
     return;
-  double sf = 2.38 * 2.38 / ((double) p->mu_hat[0]->size);
+  double sf = 2.38 * 2.38 / ((double) r->current_x->size);
   for(int k=0; k < r->K; k++) {
     gsl_matrix_memcpy(r->sigma_local[k], p->Sigma_hat[k]);
     gsl_matrix_add(r->sigma_local[k], r->Sigma_eps);
