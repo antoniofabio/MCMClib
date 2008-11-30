@@ -1,33 +1,33 @@
 #ifndef __MCMCLIB_MIXEM_ONLINE_H__
 #define __MCMCLIB_MIXEM_ONLINE_H__
-/** \file
-\brief Fitting a gaussian mixture by an Online EM algorithm
-*/
 
 #include<gsl/gsl_vector.h>
 #include<gsl/gsl_matrix.h>
+#include "mixolem_suff.h"
 #include "mvnorm.h"
 
+/** \addtogroup misc Miscellanea
+@{
+\addtogroup mixolem
+@{
+*/
+
+/**On-Line EM for gaussian mixtures*/
 typedef struct {
   /*pointers to current parameters estimates*/
+  mcmclib_mixolem_suff* gamma; /**< pointer to current parameters estimates*/
+
+  mcmclib_mixolem_suff* s; /**< pointer to currently accumulated suff. stat.*/
+  mcmclib_mixolem_suff* si; /**< pointer to last point suff. stat.*/
+
+  double eta_eps; /**< learning rate*/
+
+  mcmclib_mvnorm_lpdf** pi_k; /**< array of mixture components densities*/
+  int n, n0; /**< current it. number, burn-in length*/
+
+  gsl_vector* beta;
   gsl_vector** mu;
   gsl_matrix** Sigma;
-  gsl_vector* beta;
-
-  /*pointers to current sufficient statistics estimates*/
-  gsl_vector* delta;
-  gsl_vector** delta_x;
-  gsl_matrix** delta_xx;
-
-  /*learning rate*/
-  double eta_eps;
-
-  /*extra data*/
-  mcmclib_mvnorm_lpdf** pi_k;
-  int n, n0;
-  gsl_vector* deltai;
-  gsl_vector** delta_xi;
-  gsl_matrix** delta_xxi;
 } mcmclib_mixem_online;
 
 /**alloc mixem_online data
@@ -46,7 +46,16 @@ mcmclib_mixem_online* mcmclib_mixem_online_alloc(gsl_vector** mu,
 /**free mixem_online data*/
 void mcmclib_mixem_online_free(mcmclib_mixem_online* p);
 
-/**update mixem_rec estimates using the new datapoint*/
+/**update mixem_online estimates using the new datapoint*/
 void mcmclib_mixem_online_update(mcmclib_mixem_online* p, gsl_vector* y);
 
+/**update sufficient statistic using the new datapoint*/
+void mcmclib_mixem_online_update_s(mcmclib_mixem_online* p, gsl_vector* y);
+
+/**compute gamma estimate basing on a sufficient stat.*/
+void mcmclib_mixem_online_update_gamma(mcmclib_mixolem_suff* gamma,
+				       mcmclib_mixolem_suff* s);
+
+/**@}*/
+/**@}*/
 #endif
