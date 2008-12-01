@@ -17,9 +17,7 @@ typedef struct {
   int M; /**< number of parallel samplers*/
   mcmclib_olemrapt** ss; /**< array of olemrapt samplers*/
 
-  mcmclib_mixolem_suff* s; /**< pooled sufficient statistic*/
-  mcmclib_mixolem_suff* workspace; /**< workspace memory*/
-  mcmclib_mixolem_suff* gamma_hat; /**< mixture parameters estimates*/
+  mcmclib_mixem_online* em; /**< pooled on-line EM estimator*/
 } mcmclib_olemrapt_inca;
 
 /** alloc a new OLEM-RAPT INCA sampler object
