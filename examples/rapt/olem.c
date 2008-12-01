@@ -20,7 +20,7 @@
 /*chain length*/
 static int N = 25000;
 /*burn in length*/
-#define T0 ((int) pow(DIM, 2.0) * 25)
+#define T0 200
 /*scaling factor*/
 #define SCALING_FACTOR (2.38 * 2.38 / (double) DIM)
 /*starting global variance guess*/

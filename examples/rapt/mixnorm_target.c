@@ -6,11 +6,11 @@ const int DIM = 5;
 /*absolute local mean value*/
 const double MU0 = 1.5;
 /*local variances multipliers*/
-const double V0[] = {1.0, 1.0};
+const double V0[] = {4.0, 1.0};
 /*local pairwise correlations*/
 const double RHO[] = {-0.1, -0.1};
 /*mixture proportion of component 1*/
-const double BETA = 0.5;
+const double BETA = 0.2;
 
 double beta[K];
 gsl_vector_view beta_vv;
