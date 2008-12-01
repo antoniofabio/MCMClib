@@ -184,17 +184,29 @@ static int sample(gsl_rng* r, gsl_vector* probs) {
   return(K-1);
 }
 
+/*dest = alpha * (A + B) */
+static void matrix_addscale(gsl_matrix* dest,
+			     gsl_matrix* A, gsl_matrix* B, double alpha) {
+  gsl_matrix_memcpy(dest, A);
+  gsl_matrix_add(dest, B);
+  gsl_matrix_scale(dest, alpha);
+}
+
+void mcmclib_rapt_update_proposals_custom(mcmclib_rapt* p,
+					  gsl_matrix** variances,
+					  gsl_matrix* global_variance) {
+  double sf = 2.38 * 2.38 / ((double) p->old->size);
+  for(int k=0; k< p->K; k++)
+    matrix_addscale(p->sigma_local[k],
+			  variances[k], p->Sigma_eps, sf);
+  matrix_addscale(p->sigma_whole,
+			global_variance, p->Sigma_eps, sf);
+}
+
 void mcmclib_rapt_update_proposals(mcmclib_rapt* p) {
   if((p->t) <= p->t0)
     return;
-  for(int k=0; k< p->K; k++) {
-    gsl_matrix_memcpy(p->sigma_local[k], p->variances[k]);
-    gsl_matrix_add(p->sigma_local[k], p->Sigma_eps);
-    gsl_matrix_scale(p->sigma_local[k], 2.38 * 2.38 / ((double) p->old->size));
-  }
-  gsl_matrix_memcpy(p->sigma_whole, p->global_variance);
-  gsl_matrix_add(p->sigma_whole, p->Sigma_eps);
-  gsl_matrix_scale(p->sigma_whole, 2.38 * 2.38 / ((double) p->old->size));
+  mcmclib_rapt_update_proposals_custom(p, p->variances, p->global_variance);
 }
 
 static void rapt_update_means_variances(mcmclib_rapt* p) {

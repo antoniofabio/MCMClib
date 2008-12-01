@@ -78,9 +78,15 @@ void mcmclib_rapt_free(mcmclib_rapt* p);
 int mcmclib_rapt_update(mcmclib_rapt* p);
 
 /** update local and global proposals covariance matrices
-
 basing on current (region-specific) sample variances*/
 void mcmclib_rapt_update_proposals(mcmclib_rapt* p);
+
+/** update local and global proposals covariance matrices
+using custom estimated local and global variances
+ */
+void mcmclib_rapt_update_proposals_custom(mcmclib_rapt* p,
+					  gsl_matrix** variances,
+					  gsl_matrix* global_variance);
 
 /**@}*/
 /**@}*/
