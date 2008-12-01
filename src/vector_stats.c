@@ -71,3 +71,30 @@ void mcmclib_covariance_update(gsl_matrix* cov, gsl_vector* mean, int* n, gsl_ve
 		gsl_matrix_scale(cov, 1.0 / (double) (*n));
 	}
 }
+
+/*Pooled weighted variance*/
+void mcmclib_pooled_variance(double beta,
+			     gsl_vector** means,
+			     gsl_matrix** variances,
+			     gsl_matrix* V) {
+  int dim = means[0]->size;
+  gsl_matrix_memcpy(V, variances[0]);
+  gsl_matrix_scale(V, beta);
+  gsl_matrix* tmp = gsl_matrix_alloc(dim, dim);
+  gsl_matrix_memcpy(tmp, variances[1]);
+  gsl_matrix_scale(tmp, 1.0 - beta);
+  gsl_matrix_add(V, tmp);
+
+  gsl_matrix_view mu1v = gsl_matrix_view_array(means[0]->data, dim, 1);
+  gsl_matrix* mu1 = &(mu1v.matrix);
+  gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, mu1, mu1, 0.0, tmp);
+  gsl_matrix_view mu2v = gsl_matrix_view_array(means[1]->data, dim, 1);
+  gsl_matrix* mu2 = &(mu2v.matrix);
+  gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, mu2, mu2, 1.0, tmp);
+  gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, mu1, mu2, 1.0, tmp);
+  gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, mu2, mu1, 1.0, tmp);
+  gsl_matrix_scale(tmp, beta * (1-beta));
+  gsl_matrix_add(V, tmp);
+
+  gsl_matrix_free(tmp);
+}

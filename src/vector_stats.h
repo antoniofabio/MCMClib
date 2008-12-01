@@ -23,6 +23,15 @@ void mcmclib_matrix_covariance(gsl_matrix* m, gsl_matrix* out);
 */
 void mcmclib_covariance_update(gsl_matrix* cov, gsl_vector* mean, int* n, gsl_vector* x);
 
+/**Pooled weighted variance
+@param beta first component's weight
+@param means array of 2 means
+@param variances array of two variances
+@param output result
+*/
+void mcmclib_pooled_variance(double beta, gsl_vector** means,
+			     gsl_matrix** variances, gsl_matrix* V);
+
 /**@}*/
 
 #endif
