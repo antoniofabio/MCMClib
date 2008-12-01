@@ -32,14 +32,16 @@ typedef struct {
 @param beta_hat starting weights estimates
 @param mu_hat starting means estimates
 @param Sigma_hat starting variances estimates
+@param M number of parallel chains
 @return a new olemrapt_inca object
 */
 mcmclib_olemrapt_inca* mcmclib_olemrapt_inca_alloc(gsl_rng* r,
 						   distrfun_p logdistr, void* logdistr_data,
-						   gsl_vector* x, int t0, gsl_matrix* Sigma_zero,
+						   gsl_vector** x, int t0, gsl_matrix* Sigma_zero,
 						   gsl_vector* beta_hat,
 						   gsl_vector** mu_hat,
-						   gsl_matrix** Sigma_hat);
+						   gsl_matrix** Sigma_hat,
+						   int M);
 
 /** free OLEM-RAPT INCA data*/
 void mcmclib_olemrapt_inca_free(mcmclib_olemrapt_inca* p);
