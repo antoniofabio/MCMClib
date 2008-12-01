@@ -1,4 +1,5 @@
 #include "olemrapt_inca.h"
+#include "vector_stats.h"
 
 #define MOI mcmclib_olemrapt_inca
 
@@ -17,10 +18,13 @@ MOI* mcmclib_olemrapt_inca_alloc(gsl_rng* r,
     a->ss[m] = mcmclib_olemrapt_alloc(r, logdistr, logdistr_data,
 				      x[m], t0, Sigma_zero,
 				      beta_hat, mu_hat, Sigma_hat);
+  int dim = x[0]->size;
+  a->global_variance = gsl_matrix_alloc(dim, dim);
   return a;
 }
 
 void mcmclib_olemrapt_inca_free(MOI* p){
+  gsl_matrix_free(p->global_variance);
   mcmclib_mixem_online_free(p->em);
   for(int m=0; m < p->M; m++)
     mcmclib_olemrapt_free(p->ss[m]);
@@ -39,6 +43,11 @@ int mcmclib_olemrapt_inca_update(mcmclib_olemrapt_inca* p) {
 
 /*update chains proposals*/
 void mcmclib_olemrapt_inca_update_proposals(mcmclib_olemrapt_inca* p){
+  mcmclib_mixolem_suff* gamma = p->em->gamma;
+  mcmclib_pooled_variance(gsl_vector_get(gamma->delta, 0),
+			  gamma->delta_x, gamma->delta_xx,
+			  p->global_variance);
   for(int m=0; m < p->M; m++)
-    mcmclib_olemrapt_update_proposals(p->ss[m]);
+    mcmclib_rapt_update_proposals_custom(p->ss[m]->rapt,
+					 gamma->delta_xx, p->global_variance);
 }

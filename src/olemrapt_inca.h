@@ -18,6 +18,7 @@ typedef struct {
   mcmclib_olemrapt** ss; /**< array of olemrapt samplers*/
 
   mcmclib_mixem_online* em; /**< pooled on-line EM estimator*/
+  gsl_matrix* global_variance; /**< pooled global variance estimate*/
 } mcmclib_olemrapt_inca;
 
 /** alloc a new OLEM-RAPT INCA sampler object
