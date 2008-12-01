@@ -62,13 +62,5 @@ void mcmclib_olemrapt_update_proposals(MOR* p) {
   mcmclib_rapt* r = p->rapt;
   if((r->t) <= r->t0)
     return;
-  double sf = 2.38 * 2.38 / ((double) r->current_x->size);
-  for(int k=0; k < r->K; k++) {
-    gsl_matrix_memcpy(r->sigma_local[k], p->Sigma_hat[k]);
-    gsl_matrix_add(r->sigma_local[k], r->Sigma_eps);
-    gsl_matrix_scale(r->sigma_local[k], sf);
-  }
-  gsl_matrix_memcpy(r->sigma_whole, r->global_variance);
-  gsl_matrix_add(r->sigma_whole, r->Sigma_eps);
-  gsl_matrix_scale(r->sigma_whole, sf);
+  mcmclib_rapt_update_proposals_custom(r, p->Sigma_hat, r->global_variance);
 }
