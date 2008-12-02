@@ -12,7 +12,7 @@ MOI* mcmclib_olemrapt_inca_alloc(gsl_rng* r,
 				 int M) {
   MOI* a = (MOI*) malloc(sizeof(MOI));
   a->M = M;
-  a->em = mcmclib_mixem_online_alloc(mu_hat, Sigma_hat, beta_hat, 0.5, t0);
+  a->em = mcmclib_mixem_online_alloc(mu_hat, Sigma_hat, beta_hat, 0.5, t0 * M);
   a->ss = (mcmclib_olemrapt**) malloc(M * sizeof(mcmclib_olemrapt*));
   for(int m=0; m<M; m++)
     a->ss[m] = mcmclib_olemrapt_alloc(r, logdistr, logdistr_data,
