@@ -13,4 +13,5 @@ EXAMPLES_CFLAGS := $(CFLAGS) -I./src
 $(EXAMPLES_BIN): %: %.c src/libmcmclib.a
 	$(CC) $(EXAMPLES_CFLAGS) $^ $(EXAMPLES_LDFLAGS) -o $@
 
-examples/rapt/olem: examples/rapt/mixnorm_target.o
+examples/rapt/olem: examples/rapt/mixnorm_target.o examples/rapt/mixnorm_fitting.o
+

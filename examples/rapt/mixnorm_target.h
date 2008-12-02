@@ -1,6 +1,8 @@
 #ifndef __MIXNORM_TGT__
 #define __MIXNORM_TGT__
 
+#include <mixnorm.h>
+
 /*state space dimension*/
 extern const int DIM;
 /*absolute local mean value*/
