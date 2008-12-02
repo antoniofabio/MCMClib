@@ -49,10 +49,12 @@ void mcmclib_mixem_online_free(mcmclib_mixem_online* p);
 /**update mixem_online estimates using the new datapoint*/
 void mcmclib_mixem_online_update(mcmclib_mixem_online* p, gsl_vector* y);
 
-/**update sufficient statistic using the new datapoint*/
+/**update sufficient statistic using the new datapoint
+\internal*/
 void mcmclib_mixem_online_update_s(mcmclib_mixem_online* p, gsl_vector* y);
 
-/**compute gamma estimate basing on a sufficient stat.*/
+/**compute gamma estimate basing on a sufficient stat.
+\internal*/
 void mcmclib_mixem_online_update_gamma(mcmclib_mixolem_suff* gamma,
 				       mcmclib_mixolem_suff* s);
 

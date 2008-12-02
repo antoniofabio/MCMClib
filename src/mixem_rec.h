@@ -1,13 +1,16 @@
 #ifndef __MCMCLIB_MIXEM_REC_H__
 #define __MCMCLIB_MIXEM_REC_H__
-/** \file
-\brief Fitting a gaussian mixture by a recursive EM algorithm
+/** \addtogroup misc
+@{
+\addtogroup mixemrec Recursive mixture fitting (deprecated)
+@{
 */
 
 #include<gsl/gsl_vector.h>
 #include<gsl/gsl_matrix.h>
 #include "mvnorm.h"
 
+/**Gaussians mixture fitting by recursive EM*/
 typedef struct {
   /*current parameters estimates*/
   gsl_vector** mu;
@@ -23,7 +26,7 @@ typedef struct {
   gsl_vector* beta_i;
 } mcmclib_mixem_rec;
 
-/**alloc mixem_rec data
+/**alloc \ref mcmclib_mixem_rec data.
 @param mu array of current means estimates
 @param Sigma array of current variances estimates
 @param beta vector of current weights estimates
@@ -41,4 +44,5 @@ void mcmclib_mixem_rec_add(mcmclib_mixem_rec* p, gsl_vector* y);
 /**update mixem_rec estimates using currently accumulated data*/
 void mcmclib_mixem_rec_update(mcmclib_mixem_rec* p);
 
+/**@}@}*/
 #endif

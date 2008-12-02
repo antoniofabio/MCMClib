@@ -2,9 +2,8 @@
 #define __GAUSS_AM_H__
 
 /**\addtogroup adaptive
-@{*/
-/**\defgroup GAUSS_AM gauss_am
-\brief Gaussian Adaptive Metropolis
+@{
+\defgroup GAUSS_AM Gaussian random walk Adaptive Metropolis
 @{*/
 
 #include <math.h>

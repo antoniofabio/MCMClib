@@ -3,7 +3,7 @@
 #include <gsl/gsl_statistics_double.h>
 #include "common.h"
 
-/**\addtogroup descriptive
+/**\addtogroup misc
 @{*/
 
 /** column means */

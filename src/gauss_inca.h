@@ -2,9 +2,8 @@
 #define __GAUSS_INCA_H__
 
 /**\addtogroup adaptive
-@{*/
-/**\defgroup GAUSS_INCA gauss_inca
-\brief INter-Chain Adaptation
+@{
+\defgroup GAUSS_INCA INter-Chain Adaptation (INCA)
 @{*/
 
 #include <math.h>

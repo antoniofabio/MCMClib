@@ -4,8 +4,8 @@
 #include "common.h"
 
 /**\addtogroup metropolis_samplers
-@{*/
-/**\defgroup gauss_rw gauss_rw
+@{
+\defgroup gauss_rw gauss_rw
 @{*/
 
 /**\brief Gaussian Random Walk*/

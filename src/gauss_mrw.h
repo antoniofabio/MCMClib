@@ -2,9 +2,8 @@
 #define __GAUSS_MRW_H__
 
 /**\addtogroup metropolis_samplers
-@{*/
-/**\defgroup GAUSS_MRW gauss_mrw
-\brief Multivariate Gaussian Random Walk
+@{
+\defgroup GAUSS_MRW Multivariate Gaussian Random Walk
 */
 #include "common.h"
 
