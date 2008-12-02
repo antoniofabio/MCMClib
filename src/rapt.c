@@ -51,7 +51,7 @@ mcmclib_rapt* mcmclib_rapt_alloc(
 
   /*alloc extra data for mixture proposal density computation*/
   ans->q_mean = gsl_vector_alloc(dim);
-  ans->q_k = (mcmclib_mvnorm_lpdf**) malloc(K * sizeof(mcmclib_mvnorm_lpdf*));
+  ans->q_k = (mcmclib_mvnorm_lpdf**) malloc((K+1) * sizeof(mcmclib_mvnorm_lpdf*));
   for(int k=0; k<K; k++)
       ans->q_k[k] = mcmclib_mvnorm_lpdf_alloc(ans->q_mean, ans->sigma_local[k]->data);
   ans->q_k[K] = mcmclib_mvnorm_lpdf_alloc(ans->q_mean, ans->sigma_whole->data);
@@ -69,6 +69,7 @@ static void rapt_init(mcmclib_rapt* p) {
   gsl_vector_set_all(p->global_mean, 0.0);
   gsl_matrix_set_all(p->global_variance, 0.0);
   gsl_vector_set_all(p->n, 0.0);
+  gsl_matrix_set_all(p->lambda, 0.0);
   for(int region=0; region < p->K; region++) {
     gsl_matrix_set(p->lambda, region, region, 0.5);
     gsl_matrix_set(p->lambda, region, p->K, 0.5);
