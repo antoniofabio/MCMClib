@@ -91,8 +91,8 @@ void mcmclib_pooled_variance(double beta,
   gsl_matrix_view mu2v = gsl_matrix_view_array(means[1]->data, dim, 1);
   gsl_matrix* mu2 = &(mu2v.matrix);
   gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, mu2, mu2, 1.0, tmp);
-  gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, mu1, mu2, 1.0, tmp);
-  gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, mu2, mu1, 1.0, tmp);
+  gsl_blas_dgemm(CblasNoTrans, CblasTrans, -1.0, mu1, mu2, 1.0, tmp);
+  gsl_blas_dgemm(CblasNoTrans, CblasTrans, -1.0, mu2, mu1, 1.0, tmp);
   gsl_matrix_scale(tmp, beta * (1-beta));
   gsl_matrix_add(V, tmp);
 
