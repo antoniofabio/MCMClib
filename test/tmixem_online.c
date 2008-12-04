@@ -18,6 +18,11 @@ static const int DIM = 2;
 
 #define K 2
 
+#define TOL 1e-6
+static int check_dequal(double a, double b) {
+  return (fabs(a-b) < TOL);
+}
+
 static int sample(gsl_rng* r, gsl_vector* probs);
 
 int main(int argc, char** argv) {
@@ -78,7 +83,9 @@ int main(int argc, char** argv) {
   gsl_matrix_free(X);
 
   /*print out estimation results*/
-  gsl_vector_fprintf(stdout, w_hat, "%f");
+  //gsl_vector_fprintf(stdout, w_hat, "%f");
+  assert(check_dequal(w_hat->data[0], 0.801000));
+  assert(check_dequal(w_hat->data[1], 0.199000));
   FILE* out_mu = fopen("tmixem_online_mu.dat", "w");
   FILE* out_Sigma = fopen("tmixem_online_Sigma.dat", "w");
   for(int k=0; k<K; k++) {
