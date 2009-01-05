@@ -19,19 +19,17 @@ OLEM-RAPT, Barretts LOH data
 const int N = 50000;
 /*number of parallel chains to run*/
 const int K = 20;
-/*HCL burn in*/
+/*burn in*/
 const int T0 = 1000;
-/*starting means guesses*/
-double M0[] = {-5.0, -5.0, 5.0, 5.0,
-		     5.0, 5.0, -5.0, -5.0};
-/*starting variance guesses*/
-double V0[] = {4.0, 4.0};
-/*starting overall variance*/
-const double S0 = 6.0;
+/*starting means estimates*/
+double M0[] = {0.5, 0.1, 0.5, 0.5,
+	       0.5, 0.9, 0.2, 0.5};
+/*starting variance estimates*/
+double V0[] = {0.3, 0.05};
+/*starting overall proposal variance*/
+const double S0 = 0.01;
 /*target space dimension*/
 const int DIM = 4;
-/*scaling factor*/
-#define SCALING_FACTOR ((2.38 * 2.38) / (double) DIM)
 /*data filenamee*/
 #define DATA_FNAME "BarrettsLOH.dat"
 /*no. of rows*/
@@ -56,26 +54,32 @@ static double my_lf(int x, int n, double eta, double pi1, double pi2, double gam
   return log(ans);
 }
 
-static void log_pi(double* theta, double* ans) {
+static double log_pi(double* theta) {
   double eta = theta[0];
   double pi1 = theta[1];
   double pi2 = theta[2];
   double gamma = theta[3];
   if((eta < 0.01)  || (pi1 < 0.01) || (pi2 < 0.01) ||
      (eta > 0.99) || (pi1 > 0.99) || (pi2 > 0.99) ||
-     (abs(gamma) >= 30.0)) {
-    ans[0] = log(0.0);
-    return;
+     (abs(gamma) > 30)) {
+    return log(0.0);
   }
-  ans[0] = 0.0;
-  for(int i=0; i<NR; i++)
-    ans[0] += my_lf(gsl_matrix_get(LOH, i, 0), gsl_matrix_get(LOH, i, 1), theta[0], theta[1], theta[2], theta[3]);
+  double ans  = 0.0;
+  for(int i=0; i<NR && isfinite(ans); i++)
+    ans += my_lf(gsl_matrix_get(LOH, i, 0), gsl_matrix_get(LOH, i, 1),
+		 eta, pi1, pi2, gamma);
+  return ans;
 }
 
 /*target distribution*/
-double target_logdensity(void* ignore, gsl_vector* x) {
+static double target_logdensity(void* ignore, gsl_vector* x) {
   double ans;
-  log_pi(x->data, &ans);
+  double *gamma = x->data + 3;
+  if(*gamma < 0.01 || *gamma > 0.99)
+    return log(0.0);
+  *gamma = log(*gamma) - log(1-(*gamma));
+  ans = log_pi(x->data);
+  *gamma = exp(*gamma) / (1.0 + exp((*gamma)) );
   return ans;
 }
 
@@ -87,7 +91,7 @@ double target_logdensity(void* ignore, gsl_vector* x) {
   }
 
 int main(int argc, char** argv) {
-  /*load and setup input data*/
+  /*load input data*/
   LOH = gsl_matrix_alloc(NR, 2);
   FILE* fdata = fopen(DATA_FNAME, "r");
   if(!fdata)
@@ -97,16 +101,16 @@ int main(int argc, char** argv) {
 
   int d = DIM;
   /*set starting mixture parameters values*/
-  gsl_matrix* Sigma_zero = gsl_matrix_alloc(d, d);
-  gsl_matrix_set_identity(Sigma_zero);
-  gsl_matrix_scale(Sigma_zero, S0);
+  /*weights*/
+  gsl_vector* beta = gsl_vector_alloc(2);
+  gsl_vector_set_all(beta, 0.5);
   /*means*/
   gsl_vector_view m0v[2];
-  m0v[0] = gsl_vector_view_array(M0, DIM);
-  m0v[1] = gsl_vector_view_array(M0 + DIM, DIM);
-  gsl_vector* mu0[2];
-  mu0[0] = &(m0v[0].vector);
-  mu0[1] = &(m0v[1].vector);
+  m0v[0] = gsl_vector_view_array(M0, d);
+  m0v[1] = gsl_vector_view_array(M0 + d, d);
+  gsl_vector* mu[2];
+  mu[0] = &(m0v[0].vector);
+  mu[1] = &(m0v[1].vector);
   /*variances*/
   gsl_matrix* Sigma[2];
   for(int k=0; k<2; k++) {
@@ -114,9 +118,6 @@ int main(int argc, char** argv) {
     gsl_matrix_set_identity(Sigma[k]);
     gsl_matrix_scale(Sigma[k], V0[k]);
   }
-  /*weights*/
-  gsl_vector* beta = gsl_vector_alloc(2);
-  gsl_vector_set_all(beta, 0.5);
 
   /*alloc a new RNG*/
   gsl_rng *r = gsl_rng_alloc(gsl_rng_default);
@@ -125,16 +126,18 @@ int main(int argc, char** argv) {
   for(int k=0; k<K; k++) {
     xx[k] = gsl_vector_alloc(d);
     do {
-      for(int j=0; j<(d-1); j++)
+      for(int j=0; j<d; j++)
 	gsl_vector_set(xx[k], j, gsl_rng_uniform(r));
-      gsl_vector_set(xx[k], d-1, gsl_rng_uniform(r) * 60.0 - 30.0);
     } while(!isfinite(target_logdensity(NULL, xx[k])));
   }
   /*alloc a new OLEM-RAPT INCA sampler*/
+  gsl_matrix* Sigma_zero = gsl_matrix_alloc(d, d);
+  gsl_matrix_set_identity(Sigma_zero);
+  gsl_matrix_scale(Sigma_zero, S0);
   mcmclib_olemrapt_inca* sampler =
     mcmclib_olemrapt_inca_alloc(r, target_logdensity, NULL,
 				xx, T0, Sigma_zero,
-				beta, mu0, Sigma, K);
+				beta, mu, Sigma, K);
 
   /*open output files*/
   FILE* out_X = fopen("barrettsLOH_X.csv", "w");
@@ -146,7 +149,7 @@ int main(int argc, char** argv) {
 
   /*main MCMC loop*/
   for(int n=0; n<N; n++) {
-    /*update chain value*/
+    /*update chain values*/
     mcmclib_olemrapt_inca_update(sampler);
     mcmclib_olemrapt_inca_update_proposals(sampler);
     /*store sampled values*/
