@@ -27,7 +27,7 @@ double M0[] = {0.5, 0.1, 0.5, 0.5,
 /*starting variance estimates*/
 double V0[] = {0.3, 0.05};
 /*starting overall proposal variance*/
-const double S0 = 0.01;
+const double S0 = 1.0;
 /*target space dimension*/
 const int DIM = 4;
 /*data filenamee*/
@@ -54,32 +54,21 @@ static double my_lf(int x, int n, double eta, double pi1, double pi2, double gam
   return log(ans);
 }
 
-static double log_pi(double* theta) {
+static double target_logdensity(void* ignore, gsl_vector* theta_v) {
+  double* theta = theta_v->data;
   double eta = theta[0];
   double pi1 = theta[1];
   double pi2 = theta[2];
   double gamma = theta[3];
-  if((eta < 0.01)  || (pi1 < 0.01) || (pi2 < 0.01) ||
-     (eta > 0.99) || (pi1 > 0.99) || (pi2 > 0.99) ||
-     (abs(gamma) > 30)) {
+  if((eta < 0.01)  || (pi1 < 0.01) || (pi2 < 0.01) || (gamma < 0.01) ||
+     (eta > 0.99) || (pi1 > 0.99) || (pi2 > 0.99) || (gamma > 0.99)) {
     return log(0.0);
   }
+  gamma = log(gamma) - log(1-(gamma));
   double ans  = 0.0;
   for(int i=0; i<NR && isfinite(ans); i++)
     ans += my_lf(gsl_matrix_get(LOH, i, 0), gsl_matrix_get(LOH, i, 1),
 		 eta, pi1, pi2, gamma);
-  return ans;
-}
-
-/*target distribution*/
-static double target_logdensity(void* ignore, gsl_vector* x) {
-  double ans;
-  double *gamma = x->data + 3;
-  if(*gamma < 0.01 || *gamma > 0.99)
-    return log(0.0);
-  *gamma = log(*gamma) - log(1-(*gamma));
-  ans = log_pi(x->data);
-  *gamma = exp(*gamma) / (1.0 + exp((*gamma)) );
   return ans;
 }
 
