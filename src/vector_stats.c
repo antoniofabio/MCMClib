@@ -45,31 +45,30 @@ void mcmclib_matrix_covariance(gsl_matrix* m, gsl_matrix* out) {
 }
 
 void mcmclib_covariance_update(gsl_matrix* cov, gsl_vector* mean, int* n, gsl_vector* x) {
-	int d = cov->size1;
-	gsl_matrix_view colmean_view = gsl_matrix_view_array(mean->data, d, 1);
-	gsl_matrix* colmean = &(colmean_view.matrix);
-	gsl_matrix_view colx_view = gsl_matrix_view_array(x->data, d, 1);
-	gsl_matrix* colx = &(colx_view.matrix);
+  int d = cov->size1;
+  gsl_matrix_view colmean_view = gsl_matrix_view_array(mean->data, d, 1);
+  gsl_matrix* colmean = &(colmean_view.matrix);
+  gsl_matrix_view colx_view = gsl_matrix_view_array(x->data, d, 1);
+  gsl_matrix* colx = &(colx_view.matrix);
 
-	/*update X %*% t(X) value:*/
-	if((*n) > 0) {
-		gsl_blas_dgemm(CblasNoTrans, CblasTrans, (double) (*n), colmean, colmean, (double) (*n), cov);
-		gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, colx, colx, 1.0, cov);
-	} else {
-		gsl_matrix_set_all(cov, 0.0);
-	}
+  if((*n) == 0) { /*this is the first call: do some cleanup*/
+    gsl_vector_set_all(mean, 0.0);
+    gsl_matrix_set_all(cov, 0.0);
+  }
 
-	/*update mean value*/
-	gsl_vector_scale(mean, (double) (*n));
-	gsl_vector_add(mean, x);
-	(*n)++;
-	gsl_vector_scale(mean, 1.0 / (double) (*n));
+  /*update X %*% t(X) value:*/
+  gsl_blas_dgemm(CblasNoTrans, CblasTrans, (double) (*n), colmean, colmean, (double) (*n), cov);
+  gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, colx, colx, 1.0, cov);
 
-	/*update covariance value*/
-	if((*n) > 1) {
-		gsl_blas_dgemm(CblasNoTrans, CblasTrans, (double) -(*n), colmean, colmean, 1.0, cov);
-		gsl_matrix_scale(cov, 1.0 / (double) (*n));
-	}
+  /*update mean value*/
+  gsl_vector_scale(mean, (double) (*n));
+  gsl_vector_add(mean, x);
+  (*n)++;
+  gsl_vector_scale(mean, 1.0 / (double) (*n));
+
+  /*update covariance value*/
+  gsl_blas_dgemm(CblasNoTrans, CblasTrans, (double) -(*n), colmean, colmean, 1.0, cov);
+  gsl_matrix_scale(cov, 1.0 / (double) (*n));
 }
 
 /*Pooled weighted variance*/
