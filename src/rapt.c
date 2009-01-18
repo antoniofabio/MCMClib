@@ -154,6 +154,7 @@ static void rapt_update_current_value(mcmclib_rapt* p) {
 						rapt_q, p);
   p->which_region_x = p->accepted ? p->which_region(p->current_x, p->which_region_data) : p->which_region_old;
 
+  gsl_vector_set(p->n, p->which_region_x, gsl_vector_get(p->n, p->which_region_x) + 1);
   (p->t)++;
 }
 
