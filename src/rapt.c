@@ -213,8 +213,8 @@ void mcmclib_rapt_update_proposals(mcmclib_rapt* p) {
 
 static void rapt_update_means_variances(mcmclib_rapt* p) {
   int k = p->which_region_x;
-  int fake_n = gsl_vector_get(p->n, k);
+  int fake_n = gsl_vector_get(p->n, k) - 1;
   mcmclib_covariance_update(p->variances[k], p->means[k], &fake_n, p->current_x);
-  fake_n = p->t;
+  fake_n = p->t - 1;
   mcmclib_covariance_update(p->global_variance, p->global_mean, &fake_n, p->current_x);
 }
