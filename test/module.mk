@@ -1,6 +1,6 @@
 TEST_CFLAGS := $(CFLAGS) -I./src
 TEST_LDFLAGS:= src/libmcmclib.a $(LDFLAGS)
-TEST_names:= t1 t2 trapt tmixem tmixem_rec tmixem_online tolemrapt
+TEST_names:= t1 t2 trecursive_variance trapt tmixem tmixem_rec tmixem_online tolemrapt
 TEST_targets:=$(TEST_names:%=test_%)
 TEST_BIN:= $(TEST_names:%=test/%)
 
