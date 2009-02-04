@@ -12,6 +12,7 @@
 #define M 3 /*number of parallel chains*/
 /*burn-in*/
 #define T0 100
+#define SF (2.38*2.38/(double) DIM)
 
 #define TOL 1e-6
 static int check_dequal(double a, double b) {
@@ -26,6 +27,10 @@ static double dunif(void* ignore, gsl_vector* x) {
   if((x0 >= 0.0) && (x0 <= 1.0))
     return log(1.0);
   return log(0.0);
+}
+
+static double fix(double in, double correction) {
+  return (in + correction) * SF;
 }
 
 int main(int argc, char** argv) {
@@ -69,9 +74,8 @@ int main(int argc, char** argv) {
   assert(s->t == (N * M));
   assert(check_dequal(mean, v0(s->global_mean)));
   assert(check_dequal(variance, m00(s->global_variance)));
-  double eps = gsl_matrix_get(s->Sigma_eps, 0, 0);
-  assert(check_dequal((variance + eps) * 2.38 * 2.38,
-		      m00(s->sm[M-1]->sigma_prop)));
+  double eps = m00(s->Sigma_eps);
+  assert(check_dequal(fix(variance, eps), m00(s->sm[M-1]->sigma_prop)));
 
   /*free memory*/
   gsl_matrix_free(sigma);
