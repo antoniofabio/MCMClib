@@ -1,4 +1,4 @@
-/**Test base RAPT algorithm on a dumb target*/
+/**Test INCA RAPT algorithm on a dumb target*/
 #include <stdio.h>
 #include <assert.h>
 #include <gsl/gsl_rng.h>
@@ -13,6 +13,8 @@
 #define M 3 /*number of parallel chains*/
 /*burn-in*/
 #define T0 100
+#define SF (2.38*2.38/(double) DIM)
+#define CORRECTION 0.001
 
 #define TOL 1e-6
 static int check_dequal(double a, double b) {
@@ -31,6 +33,10 @@ static double dunif(void* ignore, gsl_vector* x) {
   if((x0 >= 0.0) && (x0 <= 1.0))
     return log(1.0);
   return log(0.0);
+}
+
+static double fix(double in) {
+  return (in + CORRECTION) * SF;
 }
 
 int main(int argc, char** argv) {
@@ -68,17 +74,11 @@ int main(int argc, char** argv) {
 						 which_region, NULL);
 
   /*Main MCMC loop*/
-  gsl_matrix* X = gsl_matrix_alloc(N * M, DIM);
-  gsl_vector* which_region_n = gsl_vector_alloc(N * M);
   for(int n=0; n<N; n++) {
     mcmclib_inca_rapt_update(s);
 
     for(int m=0; m<M; m++) {
       mcmclib_rapt* s1 = s->sm[m];
-      int n1 = n * M + m;
-      gsl_vector_view Xn = gsl_matrix_row(X, n1);
-      gsl_vector_memcpy(&(Xn.vector), x[m]);
-      gsl_vector_set(which_region_n, n, s1->which_region_x);
       means[s1->which_region_x] += v0(x[m]);
       variances[s1->which_region_x] += v0(x[m]) * v0(x[m]);
       nk[s1->which_region_x] += 1.0;
@@ -99,10 +99,12 @@ int main(int argc, char** argv) {
   assert(s->t == (N * M));
   assert(check_dequal(mean, v0(s->global_mean)));
   assert(check_dequal(variance, m00(s->global_variance)));
+  assert(check_dequal(m00(s->sm[M-1]->sigma_whole), fix(variance)));
   for(int k=0; k<K; k++) {
     assert(check_dequal(nk[k], gsl_vector_get(s->n, k)));
     assert(check_dequal(means[k], v0(s->means[k])));
     assert(check_dequal(variances[k], m00(s->variances[k])));
+    assert(check_dequal(fix(variances[k]), m00(s->sm[M-1]->sigma_local[k])));
   }
 
   /*free memory*/
