@@ -33,8 +33,8 @@ static double dunif(void* ignore, gsl_vector* x) {
   return log(0.0);
 }
 
-double fix(double in, double correction) {
-  return (in + correction) * SF;
+double fix(double in) {
+  return (in + 0.001) * SF;
 }
 
 int main(int argc, char** argv) {
@@ -46,16 +46,23 @@ int main(int argc, char** argv) {
   gsl_matrix* sigma_whole = gsl_matrix_alloc(DIM, DIM);
   gsl_matrix_set_identity(sigma_whole);
 
-  gsl_vector* mu_hat[K];
-  gsl_matrix* Sigma_hat[K];
+  gsl_vector* mu_hat[K], *mu[K];
+  gsl_matrix* Sigma_hat[K], *Sigma[K];
   for(int k=0; k<K; k++) {
     mu_hat[k] = gsl_vector_alloc(DIM);
     gsl_vector_set_all(mu_hat[k], MU[k] * 0.5);
+    mu[k] = gsl_vector_alloc(DIM);
+    gsl_vector_memcpy(mu[k], mu_hat[k]);
     Sigma_hat[k] = gsl_matrix_alloc(DIM, DIM);
     gsl_matrix_set_identity(Sigma_hat[k]);
+    Sigma[k] = gsl_matrix_alloc(DIM, DIM);
+    gsl_matrix_memcpy(Sigma[k], Sigma_hat[k]);
   }
   gsl_vector* w_hat = gsl_vector_alloc(K);
   gsl_vector_set_all(w_hat, 1.0 / (double) K);
+  gsl_vector* beta = gsl_vector_alloc(K);
+  gsl_vector_memcpy(beta, w_hat);
+  mcmclib_mixem_online* olem = mcmclib_mixem_online_alloc(mu, Sigma, beta, 0.5, T0);
 
   mcmclib_olemrapt* sampler = mcmclib_olemrapt_alloc(rng,
 						     dunif, NULL,
@@ -63,16 +70,19 @@ int main(int argc, char** argv) {
 						     w_hat, mu_hat, Sigma_hat);
 
   /*Main MCMC loop*/
-  double mean = 0.0;
-  double var = 0.0;
   for(int n=0; n<N; n++) {
     mcmclib_olemrapt_update(sampler);
     mcmclib_olemrapt_update_proposals(sampler);
-    mean += v0(x);
-    var += pow(v0(x), 2);
+    mcmclib_mixem_online_update(olem, sampler->rapt->current_x);
   }
-  mean /= (double) N;
-  var /= (double) N;
+
+  assert(check_dequal(v0(sampler->beta_hat), v0(olem->beta)));
+  assert(check_dequal(v0(sampler->mu_hat[0]), v0(olem->mu[0])));
+  assert(check_dequal(m00(sampler->Sigma_hat[0]), m00(olem->Sigma[0])));
+  assert(check_dequal(fix(m00(sampler->Sigma_hat[0])),
+		      m00(sampler->rapt->sigma_local[0])));
+  assert(check_dequal(fix(m00(sampler->Sigma_hat[1])),
+		      m00(sampler->rapt->sigma_local[1])));
 
   /*check boundary function*/
   gsl_vector_set_all(x, -1.0);
