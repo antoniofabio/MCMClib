@@ -69,13 +69,10 @@ static void rapt_init(mcmclib_rapt* p) {
   gsl_vector_set_all(p->global_mean, 0.0);
   gsl_matrix_set_all(p->global_variance, 0.0);
   gsl_vector_set_all(p->n, 0.0);
-  gsl_matrix_set_all(p->lambda, 0.0);
-  for(int region=0; region < p->K; region++) {
-    gsl_matrix_set(p->lambda, region, region, 0.5);
-    gsl_matrix_set(p->lambda, region, p->K, 0.5);
-  }
-  gsl_matrix_set_identity(p->Sigma_eps);
-  gsl_matrix_scale(p->Sigma_eps, 0.001);
+  mcmclib_rapt_set_alpha(p, 0.5);
+  mcmclib_rapt_set_correction_factor(p, 0.001);
+  double sf = 2.38 * 2.38 / ((double) p->old->size);
+  mcmclib_rapt_set_scaling_factors(p, sf, sf);
 
   p->which_region_x = p->which_region(p->current_x, p->which_region_data);
 }
@@ -197,12 +194,11 @@ static void matrix_addscale(gsl_matrix* dest,
 void mcmclib_rapt_update_proposals_custom(mcmclib_rapt* p,
 					  gsl_matrix** variances,
 					  gsl_matrix* global_variance) {
-  double sf = 2.38 * 2.38 / ((double) p->old->size);
   for(int k=0; k< p->K; k++)
     matrix_addscale(p->sigma_local[k],
-			  variances[k], p->Sigma_eps, sf);
+			  variances[k], p->Sigma_eps, p->scaling_factor_local);
   matrix_addscale(p->sigma_whole,
-			global_variance, p->Sigma_eps, sf);
+			global_variance, p->Sigma_eps, p->scaling_factor_global);
 }
 
 void mcmclib_rapt_update_proposals(mcmclib_rapt* p) {
@@ -217,4 +213,22 @@ static void rapt_update_means_variances(mcmclib_rapt* p) {
   mcmclib_covariance_update(p->variances[k], p->means[k], &fake_n, p->current_x);
   fake_n = p->t - 1;
   mcmclib_covariance_update(p->global_variance, p->global_mean, &fake_n, p->current_x);
+}
+
+void mcmclib_rapt_set_correction_factor(mcmclib_rapt* p, double eps) {
+  gsl_matrix_set_identity(p->Sigma_eps);
+  gsl_matrix_scale(p->Sigma_eps, eps);
+}
+
+void mcmclib_rapt_set_scaling_factors(mcmclib_rapt* p, double local, double global) {
+  p->scaling_factor_local = local;
+  p->scaling_factor_global = global;
+}
+
+void mcmclib_rapt_set_alpha(mcmclib_rapt* p, double alpha) {
+  gsl_matrix_set_all(p->lambda, 0.0);
+  for(int region=0; region < p->K; region++) {
+    gsl_matrix_set(p->lambda, region, region, 1.0 - alpha);
+    gsl_matrix_set(p->lambda, region, p->K, alpha);
+  }
 }

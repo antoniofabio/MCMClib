@@ -47,6 +47,8 @@ typedef struct {
   gsl_vector* workspace; /**< utility workspace memory*/
   gsl_vector* q_mean; /**< extra data for (mixture) proposal densities comp.*/
   mcmclib_mvnorm_lpdf** q_k;/**< extra data for (mixture) proposal densities comp.*/
+  double scaling_factor_local; /**< local proposal variance scaling factor*/
+  double scaling_factor_global; /**< global proposal variance scaling factor*/
 } mcmclib_rapt;
 
 /** alloc a new RAPT sampler object
@@ -87,6 +89,15 @@ using custom estimated local and global variances
 void mcmclib_rapt_update_proposals_custom(mcmclib_rapt* p,
 					  gsl_matrix** variances,
 					  gsl_matrix* global_variance);
+
+/** customly set additive variance correction factor */
+void mcmclib_rapt_set_correction_factor(mcmclib_rapt* p, double eps);
+
+/** customly set local and global scaling factors */
+void mcmclib_rapt_set_scaling_factors(mcmclib_rapt* p, double local, double global);
+
+/** customly set global proposal weight (same for all regions)*/
+void mcmclib_rapt_set_alpha(mcmclib_rapt* p, double alpha);
 
 /**@}*/
 /**@}*/
