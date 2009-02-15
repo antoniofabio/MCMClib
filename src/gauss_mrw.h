@@ -6,18 +6,13 @@
 \defgroup GAUSS_MRW Multivariate Gaussian Random Walk
 */
 #include "common.h"
+#include "mh.h"
 
 /**\brief Multivariate Gaussian Random Walk*/
 typedef struct {
-	/*common MCMC fields*/
-	gsl_rng* r;
-	distrfun_p logdistr;
-	void* logdistr_data;
-	gsl_vector* current_x;
-	gsl_vector* old;
+  mcmclib_mh* mh;
 
-	/*MRW specific fields*/
-	gsl_matrix* sigma_prop;
+  gsl_matrix* sigma_prop; /**< proposal covariance matrix*/
 } mcmclib_gauss_mrw;
 
 /** alloc (and init) extra Gaussian RW data

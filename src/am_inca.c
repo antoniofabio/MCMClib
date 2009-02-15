@@ -33,7 +33,7 @@ void mcmclib_am_inca_free(mcmclib_am_inca* p) {
 }
 
 int mcmclib_am_inca_update(mcmclib_am_inca* p) {
-  double dim = (double) p->sm[0]->current_x->size;
+  double dim = (double) p->sm[0]->mh->x->size;
   gsl_vector* global_mean = p->global_mean;
   gsl_matrix* global_variance = p->global_variance;
   int M = p->M;
@@ -43,7 +43,7 @@ int mcmclib_am_inca_update(mcmclib_am_inca* p) {
     mcmclib_gauss_mrw_update(s);
 
     /* update common means and variances */
-    mcmclib_covariance_update(global_variance, global_mean, &(p->t), s->current_x);
+    mcmclib_covariance_update(global_variance, global_mean, &(p->t), s->mh->x);
 
     if((p->t/M) > p->t0) {
       gsl_matrix_memcpy(s->sigma_prop, global_variance);
