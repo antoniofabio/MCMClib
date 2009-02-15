@@ -32,7 +32,7 @@ mcmclib_mh* mcmclib_mh_alloc(gsl_rng* r,
 			     distrfun_p q_sampler,
 			     void* q_sampler_data);
 
-void mcmclib_mh_alloc(mcmclib_mh* p);
+void mcmclib_mh_free(mcmclib_mh* p);
 
 /**\brief update chain value
 \return 1 if move accepted, 0 if rejected*/

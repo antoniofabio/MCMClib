@@ -22,7 +22,7 @@ mcmclib_mh* mcmclib_mh_alloc(gsl_rng* r,
   return p;
 }
 
-void mcmclib_mh_alloc(mcmclib_mh* p) {
+void mcmclib_mh_free(mcmclib_mh* p) {
   gsl_vector_free(p->x_old);
   free(p);
 }
