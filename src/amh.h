@@ -8,7 +8,7 @@
 
 #include "mh.h"
 
-typedef void (*mcmclib_amh_update_gamma_p) (void* p);
+typedef void (*mcmclib_amh_update_gamma_p) (void* p, gsl_vector* x);
 
 /**\brief Generic Adaptive Metropolis-Hastings sampler */
 typedef struct {

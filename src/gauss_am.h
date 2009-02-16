@@ -46,7 +46,7 @@ void mcmclib_gauss_am_free(mcmclib_gauss_am* p);
 int mcmclib_gauss_am_update(mcmclib_gauss_am* p);
 
 /** AM gamma update function \internal*/
-void mcmclib_gauss_am_update_gamma(void* in_p);
+void mcmclib_gauss_am_update_gamma(void* in_p, gsl_vector* x);
 
 /**@}*/
 /**@}*/
