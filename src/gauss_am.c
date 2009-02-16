@@ -38,13 +38,12 @@ int mcmclib_gauss_am_update(mcmclib_gauss_am* p) {
 void mcmclib_gauss_am_update_gamma(void* in_p) {
   mcmclib_gauss_am* p = (mcmclib_gauss_am*) in_p;
   int t0 = p->t0;
-  int *t = &(p->amh->n);
+  int t = p->amh->n;
   mcmclib_gauss_mrw* mrw = p->mrw;
-  gsl_matrix* cov = p->cov;
 
-  mcmclib_covariance_update(cov, p->mean, t, p->amh->mh->x);
-  if(((*t) + 1) >= t0) {
-    gsl_matrix_memcpy(mrw->sigma_prop, cov);
+  mcmclib_covariance_update(p->cov, p->mean, &t, p->amh->mh->x);
+  if(t >= t0) {
+    gsl_matrix_memcpy(mrw->sigma_prop, p->cov);
     gsl_matrix_scale(mrw->sigma_prop, p->sf);
   }
 }
