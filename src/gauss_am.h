@@ -11,26 +11,20 @@
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_randist.h>
 
-#include "common.h"
+#include "amh.h"
 #include "gauss_mrw.h"
 
 /**\brief Adaptive Metropolis Gaussian random walk*/
 typedef struct {
-	/*common MCMC fields*/
-	gsl_rng* r;
-	distrfun_p logdistr;
-	void* logdistr_data;
-	gsl_vector* current_x;
-	gsl_vector* old;
+  mcmclib_amh* amh;
 
-	/*AM specific fields*/
-	mcmclib_gauss_mrw* mrw;
-	gsl_matrix* sigma_zero;
-	int t0;
-	gsl_vector* mean;
-	gsl_matrix* cov;
-	int t;
-	double sf;
+  /*AM specific fields*/
+  mcmclib_gauss_mrw* mrw;
+  gsl_matrix* sigma_zero;
+  int t0;
+  gsl_vector* mean;
+  gsl_matrix* cov;
+  double sf;
 } mcmclib_gauss_am;
 
 /** alloc (and init) extra AM data
@@ -42,13 +36,17 @@ typedef struct {
 @param t0 burn-in length before starting adaptation
 */
 mcmclib_gauss_am* mcmclib_gauss_am_alloc(gsl_rng* r,
-	distrfun_p logdistr, void* logdistr_data, gsl_vector* start_x,
-	const gsl_matrix* sigma_zero, int t0);
+					 distrfun_p logdistr, void* logdistr_data,
+					 gsl_vector* start_x,
+					 const gsl_matrix* sigma_zero, int t0);
 /** free extra AM data*/
 void mcmclib_gauss_am_free(mcmclib_gauss_am* p);
 
 /** Adaptive Metropolis Gaussian random walk*/
 int mcmclib_gauss_am_update(mcmclib_gauss_am* p);
+
+/** AM gamma update function \internal*/
+void mcmclib_gauss_am_update_gamma(void* in_p);
 
 /**@}*/
 /**@}*/

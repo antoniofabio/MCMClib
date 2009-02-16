@@ -1,9 +1,11 @@
 #include "amh.h"
 
 mcmclib_amh* mcmclib_amh_alloc(mcmclib_mh* mh,
-			       mcmclib_amh_update_gamma_p update_gamma) {
+			       mcmclib_amh_update_gamma_p update_gamma,
+			       void* update_gamma_data) {
   mcmclib_amh* p = (mcmclib_amh*) malloc(sizeof(mcmclib_amh));
   p->update_gamma = update_gamma;
+  p->update_gamma_data = update_gamma_data;
   p->n = 0;
   return p;
 }

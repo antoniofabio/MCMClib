@@ -31,6 +31,15 @@ void mcmclib_gauss_mrw_free(mcmclib_gauss_mrw* p);
 /** Gaussian random walk step*/
 int mcmclib_gauss_mrw_update(mcmclib_gauss_mrw* p);
 
+/** GRW proposal log-density (fake) \internal*/
+double mcmclib_gauss_mrw_qd(void* ignore, gsl_vector* x, gsl_vector* y);
+
+/** GRW proposal sampler \internal
+@param in_p ptr to an mcmclib_gauss_mrw object
+@param x object in which to put result
+*/
+void mcmclib_gauss_mrw_sample(void* in_p, gsl_vector* x);
+
 /**@}*/
 /**@}*/
 #endif

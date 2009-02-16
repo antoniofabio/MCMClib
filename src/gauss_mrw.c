@@ -2,7 +2,7 @@
 #include "gauss_mrw.h"
 #include "mvnorm.h"
 
-static double mcmclib_gauss_mrw_qd(void* ignore, gsl_vector* x, gsl_vector* y) {
+double mcmclib_gauss_mrw_qd(void* ignore, gsl_vector* x, gsl_vector* y) {
   return 0.0;
 }
 

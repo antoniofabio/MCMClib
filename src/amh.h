@@ -14,11 +14,13 @@ typedef void (*mcmclib_amh_update_gamma_p) (void* p);
 typedef struct {
   mcmclib_mh* mh;
   mcmclib_amh_update_gamma_p update_gamma;
+  void* update_gamma_data;
   int n; /**< current iteration number*/
 } mcmclib_amh;
 
 mcmclib_amh* mcmclib_amh_alloc(mcmclib_mh* mh,
-			       mcmclib_amh_update_gamma_p update_gamma);
+			       mcmclib_amh_update_gamma_p update_gamma,
+			       void* update_gamma_data);
 
 void mcmclib_amh_free(mcmclib_amh* p);
 
