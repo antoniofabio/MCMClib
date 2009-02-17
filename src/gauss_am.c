@@ -43,7 +43,7 @@ int mcmclib_gauss_am_update(mcmclib_gauss_am* p) {
 void mcmclib_gauss_am_update_gamma(void* in_p, gsl_vector* x) {
   mcmclib_gauss_am* p = (mcmclib_gauss_am*) in_p;
   int t0 = p->t0;
-  int t = p->amh->n;
+  int t = p->amh->n - 1;
   mcmclib_gauss_mrw* mrw = p->mrw;
 
   mcmclib_covariance_update(p->cov, p->mean, &t, x);
