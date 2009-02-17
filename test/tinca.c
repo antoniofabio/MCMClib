@@ -46,10 +46,10 @@ int main(int argc, char** argv) {
   }
   double inc = 0.2;
   double gamma = 0.0;
-  mcmclib_inca* s = mcmclib_inca_alloc(r, dtarget, NULL,
-				       qd, NULL,
-				       sampler, &inc,
-				       update_gamma, &gamma,
+  mcmclib_inca* s = mcmclib_inca_alloc(mcmclib_amh_alloc(mcmclib_mh_alloc(r, dtarget, NULL,
+									  gsl_vector_alloc(1), qd, NULL,
+									  sampler, &inc),
+							 update_gamma, &gamma),
 				       x, 2);
   double gamma_check = 0.0;
   for(int n=0; n<2; n++) {
@@ -61,10 +61,12 @@ int main(int argc, char** argv) {
   assert(check_dequal(v0(x[0]), inc * 2));
   assert(check_dequal(v0(x[1]), inc * 2 + 0.1));
 
+  mcmclib_mh_free(s->amh->mh);
+  mcmclib_amh_free(s->amh);
+  mcmclib_inca_free(s);
   for(int m=0; m<2; m++)
     gsl_vector_free(x[m]);
   gsl_rng_free(r);
-  mcmclib_inca_free(s);
 
   return 0;
 }
