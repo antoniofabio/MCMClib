@@ -5,6 +5,7 @@
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
+#include <gauss_am.h>
 #include <am_inca.h>
 
 #define N 1000
@@ -71,11 +72,14 @@ int main(int argc, char** argv) {
   variance = variance / ((double) (N * M)) - (mean * mean);
 
   /*check results*/
-  assert(s->t == (N * M));
-  assert(check_dequal(mean, v0(s->global_mean)));
-  assert(check_dequal(variance, m00(s->global_variance)));
-  double eps = m00(s->Sigma_eps);
-  assert(check_dequal(fix(variance, eps), m00(s->sm[M-1]->sigma_prop)));
+  assert(s->inca->amh->n == (N * M));
+  mcmclib_gauss_am* gam = (mcmclib_gauss_am*) s->inca->amh;
+
+  assert(check_dequal(mean, v0(gam->mean)));
+  assert(check_dequal(variance, m00(gam->cov)));
+  double eps = m00(gam->Sigma_eps);
+  mcmclib_gauss_mrw* mrw = (mcmclib_gauss_mrw*) gam->amh->mh;
+  assert(check_dequal(fix(variance, eps), m00(mrw->sigma_prop)));
 
   /*free memory*/
   gsl_matrix_free(sigma);

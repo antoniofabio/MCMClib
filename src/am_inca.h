@@ -1,7 +1,7 @@
 #ifndef __AM_INCA_H__
 #define __AM_INCA_H__
 
-#include "gauss_mrw.h"
+#include "inca.h"
 
 /**\addtogroup adaptive
 @{*/
@@ -11,13 +11,7 @@
 
 /** \brief AM_INCA sampler data */
 typedef struct {
-  mcmclib_gauss_mrw** sm; /**< array of parallel MH samplers*/
-  int M; /**< number of parallel chains*/
-  gsl_vector* global_mean;
-  gsl_matrix* global_variance;
-  int t0; /**< burn-in length*/
-  int t; /**< total number of iterations so far*/
-  gsl_matrix* Sigma_eps; /**< variance correction factor*/
+  mcmclib_inca* inca;
 } mcmclib_am_inca;
 
 /** alloc a new AM INCA sampler object
