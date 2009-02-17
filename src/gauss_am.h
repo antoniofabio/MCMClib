@@ -24,7 +24,8 @@ typedef struct {
   int t0;
   gsl_vector* mean;
   gsl_matrix* cov;
-  double sf;
+  double sf; /**< scaling factor*/
+  gsl_matrix* Sigma_eps; /**< additive covariance correction factor*/
 } mcmclib_gauss_am;
 
 /** alloc (and init) extra AM data

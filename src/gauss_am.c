@@ -18,6 +18,10 @@ mcmclib_gauss_am* mcmclib_gauss_am_alloc(gsl_rng* r,
   gsl_matrix_memcpy(a->sigma_zero, sigma_zero);
   a->sf = (2.38 * 2.38) / d;
 
+  a->Sigma_eps = gsl_matrix_alloc(d, d);
+  gsl_matrix_set_identity(a->Sigma_eps);
+  gsl_matrix_scale(a->Sigma_eps, 0.001);
+
   gsl_vector_set_zero(a->mean);
   gsl_matrix_set_zero(a->cov);
   return a;
@@ -25,6 +29,7 @@ mcmclib_gauss_am* mcmclib_gauss_am_alloc(gsl_rng* r,
 
 void mcmclib_gauss_am_free(mcmclib_gauss_am* p) {
   mcmclib_gauss_mrw_free(p->mrw);
+  gsl_matrix_free(p->Sigma_eps);
   gsl_matrix_free(p->sigma_zero);
   gsl_vector_free(p->mean);
   gsl_matrix_free(p->cov);
@@ -44,6 +49,7 @@ void mcmclib_gauss_am_update_gamma(void* in_p, gsl_vector* x) {
   mcmclib_covariance_update(p->cov, p->mean, &t, x);
   if(t >= t0) {
     gsl_matrix_memcpy(mrw->sigma_prop, p->cov);
+    gsl_matrix_add(mrw->sigma_prop, p->Sigma_eps);
     gsl_matrix_scale(mrw->sigma_prop, p->sf);
   }
 }
