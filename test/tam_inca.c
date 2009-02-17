@@ -54,14 +54,10 @@ int main(int argc, char** argv) {
 					     x, M, T0, sigma);
 
   /*Main MCMC loop*/
-  gsl_matrix* X = gsl_matrix_alloc(N * M, DIM);
   for(int n=0; n<N; n++) {
     mcmclib_am_inca_update(s);
 
     for(int m=0; m<M; m++) {
-      int n1 = n * M + m;
-      gsl_vector_view Xn = gsl_matrix_row(X, n1);
-      gsl_vector_memcpy(&(Xn.vector), x[m]);
       mean += v0(x[m]);
       variance += v0(x[m]) * v0(x[m]);
     }
