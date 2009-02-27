@@ -1,23 +1,25 @@
 #ifndef __GAUSS_RW_H__
 #define __GAUSS_RW_H__
 
-#include "common.h"
+#include "mh.h"
 
 /**\addtogroup metropolis_samplers
 @{
 \defgroup gauss_rw gauss_rw
 @{*/
 
-/**\brief Gaussian Random Walk*/
 typedef struct {
   gsl_rng* r;
-  distrfun_p logdistr;
-  void* logdistr_data;
-  gsl_vector* current_x;
   double step_size;
-  /*internal*/
-  gsl_vector* old;
-} mcmclib_gauss_rw;
+} mcmclib_gauss_rw_gamma;
+
+mcmclib_gauss_rw_gamma* mcmclib_gauss_rw_gamma_alloc(gsl_rng* r, double step_size);
+void mcmclib_gauss_rw_gamma_free(mcmclib_gauss_rw_gamma* p);
+void mcmclib_gauss_rw_sample(void* in_p, gsl_vector* x);
+double mcmclib_gauss_rw_qd(void* ignore, gsl_vector* x, gsl_vector* y);
+
+mcmclib_mh_q* mcmclib_gauss_rw_q_alloc(gsl_rng* r, double step_size);
+void mcmclib_gauss_rw_q_free(mcmclib_mh_q* p);
 
 /** alloc (and init) Gaussian RW object
 @param r RNG state
@@ -26,14 +28,12 @@ typedef struct {
 @param data extra data to be passed to the distribution function
 @param step_size gaussian proposal width (s.d.)
 */
-mcmclib_gauss_rw* mcmclib_gauss_rw_alloc(gsl_rng* r,
-	distrfun_p logdistr, void* data, gsl_vector* start_x, double step_size);
+mcmclib_mh* mcmclib_gauss_rw_alloc(gsl_rng* r,
+				   distrfun_p logdistr, void* data,
+				   gsl_vector* start_x, double step_size);
 
 /** free Gaussian RW object*/
-void mcmclib_gauss_rw_free(mcmclib_gauss_rw* p);
-
-/** Gaussian random walk step */
-int mcmclib_gauss_rw_update(mcmclib_gauss_rw* p);
+void mcmclib_gauss_rw_free(mcmclib_mh* p);
 
 /**@}*/
 /**@}*/
