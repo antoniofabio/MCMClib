@@ -9,6 +9,13 @@
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_vector.h>
 
+/** pointer to a proposal log-distribution function
+@param data extra data
+@param  x conditioning value
+@param  y new value
+*/
+typedef double (*proposal_distr_t) (void* data, gsl_vector* x, gsl_vector* y);
+
 /** pointer to a sampler function */
 typedef void (*samplerfun_p) (void* data, gsl_vector* x);
 

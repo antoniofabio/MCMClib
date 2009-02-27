@@ -5,37 +5,40 @@
 @{
 \defgroup GAUSS_MRW Multivariate Gaussian Random Walk
 */
-#include "common.h"
 #include "mh.h"
 
-/**\brief Multivariate Gaussian Random Walk*/
 typedef struct {
-  mcmclib_mh* mh;
+  gsl_rng* r;
+  gsl_matrix* Sigma;
+} mcmclib_gauss_mrw_gamma;
 
-  gsl_matrix* sigma_prop; /**< proposal covariance matrix*/
-} mcmclib_gauss_mrw;
+mcmclib_gauss_mrw_gamma* mcmclib_gauss_mrw_gamma_alloc(gsl_rng* r, const gsl_matrix* Sigma);
+void mcmclib_gauss_mrw_gamma_free(mcmclib_gauss_mrw_gamma* p);
+void mcmclib_gauss_mrw_sample(void* in_p, gsl_vector* x);
+double mcmclib_gauss_mrw_qd(void* ignore, gsl_vector* x, gsl_vector* y);
 
-/** alloc (and init) extra Gaussian RW data
+mcmclib_mh_q* mcmclib_gauss_mrw_q_alloc(gsl_rng* r, const gsl_matrix* Sigma);
+void mcmclib_gauss_mrw_q_free(mcmclib_mh_q* p);
+
+/** alloc (and init) a Gaussian RW object
 @param r RNG state
 @param logdistr pointer to a log-likelihood function
-@param start_x starting value
 @param data extra data to be passed to the distribution function
+@param start_x starting value
 @param sigma_prop gaussian proposal covariance matrix
 */
-mcmclib_gauss_mrw* mcmclib_gauss_mrw_alloc(gsl_rng* r,
-	distrfun_p logdistr, void* data, gsl_vector* start_x, const gsl_matrix* sigma_prop);
+mcmclib_mh* mcmclib_gauss_mrw_alloc(gsl_rng* r,
+				    distrfun_p logdistr, void* data,
+				    gsl_vector* start_x, const gsl_matrix* sigma_prop);
 
 /** free extra Gaussian RW data*/
-void mcmclib_gauss_mrw_free(mcmclib_gauss_mrw* p);
-
-/** Gaussian random walk step*/
-int mcmclib_gauss_mrw_update(mcmclib_gauss_mrw* p);
+void mcmclib_gauss_mrw_free(mcmclib_mh* p);
 
 /** GRW proposal log-density (fake) \internal*/
 double mcmclib_gauss_mrw_qd(void* ignore, gsl_vector* x, gsl_vector* y);
 
 /** GRW proposal sampler \internal
-@param in_p ptr to an mcmclib_gauss_mrw object
+@param in_p ptr to a variance-covariance matrix
 @param x object in which to put result
 */
 void mcmclib_gauss_mrw_sample(void* in_p, gsl_vector* x);

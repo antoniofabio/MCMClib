@@ -1,13 +1,4 @@
-#include "mh.h"
-
-typedef struct {
-  gsl_rng* r; /**< RNG used by the sampler function*/
-  samplerfun_p sampler_fun; /**< proposal sampler fun*/
-  void* sampler_data; /**< proposal sampler data*/
-  proposal_distr_t qd_fun; /**< proposal density fun*/
-  void* qd_data; /**< proposal density data*/
-  void* gamma; /**< misc kernel parameters data*/
-} mcmclib_mh_q;
+#include "mh_q.h"
 
 mcmclib_mh_q* mcmclib_mh_q_alloc(gsl_rng* r,
 				 samplerfun_p sampler_fun, void* sampler_data,
