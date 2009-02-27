@@ -13,14 +13,14 @@ typedef void (*mcmclib_amh_update_gamma_p) (void* p, gsl_vector* x);
 /**\brief Generic Adaptive Metropolis-Hastings sampler */
 typedef struct {
   mcmclib_mh* mh;
+  void* suff_data; /**< sufficient data accumulated up to current iteration*/
   mcmclib_amh_update_gamma_p update_gamma;
-  void* update_gamma_data;
   int n; /**< current iteration number*/
 } mcmclib_amh;
 
 mcmclib_amh* mcmclib_amh_alloc(mcmclib_mh* mh,
-			       mcmclib_amh_update_gamma_p update_gamma,
-			       void* update_gamma_data);
+			       void* suff_data,
+			       mcmclib_amh_update_gamma_p update_gamma);
 
 void mcmclib_amh_free(mcmclib_amh* p);
 
