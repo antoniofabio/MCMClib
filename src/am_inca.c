@@ -14,8 +14,7 @@ mcmclib_am_inca* mcmclib_am_inca_alloc(gsl_rng* r,
 }
 
 void mcmclib_am_inca_free(mcmclib_am_inca* p) {
-  gsl_vector_free(p->inca->amh->mh->x);
-  mcmclib_gauss_am_free((mcmclib_gauss_am*) p->inca->amh);
+  mcmclib_gauss_am_free(p->inca->amh);
   free(p);
 }
 
