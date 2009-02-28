@@ -14,19 +14,15 @@
 #include "amh.h"
 #include "gauss_mrw.h"
 
-/**\brief Adaptive Metropolis Gaussian random walk*/
+/**\brief Gaussian AM cumulated sufficient statistics and support data*/
 typedef struct {
-  mcmclib_amh* amh;
-
-  /*AM specific fields*/
-  mcmclib_gauss_mrw* mrw;
-  gsl_matrix* sigma_zero;
-  int t0;
-  gsl_vector* mean;
-  gsl_matrix* cov;
+  gsl_vector* sum_x; /**< cumulated sum of xs*/
+  gsl_matrix* sum_xx; /**< cumulated sum of xxs*/
+  gsl_matrix* Sigma_eps; /**< pos. definiteness cov. correction additive constant*/
+  gsl_matrix* Sigma_zero; /**< starting proposal covariance matrix*/
+  int t0; /**< burn in before starting adaptation*/
   double sf; /**< scaling factor*/
-  gsl_matrix* Sigma_eps; /**< additive covariance correction factor*/
-} mcmclib_gauss_am;
+} mcmclib_gauss_am_suff;
 
 /** alloc (and init) extra AM data
 @param r RNG state
@@ -36,17 +32,17 @@ typedef struct {
 @param sigma_zero starting proposal covariance matrix
 @param t0 burn-in length before starting adaptation
 */
-mcmclib_gauss_am* mcmclib_gauss_am_alloc(gsl_rng* r,
-					 distrfun_p logdistr, void* logdistr_data,
-					 gsl_vector* start_x,
-					 const gsl_matrix* sigma_zero, int t0);
+mcmclib_amh* mcmclib_gauss_am_alloc(gsl_rng* r,
+				    distrfun_p logdistr, void* logdistr_data,
+				    gsl_vector* start_x,
+				    const gsl_matrix* sigma_zero, int t0);
 /** free extra AM data*/
-void mcmclib_gauss_am_free(mcmclib_gauss_am* p);
+void mcmclib_gauss_am_free(mcmclib_amh* p);
 
-/** Adaptive Metropolis Gaussian random walk*/
-int mcmclib_gauss_am_update(mcmclib_gauss_am* p);
-
-/** AM gamma update function \internal*/
+/** AM gamma update function \internal
+@param in_p ptr to an mcmclib_amh object
+@param x new sampled data point
+*/
 void mcmclib_gauss_am_update_gamma(void* in_p, gsl_vector* x);
 
 /**@}*/
