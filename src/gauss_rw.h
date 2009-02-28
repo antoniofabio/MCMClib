@@ -5,7 +5,7 @@
 
 /**\addtogroup metropolis_samplers
 @{
-\defgroup gauss_rw gauss_rw
+\defgroup gauss_rw Component-wise Gaussian Random Walk
 @{*/
 
 typedef struct {

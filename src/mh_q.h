@@ -4,7 +4,7 @@
 /**\addtogroup metropolis_samplers
 @{
 \defgroup MH Metropolis-Hastings sampling
-*/
+@{*/
 
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_vector.h>
@@ -40,7 +40,7 @@ void mcmclib_mh_q_sample(mcmclib_mh_q* p, gsl_vector* x);
 /**\brief wrapper around the proposal kernel log-density function*/
 double mcmclib_mh_q_logd(mcmclib_mh_q* p, gsl_vector* x, gsl_vector* y);
 /**\brief compute the M-H ratio offset using the kernel q function*/
-double mcmclib_mh_ratio_offset(mcmclib_mh_q* p, gsl_vector* x, gsl_vector* y);
+double mcmclib_mh_q_ratio_offset(mcmclib_mh_q* p, gsl_vector* x, gsl_vector* y);
 
 /**@}*/
 /**@}*/

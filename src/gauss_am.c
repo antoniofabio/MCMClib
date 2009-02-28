@@ -52,7 +52,7 @@ void mcmclib_gauss_am_update_gamma(void* in_p, gsl_vector* x) {
   int t0 = s->t0;
   int t = p->n;
 
-  mcmclib_gauss_update_suff(s, x);
+  mcmclib_gauss_am_update_suff(s, x);
 
   if(t >= t0) {
     mcmclib_gauss_mrw_gamma* g = (mcmclib_gauss_mrw_gamma*) p->mh->q->gamma;

@@ -4,7 +4,7 @@
 /**\addtogroup metropolis_samplers
 @{
 \defgroup GAUSS_MRW Multivariate Gaussian Random Walk
-*/
+@{*/
 #include "mh.h"
 
 typedef struct {

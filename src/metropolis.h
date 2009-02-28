@@ -1,17 +1,11 @@
 #ifndef __METROPOLIS_H__
 #define __METROPOLIS_H__
 #include "common.h"
+#include "mh_q.h"
 
 /**\addtogroup metropolis_samplers
 @{
 */
-
-/** pointer to a proposal log-distribution function
-@param data extra data
-@param  x conditioning value
-@param  y new value
-*/
-typedef double (*proposal_distr_t) (void* data, gsl_vector* x, gsl_vector* y);
 
 /** M-H step for a symmetric proposal density
 @param r GSL RNG

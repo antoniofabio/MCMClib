@@ -26,6 +26,6 @@ double mcmclib_mh_q_logd(mcmclib_mh_q* p, gsl_vector* x, gsl_vector* y) {
   return p->qd_fun(p->qd_data, x, y);
 }
 
-double mcmclib_mh_ratio_offset(mcmclib_mh_q* p, gsl_vector* x, gsl_vector* y) {
+double mcmclib_mh_q_ratio_offset(mcmclib_mh_q* p, gsl_vector* x, gsl_vector* y) {
   return mcmclib_mh_q_logd(p, x, y) - mcmclib_mh_q_logd(p, y, x);
 }

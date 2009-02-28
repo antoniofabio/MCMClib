@@ -4,7 +4,7 @@
 /**\addtogroup metropolis_samplers
 @{
 \defgroup MH Metropolis-Hastings sampling
-*/
+@{*/
 
 #include "common.h"
 #include "mh_q.h"
@@ -20,16 +20,28 @@ typedef struct {
   int last_accepted; /**< flag: last move has been accepted?*/
 } mcmclib_mh;
 
+/**\brief Alloc a new Metropolis-Hastings sampler
+@param r RNG
+@param logdistr target prob. density log-function
+@param logdistr_data target prob. density fun. extra data
+@param q proposal kernel
+@param x current chain value
+@return the new allocated MH object
+*/
 mcmclib_mh* mcmclib_mh_alloc(gsl_rng* r,
 			     distrfun_p logdistr, void* logdistr_data,
 			     mcmclib_mh_q* q, gsl_vector* x);
 
+/**\brief Free a previously allocated MH object*/
 void mcmclib_mh_free(mcmclib_mh* p);
 
 /**\brief update chain value
 \return 1 if move accepted, 0 if rejected*/
 int mcmclib_mh_update(mcmclib_mh* p);
 
+/**\brief Generic (non-symmetric) M-H step \internal*/
+int mcmclib_mh_generic_step(const gsl_rng* r, gsl_vector* old, gsl_vector* x,
+			    distrfun_p logdistr, void* data, mcmclib_mh_q* q);
 /**@}*/
 /**@}*/
 
