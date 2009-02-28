@@ -4,7 +4,7 @@
 /**\addtogroup adaptive
 @{
 \defgroup inca INter-Chain Adaptation
-*/
+@{*/
 
 #include "amh.h"
 
@@ -21,6 +21,7 @@ typedef struct {
 */
 mcmclib_inca* mcmclib_inca_alloc(mcmclib_amh* amh, gsl_vector** x, int M);
 
+/**\brief Free a previously allocated INCA sampler object*/
 void mcmclib_inca_free(mcmclib_inca* p);
 
 /**\brief update all chains values sequentially
