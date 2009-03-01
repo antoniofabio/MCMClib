@@ -3,11 +3,15 @@
 
 /**\addtogroup adaptive
 @{
-\defgroup Adatpive Metropolis-Hastings sampling
-*/
+\defgroup amh Adaptive Metropolis-Hastings sampling
+@{*/
 
 #include "mh.h"
 
+/**\brief Proposal kernel param updating function
+@param p ptr to a 'suff' data object
+@param x newly sampled point
+*/
 typedef void (*mcmclib_amh_update_gamma_p) (void* p, gsl_vector* x);
 
 /**\brief Generic Adaptive Metropolis-Hastings sampler */
@@ -18,9 +22,15 @@ typedef struct {
   int n; /**< current iteration number*/
 } mcmclib_amh;
 
+/**\brief alloc a new generic AMH sampler
+@param mh base MH sampler to be extended
+@param suff extra data to be feeded to the update-gamma function
+@param update_gamma update proposal kernel parameters
+*/
 mcmclib_amh* mcmclib_amh_alloc(mcmclib_mh* mh, void* suff,
 			       mcmclib_amh_update_gamma_p update_gamma);
 
+/**\brief free previously allocated AMH sampler*/
 void mcmclib_amh_free(mcmclib_amh* p);
 
 /**\brief update chain value
