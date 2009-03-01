@@ -1,4 +1,4 @@
-/**Test MH object*/
+/**Test AMH object*/
 #include <stdio.h>
 #include <assert.h>
 #include <gsl/gsl_rng.h>
@@ -9,11 +9,6 @@
 
 #define v0(x) gsl_vector_get(x, 0)
 #define x0 v0(x)
-
-#define TOL 1e-6
-static int check_dequal(double a, double b) {
-  return (fabs(a-b) < TOL);
-}
 
 static double dtarget(void* ignore, gsl_vector* x) {
   if((x0 >= 0.0) && (x0 <= 1.0))
@@ -43,10 +38,9 @@ int main(int argc, char** argv) {
   gsl_vector_set(x, 0, -0.5);
   double inc = 0.2;
   int gamma = 0;
-  mcmclib_mh* mh = mcmclib_mh_alloc(r, dtarget, NULL,
-				    x, qd, NULL,
-				    sampler, &inc);
-  mcmclib_amh* s = mcmclib_amh_alloc(mh, update_gamma, &gamma);
+  mcmclib_mh_q* q = mcmclib_mh_q_alloc(r, sampler, &inc, qd, NULL, &inc);
+  mcmclib_mh* mh = mcmclib_mh_alloc(r, dtarget, NULL, q, x);
+  mcmclib_amh* s = mcmclib_amh_alloc(mh, &gamma, update_gamma);
 
   for(int n=0; n<10; n++) {
     mcmclib_amh_update(s);
@@ -57,6 +51,7 @@ int main(int argc, char** argv) {
   gsl_rng_free(r);
   mcmclib_amh_free(s);
   mcmclib_mh_free(mh);
+  mcmclib_mh_q_free(q);
 
   return 0;
 }
