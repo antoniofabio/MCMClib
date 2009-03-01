@@ -45,25 +45,25 @@ int main(int argc, char** argv) {
     gsl_vector_set(x[m], 0, 0.1 * ((double) m));
   }
   double inc = 0.2;
-  double gamma = 0.0;
-  mcmclib_inca* s = mcmclib_inca_alloc(mcmclib_amh_alloc(mcmclib_mh_alloc(r, dtarget, NULL,
-									  gsl_vector_alloc(1), qd, NULL,
-									  sampler, &inc),
-							 update_gamma, &gamma),
-				       x, 2);
-  double gamma_check = 0.0;
+  double suff = 0.0;
+  mcmclib_mh_q* q = mcmclib_mh_q_alloc(r, sampler, &inc, qd, NULL, &inc);
+  mcmclib_mh* mh = mcmclib_mh_alloc(r, dtarget, NULL, q, gsl_vector_alloc(1));
+  mcmclib_amh* amh = mcmclib_amh_alloc(mh, &suff, update_gamma);
+  mcmclib_inca* s = mcmclib_inca_alloc(amh, x, 2);
+  double suff_check = 0.0;
   for(int n=0; n<2; n++) {
     mcmclib_inca_update(s);
     for(int m=0; m<2; m++)
-      gamma_check += v0(x[m]);
-    assert(check_dequal(gamma, gamma_check));
+      suff_check += v0(x[m]);
+    assert(check_dequal(suff, suff_check));
   }
   assert(check_dequal(v0(x[0]), inc * 2));
   assert(check_dequal(v0(x[1]), inc * 2 + 0.1));
 
-  mcmclib_mh_free(s->amh->mh);
-  mcmclib_amh_free(s->amh);
   mcmclib_inca_free(s);
+  mcmclib_amh_free(amh);
+  mcmclib_mh_free(mh);
+  mcmclib_mh_q_free(q);
   for(int m=0; m<2; m++)
     gsl_vector_free(x[m]);
   gsl_rng_free(r);
