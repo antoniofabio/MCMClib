@@ -22,14 +22,14 @@ static double qd(void* ignore, gsl_vector* x, gsl_vector* y) {
   return 0.0;
 }
 
-static void sampler(void* state, gsl_vector* x) {
-  double* o = (double*) state;
+static void sampler(void* p, gsl_vector* x) {
+  double* o = (double*) p;
   gsl_vector_set(x, 0, x0 + (*o));
 }
 
-static void update_gamma(void* in_p, gsl_vector* ignore) {
-  int *p = (int*) in_p;
-  (*p)++;
+static void update_gamma(void* p, gsl_vector* ignore) {
+  int *suff = (int*) ((mcmclib_amh*) p)->suff;
+  (*suff)++;
 }
 
 int main(int argc, char** argv) {

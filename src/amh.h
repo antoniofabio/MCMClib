@@ -9,7 +9,7 @@
 #include "mh.h"
 
 /**\brief Proposal kernel param updating function
-@param p ptr to a 'suff' data object
+@param p ptr to an amh object
 @param x newly sampled point
 */
 typedef void (*mcmclib_amh_update_gamma_p) (void* p, gsl_vector* x);
@@ -24,7 +24,7 @@ typedef struct {
 
 /**\brief alloc a new generic AMH sampler
 @param mh base MH sampler to be extended
-@param suff extra data to be feeded to the update-gamma function
+@param suff extra data eventually used by the update_gamma function
 @param update_gamma update proposal kernel parameters
 */
 mcmclib_amh* mcmclib_amh_alloc(mcmclib_mh* mh, void* suff,
