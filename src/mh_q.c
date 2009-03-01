@@ -4,7 +4,7 @@ mcmclib_mh_q* mcmclib_mh_q_alloc(gsl_rng* r,
 				 samplerfun_p sampler_fun, void* sampler_data,
 				 proposal_distr_t qd_fun, void* qd_data,
 				 void* gamma) {
-  mcmclib_mh_q* a = (mcmclib_mh_q*) malloc(sizeof(mcmclib_mh_q*));
+  mcmclib_mh_q* a = (mcmclib_mh_q*) malloc(sizeof(mcmclib_mh_q));
   a->r = r;
   a->sampler_fun = sampler_fun;
   a->sampler_data = sampler_data;
