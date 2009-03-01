@@ -64,6 +64,7 @@ void mcmclib_gauss_am_update_gamma(void* in_p, gsl_vector* x) {
     gsl_matrix* mean_cm = &(mean_cv.matrix);
 
     gsl_matrix_memcpy(g->Sigma, s->sum_xx);
+    gsl_matrix_scale(g->Sigma, 1.0 / (double) t);
     gsl_blas_dgemm(CblasNoTrans, CblasTrans, -1.0, mean_cm, mean_cm, 1.0, g->Sigma);
     gsl_matrix_scale(g->Sigma, s->sf);
     gsl_vector_free(mean);
