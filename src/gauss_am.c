@@ -8,7 +8,7 @@ mcmclib_amh* mcmclib_gauss_am_alloc(gsl_rng* r,
 				    gsl_vector* start_x,
 				    const gsl_matrix* sigma_zero, int t0) {
   mcmclib_gauss_am_suff* suff = (mcmclib_gauss_am_suff*)
-    malloc(sizeof(mcmclib_gauss_am_suff*));
+    malloc(sizeof(mcmclib_gauss_am_suff));
   int d = start_x->size;
   suff->Sigma_zero = gsl_matrix_alloc(d, d);
   gsl_matrix_memcpy(suff->Sigma_zero, sigma_zero);
@@ -66,6 +66,7 @@ void mcmclib_gauss_am_update_gamma(void* in_p, gsl_vector* x) {
     gsl_matrix_memcpy(g->Sigma, s->sum_xx);
     gsl_matrix_scale(g->Sigma, 1.0 / (double) t);
     gsl_blas_dgemm(CblasNoTrans, CblasTrans, -1.0, mean_cm, mean_cm, 1.0, g->Sigma);
+    gsl_matrix_add(g->Sigma, s->Sigma_eps);
     gsl_matrix_scale(g->Sigma, s->sf);
     gsl_vector_free(mean);
   }
