@@ -1,4 +1,4 @@
-/**Test base AM-INCA algorithm on a dumb target*/
+/**Test AM-INCA algorithm on a dumb target*/
 #include <stdio.h>
 #include <assert.h>
 #include <gsl/gsl_rng.h>
@@ -63,19 +63,18 @@ int main(int argc, char** argv) {
     }
   }
 
-  /*compute mean and variance*/
-  mean /= (double) (N * M);
-  variance = variance / ((double) (N * M)) - (mean * mean);
 
   /*check results*/
   assert(s->inca->amh->n == (N * M));
-  mcmclib_gauss_am* gam = (mcmclib_gauss_am*) s->inca->amh;
+  mcmclib_gauss_am_suff* suff = (mcmclib_gauss_am_suff*) s->inca->amh->suff;
 
-  assert(check_dequal(mean, v0(gam->mean)));
-  assert(check_dequal(variance, m00(gam->cov)));
-  double eps = m00(gam->Sigma_eps);
-  mcmclib_gauss_mrw* mrw = (mcmclib_gauss_mrw*) gam->amh->mh;
-  assert(check_dequal(fix(variance, eps), m00(mrw->sigma_prop)));
+  assert(check_dequal(mean, v0(suff->sum_x)));
+  assert(check_dequal(variance, m00(suff->sum_xx)));
+  double eps = m00(suff->Sigma_eps);
+  mcmclib_gauss_mrw_gamma* gamma = (mcmclib_gauss_mrw_gamma*) s->inca->amh->mh->q->gamma;
+  mean /= (double) (N * M);
+  variance = variance / ((double) (N * M)) - (mean * mean);
+  assert(check_dequal(fix(variance, eps), m00(gamma->Sigma)));
 
   /*free memory*/
   gsl_matrix_free(sigma);
