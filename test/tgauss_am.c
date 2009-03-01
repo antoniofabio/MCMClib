@@ -41,33 +41,32 @@ int main(int argc, char** argv) {
   gsl_matrix* sigma = gsl_matrix_alloc(DIM, DIM);
   gsl_matrix_set_identity(sigma);
 
-  double mean = 0.0;
-  double variance = 0.0;
+  double sum_x = 0.0;
+  double sum_xx = 0.0;
 
-  mcmclib_gauss_am* s = mcmclib_gauss_am_alloc(rng,
-					       dunif, NULL, /*target distrib.*/
-					       x, sigma, T0);
+  mcmclib_amh* s = mcmclib_gauss_am_alloc(rng,
+					  dunif, NULL, /*target distrib.*/
+					  x, sigma, T0);
 
   /*Main MCMC loop*/
   for(int n=0; n<N; n++) {
-    mcmclib_gauss_am_update(s);
+    mcmclib_amh_update(s);
 
-    mean += x0;
-    variance += x0 * x0;
+    sum_x += x0;
+    sum_xx += x0 * x0;
   }
 
-  /*compute mean and variance*/
-  mean /= (double) N;
-  variance = variance / ((double) N) - (mean * mean);
-
   /*check results*/
-  assert(s->amh->n == N);
+  assert(s->n == N);
+  mcmclib_gauss_am_suff* suff = (mcmclib_gauss_am_suff*) s->suff;
 
-  assert(check_dequal(mean, v0(s->mean)));
-  assert(check_dequal(variance, m00(s->cov)));
-  double eps = m00(s->Sigma_eps);
-  mcmclib_gauss_mrw* mrw = (mcmclib_gauss_mrw*) s->mrw;
-  assert(check_dequal(fix(variance, eps), m00(mrw->sigma_prop)));
+  assert(check_dequal(sum_x, v0(suff->sum_x)));
+  assert(check_dequal(sum_xx, m00(suff->sum_xx)));
+  double eps = m00(suff->Sigma_eps);
+  mcmclib_gauss_mrw_gamma* gamma = (mcmclib_gauss_mrw_gamma*) s->mh->q->gamma;
+  double mean = sum_x / (double) N;
+  double variance = sum_xx / (double) N - mean * mean;
+  assert(check_dequal(fix(variance, eps), m00(gamma->Sigma)));
 
   /*free memory*/
   gsl_matrix_free(sigma);
