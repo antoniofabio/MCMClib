@@ -29,6 +29,7 @@ typedef struct {
   void* gamma; /**< misc kernel parameters data*/
 } mcmclib_mh_q;
 
+/**\brief alloc a new M-H proposal kernel*/
 mcmclib_mh_q* mcmclib_mh_q_alloc(gsl_rng* r,
 				 samplerfun_p sampler_fun, void* sampler_data,
 				 proposal_distr_t qd_fun, void* qd_data,
