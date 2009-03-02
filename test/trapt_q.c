@@ -57,7 +57,9 @@ int main(int argc, char** argv) {
     gsl_matrix_free(sigma_local[k]);
   gsl_matrix_free(sigma_whole);
   gsl_vector_free(x);
+  gsl_vector_free(y);
   mcmclib_rapt_q_free(q);
+  gsl_rng_free(rng);
 
   return 0;
 }
