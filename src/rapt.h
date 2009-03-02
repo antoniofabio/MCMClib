@@ -1,8 +1,8 @@
 #ifndef __RAPT_H__
 #define __RAPT_H__
 
-#include "common.h"
-#include "mvnorm.h"
+#include "amh.h"
+#include "rapt_q.h"
 
 /**\addtogroup adaptive
 @{*/
@@ -10,46 +10,21 @@
 \brief Regional AdaPTive
 @{*/
 
-/** Pointer to a region-computing function */
-typedef int (*region_fun_t) (gsl_vector*, void*);
-
-/** \brief Regional Adaptive sampler data */
+/**\brief RAPT sufficient statistics*/
 typedef struct {
-  /*common MCMC fields*/
-  gsl_rng* r;
-  distrfun_p logdistr;
-  void* logdistr_data;
-  gsl_vector* current_x;
-  gsl_vector* old;
-  
-  /*rapt specific fields*/
   int t0; /**< burn-in length*/
-  gsl_matrix* sigma_whole; /**< global proposal covariance matrix*/
-  int K; /**< number of regions*/
-  gsl_matrix** sigma_local; /**< array of local proposal covariance matrices*/
-  region_fun_t which_region; /**< boundary computing function*/
-  void* which_region_data; /**< ptr to extra 'which_region' data*/
-  gsl_matrix* lambda; /**< K+1 weights for local and global proposals, in each region*/
-
-  /*extra infos*/
-  int t; /**<number of iterations done so far*/
   gsl_vector** means; /**< array of regions means*/
   gsl_matrix** variances; /**< array of regions variances*/
   gsl_vector* global_mean;
   gsl_matrix* global_variance;
   gsl_vector* n; /**< number of visits in each region*/
-  int which_proposal; /**< which proposal have been used in last step*/
-  int accepted; /**< last step was an acceptance or a rejection?*/
-  int which_region_x, which_region_old; /**< region info*/
 
   /*internal data*/
   gsl_matrix* Sigma_eps; /**< additive perturbation factor for variances updating*/
   gsl_vector* workspace; /**< utility workspace memory*/
-  gsl_vector* q_mean; /**< extra data for (mixture) proposal densities comp.*/
-  mcmclib_mvnorm_lpdf** q_k;/**< extra data for (mixture) proposal densities comp.*/
   double scaling_factor_local; /**< local proposal variance scaling factor*/
   double scaling_factor_global; /**< global proposal variance scaling factor*/
-} mcmclib_rapt;
+} mcmclib_rapt_suff;
 
 /** alloc a new RAPT sampler object
 @param r RNG state
@@ -63,41 +38,35 @@ typedef struct {
 @param which_region boundary computing function
 @param which_region_data ptr to extra 'which_region' data
 */
-mcmclib_rapt* mcmclib_rapt_alloc(gsl_rng* r,
-				 distrfun_p logdistr, void* logdistr_data,
-				 gsl_vector* x,
-				 int t0,
-				 const gsl_matrix* sigma_whole,
-				 int K,
-				 gsl_matrix** sigma_local,
-				 region_fun_t which_region,
-				 void* which_region_data);
+mcmclib_amh* mcmclib_rapt_alloc(gsl_rng* r,
+				distrfun_p logdistr, void* logdistr_data,
+				gsl_vector* x,
+				int t0,
+				const gsl_matrix* sigma_whole,
+				int K,
+				gsl_matrix** sigma_local,
+				region_fun_t which_region,
+				void* which_region_data);
 
 /** free  data*/
-void mcmclib_rapt_free(mcmclib_rapt* p);
-
-/** Update current value of a RAPT chain*/
-int mcmclib_rapt_update(mcmclib_rapt* p);
+void mcmclib_rapt_free(mcmclib_amh* p);
 
 /** update local and global proposals covariance matrices
 basing on current (region-specific) sample variances*/
-void mcmclib_rapt_update_proposals(mcmclib_rapt* p);
+void mcmclib_rapt_update_proposals(mcmclib_amh* p);
 
 /** update local and global proposals covariance matrices
 using custom estimated local and global variances
  */
-void mcmclib_rapt_update_proposals_custom(mcmclib_rapt* p,
+void mcmclib_rapt_update_proposals_custom(mcmclib_amh* p,
 					  gsl_matrix** variances,
 					  gsl_matrix* global_variance);
 
 /** customly set additive variance correction factor */
-void mcmclib_rapt_set_correction_factor(mcmclib_rapt* p, double eps);
+void mcmclib_rapt_suff_set_correction_factor(mcmclib_rapt_suff* p, double eps);
 
 /** customly set local and global scaling factors */
-void mcmclib_rapt_set_scaling_factors(mcmclib_rapt* p, double local, double global);
-
-/** customly set global proposal weight (same for all regions)*/
-void mcmclib_rapt_set_alpha(mcmclib_rapt* p, double alpha);
+void mcmclib_rapt_suff_set_scaling_factors(mcmclib_rapt_suff* p, double local, double global);
 
 /**@}*/
 /**@}*/
