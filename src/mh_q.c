@@ -19,7 +19,7 @@ void mcmclib_mh_q_free(mcmclib_mh_q* p) {
 }
 
 void mcmclib_mh_q_sample(mcmclib_mh_q* p, gsl_vector* x) {
-  p->sampler_fun(p->sampler_data, x);
+  p->sampler_fun(p, x);
 }
 
 double mcmclib_mh_q_logd(mcmclib_mh_q* p, gsl_vector* x, gsl_vector* y) {
