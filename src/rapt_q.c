@@ -96,7 +96,7 @@ void mcmclib_rapt_q_sample(void* in_p, gsl_vector* x) {
   mcmclib_mh_q* q = (mcmclib_mh_q*) in_p;
   mcmclib_rapt_gamma* g = (mcmclib_rapt_gamma*) q->gamma;
 
-  g->which_region_old = g->which_region_x;
+  g->which_region_old = g->which_region_x = g->which_region(x, g->which_region_data);
   gsl_vector_memcpy(g->workspace, x);
 
   gsl_vector_view lambda_vw = gsl_matrix_row(g->lambda, g->which_region_old);
