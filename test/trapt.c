@@ -1,4 +1,4 @@
-/**Test base RAPT algorithm on a dumb target*/
+/**Test RAPT algorithm on a dumb target*/
 #include <stdio.h>
 #include <assert.h>
 #include <gsl/gsl_rng.h>
@@ -58,25 +58,26 @@ int main(int argc, char** argv) {
   double mean = 0.0;
   double variance = 0.0;
 
-  mcmclib_rapt* s = mcmclib_rapt_alloc(rng,
-				       dunif, NULL, /*target distrib.*/
-				       x, T0,
-				       sigma_whole, K, sigma_local,
-				       which_region, NULL);
+  mcmclib_amh* s = mcmclib_rapt_alloc(rng,
+				      dunif, NULL, /*target distrib.*/
+				      x, T0,
+				      sigma_whole, K, sigma_local,
+				      which_region, NULL);
+  mcmclib_rapt_gamma* g = (mcmclib_rapt_gamma*) s->mh->q->gamma;
+  mcmclib_rapt_suff* suff = (mcmclib_rapt_suff*) s->suff;
 
   /*Main MCMC loop*/
   gsl_matrix* X = gsl_matrix_alloc(N, DIM);
   gsl_vector* which_region_n = gsl_vector_alloc(N);
   for(int n=0; n<N; n++) {
-    mcmclib_rapt_update(s);
-    mcmclib_rapt_update_proposals(s);
+    mcmclib_amh_update(s);
 
     gsl_vector_view Xn = gsl_matrix_row(X, n);
     gsl_vector_memcpy(&(Xn.vector), x);
-    gsl_vector_set(which_region_n, n, s->which_region_x);
-    means[s->which_region_x] += x0;
-    variances[s->which_region_x] += x0 * x0;
-    nk[s->which_region_x] += 1.0;
+    gsl_vector_set(which_region_n, n, g->which_region_x);
+    means[g->which_region_x] += x0;
+    variances[g->which_region_x] += x0 * x0;
+    nk[g->which_region_x] += 1.0;
     mean += x0;
     variance += x0 * x0;
   }
@@ -90,14 +91,13 @@ int main(int argc, char** argv) {
   }
 
   /*check results*/
-  assert(s->t == N);
-  assert(s->t0 == T0);
-  assert(check_dequal(mean, v0(s->global_mean)));
-  assert(check_dequal(variance, m00(s->global_variance)));
+  assert(suff->t0 == T0);
+  assert(check_dequal(mean, v0(suff->global_mean)));
+  assert(check_dequal(variance, m00(suff->global_variance)));
   for(int k=0; k<K; k++) {
-    assert(check_dequal(nk[k], gsl_vector_get(s->n, k)));
-    assert(check_dequal(means[k], v0(s->means[k])));
-    assert(check_dequal(variances[k], m00(s->variances[k])));
+    assert(check_dequal(nk[k], gsl_vector_get(suff->n, k)));
+    assert(check_dequal(means[k], v0(suff->means[k])));
+    assert(check_dequal(variances[k], m00(suff->variances[k])));
   }
 
   /*free memory*/
