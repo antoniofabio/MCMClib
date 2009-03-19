@@ -17,6 +17,6 @@ void mcmclib_amh_free(mcmclib_amh* p) {
 int mcmclib_amh_update(mcmclib_amh* p) {
   mcmclib_mh_update(p->mh);
   p->n++;
-  p->update_gamma(p, p->mh->x);
+  p->update_gamma(p);
   return(p->mh->last_accepted);
 }

@@ -10,9 +10,8 @@
 
 /**\brief Proposal kernel param updating function
 @param p ptr to an amh object
-@param x newly sampled point
 */
-typedef void (*mcmclib_amh_update_gamma_p) (void* p, gsl_vector* x);
+typedef void (*mcmclib_amh_update_gamma_p) (void* p);
 
 /**\brief Generic Adaptive Metropolis-Hastings sampler */
 typedef struct {

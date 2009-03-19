@@ -43,7 +43,7 @@ void mcmclib_rapt_suff_free(mcmclib_rapt_suff* p) {
   free(p);
 }
 
-void mcmclib_rapt_update(void* p, gsl_vector* x);
+void mcmclib_rapt_update(void* p);
 
 mcmclib_amh* mcmclib_rapt_alloc(gsl_rng* r,
 				distrfun_p logdistr, void* logdistr_data,
@@ -112,7 +112,7 @@ void mcmclib_rapt_update_suff(mcmclib_amh* p) {
   gsl_vector_set(s->n, g->which_region_x, gsl_vector_get(s->n, g->which_region_x) + 1);
 }
 
-void mcmclib_rapt_update(void* in_p, gsl_vector* x) {
+void mcmclib_rapt_update(void* in_p) {
   mcmclib_amh* p = (mcmclib_amh*) in_p;
   mcmclib_rapt_update_suff(p);
   mcmclib_rapt_update_proposals(p);
