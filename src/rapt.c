@@ -99,18 +99,23 @@ void mcmclib_rapt_update_proposals(mcmclib_amh* p) {
   mcmclib_rapt_update_proposals_custom(p, s->variances, s->global_variance);
 }
 
-void mcmclib_rapt_update(void* p, gsl_vector* x) {
-}
-
-void mcmclib_rapt_update_suff(mcmclib_amh* p, gsl_vector* x) {
+void mcmclib_rapt_update_suff(mcmclib_amh* p) {
   mcmclib_rapt_suff* s = (mcmclib_rapt_suff*) p->suff;
-  mcmclib_rapt_gamma* g = (mcmclib_rapt_gamma*) p->mh->q->gamma;
+  mcmclib_mh* mh = p->mh;
+  mcmclib_rapt_gamma* g = (mcmclib_rapt_gamma*) mh->q->gamma;
+  gsl_vector* x = mh->x;
   int k = g->which_region_x;
   int fake_n = gsl_vector_get(s->n, k) - 1;
   mcmclib_covariance_update(s->variances[k], s->means[k], &fake_n, x);
   fake_n = p->n - 1;
   mcmclib_covariance_update(s->global_variance, s->global_mean, &fake_n, x);
   gsl_vector_set(s->n, g->which_region_x, gsl_vector_get(s->n, g->which_region_x) + 1);
+}
+
+void mcmclib_rapt_update(void* in_p, gsl_vector* x) {
+  mcmclib_amh* p = (mcmclib_amh*) in_p;
+  mcmclib_rapt_update_suff(p);
+  mcmclib_rapt_update_proposals(p);
 }
 
 void mcmclib_rapt_suff_set_correction_factor(mcmclib_rapt_suff* p, double eps) {
