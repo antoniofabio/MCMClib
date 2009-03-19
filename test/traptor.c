@@ -1,4 +1,4 @@
-/**Test OLEM-RAPT algorithm on dumb target*/
+/**Test RAPTOR algorithm on dumb target*/
 #include <stdio.h>
 #include <assert.h>
 #include <gsl/gsl_rng.h>

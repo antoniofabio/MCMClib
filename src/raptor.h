@@ -1,5 +1,5 @@
-#ifndef __OLEMRAPT_H__
-#define __OLEMRAPT_H__
+#ifndef __RAPTOR_H__
+#define __RAPTOR_H__
 
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_vector.h>
@@ -10,14 +10,12 @@
 
 /**\addtogroup adaptive
 @{*/
-/**\defgroup OLEMRAPT olem_rapt
+/**\defgroup RAPTOR raptor
 \brief RAPT based on On-Line EM fitting of a Gaussian mixture
 @{*/
 
-/** \brief OLEM-RAPT data */
+/** \brief RAPTOR sufficient data */
 typedef struct {
-  mcmclib_rapt* rapt; /**< rapt sampler*/
-
   gsl_vector* beta_hat; /**< current mixture weights estimates*/
   gsl_vector** mu_hat; /**< current mixture means estimates*/
   gsl_matrix** Sigma_hat; /**< current mixture variances estimates*/
@@ -29,34 +27,27 @@ typedef struct {
 } mcmclib_olemrapt;
 
 /** alloc a new OLEM-RAPT sampler object
-@param r RNG state
-@param logdistr pointer to a log-likelihood function
-@param logdistr_data extra data to be passed to the distribution function
-@param x current chain value
 @param t0 burn-in length before starting adaptation
-@param Sigma_zero initial global proposal covariance matrix
 @param beta_hat starting weights estimates
 @param mu_hat starting means estimates
 @param Sigma_hat starting variances estimates
-@returns a new olemrapt object
+@returns a new raptor_suff object
 */
-mcmclib_olemrapt* mcmclib_olemrapt_alloc(gsl_rng* r,
-					 distrfun_p logdistr, void* logdistr_data,
-					 gsl_vector* x, int t0, gsl_matrix* Sigma_zero,
-					 gsl_vector* beta_hat,
-					 gsl_vector** mu_hat,
-					 gsl_matrix** Sigma_hat);
+mcmclib_raptor_suff* mcmclib_raptor_suff_alloc(int t0,
+					       gsl_vector* beta_hat,
+					       gsl_vector** mu_hat,
+					       gsl_matrix** Sigma_hat);
 
-/** free OLEM-RAPT data*/
-void mcmclib_olemrapt_free(mcmclib_olemrapt* p);
+/** free raptor_suff data*/
+void mcmclib_raptor_suff_free(mcmclib_raptor_suff* p);
 
 /** Update current value of an OLEM-RAPT chain*/
-int mcmclib_olemrapt_update(mcmclib_olemrapt* p);
+int mcmclib_raptor_suff_update(mcmclib_raptor_suff* p);
 
 /** update local and global RAPT proposals covariance matrices
 
 basing on current mixture parameters estimates*/
-void mcmclib_olemrapt_update_proposals(mcmclib_olemrapt* p);
+void mcmclib_raptor_update_proposals(mcmclib_raptor_suff* p);
 
 /**@}*/
 /**@}*/
