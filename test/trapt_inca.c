@@ -5,7 +5,7 @@
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
-#include <rapt_inca.h>
+#include <inca_rapt.h>
 
 #define N 1000
 #define DIM 1
@@ -64,24 +64,27 @@ int main(int argc, char** argv) {
     variances[k] = 0.0;
     nk[k] = 0.0;
   }
+  for(int m=0; m<M; m++)
+    nk[ which_region(x[m], NULL) ] += 1.0;
+
   double mean = 0.0;
   double variance = 0.0;
 
-  mcmclib_inca_rapt* s = mcmclib_inca_rapt_alloc(rng,
-						 dunif, NULL, /*target distrib.*/
-						 x, M, T0,
-						 sigma_whole, K, sigma_local,
-						 which_region, NULL);
+  mcmclib_inca* s = mcmclib_inca_rapt_alloc(rng,
+					    dunif, NULL, /*target distrib.*/
+					    x, M, T0,
+					    sigma_whole, K, sigma_local,
+					    which_region, NULL);
 
   /*Main MCMC loop*/
   for(int n=0; n<N; n++) {
-    mcmclib_inca_rapt_update(s);
+    mcmclib_inca_update(s);
 
     for(int m=0; m<M; m++) {
-      mcmclib_rapt* s1 = s->sm[m];
-      means[s1->which_region_x] += v0(x[m]);
-      variances[s1->which_region_x] += v0(x[m]) * v0(x[m]);
-      nk[s1->which_region_x] += 1.0;
+      int which_region_xm = which_region(x[m], NULL);
+      means[ which_region_xm ] += v0(x[m]);
+      variances[ which_region_xm ] += v0(x[m]) * v0(x[m]);
+      nk[ which_region_xm ] += 1.0;
       mean += v0(x[m]);
       variance += v0(x[m]) * v0(x[m]);
     }
@@ -96,15 +99,20 @@ int main(int argc, char** argv) {
   }
 
   /*check results*/
-  assert(s->t == (N * M));
-  assert(check_dequal(mean, v0(s->global_mean)));
-  assert(check_dequal(variance, m00(s->global_variance)));
-  assert(check_dequal(m00(s->sm[M-1]->sigma_whole), fix(variance)));
+  mcmclib_amh* amh = s->amh;
+  mcmclib_rapt_suff* suff = (mcmclib_rapt_suff*) amh->suff;
+  mcmclib_rapt_gamma* g = (mcmclib_rapt_gamma*) amh->mh->q->gamma;
+  assert(s->amh->n == (N * M));
+  assert(check_dequal(mean, v0(suff->global_mean)));
+  assert(check_dequal(variance, m00(suff->global_variance)));
+  assert(check_dequal(m00(g->sigma_whole), fix(variance)));
   for(int k=0; k<K; k++) {
-    assert(check_dequal(nk[k], gsl_vector_get(s->n, k)));
-    assert(check_dequal(means[k], v0(s->means[k])));
-    assert(check_dequal(variances[k], m00(s->variances[k])));
-    assert(check_dequal(fix(variances[k]), m00(s->sm[M-1]->sigma_local[k])));
+    printf("%f\n", nk[k]);
+    printf("%f\n", gsl_vector_get(suff->n, k));
+    assert(check_dequal(nk[k], gsl_vector_get(suff->n, k)));
+    assert(check_dequal(means[k], v0(suff->means[k])));
+    assert(check_dequal(variances[k], m00(suff->variances[k])));
+    assert(check_dequal(fix(variances[k]), m00(g->sigma_local[k])));
   }
 
   /*free memory*/
