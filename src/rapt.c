@@ -105,7 +105,7 @@ void mcmclib_rapt_update_suff(mcmclib_amh* p) {
   mcmclib_rapt_gamma* g = (mcmclib_rapt_gamma*) mh->q->gamma;
   gsl_vector* x = mh->x;
   int k = g->which_region_x;
-  int fake_n = gsl_vector_get(s->n, k) - 1;
+  int fake_n = gsl_vector_get(s->n, k);
   mcmclib_covariance_update(s->variances[k], s->means[k], &fake_n, x);
   fake_n = p->n - 1;
   mcmclib_covariance_update(s->global_variance, s->global_mean, &fake_n, x);
