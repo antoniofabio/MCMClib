@@ -7,12 +7,12 @@
 #include <gsl/gsl_matrix.h>
 #include <inca_rapt.h>
 
-#define N 1000
+#define N 100
 #define DIM 1
 #define K 2 /*number of regions*/
 #define M 3 /*number of parallel chains*/
 /*burn-in*/
-#define T0 100
+#define T0 2
 #define SF (2.38*2.38/(double) DIM)
 #define CORRECTION 0.001
 
@@ -64,8 +64,6 @@ int main(int argc, char** argv) {
     variances[k] = 0.0;
     nk[k] = 0.0;
   }
-  for(int m=0; m<M; m++)
-    nk[ which_region(x[m], NULL) ] += 1.0;
 
   double mean = 0.0;
   double variance = 0.0;
@@ -107,8 +105,6 @@ int main(int argc, char** argv) {
   assert(check_dequal(variance, m00(suff->global_variance)));
   assert(check_dequal(m00(g->sigma_whole), fix(variance)));
   for(int k=0; k<K; k++) {
-    printf("%f\n", nk[k]);
-    printf("%f\n", gsl_vector_get(suff->n, k));
     assert(check_dequal(nk[k], gsl_vector_get(suff->n, k)));
     assert(check_dequal(means[k], v0(suff->means[k])));
     assert(check_dequal(variances[k], m00(suff->variances[k])));
