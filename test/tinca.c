@@ -28,13 +28,15 @@ static double qd(void* ignore, gsl_vector* x, gsl_vector* y) {
 }
 
 static void sampler(void* state, gsl_vector* x) {
-  double* o = (double*) state;
+  mcmclib_mh_q* q = (mcmclib_mh_q*) state;
+  double* o = (double*) q->gamma;
   gsl_vector_set(x, 0, x0 + (*o));
 }
 
-static void update_gamma(void* in_p, gsl_vector* x) {
-  double *p = (double*) in_p;
-  (*p)+= x0;
+static void update_gamma(void* in_p) {
+  mcmclib_amh* p = (mcmclib_amh*) in_p;
+  double *s = (double*) p->suff;
+  (*s)+= v0(p->mh->x);
 }
 
 int main(int argc, char** argv) {
