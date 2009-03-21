@@ -12,10 +12,10 @@ static const double beta = 0.5;
 static const double V[] = {1.0, 1.0};
 static const double MU[] = {0.2, 0.8};
 
-#define N 1000
+#define N 100
 #define DIM 1
 #define K 2
-#define T0 100
+#define T0 50
 #define SF (2.38*2.38/(double) DIM)
 
 #define v0(x) gsl_vector_get(x, 0)
@@ -75,7 +75,8 @@ int main(int argc, char** argv) {
     mcmclib_mixem_online_update(olem, sampler->mh->x);
   }
 
-  mcmclib_raptor_gamma* g = (mcmclib_raptor_gamma*) sampler->mh->q->gamma;
+  mcmclib_rapt_gamma* q = (mcmclib_rapt_gamma*) sampler->mh->q->gamma;
+  mcmclib_raptor_gamma* g = (mcmclib_raptor_gamma*) q->which_region_data;
   assert(check_dequal(v0(g->beta_hat), v0(olem->beta)));
   assert(check_dequal(v0(g->mu_hat[0]), v0(olem->mu[0])));
   assert(check_dequal(m00(g->Sigma_hat[0]), m00(olem->Sigma[0])));
