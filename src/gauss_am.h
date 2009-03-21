@@ -41,9 +41,8 @@ void mcmclib_gauss_am_free(mcmclib_amh* p);
 
 /** AM gamma update function \internal
 @param in_p ptr to an mcmclib_amh object
-@param x new sampled data point
 */
-void mcmclib_gauss_am_update_gamma(void* in_p, gsl_vector* x);
+void mcmclib_gauss_am_update_gamma(void* in_p);
 
 /**@}*/
 /**@}*/

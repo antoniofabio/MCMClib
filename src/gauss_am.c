@@ -46,17 +46,17 @@ void mcmclib_gauss_am_update_suff(mcmclib_gauss_am_suff* s, gsl_vector* x) {
   gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, x_cm, x_cm, 1.0, s->sum_xx);
 }
 
-void mcmclib_gauss_am_update_gamma(void* in_p, gsl_vector* x) {
+void mcmclib_gauss_am_update_gamma(void* in_p) {
   mcmclib_amh* p = (mcmclib_amh*) in_p;
   mcmclib_gauss_am_suff* s = p->suff;
   int t0 = s->t0;
   int t = p->n;
 
-  mcmclib_gauss_am_update_suff(s, x);
+  mcmclib_gauss_am_update_suff(s, p->mh->x);
 
   if(t >= t0) {
     mcmclib_gauss_mrw_gamma* g = (mcmclib_gauss_mrw_gamma*) p->mh->q->gamma;
-    int d = x->size;
+    int d = p->mh->x->size;
     gsl_vector* mean = gsl_vector_alloc(d);
     gsl_vector_memcpy(mean, s->sum_x);
     gsl_vector_scale(mean, 1.0 / (double) t);
