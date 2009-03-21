@@ -16,7 +16,9 @@
 */
 typedef double (*proposal_distr_t) (void* data, gsl_vector* x, gsl_vector* y);
 
-/** pointer to a sampler function */
+/** pointer to a sampler function
+@param data ptr to an mcmclib_mh_q object
+*/
 typedef void (*samplerfun_p) (void* data, gsl_vector* x);
 
 /**\brief Metropolis-Hastings proposal kernel*/
