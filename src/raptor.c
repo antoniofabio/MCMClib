@@ -88,7 +88,8 @@ mcmclib_amh* mcmclib_raptor_alloc(gsl_rng* r,
 
 void mcmclib_raptor_free(mcmclib_amh* p) {
   mcmclib_raptor_suff_free((mcmclib_raptor_suff*) p->suff);
-  mcmclib_raptor_gamma_free((mcmclib_raptor_gamma*) p->mh->q->gamma);
+  mcmclib_rapt_gamma* g = (mcmclib_rapt_gamma*) p->mh->q->gamma;
+  mcmclib_raptor_gamma_free((mcmclib_raptor_gamma*) g->which_region_data);
   mcmclib_rapt_q_free(p->mh->q);
   mcmclib_mh_free(p->mh);
   mcmclib_amh_free(p);
