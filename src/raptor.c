@@ -7,10 +7,16 @@ mcmclib_raptor_gamma* mcmclib_raptor_gamma_alloc(gsl_vector* beta_hat,
 						 gsl_vector** mu_hat,
 						 gsl_matrix** Sigma_hat) {
   mcmclib_raptor_gamma* a = (mcmclib_raptor_gamma*) malloc(sizeof(mcmclib_raptor_gamma));
+  a->beta_hat = gsl_vector_alloc(beta_hat->size);
   gsl_vector_memcpy(a->beta_hat, beta_hat);
   int K = beta_hat->size;
+  int d = mu_hat[0]->size;
+  a->mu_hat = (gsl_vector**) malloc(K * sizeof(gsl_vector*));
+  a->Sigma_hat = (gsl_matrix**) malloc(K * sizeof(gsl_matrix*));
   for(int k=0; k < K; k++) {
+    a->mu_hat[k] = gsl_vector_alloc(d);
     gsl_vector_memcpy(a->mu_hat[k], mu_hat[k]);
+    a->Sigma_hat[k] = gsl_matrix_alloc(d, d);
     gsl_matrix_memcpy(a->Sigma_hat[k], Sigma_hat[k]);
   }
 
@@ -24,8 +30,14 @@ mcmclib_raptor_gamma* mcmclib_raptor_gamma_alloc(gsl_vector* beta_hat,
 
 void mcmclib_raptor_gamma_free(mcmclib_raptor_gamma* p) {
   mcmclib_mixnorm_lpdf_free(p->pi_hat);
-  for(int k=0; k< p->beta_hat->size; k++)
+  for(int k=0; k< p->beta_hat->size; k++) {
     mcmclib_mvnorm_lpdf_free(p->pik_hat[k]);
+    gsl_vector_free(p->mu_hat[k]);
+    gsl_matrix_free(p->Sigma_hat[k]);
+  }
+  free(p->mu_hat);
+  free(p->Sigma_hat);
+  gsl_vector_free(p->beta_hat);
   free(p->pik_hat);
   free(p);
 }
