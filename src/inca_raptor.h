@@ -6,7 +6,7 @@
 
 /**\addtogroup adaptive
 @{*/
-/**\defgroup INCA_RAPT inca_raptor
+/**\defgroup INCA_RAPTOR inca_raptor
 \brief INCA Regional AdaPTive OnLine Recursive
 @{*/
 
