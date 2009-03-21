@@ -77,4 +77,7 @@ void mcmclib_raptor_update(void* in_p) {
   mcmclib_amh* p = (mcmclib_amh*) in_p;
   mcmclib_mixem_online* s = (mcmclib_mixem_online*) p->suff;
   mcmclib_mixem_online_update(s, p->mh->x);
+  if((p->n) <= s->n0)
+    return;
+  mcmclib_rapt_update_proposals_custom(p, s->Sigma, s->Sigma_global);
 }
