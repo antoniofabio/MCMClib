@@ -14,29 +14,26 @@
 \brief RAPT based on On-Line EM fitting of a Gaussian mixture
 @{*/
 
-/** \brief RAPTOR sufficient data */
+/** \brief RAPTOR sampler gamma values */
 typedef struct {
   gsl_vector* beta_hat; /**< current mixture weights estimates*/
   gsl_vector** mu_hat; /**< current mixture means estimates*/
   gsl_matrix** Sigma_hat; /**< current mixture variances estimates*/
 
   mcmclib_mvnorm_lpdf** pik_hat; /**< single mixture components densities*/
-  mcmclib_mixnorm_lpdf* pi_hat; /**< estimated mixture density*/
+  mcmclib_mixnorm_lpdf* pi_hat; /**< mixture density*/
+} mcmclib_raptor_gamma;
 
+/** \brief RAPTOR sufficient data */
+typedef struct {
   mcmclib_mixem_online* em; /**< online-EM mixture fitter*/
-} mcmclib_olemrapt;
+} mcmclib_raptor_suff;
 
-/** alloc a new OLEM-RAPT sampler object
+/** alloc a new RAPTOR sampler suff. stats. object
 @param t0 burn-in length before starting adaptation
-@param beta_hat starting weights estimates
-@param mu_hat starting means estimates
-@param Sigma_hat starting variances estimates
 @returns a new raptor_suff object
 */
-mcmclib_raptor_suff* mcmclib_raptor_suff_alloc(int t0,
-					       gsl_vector* beta_hat,
-					       gsl_vector** mu_hat,
-					       gsl_matrix** Sigma_hat);
+mcmclib_raptor_suff* mcmclib_raptor_suff_alloc(mcmclib_raptor_gamma* g, int t0);
 
 /** free raptor_suff data*/
 void mcmclib_raptor_suff_free(mcmclib_raptor_suff* p);

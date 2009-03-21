@@ -6,7 +6,7 @@
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 #include <region_mixnorm.h>
-#include <olem_rapt.h>
+#include <raptor.h>
 
 static const double beta = 0.5;
 static const double V[] = {1.0, 1.0};
