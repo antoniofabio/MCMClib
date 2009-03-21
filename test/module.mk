@@ -3,7 +3,7 @@ TEST_LDFLAGS:= src/libmcmclib.a $(LDFLAGS)
 TEST_names:= t1 t2 trecursive_variance tmixem tmixem_rec tmixem_online \
 	tmh_q tmh tgauss_mrw \
 	tamh trapt_q trapt traptor tgauss_am \
-	tinca trapt_inca tam_inca
+	tinca trapt_inca tam_inca tinca_raptor
 
 TEST_targets:=$(TEST_names:%=test_%)
 TEST_BIN:= $(TEST_names:%=test/%)
