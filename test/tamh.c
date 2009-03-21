@@ -27,7 +27,7 @@ static void sampler(void* p, gsl_vector* x) {
   gsl_vector_set(x, 0, x0 + (*o));
 }
 
-static void update_gamma(void* p, gsl_vector* ignore) {
+static void update_gamma(void* p) {
   int *suff = (int*) ((mcmclib_amh*) p)->suff;
   (*suff)++;
 }
