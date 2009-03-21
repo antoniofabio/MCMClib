@@ -3,6 +3,7 @@
 #include<gsl/gsl_matrix.h>
 #include<gsl/gsl_blas.h>
 #include "mixem_online.h"
+#include "vector_stats.h"
 #include "mvnorm.h"
 
 mcmclib_mixem_online* mcmclib_mixem_online_alloc(gsl_vector** mu,
@@ -29,6 +30,11 @@ mcmclib_mixem_online* mcmclib_mixem_online_alloc(gsl_vector** mu,
   for(int k=0; k<K; k++) {
     a->pi_k[k] = mcmclib_mvnorm_lpdf_alloc(mu[k], Sigma[k]->data);
   }
+
+  a->mu_global = gsl_vector_alloc(d);
+  gsl_vector_set_all(a->mu_global, 0.0);
+  a->Sigma_global = gsl_matrix_alloc(d, d);
+  gsl_matrix_set_all(a->Sigma_global, 0.0);
   return a;
 }
 
@@ -39,6 +45,8 @@ void mcmclib_mixem_online_free(mcmclib_mixem_online* p) {
   free(p->gamma);
   mcmclib_mixolem_suff_free(p->s);
   mcmclib_mixolem_suff_free(p->si);
+  gsl_vector_free(p->mu_global);
+  gsl_matrix_free(p->Sigma_global);
   free(p->pi_k);
   free(p);
 }
@@ -94,6 +102,8 @@ void mcmclib_mixem_online_update_gamma(mcmclib_mixolem_suff* gamma,
 }
 
 void mcmclib_mixem_online_update(mcmclib_mixem_online* p, gsl_vector* y) {
+  int n = p->n;
+  mcmclib_covariance_update(p->Sigma_global, p->mu_global, &n, y);
   (p->n)++;
   mcmclib_mixem_online_update_s(p, y);
   if(p->n <= p->n0)

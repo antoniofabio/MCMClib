@@ -28,6 +28,9 @@ typedef struct {
   gsl_vector* beta;
   gsl_vector** mu;
   gsl_matrix** Sigma;
+
+  gsl_vector* mu_global; /**< current global mean*/
+  gsl_matrix* Sigma_global; /**< current global variance*/
 } mcmclib_mixem_online;
 
 /**alloc mixem_online data
