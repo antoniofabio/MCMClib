@@ -128,3 +128,24 @@ double mcmclib_rapt_q_d(void* gamma, gsl_vector* x, gsl_vector* y) {
 
   return log(ans);
 }
+
+/*dest = alpha * (A + B) */
+static void matrix_addscale(gsl_matrix* dest,
+			     gsl_matrix* A, gsl_matrix* B, double alpha) {
+  gsl_matrix_memcpy(dest, A);
+  gsl_matrix_add(dest, B);
+  gsl_matrix_scale(dest, alpha);
+}
+
+void mcmclib_rapt_q_update_proposals_custom(mcmclib_rapt_gamma* p,
+					    gsl_matrix** variances,
+					    gsl_matrix* global_variance,
+					    gsl_matrix* Sigma_eps,
+					    double scaling_factor_local,
+					    double scaling_factor_global) {
+  for(int k=0; k< p->K; k++)
+    matrix_addscale(p->sigma_local[k],
+			  variances[k], Sigma_eps, scaling_factor_local);
+  matrix_addscale(p->sigma_whole,
+		  global_variance, Sigma_eps, scaling_factor_global);
+}

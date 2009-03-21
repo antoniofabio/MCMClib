@@ -45,6 +45,14 @@ void mcmclib_rapt_q_free(mcmclib_mh_q* p);
 /** customly set global proposal weight (same for all regions)*/
 void mcmclib_rapt_gamma_set_alpha(mcmclib_rapt_gamma* p, double alpha);
 
+/** customly set global and local covariance matrices */
+void mcmclib_rapt_q_update_proposals_custom(mcmclib_rapt_gamma* p,
+					    gsl_matrix** variances,
+					    gsl_matrix* global_variance,
+					    gsl_matrix* Sigma_eps,
+					    double scaling_factor_local,
+					    double scaling_factor_global);
+
 /**@}*/
 /**@}*/
 #endif
