@@ -64,38 +64,34 @@ int main(int argc, char** argv) {
   gsl_vector_memcpy(beta, w_hat);
   mcmclib_mixem_online* olem = mcmclib_mixem_online_alloc(mu, Sigma, beta, 0.5, T0);
 
-  mcmclib_olemrapt* sampler = mcmclib_olemrapt_alloc(rng,
-						     dunif, NULL,
-						     x, T0, sigma_whole,
-						     w_hat, mu_hat, Sigma_hat);
+  mcmclib_amh* sampler = mcmclib_raptor_alloc(rng,
+					      dunif, NULL,
+					      x, T0, sigma_whole,
+					      w_hat, mu_hat, Sigma_hat);
 
   /*Main MCMC loop*/
   for(int n=0; n<N; n++) {
-    mcmclib_olemrapt_update(sampler);
-    mcmclib_olemrapt_update_proposals(sampler);
-    mcmclib_mixem_online_update(olem, sampler->rapt->current_x);
+    mcmclib_amh_update(sampler);
+    mcmclib_mixem_online_update(olem, sampler->mh->x);
   }
 
-  assert(check_dequal(v0(sampler->beta_hat), v0(olem->beta)));
-  assert(check_dequal(v0(sampler->mu_hat[0]), v0(olem->mu[0])));
-  assert(check_dequal(m00(sampler->Sigma_hat[0]), m00(olem->Sigma[0])));
-  assert(check_dequal(fix(m00(sampler->Sigma_hat[0])),
-		      m00(sampler->rapt->sigma_local[0])));
-  assert(check_dequal(fix(m00(sampler->Sigma_hat[1])),
-		      m00(sampler->rapt->sigma_local[1])));
+  mcmclib_raptor_gamma* g = (mcmclib_raptor_gamma*) sampler->mh->q->gamma;
+  assert(check_dequal(v0(g->beta_hat), v0(olem->beta)));
+  assert(check_dequal(v0(g->mu_hat[0]), v0(olem->mu[0])));
+  assert(check_dequal(m00(g->Sigma_hat[0]), m00(olem->Sigma[0])));
 
   /*check boundary function*/
   gsl_vector_set_all(x, -1.0);
-  int rx = mcmclib_region_mixnorm_compute(x, sampler->pi_hat);
+  int rx = mcmclib_region_mixnorm_compute(x, g->pi_hat);
   assert(rx == 0);
   gsl_vector_set_all(x, 1.0);
-  rx = mcmclib_region_mixnorm_compute(x, sampler->pi_hat);
+  rx = mcmclib_region_mixnorm_compute(x, g->pi_hat);
   assert(rx == 1);
 
   /*free memory*/
   gsl_matrix_free(sigma_whole);
   gsl_vector_free(x);
-  mcmclib_olemrapt_free(sampler);
+  mcmclib_raptor_free(sampler);
 
   return 0;
 }
