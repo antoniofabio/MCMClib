@@ -34,12 +34,30 @@ typedef struct {
 @returns a new raptor_suff object
 */
 mcmclib_raptor_suff* mcmclib_raptor_suff_alloc(mcmclib_raptor_gamma* g, int t0);
-
 /** free raptor_suff data*/
 void mcmclib_raptor_suff_free(mcmclib_raptor_suff* p);
-
-/** Update current value of an OLEM-RAPT chain*/
+/** Update suff. stats. of a RAPTOR chain*/
 int mcmclib_raptor_suff_update(mcmclib_raptor_suff* p);
+
+/** \brief alloc a new RAPTOR sampler
+@param r RNG
+@param logdistr target log-distrib. fun.
+@param logditsr_data log-distrib. fun. extra data
+@param x current chain value
+@param t0 burn in length
+@param Sigma_zero starting variance-covariance matrix
+@param beta_hat starting mixture weights estimates
+@param mu_hat starting mixture means estimates
+@param Sigma_hat starting mixture variance estimates
+*/
+mcmclib_amh* mcmclib_raptor_alloc(gsl_rng* r,
+				  distrfun_p logdistr, void* logdistr_data,
+				  gsl_vector* x, int t0, gsl_matrix* Sigma_zero,
+				  gsl_vector* beta_hat,
+				  gsl_vector** mu_hat,
+				  gsl_matrix** Sigma_hat);
+/**\brief free a previously allocated RAPTOR sampler*/
+void mcmclib_raptor_free(mcmclib_amh* p);
 
 /** update local and global RAPT proposals covariance matrices
 
