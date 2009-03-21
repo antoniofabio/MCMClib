@@ -27,6 +27,10 @@ typedef struct {
 /** \brief RAPTOR sufficient data */
 typedef struct {
   mcmclib_mixem_online* em; /**< online-EM mixture fitter*/
+
+  gsl_matrix* Sigma_eps;
+  double scaling_factor_local;
+  double scaling_factor_global;
 } mcmclib_raptor_suff;
 
 /** alloc a new RAPTOR sampler suff. stats. object
