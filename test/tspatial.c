@@ -50,6 +50,7 @@ int main(int argc, char** argv) {
   printf("%f -> %f\n", 0.0, lpdf(0.0));
   printf("%f -> %f\n", -1.0, lpdf(-1.0));
   printf("%f -> %f\n", MU, lpdf(MU));
+  gsl_vector_free(x);
 
   mcmclib_spatial_lpdf_free(p);
   gsl_matrix_free(D);
