@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <math.h>
 #include <gsl/gsl_math.h>
 #include "spatial.h"
@@ -9,10 +10,15 @@ mcmclib_spatial_lpdf* mcmclib_spatial_lpdf_alloc(gsl_vector* mu,
 						 gsl_matrix* D) {
   mcmclib_spatial_lpdf* a = (mcmclib_spatial_lpdf*) malloc(sizeof(mcmclib_spatial_lpdf));
   a->mu = mu;
+  assert(mu->size == D->size1);
   a->rho = rho;
+  assert(rho->size == 1);
   a->sigma = sigma;
+  assert(sigma->size == 1);
   a->tausq = tausq;
+  assert(tausq->size == 1);
   a->D = D;
+  assert(D->size1 == D->size2);
   a->Sigma = gsl_matrix_alloc(mu->size, mu->size);
   a->norm = mcmclib_mvnorm_lpdf_alloc(mu, a->Sigma->data);
   return a;
@@ -62,6 +68,7 @@ double mcmclib_spatial_lpdf_compute(void* in_p, gsl_vector* x) {
   mcmclib_spatial_lpdf* p = (mcmclib_spatial_lpdf*) in_p;
   int n = x->size;
   gsl_matrix* D = p->D;
+  assert(n == D->size1);
   double rho = gsl_vector_get(p->rho, 0);
   double sigma = gsl_vector_get(p->sigma, 0);
   double tausq = gsl_vector_get(p->tausq, 0);
