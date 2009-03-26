@@ -44,6 +44,14 @@ void mcmclib_spatial_lpdf_free(mcmclib_spatial_lpdf* p);
 */
 double mcmclib_spatial_lpdf_compute(void* in_p, gsl_vector* x);
 
+/** Compute distances matrix
+@param D result square matrix
+@param xy vertical (n x d) matrix of points coordinates */
+void mcmclib_spatial_distances(gsl_matrix* D, gsl_matrix* xy);
+
+/** Set pairwise distances basing on given set of coordinates*/
+void mcmclib_spatial_set_xy(mcmclib_spatial_lpdf* p, gsl_matrix* xy);
+
 /**@}*/
 /**@}*/
 #endif

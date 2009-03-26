@@ -24,13 +24,54 @@ void mcmclib_spatial_lpdf_free(mcmclib_spatial_lpdf* p) {
   free(p);
 }
 
+double mcmclib_spatial_cov_exponential(double d, double rho, double sigma, double tausq) {
+  double a = (sigma - tausq) * (1.0 - exp(- d / rho));
+  if (d>0)
+    a += tausq;
+  return a;
+}
+
+void mcmclib_spatial_distances(gsl_matrix* D, gsl_matrix* xy) {
+  int n = xy->size1;
+  int d = xy->size2;
+  gsl_matrix_set_all(D, 0.0);
+  gsl_vector* x = gsl_vector_alloc(d);
+  for(int i=0; i<n; i++) for(int j=i+1; j<n; j++) {
+      gsl_vector_view ri_v = gsl_matrix_row(xy, i);
+      gsl_vector* ri = &(ri_v.vector);
+      gsl_vector_memcpy(x, ri);
+      gsl_vector_view rj_v = gsl_matrix_row(xy, j);
+      gsl_vector* rj = &(rj_v.vector);
+      gsl_vector_sub(x, rj);
+      gsl_vector_mul(x, x);
+      double dist = 0.0;
+      for(int k = 0; k<d; k++)
+	dist += gsl_vector_get(x, k);
+      dist = sqrt(dist);
+      gsl_matrix_set(D, i, j, dist);
+      gsl_matrix_set(D, j, i, dist);
+  }
+  gsl_vector_free(x);
+}
+
+void mcmclib_spatial_set_xy(mcmclib_spatial_lpdf* p, gsl_matrix* xy) {
+  mcmclib_spatial_distances(p->D, xy);
+}
+
 double mcmclib_spatial_lpdf_compute(void* in_p, gsl_vector* x) {
   mcmclib_spatial_lpdf* p = (mcmclib_spatial_lpdf*) in_p;
-  int d = p->D->size1;
-  for(int i=0; i<d; i++)
-    for(int j=0; j<d; j++) {
-      gsl_matrix_set(p->Sigma, i, j, 0.0);
+  int n = x->size;
+  gsl_matrix* D = p->D;
+  double rho = gsl_vector_get(p->rho, 0);
+  double sigma = gsl_vector_get(p->sigma, 0);
+  double tausq = gsl_vector_get(p->tausq, 0);
+  for(int i=0; i<n; i++)
+    gsl_matrix_set(p->Sigma, i, i, sigma);
+  for(int i=0; i<n; i++)
+    for(int j=i+1; j<n; j++) {
+      double gammaij = mcmclib_spatial_cov_exponential(gsl_matrix_get(D, i, j), rho, sigma, tausq);
+      gsl_matrix_set(p->Sigma, i, j, sigma - gammaij);
+      gsl_matrix_set(p->Sigma, j, i, sigma - gammaij);
     }
-  gsl_matrix_set_identity(p->Sigma);
   return mcmclib_mvnorm_lpdf_compute(p->norm, x);
 }
