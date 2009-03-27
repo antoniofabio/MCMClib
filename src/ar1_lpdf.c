@@ -3,9 +3,9 @@
 #include <gsl/gsl_math.h>
 #include "ar1_lpdf.h"
 
-mcmclib_ar1_lpdf* mcmclib_spatial_lpdf_alloc(gsl_vector* mu,
-					     gsl_vector* sigma,
-					     gsl_vector* phi) {
+mcmclib_ar1_lpdf* mcmclib_ar1_lpdf_alloc(gsl_vector* mu,
+					 gsl_vector* sigma,
+					 gsl_vector* phi) {
   mcmclib_ar1_lpdf* a = (mcmclib_ar1_lpdf*) malloc(sizeof(mcmclib_ar1_lpdf));
   a->mu = mu;
   a->sigma = sigma;
