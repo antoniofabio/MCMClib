@@ -10,8 +10,9 @@ mcmclib_gauss_rw_gamma* mcmclib_gauss_rw_gamma_alloc(gsl_rng* r, double step_siz
 void mcmclib_gauss_rw_gamma_free(mcmclib_gauss_rw_gamma* p) {
   free(p);
 }
-void mcmclib_gauss_rw_sample(void* in_p, gsl_vector* x) {
-  mcmclib_gauss_rw_gamma* p = (mcmclib_gauss_rw_gamma*) in_p;
+void mcmclib_gauss_rw_sample(void* in_q, gsl_vector* x) {
+  mcmclib_mh_q* q = (mcmclib_mh_q*) in_q;
+  mcmclib_gauss_rw_gamma* p = (mcmclib_gauss_rw_gamma*) q->sampler_data;
   int d = x->size;
   while(d--) {
     gsl_vector_set(x, d,
