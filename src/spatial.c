@@ -80,5 +80,8 @@ double mcmclib_spatial_lpdf_compute(void* in_p, gsl_vector* x) {
       gsl_matrix_set(p->Sigma, i, j, sigma - gammaij);
       gsl_matrix_set(p->Sigma, j, i, sigma - gammaij);
     }
+  for(int i=0; i<n; i++)
+    if(gsl_matrix_get(p->Sigma, i, i) < 1e-6)
+      return log(0.0);
   return mcmclib_mvnorm_lpdf_compute(p->norm, x);
 }
