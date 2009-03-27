@@ -2,7 +2,7 @@
 #include "gauss_rw.h"
 
 mcmclib_gauss_rw_gamma* mcmclib_gauss_rw_gamma_alloc(gsl_rng* r, double step_size) {
-  mcmclib_gauss_rw_gamma* a = (mcmclib_gauss_rw_gamma*) malloc(sizeof(mcmclib_gauss_rw_gamma*));
+  mcmclib_gauss_rw_gamma* a = (mcmclib_gauss_rw_gamma*) malloc(sizeof(mcmclib_gauss_rw_gamma));
   a->r = r;
   a->step_size = step_size;
   return a;
