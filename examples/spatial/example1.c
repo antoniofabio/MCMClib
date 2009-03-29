@@ -9,7 +9,7 @@
 
 #define S 9 /*number of points*/
 #define OUTPUT_FILE "data.csv"
-#define N 100000 /*chain length*/
+#define N 10000 /*chain length*/
 #define V0 0.1 /*step size*/
 
 gsl_vector* theta; /*spatial covariance parameters vector*/
