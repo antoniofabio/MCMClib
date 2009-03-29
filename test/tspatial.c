@@ -8,6 +8,9 @@
 #include <spatial.h>
 
 #define TOL 1e-6
+static int check_dequal(double a, double b) {
+  return (fabs(a-b) < TOL);
+}
 
 #define N 9
 #define MU 1.5
@@ -46,10 +49,10 @@ int main(int argc, char** argv) {
 
   p = mcmclib_spatial_lpdf_alloc(mu, rho, sigma, tausq, D);
   x = gsl_vector_alloc(N);
-  printf("%f -> %f\n", 1.0, lpdf(1.0));
-  printf("%f -> %f\n", 0.0, lpdf(0.0));
-  printf("%f -> %f\n", -1.0, lpdf(-1.0));
-  printf("%f -> %f\n", MU, lpdf(MU));
+  assert(check_dequal(lpdf(1.0), -10.253884));
+  assert(check_dequal(lpdf(0.0), -11.491107));
+  assert(check_dequal(lpdf(-1.0),-13.965553));
+  assert(check_dequal(lpdf(1.5), -10.099231));
   gsl_vector_free(x);
 
   mcmclib_spatial_lpdf_free(p);
