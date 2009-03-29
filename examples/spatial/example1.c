@@ -50,15 +50,23 @@ int main(int argc, char** argv) {
 
   /*set observed data*/
   y_obs = gsl_vector_alloc(S);
-  for(int i=0; i<3; i++) for(int j=0; j<3; j++) {
-      gsl_vector_set(y_obs, i*3 + j, gsl_ran_gaussian(r, 1.0));
-  }
+  gsl_vector_set(y_obs, 0, 1.64);
+  gsl_vector_set(y_obs, 1, 0.19);
+  gsl_vector_set(y_obs, 2, 0.77);
+  gsl_vector_set(y_obs, 3, 1.09);
+  gsl_vector_set(y_obs, 4, 0.26);
+  gsl_vector_set(y_obs, 5, -0.87);
+  gsl_vector_set(y_obs, 6, -1.22);
+  gsl_vector_set(y_obs, 7, 0.80);
+  gsl_vector_set(y_obs, 8, 0.68);
 
-  /*read spatial info*/
+  /*set spatial info*/
   gsl_matrix* XY = gsl_matrix_alloc(S, 2);
+  int k=0;
   for(int i=0; i<3; i++) for(int j=0; j<3; j++) {
-      gsl_matrix_set(XY, i*3 + j, 0, (double) i);
-      gsl_matrix_set(XY, i*3 + j, 1, (double) j);
+      gsl_matrix_set(XY, k, 0, (double) i);
+      gsl_matrix_set(XY, k, 1, (double) j);
+      k++;
     }
   gsl_matrix* D = gsl_matrix_alloc(S, S);
   mcmclib_spatial_distances(D, XY);
