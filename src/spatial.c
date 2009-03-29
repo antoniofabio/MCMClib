@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <math.h>
 #include <gsl/gsl_math.h>
+#include <gsl/gsl_eigen.h>
 #include "spatial.h"
 
 mcmclib_spatial_lpdf* mcmclib_spatial_lpdf_alloc(gsl_vector* mu,
@@ -64,6 +65,21 @@ void mcmclib_spatial_set_xy(mcmclib_spatial_lpdf* p, gsl_matrix* xy) {
   mcmclib_spatial_distances(p->D, xy);
 }
 
+/*check if the real, simm. matrix A is pos. def.*/
+int matrix_posDef(gsl_matrix* A) {
+  int n = A->size1;
+  gsl_eigen_symm_workspace* work = gsl_eigen_symm_alloc(n);
+  gsl_matrix* A1 = gsl_matrix_alloc(n, n);
+  gsl_matrix_memcpy(A1, A);
+  gsl_vector* v = gsl_vector_alloc(n);
+  gsl_eigen_symm(A1, v, work);
+  gsl_eigen_symm_free(work);
+  gsl_matrix_free(A1);
+  int ans = gsl_vector_ispos(v);
+  gsl_vector_free(v);
+  return ans;
+}
+
 double mcmclib_spatial_lpdf_compute(void* in_p, gsl_vector* x) {
   mcmclib_spatial_lpdf* p = (mcmclib_spatial_lpdf*) in_p;
   int n = x->size;
@@ -83,5 +99,7 @@ double mcmclib_spatial_lpdf_compute(void* in_p, gsl_vector* x) {
   for(int i=0; i<n; i++)
     if(gsl_matrix_get(p->Sigma, i, i) < 1e-6)
       return log(0.0);
+  if(!matrix_posDef(p->Sigma))
+    return log(0.0);
   return mcmclib_mvnorm_lpdf_compute(p->norm, x);
 }
