@@ -1,5 +1,6 @@
 /**Spatial model example*/
 #include <stdio.h>
+#include <gsl/gsl_sf.h>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
@@ -26,6 +27,10 @@ double loglik(gsl_vector* in_theta) {
   return mcmclib_spatial_lpdf_compute(lik, y_obs);
 }
 
+double linvGamma(double x, double a, double b) {
+  return a * log(b) - (a + 1.0) * log(x) - (b / x) - gsl_sf_lngamma(a);
+}
+
 /*target distribution*/
 double target_logdensity(void* ignore, gsl_vector* x) {
   double r = x->data[0];
@@ -34,9 +39,9 @@ double target_logdensity(void* ignore, gsl_vector* x) {
   if((r<0) || (s<0) || (t<0) )
     return log(0.0);
   return loglik(x)
-    + log(gsl_ran_gamma_pdf(r, 1.0, 1.0))
-    + log(gsl_ran_gamma_pdf(s, 1.0, 1.0))
-    + log(gsl_ran_gamma_pdf(t, 1.0, 1.0));
+    + linvGamma(r, 4.0, 2.0)
+    + linvGamma(s, 4.0, 2.0)
+    + gsl_ran_gamma_pdf(t, 1.0, 1.0);
 }
 
 int main(int argc, char** argv) {
