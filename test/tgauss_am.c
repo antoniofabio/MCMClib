@@ -68,6 +68,10 @@ int main(int argc, char** argv) {
   double variance = sum_xx / (double) N - mean * mean;
   assert(check_dequal(fix(variance, eps), m00(gamma->Sigma)));
 
+  /*check against uniform distribution*/
+  assert(check_dequal(0.461706, mean));
+  assert(check_dequal(0.076635, variance));
+
   /*free memory*/
   gsl_matrix_free(sigma);
   gsl_vector_free(x);
