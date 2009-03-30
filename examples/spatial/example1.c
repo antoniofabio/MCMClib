@@ -13,11 +13,11 @@
 #define OUTPUT_FILE "chain.csv"
 #define N 150000 /*chain length*/
 #define THIN 10 /*thinning interval*/
-#define V0 0.1 /*step size*/
 #define K (3 + S) /*total number of parameters*/
+#define V0 1.0/((double) K) /*step size*/
 
 #define MU_MU0 0.5
-#define MU_SIGMA2 0.1
+#define MU_SIGMA2 10.0
 
 gsl_vector* theta; /*spatial covariance parameters vector*/
 gsl_vector_view rho_v; /*range*/
@@ -54,18 +54,21 @@ double target_logdensity(void* ignore, gsl_vector* x) {
   double t = x->data[2];
   gsl_vector_view mu_v = gsl_vector_subvector(x, 3, S);
   gsl_vector* mu = &(mu_v.vector);
-  if((r<0) || (s<0) || (t<0) )
+  if((r<=0) || (s<=0) || (t<=0) )
     return log(0.0);
   return loglik(x)
-    + gsl_ran_gamma_pdf(r, 3.0, 40.0)
+    + log(gsl_ran_gamma_pdf(r, 3.0, 0.025))
     + linvGamma(s, 8.0, 9.0)
-    + gsl_ran_gamma_pdf(t, 0.1, 0.1)
+    + log(gsl_ran_gamma_pdf(t, 0.1, 0.1))
     + lmu_prior(mu, MU_MU0, MU_SIGMA2);
 }
 
 int main(int argc, char** argv) {
   /*read input data*/
   gsl_matrix* data = gsl_matrix_alloc(S, 3);
+  FILE* data_file = fopen(INPUT_FILE, "r");
+  gsl_matrix_fscanf(data_file, data);
+  fclose(data_file);
   gsl_matrix_view xy_v = gsl_matrix_submatrix(data, 0, 0, S, 2);
   gsl_matrix* xy = &(xy_v.matrix);
   gsl_vector_view y_obs_v = gsl_matrix_column(data, 2);
