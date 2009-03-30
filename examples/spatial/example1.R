@@ -34,8 +34,6 @@ Y <- rmvnorm(1, rep(0, N), Sigma)
 ##read chain output
 X <- read.csv("chain.csv")
 library(coda)
-xx <- mcmc(X)
+xx <- mcmc(X[,1:4])
 plot(xx)
-yy <- mcmc(xx[seq(1, 10000, by=10),])
-plot(yy)
 
