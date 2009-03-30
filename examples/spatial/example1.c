@@ -1,5 +1,6 @@
 /**Spatial model example*/
 #include <stdio.h>
+#include <math.h>
 #include <gsl/gsl_sf.h>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_vector.h>
@@ -10,12 +11,13 @@
 #define S 27 /*number of points*/
 #define INPUT_FILE "data.dat"
 #define OUTPUT_FILE "chain.csv"
-#define N 15000 /*chain length*/
+#define N 150000 /*chain length*/
+#define THIN 10 /*thinning interval*/
 #define V0 0.1 /*step size*/
 #define K (3 + S) /*total number of parameters*/
 
 #define MU_MU0 0.5
-#define MU_SIGMA2 10.0
+#define MU_SIGMA2 0.1
 
 gsl_vector* theta; /*spatial covariance parameters vector*/
 gsl_vector_view rho_v; /*range*/
@@ -37,17 +39,11 @@ double linvGamma(double x, double a, double b) {
   return a * log(b) - (a + 1.0) * log(x) - (b / x) - gsl_sf_lngamma(a);
 }
 
-double lmu_prior(gsl_vector* x) {
-  gsl_matrix* Sigma = gsl_matrix_alloc(S, S);
-  gsl_matrix_set_identity(Sigma);
-  gsl_matrix_scale(Sigma, MU_SIGMA2);
-  gsl_vector* mu = gsl_vector_alloc(S);
-  gsl_vector_set_all(mu, MU_MU0);
-  mcmclib_mvnorm_lpdf* mu_prior = mcmclib_mvnorm_lpdf_alloc(mu, Sigma->data);
-  double ans = mcmclib_mvnorm_lpdf_compute(mu_prior, x);
-  gsl_vector_free(mu);
-  gsl_matrix_free(Sigma);
-  mcmclib_mvnorm_lpdf_free(mu_prior);
+double lmu_prior(gsl_vector* x, double mu0, double sigma0) {
+  int n = x->size;
+  double ans = 0.0;
+  for(int s=0; s<n; s++)
+    ans += log(gsl_ran_gaussian_pdf(gsl_vector_get(x, s) - mu0, sqrt(sigma0)));
   return ans;
 }
 
@@ -63,8 +59,8 @@ double target_logdensity(void* ignore, gsl_vector* x) {
   return loglik(x)
     + gsl_ran_gamma_pdf(r, 3.0, 40.0)
     + linvGamma(s, 8.0, 9.0)
-    + gsl_ran_gamma_pdf(t, 1.0, 1.0)
-    + lmu_prior(mu);
+    + gsl_ran_gamma_pdf(t, 0.1, 0.1)
+    + lmu_prior(mu, MU_MU0, MU_SIGMA2);
 }
 
 int main(int argc, char** argv) {
@@ -106,9 +102,11 @@ int main(int argc, char** argv) {
   /*main MCMC loop*/
   for(int i=0; i<N; i++) {
     mcmclib_mh_update(sampler);
-    for(int j=0; j<(K-1); j++)
-      fprintf(out, "%f, ", gsl_vector_get(x, j));
-    fprintf(out, "%f\n", gsl_vector_get(x, K-1));
+    if(((i+1) % THIN) == 0) {
+      for(int j=0; j<(K-1); j++)
+	fprintf(out, "%f, ", gsl_vector_get(x, j));
+      fprintf(out, "%f\n", gsl_vector_get(x, K-1));
+    }
   }
 
   fclose(out);
