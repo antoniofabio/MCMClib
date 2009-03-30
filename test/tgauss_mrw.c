@@ -19,10 +19,8 @@ static int check_dequal(double a, double b) {
 #define x0 v0(x)
 #define m00(m) gsl_matrix_get(m, 0, 0)
 
-static double dunif(void* ignore, gsl_vector* x) {
-  if((x0 >= 0.0) && (x0 <= 1.0))
-    return log(1.0);
-  return log(0.0);
+static double dtarget(void* ignore, gsl_vector* x) {
+  return log(gsl_ran_gaussian_pdf(x0, 1.0));
 }
 
 int main(int argc, char** argv) {
@@ -38,13 +36,12 @@ int main(int argc, char** argv) {
   double variance = 0.0;
 
   mcmclib_mh* s = mcmclib_gauss_mrw_alloc(rng,
-					  dunif, NULL, /*target distrib.*/
+					  dtarget, NULL, /*target distrib.*/
 					  x, sigma);
 
   /*Main MCMC loop*/
   for(int n=0; n<N; n++) {
     mcmclib_mh_update(s);
-
     mean += x0;
     variance += x0 * x0;
   }
@@ -53,8 +50,8 @@ int main(int argc, char** argv) {
   mean /= (double) N;
   variance = variance / ((double) N) - (mean * mean);
 
-  assert(check_dequal(mean, 0.484628));
-  assert(check_dequal(variance, 0.074841));
+  assert(check_dequal(mean, 0.072261));
+  assert(check_dequal(variance, 0.927399));
 
   /*free memory*/
   gsl_matrix_free(sigma);
