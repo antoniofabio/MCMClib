@@ -32,9 +32,10 @@ set.seed(1234)
 Y <- rmvnorm(1, rep(0, N), Sigma)
 
 ##read chain output
-X <- read.csv("data.csv")
+X <- read.csv("chain.csv")
 library(coda)
 xx <- mcmc(X)
+plot(xx)
 yy <- mcmc(xx[seq(1, 10000, by=10),])
 plot(yy)
 
