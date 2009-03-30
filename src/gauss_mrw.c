@@ -16,7 +16,10 @@ void mcmclib_gauss_mrw_gamma_free(mcmclib_gauss_mrw_gamma* p) {
 void mcmclib_gauss_mrw_sample(void* in_p, gsl_vector* x) {
   mcmclib_mh_q* q = (mcmclib_mh_q*) in_p;
   mcmclib_gauss_mrw_gamma* p = (mcmclib_gauss_mrw_gamma*) q->gamma;
+  gsl_vector* x_old = gsl_vector_alloc(x->size);
   mcmclib_mvnorm(p->r, p->Sigma, x);
+  gsl_vector_add(x, x_old);
+  gsl_vector_free(x_old);
 }
 double mcmclib_gauss_mrw_qd(void* ignore, gsl_vector* x, gsl_vector* y) {
   return 0.0;
