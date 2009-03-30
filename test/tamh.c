@@ -22,8 +22,9 @@ static double qd(void* ignore, gsl_vector* x, gsl_vector* y) {
   return 0.0;
 }
 
-static void sampler(void* p, gsl_vector* x) {
-  double* o = (double*) p;
+static void sampler(void* in_p, gsl_vector* x) {
+  mcmclib_mh_q* p = in_p;
+  double* o = (double*) p->gamma;
   gsl_vector_set(x, 0, x0 + (*o));
 }
 
