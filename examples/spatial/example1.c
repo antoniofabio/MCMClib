@@ -33,6 +33,8 @@ mcmclib_spatial_lpdf* lik; /*data likelihood object*/
 /*log-likelihood function*/
 double loglik(gsl_vector* in_theta) {
   gsl_vector_memcpy(theta, in_theta);
+  for(int i=0; i<3; i++)
+    gsl_vector_set(theta, i, exp(gsl_vector_get(theta, i)));
   return mcmclib_spatial_lpdf_compute(lik, y_obs);
 }
 
@@ -50,12 +52,12 @@ double lmu_prior(gsl_vector* x, double mu0, double sigma0) {
 
 /*target distribution*/
 double target_logdensity(void* ignore, gsl_vector* x) {
-  double r = x->data[0];
-  double s = x->data[1];
-  double t = x->data[2];
+  double r = exp(x->data[0]);
+  double s = exp(x->data[1]);
+  double t = exp(x->data[2]);
   gsl_vector_view mu_v = gsl_vector_subvector(x, 3, S);
   gsl_vector* mu = &(mu_v.vector);
-  if((r<=0) || (s<=0) || (t<=0) )
+  if((r<=0) || (s<=0) || (t<=0.01))
     return log(0.0);
   return loglik(x)
     + log(gsl_ran_gamma_pdf(r, 3.0, 0.025))
@@ -88,7 +90,7 @@ int main(int argc, char** argv) {
 
   /*set starting chain values*/
   gsl_vector* x = gsl_vector_alloc(K);
-  gsl_vector_set_all(x, 0.5);
+  gsl_vector_set_all(x, 0.0);
 
   /*alloc a new RNG*/
   gsl_rng *r = gsl_rng_alloc(gsl_rng_default);
