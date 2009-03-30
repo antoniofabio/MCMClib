@@ -1,7 +1,7 @@
 TEST_CFLAGS := $(CFLAGS) -I./src
 TEST_LDFLAGS:= src/libmcmclib.a $(LDFLAGS)
 TEST_names:= t1 t2 trecursive_variance tmixem tmixem_rec tmixem_online \
-	tmh_q tmh tgauss_rw tgauss_mrw \
+	tmh_q tmh tmh2 tgauss_rw tgauss_mrw \
 	tamh trapt_q trapt traptor tgauss_am \
 	tinca trapt_inca tam_inca tinca_raptor \
 	tspatial
