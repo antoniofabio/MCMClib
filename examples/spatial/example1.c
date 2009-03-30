@@ -7,6 +7,7 @@
 #include <gsl/gsl_matrix.h>
 #include <spatial.h>
 #include <gauss_rw.h>
+#include <gauss_am.h>
 
 #define S 27 /*number of points*/
 #define INPUT_FILE "data.dat"
@@ -92,7 +93,10 @@ int main(int argc, char** argv) {
   /*alloc a new RNG*/
   gsl_rng *r = gsl_rng_alloc(gsl_rng_default);
   /*alloc a new sampler*/
-  mcmclib_mh* sampler = mcmclib_gauss_rw_alloc(r, target_logdensity, NULL, x, V0);
+  gsl_matrix* sampler_Sigma0 = gsl_matrix_alloc(K, K);
+  gsl_matrix_set_identity(sampler_Sigma0);
+  gsl_matrix_scale(sampler_Sigma0, V0);
+  mcmclib_amh* sampler = mcmclib_gauss_am_alloc(r, target_logdensity, NULL, x, sampler_Sigma0, 10000);
 
   /*open output file*/
   FILE* out = fopen(OUTPUT_FILE, "w");
@@ -104,7 +108,7 @@ int main(int argc, char** argv) {
 
   /*main MCMC loop*/
   for(int i=0; i<N; i++) {
-    mcmclib_mh_update(sampler);
+    mcmclib_amh_update(sampler);
     if(((i+1) % THIN) == 0) {
       for(int j=0; j<(K-1); j++)
 	fprintf(out, "%f, ", gsl_vector_get(x, j));
@@ -115,7 +119,7 @@ int main(int argc, char** argv) {
   fclose(out);
   gsl_rng_free(r);
   gsl_vector_free(x);
-  mcmclib_gauss_rw_free(sampler);
+  mcmclib_gauss_am_free(sampler);
   mcmclib_spatial_lpdf_free(lik);
   gsl_matrix_free(D);
   gsl_vector_free(theta);
