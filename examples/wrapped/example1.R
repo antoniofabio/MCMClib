@@ -9,8 +9,10 @@ for(k in seq_len(K)) {
   xk <- xx[,k + 2]
   fk <- table(xk) / length(xk)
   kk <- as.numeric(names(fk))
-  plot(kk, fk, type="h", main="", xlab="", ylab="", xlim=c(-8, 8), ylim=c(0, 0.31),
+  lL <- c(-8, 8)
+  plot(kk, fk, type="h", main="", xlab="", ylab="", xlim=lL, ylim=c(0, 0.70),
        axes=FALSE)
-  axis(1, at=seq(-8, 8))
+  axis(1, at=seq(lL[1], lL[2]))
   axis(2)
+  box()
 }

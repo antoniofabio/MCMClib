@@ -11,7 +11,7 @@
 
 #define S 100 /*number of points*/
 #define OUTPUT_FILE "chain.csv"
-#define N 1500000 /*chain length*/
+#define N 150000 /*chain length*/
 #define THIN 10 /*thinning interval*/
 #define K (2 + S) /*total number of parameters*/
 #define V0 1.0 /*step size*/
@@ -43,14 +43,14 @@ double sampk_d(void* data, gsl_vector* x, gsl_vector* y) {
 /*log-likelihood function*/
 double loglik(gsl_vector* theta, gsl_vector* kv) {
   double mu = gsl_vector_get(theta, 0);
-  double sigma = exp(gsl_vector_get(theta, 1));
+  double sigma = sqrt(exp(gsl_vector_get(theta, 1)));
   double* k = kv->data;
   double ans = 0.0;
   if(sigma <= 0)
     return log(0.0);
   for(int i=0; i<S; i++) {
     double xi = gsl_vector_get(y, i);
-    ans += log(gsl_ran_gaussian_pdf(xi + 2.0 * k[i] - mu, sigma));
+    ans += log(gsl_ran_gaussian_pdf(xi - M_PI + 2.0 * k[i] * M_PI - mu, sigma));
   }
   return ans;
 }
@@ -63,7 +63,7 @@ double linvGamma(double x, double a, double b) {
 double post_theta(void* ignore, gsl_vector* x) {
   return loglik(x, x_k)
     + log(gsl_ran_gaussian_pdf(gsl_vector_get(x, 0) - MU_MU0, sqrt(MU_SIGMA2)))
-    + linvGamma(exp(gsl_vector_get(x, 1)), 3.0, 5.0);
+    + linvGamma(exp(gsl_vector_get(x, 1)), 10002.0, 10001000.0);
 }
 
 /*target k distribution*/
@@ -78,11 +78,12 @@ int main(int argc, char** argv) {
   /*set observed data*/
   y = gsl_vector_alloc(S);
   for(int i=0; i<S; i++)
-    gsl_vector_set(y, i, gsl_ran_flat(r, 0, 2 * M_PI));
+    gsl_vector_set(y, i, gsl_ran_flat(r, -M_PI, M_PI));
 
   /*set starting chain values*/
   x_theta = gsl_vector_alloc(2);
-  gsl_vector_set_all(x_theta, 0.0);
+  gsl_vector_set(x_theta, 0, 0.0);
+  gsl_vector_set(x_theta, 1, log(1000));
   x_k = gsl_vector_alloc(S);
   gsl_vector_set_all(x_k, 0.0);
 
