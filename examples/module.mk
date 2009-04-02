@@ -1,4 +1,4 @@
-EXES := spatial/example1 wrapped/example1
+EXES := spatial/example1 wrapped/example1 wrapped/regression
 
 EXAMPLES_BIN := $(EXES:%=examples/%)
 TOCLEAN += $(EXAMPLES_BIN)
