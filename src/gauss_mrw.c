@@ -3,7 +3,7 @@
 #include "mvnorm.h"
 
 mcmclib_gauss_mrw_gamma* mcmclib_gauss_mrw_gamma_alloc(gsl_rng* r, const gsl_matrix* Sigma) {
-  mcmclib_gauss_mrw_gamma* a = (mcmclib_gauss_mrw_gamma*) malloc(sizeof(mcmclib_gauss_mrw_gamma*));
+  mcmclib_gauss_mrw_gamma* a = (mcmclib_gauss_mrw_gamma*) malloc(sizeof(mcmclib_gauss_mrw_gamma));
   a->r = r;
   a->Sigma = gsl_matrix_alloc(Sigma->size1, Sigma->size1);
   gsl_matrix_memcpy(a->Sigma, Sigma);
