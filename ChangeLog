@@ -1,0 +1,21 @@
+Version 0.14 27-04-2009 A. F. Di Narzo <antonio.fabio@gmail.com>
+	* added SCAM algorithm implementation
+	* fixed 2 bugs in gauss_mrw
+	* added wrapped regression example
+	* improved gauss_am testing prog
+	* improved gauss_mrw testing prog
+	* fixed bug in gauss_mrw
+	* added another amh testing prog
+	* added another mh testing prog
+	* added gauss_rw testing prog
+	* added spatial example with companion R script
+	* fixed bugs
+	* added spatial Gaussian distribution function
+	* added inca_raptor, with testing prog
+	* added mh, mh_q testing progs
+	* improved docs
+	* fixed raptor design
+	* improved mixem-online
+	* cleaned all sources
+	* fixed misc memory leaks
+	* refactored mh and amh design
