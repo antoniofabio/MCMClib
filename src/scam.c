@@ -39,6 +39,7 @@ double mcmclib_scam_logdistr(void* data, gsl_vector* x) {
 void mcmclib_scam_update(mcmclib_scam* p) {
 	for(int i=0; i< p->x_full->size; i++) {
 		p->curr_index = i;
+		gsl_vector_set(p->xi, 0, gsl_vector_get(p->x_full, i));
 		mcmclib_amh_update(p->x_smp[i]);
 	}
 }
