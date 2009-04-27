@@ -41,5 +41,6 @@ void mcmclib_scam_update(mcmclib_scam* p) {
 		p->curr_index = i;
 		gsl_vector_set(p->xi, 0, gsl_vector_get(p->x_full, i));
 		mcmclib_amh_update(p->x_smp[i]);
+		gsl_vector_set(p->x_full, i, gsl_vector_get(p->xi, 0));
 	}
 }
