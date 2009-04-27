@@ -18,7 +18,9 @@
 #define m00(m) gsl_matrix_get(m, 0, 0)
 
 static double dunif_j(void* ignore, int j, double xj) {
-  if((xj >= 0.0) && (xj <= 1.0))
+	double min = j ? 0.0 : 1.0;
+	double max = j ? 1.0 : 2.0;
+  if((xj >= min) && (xj <= max))
     return log(1.0);
   return log(0.0);
 }
@@ -27,7 +29,8 @@ int main(int argc, char** argv) {
   gsl_rng* rng = gsl_rng_alloc(gsl_rng_default);
 
   gsl_vector* x = gsl_vector_alloc(DIM);
-  gsl_vector_set_all(x, gsl_rng_uniform(rng));
+	gsl_vector_set(x, 0, gsl_rng_uniform(rng));
+	gsl_vector_set(x, 1, 1.0 + gsl_rng_uniform(rng));
 
   mcmclib_scam* s = mcmclib_scam_alloc(rng, dunif_j, NULL,
 																			 x, 1.0, T0);
@@ -37,6 +40,8 @@ int main(int argc, char** argv) {
     mcmclib_scam_update(s);
 
   /*check results*/
+	assert((gsl_vector_get(x, 0) >= 0.0) && (gsl_vector_get(x, 0) <= 1.0));
+	assert((gsl_vector_get(x, 1) >= 1.0) && (gsl_vector_get(x, 1) <= 2.0));
 
   /*free memory*/
   mcmclib_scam_free(s);
