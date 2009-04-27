@@ -41,6 +41,7 @@ int main(int argc, char** argv) {
   /*free memory*/
   mcmclib_scam_free(s);
   gsl_vector_free(x);
+	gsl_rng_free(rng);
 
   return 0;
 }
