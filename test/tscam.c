@@ -48,6 +48,8 @@ int main(int argc, char** argv) {
 																			 right number of times*/
 	assert((gsl_vector_get(x, 0) >= 0.0) && (gsl_vector_get(x, 0) <= 1.0));
 	assert((gsl_vector_get(x, 1) >= 1.0) && (gsl_vector_get(x, 1) <= 2.0));
+	for(int i=0; i<DIM; i++)
+		assert(s->x_smp[i]->n == N);
 
   /*free memory*/
   mcmclib_scam_free(s);
