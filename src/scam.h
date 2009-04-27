@@ -6,12 +6,10 @@
 \defgroup SCAM Single Component Adaptive Metropolis
 @{*/
 
-#include <math.h>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_vector.h>
 
 #include "amh.h"
-#include "gauss_am.h"
 
 /** pointer to a vector of distribution functions */
 typedef double (*distrfun_i_p) (void* data, int index, double x);
@@ -19,7 +17,7 @@ typedef double (*distrfun_i_p) (void* data, int index, double x);
 /**\brief SCAM support data*/
 typedef struct {
 	gsl_vector* x_full; /**< full state vector*/
-	gsl_vector_view* xi; /**< univariate state views*/
+	gsl_vector* xi; /**< univariate state view*/
 	mcmclib_amh** x_smp; /**< array of univariate adaptive samplers*/
 	distrfun_i_p logdistr; /**< target log-distribution*/
 	void* logdistr_data; /**< target log-distribution extra data*/
@@ -35,12 +33,13 @@ typedef struct {
 @param t0 burn-in length before starting adaptation
 */
 mcmclib_scam* mcmclib_scam_alloc(gsl_rng* r,
-																 distrfun_p logdistr, void* logdistr_data,
+																 distrfun_i_p logdistr, void* logdistr_data,
 																 gsl_vector* x,
 																 double sigma_zero, int t0);
-
 /** free SCAM data*/
 void mcmclib_scam_free(mcmclib_scam* p);
+/** update all state components, one after another */
+void mcmclib_scam_update(mcmclib_scam* p);
 
 /** SCAM target logdistrib wrapper function \internal*/
 double mcmclib_scam_logdistr(void* data, gsl_vector* x);
