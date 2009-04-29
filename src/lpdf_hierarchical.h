@@ -11,6 +11,7 @@
 #define __MCMC_HIERARCHICAL_H__
 
 #include "common.h"
+#include "mh.h"
 
 /** \addtogroup distributions
 @{*/
