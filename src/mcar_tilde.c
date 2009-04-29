@@ -11,6 +11,7 @@
 #include <math.h>
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_blas.h>
+#include <gsl/gsl_permutation.h>
 #include <gsl/gsl_linalg.h>
 #include "mcar_tilde.h"
 
@@ -158,11 +159,25 @@ static void get_inverse(gsl_matrix* A) {
   gsl_linalg_cholesky_invert(A);
 }
 
+static void get_inverse_LU(gsl_matrix* A) {
+  gsl_permutation* p = gsl_permutation_alloc(A->size1);
+  gsl_matrix* A1 = gsl_matrix_alloc(A->size1, A->size1);
+  int tmp=0;
+  gsl_matrix_memcpy(A1, A);
+  gsl_linalg_LU_decomp(A1, p, &tmp);
+  gsl_linalg_LU_invert(A1, p, A);
+  gsl_matrix_free(A1);
+  gsl_permutation_free(p);
+}
+
 static void get_Lambda_ij(gsl_matrix* Lambda_ij, int i, int j,
-			  gsl_vector* m, gsl_matrix* A, gsl_matrix* B_tilde) {
+			  gsl_vector* m, gsl_matrix* M,
+			  gsl_matrix* A, gsl_matrix* B_tilde) {
   int p = A->size1;
-  if(i==j)
+  if(gsl_matrix_get(M, i, j) != 1.0) {
     gsl_matrix_set_zero(Lambda_ij);
+    return;
+  }
   gsl_matrix* AB = gsl_matrix_alloc(p, p);
   gsl_matrix_set_zero(AB);
   if(i < j)
@@ -182,7 +197,7 @@ static void block_memcpy(gsl_matrix* dest, int i, int j, gsl_matrix* src) {
   int p = src->size1;
   int q = src->size2;
   for(int i1 = 0; i1 < p; i1++)
-    for(int j1 = 0; j < q; j1++)
+    for(int j1 = 0; j1 < q; j1++)
       gsl_matrix_set(dest, i1+i, j1+j, gsl_matrix_get(src, i1, j1));
 }
 
@@ -201,15 +216,16 @@ static void get_vcov(mcmclib_mcar_tilde_lpdf* p) {
   gsl_matrix_set_zero(Block);
   for(int i=0; i<n; i++) {
     gsl_matrix_memcpy(Gammai, p->Gamma);
-    gsl_matrix_scale(Gammai, -1.0 / gsl_vector_get(p->m, i));
+    gsl_matrix_scale(Gammai, 1.0 / gsl_vector_get(p->m, i));
     get_inverse(Gammai);
     for(int j=0; j<n; j++) {
-      get_Lambda_ij(Lambda_ij, i, j, p->m, A, p->B_tilde);
+      get_Lambda_ij(Lambda_ij, i, j, p->m, p->M, A, p->B_tilde);
       gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, Gammai, Lambda_ij, 0.0, Block);
+      gsl_matrix_scale(Block, -1.0);
       block_memcpy(p->vcov, i* p->p, j* p->p, Block);
     }
   }
-  get_inverse(p->vcov);
+  get_inverse_LU(p->vcov);
   gsl_matrix_free(Block);
   gsl_matrix_free(Gammai);
   gsl_matrix_free(Lambda_ij);
