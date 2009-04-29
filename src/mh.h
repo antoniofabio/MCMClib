@@ -9,6 +9,9 @@
 #include "common.h"
 #include "mh_q.h"
 
+/** pointer to a distribution function */
+typedef double (*distrfun_p) (void* data, gsl_vector* x);
+
 /**\brief Generic Metropolis-Hastings sampler */
 typedef struct {
   gsl_rng* r; /**< rng*/
