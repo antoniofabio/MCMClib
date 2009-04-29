@@ -143,37 +143,6 @@ static int is_positive_definite(mcmclib_mcar_tilde_lpdf* p) {
   double sigma_0 = gsl_vector_get(p->sigma, 0);
   if((sigma_0 <= 0.0) ||(sigma_0 >= 1.0))
     return 0;
-
-  get_B_tilde(p->B_tilde, p->sigma, p->alpha1, p->alpha2);
-  for(int i=0; i<p->n; i++) {
-    double mi = gsl_vector_get(p->m, i);
-    double mUi = 0.0;
-    for(int j=0; j<p->n; j++)
-      if(i < j)
-	mUi += gsl_matrix_get(p->M, i, j);
-    double mLi = mi - mUi;
-
-    for(int k=0; k<p->p; k++) {
-      double a = fabs(gsl_matrix_get(p->B_tilde, k, k));
-      double b = 0.0;
-      for(int l=0; l<p->p; l++) {
-	if(l == k)
-	  continue;
-	b += fabs(gsl_matrix_get(p->B_tilde, k, l));
-      }
-      b *= mUi / mi;
-      double c = 0.0;
-      for(int l=0; l<p->p; l++) {
-	if(l == k)
-	  continue;
-	c += fabs(gsl_matrix_get(p->B_tilde, l, k));
-      }
-      c *= mLi / mi;
-
-      if((a + b + c >= 1.0))
-	return 0;
-    }
-  }
   return 1;
 }
 
@@ -186,6 +155,7 @@ double mcmclib_mcar_tilde_lpdf_compute(void* in_p, gsl_vector* x) {
   mcmclib_mcar_tilde_lpdf* p = (mcmclib_mcar_tilde_lpdf*) in_p;
   if(!is_positive_definite(p))
     return log(0.0);
+  get_B_tilde(p->B_tilde, p->sigma, p->alpha1, p->alpha2);
   gsl_matrix_set_identity(p->vcov); /*FIXME*/
   return mcmclib_mvnorm_lpdf_compute(p->mvnorm, x);
 }
