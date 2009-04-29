@@ -26,7 +26,7 @@ typedef struct {
   gsl_vector* alpha2; /**< Givens angles for P2 */
   gsl_vector* sigma; /**< B_tilde singular values (p) */
   gsl_matrix* B_tilde; /**< variance par. matrix (p x p) */
-	gsl_matrix* Gamma; /**< 'variance of variance' par. matrix (p x p) */
+  gsl_matrix* Gamma; /**< 'variance of variance' par. matrix (p x p) */
 
   gsl_matrix* M; /**< adiancency matrix (n x n)*/
   gsl_vector* m; /**< adiancency weights (n)*/
@@ -63,7 +63,7 @@ void mcmclib_mcar_tilde_lpdf_free(mcmclib_mcar_tilde_lpdf* p);
 */
 double mcmclib_mcar_tilde_lpdf_compute(void* in_p, gsl_vector* x);
 
-/** Build a symmetric matrix from its Givens angles */
+/** Build an ortogonal matrix from its Givens angles */
 void mcmclib_Givens_rotations(gsl_matrix* A, gsl_vector* alpha);
 
 /** update current vcov matrix value \internal */

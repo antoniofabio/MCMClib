@@ -109,16 +109,17 @@ void mcmclib_Givens_rotations(gsl_matrix* A, gsl_vector* alpha) {
   gsl_matrix* S[2];
   for(int h=0; h<2; h++)
     S[h] = gsl_matrix_alloc(p, p);
-  gsl_matrix_set_zero(A);
   gsl_matrix_set_identity(S[1]);
 
   for(int i=0; i<(p-1); i++) {
     for(int j=i+1; j<p; j++) {
       Givens_set_Shij(S[0], i, j, alpha_get(alpha, i, j));
+      gsl_matrix_set_zero(A);
       gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, S[1], S[0], 0.0, A);
       gsl_matrix_memcpy(S[1], A);
     }
   }
+  gsl_matrix_memcpy(A, S[1]);
 
   for(int h=0; h<2; h++)
     gsl_matrix_free(S[h]);
@@ -127,6 +128,7 @@ void mcmclib_Givens_rotations(gsl_matrix* A, gsl_vector* alpha) {
 /* rebuild asymm. matrix from its SVD decomposition */
 static void anti_SVD(gsl_matrix* A, gsl_matrix* P1, gsl_matrix* P2, gsl_vector* sigma) {
   int p = A->size1;
+  gsl_matrix_set_zero(A);
   gsl_matrix* Delta = gsl_matrix_alloc(p, p);
   gsl_matrix* P1Delta = gsl_matrix_alloc(p, p);
   gsl_matrix_set_zero(Delta);
@@ -182,10 +184,9 @@ static void get_Lambda_ij(gsl_matrix* Lambda_ij, int i, int j,
 			  gsl_vector* m, gsl_matrix* M,
 			  gsl_matrix* A, gsl_matrix* B_tilde) {
   int p = A->size1;
-  if(gsl_matrix_get(M, i, j) != 1.0) {
-    gsl_matrix_set_zero(Lambda_ij);
+  gsl_matrix_set_zero(Lambda_ij);
+  if(gsl_matrix_get(M, i, j) != 1.0)
     return;
-  }
   gsl_matrix* AB = gsl_matrix_alloc(p, p);
   gsl_matrix_set_zero(AB);
   if(i < j)
@@ -222,13 +223,13 @@ void mcmclib_mcar_tilde_lpdf_update_blocks(mcmclib_mcar_tilde_lpdf* p) {
     for (int j=i+1; j < p->p; j++)
       gsl_matrix_set(A, i, j, gsl_matrix_get(A, j, i));
 
-  gsl_matrix_set_zero(Block);
   for(int i=0; i<n; i++) {
     gsl_matrix_memcpy(Gammai, p->Gamma);
     gsl_matrix_scale(Gammai, 1.0 / gsl_vector_get(p->m, i));
     get_inverse(Gammai);
     for(int j=0; j<n; j++) {
       get_Lambda_ij(Lambda_ij, i, j, p->m, p->M, A, p->B_tilde);
+      gsl_matrix_set_zero(Block);
       gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, Gammai, Lambda_ij, 0.0, Block);
       gsl_matrix_scale(Block, -1.0);
       block_memcpy(p->vcov, i * p->p, j * p->p, Block);
