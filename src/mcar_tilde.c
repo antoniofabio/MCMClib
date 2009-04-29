@@ -11,6 +11,7 @@
 #include <math.h>
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_blas.h>
+#include <gsl/gsl_linalg.h>
 #include "mcar_tilde.h"
 
 mcmclib_mcar_tilde_lpdf* mcmclib_mcar_tilde_lpdf_alloc(int p, int n, gsl_matrix* M) {
@@ -20,6 +21,8 @@ mcmclib_mcar_tilde_lpdf* mcmclib_mcar_tilde_lpdf_alloc(int p, int n, gsl_matrix*
   a->p = p;
   a->n = n;
   a->B_tilde = gsl_matrix_alloc(p, p);
+  a->Gamma = gsl_matrix_alloc(p, p);
+  gsl_matrix_set_identity(a->Gamma);
   a->alpha1 = gsl_vector_alloc(p * (p-1) / 2);
   a->alpha2 = gsl_vector_alloc(p * (p-1) / 2);
   a->sigma = gsl_vector_alloc(p);
@@ -55,6 +58,7 @@ void mcmclib_mcar_tilde_lpdf_free(mcmclib_mcar_tilde_lpdf* p) {
   gsl_vector_free(p->alpha1);
   gsl_vector_free(p->alpha2);
   gsl_matrix_free(p->B_tilde);
+  gsl_matrix_free(p->Gamma);
   free(p);
 }
 
@@ -151,11 +155,74 @@ double mcmclib_mcar_tilde_lpdf_i_compute(void* in_p, int i, gsl_vector* x) {
   return 0.0; /*FIXME*/
 }
 
+static void get_inverse(gsl_matrix* A) {
+  gsl_linalg_cholesky_decomp(A);
+  gsl_linalg_cholesky_invert(A);
+}
+
+static void get_Lambda_ij(gsl_matrix* Lambda_ij, int i, int j,
+			  gsl_vector* m, gsl_matrix* A, gsl_matrix* B_tilde) {
+  int p = A->size1;
+  if(i==j)
+    gsl_matrix_set_zero(Lambda_ij);
+  gsl_matrix* AB = gsl_matrix_alloc(p, p);
+  gsl_matrix_set_zero(AB);
+  if(i < j)
+    gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, A, B_tilde, 0.0, AB);
+  else
+    gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, A, B_tilde, 0.0, AB);
+  gsl_matrix* A1 = gsl_matrix_alloc(p, p);
+  gsl_matrix_memcpy(A1, A);
+  get_inverse(A1);
+  gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, AB, A1, 0.0, Lambda_ij);
+  gsl_matrix_scale(Lambda_ij, 1.0 / (i<j) ? gsl_vector_get(m, i) : gsl_vector_get(m, j) );
+  gsl_matrix_free(AB);
+  gsl_matrix_free(A1);
+}
+
+static void block_memcpy(gsl_matrix* dest, int i, int j, gsl_matrix* src) {
+  int p = src->size1;
+  int q = src->size2;
+  for(int i1 = 0; i1 < p; i1++)
+    for(int j1 = 0; j < q; j1++)
+      gsl_matrix_set(dest, i1+i, j1+j, gsl_matrix_get(src, i1, j1));
+}
+
+static void get_vcov(mcmclib_mcar_tilde_lpdf* p) {
+  int n = p->n;
+  gsl_matrix* A = gsl_matrix_alloc(p->p, p->p);
+  gsl_matrix_memcpy(A, p->Gamma);
+  gsl_linalg_cholesky_decomp(A);
+  for(int i=0; i<(p->p - 1); i++)
+    for (int j=i+1; j < p->p; j++)
+      gsl_matrix_set(A, i, j, gsl_matrix_get(A, j, i));
+
+  gsl_matrix* Lambda_ij = gsl_matrix_alloc(p->p, p->p);
+  gsl_matrix* Gammai = gsl_matrix_alloc(p->p, p->p);
+  gsl_matrix* Block = gsl_matrix_alloc(p->p, p->p);
+  gsl_matrix_set_zero(Block);
+  for(int i=0; i<n; i++) {
+    gsl_matrix_memcpy(Gammai, p->Gamma);
+    gsl_matrix_scale(Gammai, -1.0 / gsl_vector_get(p->m, i));
+    get_inverse(Gammai);
+    for(int j=0; j<n; j++) {
+      get_Lambda_ij(Lambda_ij, i, j, p->m, A, p->B_tilde);
+      gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, Gammai, Lambda_ij, 0.0, Block);
+      block_memcpy(p->vcov, i* p->p, j* p->p, Block);
+    }
+  }
+  get_inverse(p->vcov);
+  gsl_matrix_free(Block);
+  gsl_matrix_free(Gammai);
+  gsl_matrix_free(Lambda_ij);
+  gsl_matrix_free(A);
+}
+
 double mcmclib_mcar_tilde_lpdf_compute(void* in_p, gsl_vector* x) {
   mcmclib_mcar_tilde_lpdf* p = (mcmclib_mcar_tilde_lpdf*) in_p;
   if(!is_positive_definite(p))
     return log(0.0);
   get_B_tilde(p->B_tilde, p->sigma, p->alpha1, p->alpha2);
-  gsl_matrix_set_identity(p->vcov); /*FIXME*/
+  get_vcov(p);
   return mcmclib_mvnorm_lpdf_compute(p->mvnorm, x);
 }

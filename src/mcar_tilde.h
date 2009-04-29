@@ -24,8 +24,9 @@ typedef struct {
 
   gsl_vector* alpha1; /**< Givens angles for P1 */
   gsl_vector* alpha2; /**< Givens angles for P2 */
-  gsl_vector* sigma; /**< B_tilde singular values */
-  gsl_matrix* B_tilde; /**< variance par. matrix */
+  gsl_vector* sigma; /**< B_tilde singular values (p) */
+  gsl_matrix* B_tilde; /**< variance par. matrix (p x p) */
+	gsl_matrix* Gamma; /**< 'variance of variance' par. matrix (p x p) */
 
   gsl_matrix* M; /**< adiancency matrix (n x n)*/
   gsl_vector* m; /**< adiancency weights (n)*/
