@@ -51,6 +51,7 @@ mcmclib_mcar_tilde_lpdf* mcmclib_mcar_tilde_lpdf_alloc(int p, int n, gsl_matrix*
   a->Gammai = gsl_matrix_alloc(p, p);
   a->Block = gsl_matrix_alloc(p, p);
 
+  mcmclib_mcar_tilde_lpdf_update_vcov(a);
   return a;
 }
 
@@ -216,6 +217,7 @@ void mcmclib_mcar_tilde_lpdf_update_blocks(mcmclib_mcar_tilde_lpdf* p) {
   gsl_matrix* Block = p->Block;
 
   int n = p->n;
+  mcmclib_mcar_tilde_lpdf_update_B_tilde(p);
   gsl_matrix* A = gsl_matrix_alloc(p->p, p->p);
   gsl_matrix_memcpy(A, p->Gamma);
   gsl_linalg_cholesky_decomp(A);
