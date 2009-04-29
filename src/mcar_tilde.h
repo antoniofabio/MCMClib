@@ -35,6 +35,9 @@ typedef struct {
   gsl_vector* mu;
   gsl_matrix* vcov;
   mcmclib_mvnorm_lpdf* mvnorm; /**< normal density object */
+
+  /*workspace memory*/
+  gsl_matrix *Lambda_ij, *Gammai, *Block; /**< used in fun 'vcov_blockij' */
 } mcmclib_mcar_tilde_lpdf;
 
 /** Alloc extra data for an mcar_tilde distribution
@@ -60,7 +63,11 @@ void mcmclib_mcar_tilde_lpdf_free(mcmclib_mcar_tilde_lpdf* p);
 */
 double mcmclib_mcar_tilde_lpdf_compute(void* in_p, gsl_vector* x);
 
-/** update current vcov matrix value */
+/** update current vcov matrix value \internal */
+void mcmclib_mcar_tilde_lpdf_update_B_tilde(mcmclib_mcar_tilde_lpdf* p);
+/** update current inverse vcov matrix value \internal */
+void mcmclib_mcar_tilde_lpdf_update_blocks(mcmclib_mcar_tilde_lpdf* p);
+/** update current vcov matrix value \internal */
 void mcmclib_mcar_tilde_lpdf_update_vcov(mcmclib_mcar_tilde_lpdf* p);
 
 /**@}*/

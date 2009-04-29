@@ -46,6 +46,11 @@ mcmclib_mcar_tilde_lpdf* mcmclib_mcar_tilde_lpdf_alloc(int p, int n, gsl_matrix*
   a->mu = gsl_vector_alloc(p*n);
   gsl_vector_set_zero(a->mu);
   a->mvnorm = mcmclib_mvnorm_lpdf_alloc(a->mu, a->vcov->data);
+
+  a->Lambda_ij = gsl_matrix_alloc(p, p);
+  a->Gammai = gsl_matrix_alloc(p, p);
+  a->Block = gsl_matrix_alloc(p, p);
+
   return a;
 }
 
@@ -60,6 +65,10 @@ void mcmclib_mcar_tilde_lpdf_free(mcmclib_mcar_tilde_lpdf* p) {
   gsl_vector_free(p->alpha2);
   gsl_matrix_free(p->B_tilde);
   gsl_matrix_free(p->Gamma);
+
+  gsl_matrix_free(p->Lambda_ij);
+  gsl_matrix_free(p->Gammai);
+  gsl_matrix_free(p->Block);
   free(p);
 }
 
@@ -142,16 +151,15 @@ static void get_B_tilde(gsl_matrix* A, gsl_vector* sigma,
   gsl_matrix_free(P2);
 }
 
+void mcmclib_mcar_tilde_lpdf_update_B_tilde(mcmclib_mcar_tilde_lpdf* p) {
+  get_B_tilde(p->B_tilde, p->sigma, p->alpha1, p->alpha2);
+}
+
 static int is_positive_definite(mcmclib_mcar_tilde_lpdf* p) {
   double sigma_0 = gsl_vector_get(p->sigma, 0);
   if((sigma_0 <= 0.0) ||(sigma_0 >= 1.0))
     return 0;
   return 1;
-}
-
-double mcmclib_mcar_tilde_lpdf_i_compute(void* in_p, int i, gsl_vector* x) {
-  mcmclib_mcar_tilde_lpdf* p = (mcmclib_mcar_tilde_lpdf*) in_p;
-  return 0.0; /*FIXME*/
 }
 
 static void get_inverse(gsl_matrix* A) {
@@ -201,7 +209,11 @@ static void block_memcpy(gsl_matrix* dest, int i, int j, gsl_matrix* src) {
       gsl_matrix_set(dest, i1+i, j1+j, gsl_matrix_get(src, i1, j1));
 }
 
-void mcmclib_mcar_tilde_lpdf_update_vcov(mcmclib_mcar_tilde_lpdf* p) {
+void mcmclib_mcar_tilde_lpdf_update_blocks(mcmclib_mcar_tilde_lpdf* p) {
+  gsl_matrix* Lambda_ij = p->Lambda_ij;
+  gsl_matrix* Gammai = p->Gammai;
+  gsl_matrix* Block = p->Block;
+
   int n = p->n;
   gsl_matrix* A = gsl_matrix_alloc(p->p, p->p);
   gsl_matrix_memcpy(A, p->Gamma);
@@ -210,9 +222,6 @@ void mcmclib_mcar_tilde_lpdf_update_vcov(mcmclib_mcar_tilde_lpdf* p) {
     for (int j=i+1; j < p->p; j++)
       gsl_matrix_set(A, i, j, gsl_matrix_get(A, j, i));
 
-  gsl_matrix* Lambda_ij = gsl_matrix_alloc(p->p, p->p);
-  gsl_matrix* Gammai = gsl_matrix_alloc(p->p, p->p);
-  gsl_matrix* Block = gsl_matrix_alloc(p->p, p->p);
   gsl_matrix_set_zero(Block);
   for(int i=0; i<n; i++) {
     gsl_matrix_memcpy(Gammai, p->Gamma);
@@ -222,21 +231,23 @@ void mcmclib_mcar_tilde_lpdf_update_vcov(mcmclib_mcar_tilde_lpdf* p) {
       get_Lambda_ij(Lambda_ij, i, j, p->m, p->M, A, p->B_tilde);
       gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, Gammai, Lambda_ij, 0.0, Block);
       gsl_matrix_scale(Block, -1.0);
-      block_memcpy(p->vcov, i* p->p, j* p->p, Block);
+      block_memcpy(p->vcov, i * p->p, j * p->p, Block);
     }
   }
-  get_inverse_LU(p->vcov);
-  gsl_matrix_free(Block);
-  gsl_matrix_free(Gammai);
-  gsl_matrix_free(Lambda_ij);
+
   gsl_matrix_free(A);
+}
+
+void mcmclib_mcar_tilde_lpdf_update_vcov(mcmclib_mcar_tilde_lpdf* p) {
+  mcmclib_mcar_tilde_lpdf_update_blocks(p);
+  get_inverse_LU(p->vcov);
 }
 
 double mcmclib_mcar_tilde_lpdf_compute(void* in_p, gsl_vector* x) {
   mcmclib_mcar_tilde_lpdf* p = (mcmclib_mcar_tilde_lpdf*) in_p;
   if(!is_positive_definite(p))
     return log(0.0);
-  get_B_tilde(p->B_tilde, p->sigma, p->alpha1, p->alpha2);
+  mcmclib_mcar_tilde_lpdf_update_B_tilde(p);
   mcmclib_mcar_tilde_lpdf_update_vcov(p);
   return mcmclib_mvnorm_lpdf_compute(p->mvnorm, x);
 }
