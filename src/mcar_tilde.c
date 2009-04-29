@@ -169,7 +169,7 @@ static void get_inverse(gsl_matrix* A) {
   gsl_linalg_cholesky_invert(A);
 }
 
-static void get_inverse_LU(gsl_matrix* A) {
+void mcmclib_matrix_inverse(gsl_matrix* A) {
   gsl_permutation* p = gsl_permutation_alloc(A->size1);
   gsl_matrix* A1 = gsl_matrix_alloc(A->size1, A->size1);
   int tmp=0;
@@ -241,7 +241,7 @@ void mcmclib_mcar_tilde_lpdf_update_blocks(mcmclib_mcar_tilde_lpdf* p) {
 
 void mcmclib_mcar_tilde_lpdf_update_vcov(mcmclib_mcar_tilde_lpdf* p) {
   mcmclib_mcar_tilde_lpdf_update_blocks(p);
-  get_inverse_LU(p->vcov);
+  mcmclib_matrix_inverse(p->vcov);
 }
 
 double mcmclib_mcar_tilde_lpdf_compute(void* in_p, gsl_vector* x) {

@@ -63,6 +63,8 @@ void mcmclib_mcar_tilde_lpdf_free(mcmclib_mcar_tilde_lpdf* p);
 */
 double mcmclib_mcar_tilde_lpdf_compute(void* in_p, gsl_vector* x);
 
+/** Compute matrix inverse by LU factorization */
+void mcmclib_matrix_inverse(gsl_matrix* A);
 /** Build an ortogonal matrix from its Givens angles */
 void mcmclib_Givens_rotations(gsl_matrix* A, gsl_vector* alpha);
 
