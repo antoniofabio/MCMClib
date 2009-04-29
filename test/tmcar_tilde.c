@@ -35,6 +35,25 @@ mcmclib_mcar_tilde_lpdf* p;
   }
 
 int main(int argc, char** argv) {
+  /************************/
+  /*check Givens rotations*/
+  /************************/
+  gsl_vector* alpha = gsl_vector_alloc(3);
+  gsl_vector_set(alpha, 0, -0.5);
+  gsl_vector_set(alpha, 1, 0.1);
+  gsl_vector_set(alpha, 2, 0.5);
+  gsl_matrix* A = gsl_matrix_alloc(3, 3);
+  mcmclib_Givens_rotations(A, alpha);
+  gsl_matrix* A1 = gsl_matrix_alloc(3, 3);
+  gsl_matrix_memcpy(A1, A);
+  mcmclib_matrix_inverse(A1);
+  for(int i=0; i<3; i++)
+    for(int j=0; j<3; j++)
+      assert(check_dequal(gsl_matrix_get(A, i, j), gsl_matrix_get(A1, j, i)));
+  gsl_matrix_free(A1);
+  gsl_matrix_free(A);
+  gsl_vector_free(alpha);
+
   gsl_vector* mu = gsl_vector_alloc(N * P);
   gsl_vector_set_zero(mu);
   gsl_matrix* W = gsl_matrix_alloc(N, N);
@@ -46,6 +65,12 @@ int main(int argc, char** argv) {
   mcmclib_mcar_tilde_lpdf_update_vcov(p);
   matrix_printf(p->vcov);
 
+  gsl_vector* x = gsl_vector_alloc(N*P);
+  gsl_vector_set_all(x, 1.0);
+  mcmclib_mcar_tilde_lpdf_compute(p, x);
+  gsl_vector_free(x);
+
   mcmclib_mcar_tilde_lpdf_free(p);
   gsl_matrix_free(W);
+  gsl_vector_free(mu);
 }
