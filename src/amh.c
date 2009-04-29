@@ -1,3 +1,12 @@
+/*
+ *  MCMClib: A C Library for doing MCMC
+ *  Copyright (C) 2009 Antonio, Fabio Di Narzo
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ */
 #include "amh.h"
 
 mcmclib_amh* mcmclib_amh_alloc(mcmclib_mh* mh, void* suff,
