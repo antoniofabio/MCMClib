@@ -201,7 +201,7 @@ static void block_memcpy(gsl_matrix* dest, int i, int j, gsl_matrix* src) {
       gsl_matrix_set(dest, i1+i, j1+j, gsl_matrix_get(src, i1, j1));
 }
 
-static void get_vcov(mcmclib_mcar_tilde_lpdf* p) {
+void mcmclib_mcar_tilde_lpdf_update_vcov(mcmclib_mcar_tilde_lpdf* p) {
   int n = p->n;
   gsl_matrix* A = gsl_matrix_alloc(p->p, p->p);
   gsl_matrix_memcpy(A, p->Gamma);
@@ -237,6 +237,6 @@ double mcmclib_mcar_tilde_lpdf_compute(void* in_p, gsl_vector* x) {
   if(!is_positive_definite(p))
     return log(0.0);
   get_B_tilde(p->B_tilde, p->sigma, p->alpha1, p->alpha2);
-  get_vcov(p);
+  mcmclib_mcar_tilde_lpdf_update_vcov(p);
   return mcmclib_mvnorm_lpdf_compute(p->mvnorm, x);
 }
