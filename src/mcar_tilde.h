@@ -63,6 +63,9 @@ void mcmclib_mcar_tilde_lpdf_free(mcmclib_mcar_tilde_lpdf* p);
 */
 double mcmclib_mcar_tilde_lpdf_compute(void* in_p, gsl_vector* x);
 
+/** Build a symmetric matrix from its Givens angles */
+void mcmclib_Givens_rotations(gsl_matrix* A, gsl_vector* alpha);
+
 /** update current vcov matrix value \internal */
 void mcmclib_mcar_tilde_lpdf_update_B_tilde(mcmclib_mcar_tilde_lpdf* p);
 /** update current inverse vcov matrix value \internal */

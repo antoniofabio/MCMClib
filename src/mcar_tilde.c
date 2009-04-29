@@ -102,7 +102,7 @@ static void Givens_set_Shij(gsl_matrix* S, int i, int j, double alpha_ij) {
   gsl_matrix_set(S, j, i, -sin(alpha_ij));
 }
 
-static void Givens_rotations(gsl_matrix* A, gsl_vector* alpha) {
+void mcmclib_Givens_rotations(gsl_matrix* A, gsl_vector* alpha) {
   assert(A->size1 == A->size2);
   int p = A->size1;
   assert(alpha->size == (p * (p-1) / 2));
@@ -144,8 +144,8 @@ static void get_B_tilde(gsl_matrix* A, gsl_vector* sigma,
   int p = A->size1;
   gsl_matrix* P1 = gsl_matrix_alloc(p, p);
   gsl_matrix* P2 = gsl_matrix_alloc(p, p);
-  Givens_rotations(P1, alpha1);
-  Givens_rotations(P2, alpha2);
+  mcmclib_Givens_rotations(P1, alpha1);
+  mcmclib_Givens_rotations(P2, alpha2);
   anti_SVD(A, P1, P2, sigma);
   gsl_matrix_free(P1);
   gsl_matrix_free(P2);
