@@ -10,6 +10,7 @@
 #ifndef __METROPOLIS_H__
 #define __METROPOLIS_H__
 #include "common.h"
+#include "mh.h"
 #include "mh_q.h"
 
 /**\addtogroup metropolis_samplers
