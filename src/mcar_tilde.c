@@ -73,17 +73,15 @@ void mcmclib_mcar_tilde_lpdf_set_sigma(mcmclib_mcar_tilde_lpdf* p,
   gsl_vector_memcpy(p->sigma, sigma);
 }
 
-static int ALPHA(int i, int j) {
-  assert(j > i);
-  int ans = 1;
-  for(int i1 = 0; i1<i; i1++)
-    for(int j1 = i1+1; j1<j; j1++)
-      ans++;
-  return ans;
+static int ALPHA(int i, int j, int p) {
+  assert(i < j);
+  if(i == 0)
+    return (j - i) - 1;
+  return p - i - 1 + ALPHA(i-1, j, p);
 }
 
 static double alpha_get(gsl_vector* a, int i, int j) {
-  return gsl_vector_get(a, ALPHA(i, j));
+  return gsl_vector_get(a, ALPHA(i, j, a->size));
 }
 
 static void Givens_set_Shij(gsl_matrix* S, int i, int j, double alpha_ij) {
@@ -108,7 +106,7 @@ static void Givens_rotations(gsl_matrix* A, gsl_vector* alpha) {
     for(int j=i+1; j<p; j++) {
       Givens_set_Shij(S[0], i, j, alpha_get(alpha, i, j));
       gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, S[1], S[0], 0.0, A);
-      gsl_matrix_memcpy(S[1], S[2]);
+      gsl_matrix_memcpy(S[1], A);
     }
   }
 
