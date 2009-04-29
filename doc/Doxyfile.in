@@ -5,7 +5,7 @@
 #---------------------------------------------------------------------------
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = mcmclib
-PROJECT_NUMBER         = 0.1
+PROJECT_NUMBER         = VERSION-NUMBER
 OUTPUT_DIRECTORY       = .
 CREATE_SUBDIRS         = NO
 OUTPUT_LANGUAGE        = English

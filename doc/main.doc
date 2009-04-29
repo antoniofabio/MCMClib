@@ -3,7 +3,7 @@
 MCMClib is a plain C library for doing 'decent-speed'
 Monte-Carlo Markov Chain.
 
-The API design is object oriented, and should allow easy binding
+The API design is object oriented, and should allow for easy binding
 to higher level languages.
 
 \author Antonio, Fabio Di Narzo

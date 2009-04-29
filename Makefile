@@ -16,7 +16,7 @@ lib: src/libmcmclib.a src/libmcmclib.so
 examples: $(EXAMPLES_BIN)
 
 doc:
-	cd doc; doxygen
+	cd doc; sh makeDoxyfile.sh; doxygen
 
 clean:
 	@rm -rf *~ $(SRC:%.c=%.o) $(SRC:%=%~) $(TOCLEAN) doc/html doc/latex
