@@ -1,3 +1,7 @@
+Version 0.15 A. F. Di Narzo <antonio.fabio@gmail.com>
+	* added missing distrfun_p typedef documentation
+	* improved release tarballs naming scheme
+
 Version 0.14 27-04-2009 A. F. Di Narzo <antonio.fabio@gmail.com>
 	* added SCAM algorithm implementation
 	* fixed 2 bugs in gauss_mrw
