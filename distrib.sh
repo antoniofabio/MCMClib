@@ -1,3 +1,3 @@
 make clean
-VNAME=`date '+%m-%d-%Y'`
+VNAME=`git describe --tags --abbrev=5`
 git archive --format=tar --prefix=MCMClib_$VNAME/ HEAD | gzip >MCMClib_$VNAME.tar.gz
