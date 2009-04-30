@@ -231,13 +231,16 @@ void mcmclib_mcar_tilde_lpdf_update_blocks(mcmclib_mcar_tilde_lpdf* p) {
     gsl_matrix_scale(Gammai, gsl_vector_get(p->m, i));
     for(int j=0; j<n; j++) {
       gsl_matrix_set_zero(Block);
-      if(gsl_matrix_get(p->M, i, j) == 1.0) {
+      if((gsl_matrix_get(p->M, i, j) == 1.0) || (i==j)) {
 	if(i<j) {
 	  gsl_matrix_memcpy(Lambda_ij, Lambda_U);
 	  gsl_matrix_scale(Lambda_ij, 1.0 / gsl_vector_get(p->m, i));
-	} else {
+	} else if(i>j) {
 	  gsl_matrix_memcpy(Lambda_ij, Lambda_L);
 	  gsl_matrix_scale(Lambda_ij, 1.0 / gsl_vector_get(p->m, j));
+	} else {
+	  gsl_matrix_set_identity(Lambda_ij);
+	  gsl_matrix_scale(Lambda_ij, -1.0);
 	}
 	gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, -1.0, Gammai, Lambda_ij, 0.0, Block);
       }
