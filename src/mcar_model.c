@@ -13,10 +13,17 @@ mcmclib_mcar_model* mcmclib_mcar_model_alloc(mcmclib_mcar_tilde_lpdf* m, gsl_vec
   mcmclib_mcar_model* a = (mcmclib_mcar_model*) malloc(sizeof(mcmclib_mcar_model));
   a->lpdf = m;
   a->e = e;
+
+  int p = m->p;
+  gsl_matrix* V = gsl_matrix_alloc(p, p);
+  gsl_matrix_set_identity(V);
+  a->w = mcmclib_wishart_lpdf_alloc(V, p);
+  gsl_matrix_free(V);
   return a;
 }
 
 void mcmclib_mcar_model_free(mcmclib_mcar_model* p) {
+  mcmclib_wishart_lpdf_free(p->w);
   free(p);
 }
 
@@ -69,7 +76,8 @@ double mcmclib_mcar_model_Gamma_lpdf(mcmclib_mcar_model* p, gsl_vector* gamma) {
   gsl_matrix_view gamma_v = gsl_matrix_view_vector(gamma, P, P);
   gsl_matrix_memcpy(tmp, p->lpdf->Gamma);
   gsl_matrix_memcpy(p->lpdf->Gamma, &(gamma_v.matrix));
-  double ans = mcmclib_mcar_tilde_lpdf_compute(p->lpdf, p->e);
+  double ans = mcmclib_mcar_tilde_lpdf_compute(p->lpdf, p->e)
+    + mcmclib_wishart_lpdf_compute(p->w, gamma);
   gsl_matrix_memcpy(p->lpdf->Gamma, tmp);
   gsl_matrix_free(tmp);
   return ans;

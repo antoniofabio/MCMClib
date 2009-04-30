@@ -15,23 +15,29 @@
  @{*/
 
 #include "mcar_tilde.h"
+#include "lpdf_wishart.h"
 
-/**\brief MCAR(\tilde B, \Gamma) Model
-
-TODO
-*/
+/**\brief MCAR(\tilde B, \Gamma) Model */
 typedef struct {
-  mcmclib_mcar_tilde_lpdf* lpdf;
-
+  mcmclib_mcar_tilde_lpdf* lpdf; /**< log-likelihood component */
   gsl_vector* e; /**< observed residuals*/
+
+  mcmclib_wishart_lpdf* w;
 } mcmclib_mcar_model;
 
+
+/** Alloc a new MCAR model object */
 mcmclib_mcar_model* mcmclib_mcar_model_alloc(mcmclib_mcar_tilde_lpdf* m, gsl_vector* e);
+/** De-alloc a MCAR model object */
 void mcmclib_mcar_model_free(mcmclib_mcar_model* p);
 
+/** alpha1 full conditional log-distribution */
 double mcmclib_mcar_model_alpha1_lpdf(mcmclib_mcar_model* p, gsl_vector* alpha1);
+/** alpha2 full conditional log-distribution */
 double mcmclib_mcar_model_alpha2_lpdf(mcmclib_mcar_model* p, gsl_vector* alpha2);
+/** sigma full conditional log-distribution */
 double mcmclib_mcar_model_sigma_lpdf(mcmclib_mcar_model* p, gsl_vector* sigma);
+/** gamma full conditional log-distribution (Gamma is assumed being pos. def.) */
 double mcmclib_mcar_model_Gamma_lpdf(mcmclib_mcar_model* p, gsl_vector* gamma);
 
 /**@}*/
