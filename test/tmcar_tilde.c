@@ -54,16 +54,23 @@ int main(int argc, char** argv) {
   gsl_matrix_free(A);
   gsl_vector_free(alpha);
 
+  /************************/
+  /*check MCAR distrib.   */
+  /************************/
   gsl_vector* mu = gsl_vector_alloc(N * P);
   gsl_vector_set_zero(mu);
   gsl_matrix* W = gsl_matrix_alloc(N, N);
-  gsl_matrix_set_zero(W);
+  gsl_matrix_set_identity(W);
   for(int i=0; i<(N-1); i++)
     DECL_AD(i, i+1);
   
   p = mcmclib_mcar_tilde_lpdf_alloc(P, N, W);
-  mcmclib_mcar_tilde_lpdf_update_vcov(p);
-  matrix_printf(p->vcov);
+  for(int i=0; i<N; i++) {
+    int count = 0;
+    for(int j=0; j<N; j++)
+      count += gsl_matrix_get(W, i, j) == 1.0;
+    assert(gsl_vector_get(p->m, i) == (double) count);
+  }
 
   gsl_vector* x = gsl_vector_alloc(N*P);
   gsl_vector_set_all(x, 1.0);
