@@ -76,6 +76,7 @@ int main(int argc, char** argv) {
   gsl_vector_free(sigma);
 
   mcmclib_mcar_model_free(p);
+  gsl_vector_free(e);
   mcmclib_mcar_tilde_lpdf_free(llik);
   gsl_matrix_free(W);
 }
