@@ -223,7 +223,7 @@ void mcmclib_mcar_tilde_lpdf_update_blocks(mcmclib_mcar_tilde_lpdf* p) {
   gsl_linalg_cholesky_decomp(A);
   for(int i=0; i<(p->p - 1); i++)
     for (int j=i+1; j < p->p; j++)
-      gsl_matrix_set(A, i, j, gsl_matrix_get(A, j, i));
+      gsl_matrix_set(A, i, j, 0.0);
 
   for(int i=0; i<n; i++) {
     gsl_matrix_memcpy(Gammai, p->Gamma);
