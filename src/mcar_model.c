@@ -64,5 +64,13 @@ double mcmclib_mcar_model_sigma_lpdf(mcmclib_mcar_model* p, gsl_vector* sigma) {
 }
 
 double mcmclib_mcar_model_Gamma_lpdf(mcmclib_mcar_model* p, gsl_vector* gamma) {
-  return 0.0;
+  int P = p->lpdf->p;
+  gsl_matrix* tmp = gsl_matrix_alloc(P, P);
+  gsl_matrix_view gamma_v = gsl_matrix_view_vector(gamma, P, P);
+  gsl_matrix_memcpy(tmp, p->lpdf->Gamma);
+  gsl_matrix_memcpy(p->lpdf->Gamma, &(gamma_v.matrix));
+  double ans = mcmclib_mcar_tilde_lpdf_compute(p->lpdf, p->e);
+  gsl_matrix_memcpy(p->lpdf->Gamma, tmp);
+  gsl_matrix_free(tmp);
+  return ans;
 }
