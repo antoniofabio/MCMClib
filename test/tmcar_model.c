@@ -67,6 +67,14 @@ int main(int argc, char** argv) {
   assert(mcmclib_mcar_model_alpha2_lpdf(p, alpha_h) == log(0.0));
   gsl_vector_free(alpha_h);
 
+  gsl_vector* sigma = gsl_vector_alloc(P);
+  gsl_vector_set_all(sigma, 0.5);
+  gsl_vector_set(sigma, 0, 0.0);
+  assert(mcmclib_mcar_model_sigma_lpdf(p, sigma) == log(0.0));
+  gsl_vector_set(sigma, 0, 1.0);
+  assert(mcmclib_mcar_model_sigma_lpdf(p, sigma) == log(0.0));
+  gsl_vector_free(sigma);
+
   mcmclib_mcar_model_free(p);
   mcmclib_mcar_tilde_lpdf_free(llik);
   gsl_matrix_free(W);
