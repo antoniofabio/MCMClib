@@ -35,7 +35,7 @@ void mcmclib_mcar_model_free(mcmclib_mcar_model* p);
 double mcmclib_mcar_model_alpha1_lpdf(mcmclib_mcar_model* p, gsl_vector* alpha1);
 /** alpha2 full conditional log-distribution. Domain: real line*/
 double mcmclib_mcar_model_alpha2_lpdf(mcmclib_mcar_model* p, gsl_vector* alpha2);
-/** sigma full conditional log-distribution */
+/** sigma full conditional log-distribution. The vector doesn't have to be ordered */
 double mcmclib_mcar_model_sigma_lpdf(mcmclib_mcar_model* p, gsl_vector* sigma);
 /** gamma full conditional log-distribution (Gamma is assumed being pos. def.) */
 double mcmclib_mcar_model_Gamma_lpdf(mcmclib_mcar_model* p, gsl_vector* gamma);

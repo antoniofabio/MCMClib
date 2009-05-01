@@ -7,6 +7,7 @@
  *  the Free Software Foundation; either version 2 of the License, or
  *  (at your option) any later version.
  */
+#include <gsl/gsl_sort_vector.h>
 #include "mcar_model.h"
 
 mcmclib_mcar_model* mcmclib_mcar_model_alloc(mcmclib_mcar_tilde_lpdf* m, gsl_vector* e) {
@@ -60,12 +61,20 @@ double mcmclib_mcar_model_alpha2_lpdf(mcmclib_mcar_model* p, gsl_vector* alpha2)
 }
 
 double mcmclib_mcar_model_sigma_lpdf(mcmclib_mcar_model* p, gsl_vector* sigma) {
-  double sigma0 = gsl_vector_get(sigma, 0);
-  if((sigma0 <= 0.0) || (sigma0 >= 1.0))
-    return log(0.0);
-  gsl_vector* tmp = gsl_vector_alloc(sigma->size);
+  int P = sigma->size;
+  gsl_vector* tmp = gsl_vector_alloc(P);
   gsl_vector_memcpy(tmp, p->lpdf->sigma);
-  gsl_vector_memcpy(p->lpdf->sigma, sigma);
+  gsl_vector* sigma1 = gsl_vector_alloc(P);
+  gsl_vector_memcpy(sigma1, sigma);
+  gsl_vector_scale(sigma1, -1.0);
+  gsl_sort_vector(sigma1);
+  gsl_vector_scale(sigma1, -1.0);
+  for(int i=0; i<P; i++) {
+    double bs = exp(gsl_vector_get(sigma1, i));
+    gsl_vector_set(sigma1, i, 0.5 * (bs - 1.0) / (bs + 1.0) + 0.5 );
+  }
+  gsl_vector_memcpy(p->lpdf->sigma, sigma1);
+  gsl_vector_free(sigma1);
   double ans = mcmclib_mcar_tilde_lpdf_compute(p->lpdf, p->e);
   gsl_vector_memcpy(p->lpdf->sigma, tmp);
   gsl_vector_free(tmp);

@@ -59,11 +59,17 @@ int main(int argc, char** argv) {
   gsl_vector_free(alpha_h);
 
   gsl_vector* sigma = gsl_vector_alloc(P);
-  gsl_vector_set_all(sigma, 0.5);
-  gsl_vector_set(sigma, 0, 0.0);
-  assert(mcmclib_mcar_model_sigma_lpdf(p, sigma) == log(0.0));
-  gsl_vector_set(sigma, 0, 1.0);
-  assert(mcmclib_mcar_model_sigma_lpdf(p, sigma) == log(0.0));
+  gsl_vector_set_all(sigma, 0.0);
+  gsl_vector_set(sigma, 1, -1.0);
+  double l1 = mcmclib_mcar_model_sigma_lpdf(p, sigma);
+  gsl_vector_set_all(sigma, 0.0);
+  gsl_vector_set(sigma, 0, -1.0);
+  double l2 = mcmclib_mcar_model_sigma_lpdf(p, sigma);
+  printf("%f == %f ?\n", l1, l2);
+  assert(gsl_finite(l1));
+  assert(gsl_finite(l2));
+  /* distrib. should not change for permutations of sigma: */
+  assert(l1 == l2);
   gsl_vector_free(sigma);
 
   gsl_matrix* Gamma = gsl_matrix_alloc(P, P);
