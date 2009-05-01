@@ -9,11 +9,12 @@
  */
 #ifndef __MCMCLIB_IWISHART_H__
 #define __MCMCLIB_IWISHART_H__
-
 /**\addtogroup distributions
  @{*/
 /**\addtogroup multivariate
  @{*/
+#include <gsl/gsl_vector.h>
+#include <gsl/gsl_matrix.h>
 
 /**\brief Inverse Wishart distribution */
 typedef struct {
