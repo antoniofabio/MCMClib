@@ -31,9 +31,9 @@ mcmclib_mcar_model* mcmclib_mcar_model_alloc(mcmclib_mcar_tilde_lpdf* m, gsl_vec
 /** De-alloc a MCAR model object */
 void mcmclib_mcar_model_free(mcmclib_mcar_model* p);
 
-/** alpha1 full conditional log-distribution */
+/** alpha1 full conditional log-distribution. Domain: real line */
 double mcmclib_mcar_model_alpha1_lpdf(mcmclib_mcar_model* p, gsl_vector* alpha1);
-/** alpha2 full conditional log-distribution */
+/** alpha2 full conditional log-distribution. Domain: real line*/
 double mcmclib_mcar_model_alpha2_lpdf(mcmclib_mcar_model* p, gsl_vector* alpha2);
 /** sigma full conditional log-distribution */
 double mcmclib_mcar_model_sigma_lpdf(mcmclib_mcar_model* p, gsl_vector* sigma);

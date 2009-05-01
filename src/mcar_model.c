@@ -28,14 +28,15 @@ void mcmclib_mcar_model_free(mcmclib_mcar_model* p) {
 }
 
 double mcmclib_mcar_model_alpha1_lpdf(mcmclib_mcar_model* p, gsl_vector* alpha1) {
-  for(int i=0; i < alpha1->size; i++) {
-    double alpha1i = gsl_vector_get(alpha1, i);
-    if((alpha1i <= -M_PI/2.0) || (alpha1i >= M_PI/2.0))
-      return log(0.0);
-  }
   gsl_vector* tmp = gsl_vector_alloc(alpha1->size);
   gsl_vector_memcpy(tmp, p->lpdf->alpha1);
-  gsl_vector_memcpy(p->lpdf->alpha1, alpha1);
+  gsl_vector* alpha1b = gsl_vector_alloc(alpha1->size);
+  for(int i=0; i < alpha1->size; i++) {
+    double bi = exp(gsl_vector_get(alpha1, i));
+    gsl_vector_set(alpha1b, i, M_PI_2 * (bi - 1.0) / (bi + 1.0));
+  }
+  gsl_vector_memcpy(p->lpdf->alpha1, alpha1b);
+  gsl_vector_free(alpha1b);
   double ans = mcmclib_mcar_tilde_lpdf_compute(p->lpdf, p->e);
   gsl_vector_memcpy(p->lpdf->alpha1, tmp);
   gsl_vector_free(tmp);
@@ -43,14 +44,15 @@ double mcmclib_mcar_model_alpha1_lpdf(mcmclib_mcar_model* p, gsl_vector* alpha1)
 }
 
 double mcmclib_mcar_model_alpha2_lpdf(mcmclib_mcar_model* p, gsl_vector* alpha2) {
-  for(int i=0; i < alpha2->size; i++) {
-    double alpha2i = gsl_vector_get(alpha2, i);
-    if((alpha2i <= -M_PI/2.0) || (alpha2i >= M_PI/2.0))
-      return log(0.0);
-  }
   gsl_vector* tmp = gsl_vector_alloc(alpha2->size);
   gsl_vector_memcpy(tmp, p->lpdf->alpha2);
-  gsl_vector_memcpy(p->lpdf->alpha2, alpha2);
+  gsl_vector* alpha2b = gsl_vector_alloc(alpha2->size);
+  for(int i=0; i < alpha2->size; i++) {
+    double bi = exp(gsl_vector_get(alpha2, i));
+    gsl_vector_set(alpha2b, i, M_PI_2 * (bi - 1.0) / (bi + 1.0));
+  }
+  gsl_vector_memcpy(p->lpdf->alpha2, alpha2b);
+  gsl_vector_free(alpha2b);
   double ans = mcmclib_mcar_tilde_lpdf_compute(p->lpdf, p->e);
   gsl_vector_memcpy(p->lpdf->alpha2, tmp);
   gsl_vector_free(tmp);
