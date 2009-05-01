@@ -37,9 +37,9 @@ double mcmclib_mcar_model_alpha1_lpdf(mcmclib_mcar_model* p, gsl_vector* alpha1)
 double mcmclib_mcar_model_alpha2_lpdf(mcmclib_mcar_model* p, gsl_vector* alpha2);
 /** sigma full conditional log-distribution. The vector doesn't have to be ordered */
 double mcmclib_mcar_model_sigma_lpdf(mcmclib_mcar_model* p, gsl_vector* sigma);
-/** gamma full conditional log-distribution (Gamma is assumed being pos. def.) */
+/** Gamma full conditional log-distribution (Gamma is assumed being pos. def.) */
 double mcmclib_mcar_model_Gamma_lpdf(mcmclib_mcar_model* p, gsl_vector* gamma);
-/** gamma full conditional log-distribution
+/** Gamma full conditional log-distribution.
     Gamma is parametrized as a p x (p-1)/2 + p vector of real valued
     coefficients */
 double mcmclib_mcar_model_alphasigma_lpdf(mcmclib_mcar_model* p, gsl_vector* alphasigma);
