@@ -7,6 +7,7 @@
  *  the Free Software Foundation; either version 2 of the License, or
  *  (at your option) any later version.
  */
+#include <gsl/gsl_math.h>
 #include <gsl/gsl_sort_vector.h>
 #include "mcar_model.h"
 
@@ -18,13 +19,13 @@ mcmclib_mcar_model* mcmclib_mcar_model_alloc(mcmclib_mcar_tilde_lpdf* m, gsl_vec
   int p = m->p;
   gsl_matrix* V = gsl_matrix_alloc(p, p);
   gsl_matrix_set_identity(V);
-  a->w = mcmclib_wishart_lpdf_alloc(V, p);
+  a->w = mcmclib_iwishart_lpdf_alloc(V, p);
   gsl_matrix_free(V);
   return a;
 }
 
 void mcmclib_mcar_model_free(mcmclib_mcar_model* p) {
-  mcmclib_wishart_lpdf_free(p->w);
+  mcmclib_iwishart_lpdf_free(p->w);
   free(p);
 }
 
@@ -132,8 +133,9 @@ double mcmclib_mcar_model_Gamma_lpdf(mcmclib_mcar_model* p, gsl_vector* gamma) {
   gsl_matrix_view gamma_v = gsl_matrix_view_vector(gamma, P, P);
   gsl_matrix_memcpy(tmp, p->lpdf->Gamma);
   gsl_matrix_memcpy(p->lpdf->Gamma, &(gamma_v.matrix));
-  double ans = mcmclib_mcar_tilde_lpdf_compute(p->lpdf, p->e)
-    + mcmclib_wishart_lpdf_compute(p->w, gamma);
+  double ans = mcmclib_iwishart_lpdf_compute(p->w, gamma);
+  if(gsl_finite(ans))
+    ans += mcmclib_mcar_tilde_lpdf_compute(p->lpdf, p->e);
   gsl_matrix_memcpy(p->lpdf->Gamma, tmp);
   gsl_matrix_free(tmp);
   return ans;

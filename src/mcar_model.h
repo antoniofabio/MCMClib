@@ -15,14 +15,14 @@
  @{*/
 
 #include "mcar_tilde.h"
-#include "lpdf_wishart.h"
+#include "lpdf_iwishart.h"
 
 /**\brief MCAR(\tilde B, \Gamma) Model */
 typedef struct {
   mcmclib_mcar_tilde_lpdf* lpdf; /**< log-likelihood component */
   gsl_vector* e; /**< observed residuals*/
 
-  mcmclib_wishart_lpdf* w;
+  mcmclib_iwishart_lpdf* w;
 } mcmclib_mcar_model;
 
 
