@@ -119,8 +119,9 @@ double mcmclib_mcar_model_alphasigma_lpdf(mcmclib_mcar_model* p, gsl_vector* alp
   gsl_vector* sigma1 = gsl_vector_alloc(P);
   for(int i=0; i<P; i++)
     gsl_vector_set(sigma1, i, exp(gsl_vector_get(sigma, i)));
-  givens_representation(Gamma, alpha, sigma1);
+  givens_representation(Gamma, alpha1, sigma1);
   gsl_vector_free(sigma1);
+  gsl_vector_free(alpha1);
   gsl_vector_view gamma_v = gsl_vector_view_array(Gamma->data, P*P);
   double ans = mcmclib_mcar_model_Gamma_lpdf(p, &gamma_v.vector);
   gsl_matrix_free(Gamma);
