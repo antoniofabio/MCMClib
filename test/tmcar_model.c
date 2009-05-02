@@ -72,33 +72,6 @@ int main(int argc, char** argv) {
   assert(l1 == l2);
   gsl_vector_free(sigma);
 
-  gsl_matrix* Gamma = gsl_matrix_alloc(P, P);
-  gsl_matrix* AGamma = gsl_matrix_alloc(P, P);
-  gsl_matrix* DGamma = gsl_matrix_alloc(P, P);
-  gsl_matrix* ADGamma = gsl_matrix_alloc(P, P);
-  gsl_vector* alpha_gamma = gsl_vector_alloc(P * (P-1) / 2);
-  gsl_vector_view gamma_v = gsl_vector_view_array(Gamma->data, P * P);
-  gsl_vector* gamma = &(gamma_v.vector);
-  gsl_vector_set_all(alpha_gamma, 0.0);
-  gsl_vector_set(alpha_gamma, 0, 0.5);
-  gsl_vector_set(alpha_gamma, 1, -0.5);
-  mcmclib_Givens_rotations(AGamma, alpha_gamma);
-  gsl_matrix_set_identity(DGamma);
-  gsl_matrix_set(DGamma, 0, 0, 3.0);
-  gsl_matrix_set(DGamma, 1, 1, 2.0);
-  gsl_matrix_set(DGamma, 2, 2, 1.0);
-  gsl_matrix_set_zero(Gamma);
-  gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, AGamma, DGamma,
-		 0.0, ADGamma);
-  gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, ADGamma, AGamma, 0.0, Gamma);
-  matrix_printf(Gamma);
-  printf("%f -> %f\n", 0.5, mcmclib_mcar_model_Gamma_lpdf(p, gamma));
-  gsl_vector_free(alpha_gamma);
-  gsl_matrix_free(ADGamma);
-  gsl_matrix_free(DGamma);
-  gsl_matrix_free(AGamma);
-  gsl_matrix_free(Gamma);
-
   gsl_vector* alphasigma = gsl_vector_alloc(P * (P-1) / 2 + P);
   gsl_vector_set_zero(alphasigma);
   printf("%f -> %f\n", 0.0, mcmclib_mcar_model_alphasigma_lpdf(p, alphasigma));
