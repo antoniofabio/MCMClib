@@ -27,6 +27,7 @@ typedef struct {
   gsl_vector* sigma; /**< B_tilde singular values (p) */
   gsl_matrix* B_tilde; /**< variance par. matrix (p x p) */
   gsl_matrix* Gamma; /**< 'variance of variance' par. matrix (p x p) */
+  gsl_vector *alphasigmag; /**< Givens angles and eigenv. repr. of Gamma */
 
   gsl_matrix* M; /**< adiancency matrix (n x n)*/
   gsl_vector* m; /**< adiancency weights (n)*/
@@ -73,6 +74,8 @@ void mcmclib_mcar_tilde_lpdf_update_B_tilde(mcmclib_mcar_tilde_lpdf* p);
 void mcmclib_mcar_tilde_lpdf_update_blocks(mcmclib_mcar_tilde_lpdf* p);
 /** update current vcov matrix value \internal */
 void mcmclib_mcar_tilde_lpdf_update_vcov(mcmclib_mcar_tilde_lpdf* p);
+/** update current Gamma matrix value \internal */
+void mcmclib_mcar_tilde_lpdf_update_Gamma(mcmclib_mcar_tilde_lpdf* p);
 
 /**@}*/
 /**@}*/

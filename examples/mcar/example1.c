@@ -69,7 +69,7 @@ int main(int argc, char** argv) {
     gsl_matrix_set(W, i, i+1, 1.0);
     gsl_matrix_set(W, i+1, i, 1.0);
   }
-  lpdf = mcmclib_mcar_tilde_lpdf_alloc(P, DIM, W);
+  lpdf = mcmclib_mcar_tilde_lpdf_alloc(P, W);
   gsl_matrix_free(W);
   gsl_vector* e = gsl_vector_alloc(P * DIM);
   gsl_vector_set_zero(e);

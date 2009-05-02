@@ -41,6 +41,11 @@ mcmclib_mcar_tilde_lpdf* mcmclib_mcar_tilde_lpdf_alloc(int p, gsl_matrix* M) {
       count += gsl_matrix_get(M, i, j) == 1.0;
     gsl_vector_set(a->m, i, (double) count);
   }
+  a->alphasigmag = gsl_vector_alloc(p * (p-1)/2 + p);
+  gsl_vector_set_all(a->alphasigmag, 0.0);
+  for(int i=p * (p-1)/2; i<p * (p-1)/2 + p; i++) {
+    gsl_vector_set(a->alphasigmag, i, 0.5);
+  }
 
   a->vcov = gsl_matrix_alloc(p*n, p*n);
   gsl_matrix_set_identity(a->vcov);
@@ -67,6 +72,7 @@ void mcmclib_mcar_tilde_lpdf_free(mcmclib_mcar_tilde_lpdf* p) {
   gsl_vector_free(p->alpha2);
   gsl_matrix_free(p->B_tilde);
   gsl_matrix_free(p->Gamma);
+  gsl_vector_free(p->alphasigmag);
 
   gsl_matrix_free(p->Lambda_ij);
   gsl_matrix_free(p->Gammai);
@@ -264,6 +270,36 @@ double mcmclib_mcar_tilde_lpdf_compute(void* in_p, gsl_vector* x) {
   if(!is_positive_definite(p))
     return log(0.0);
   mcmclib_mcar_tilde_lpdf_update_B_tilde(p);
+	mcmclib_mcar_tilde_lpdf_update_Gamma(p);
   mcmclib_mcar_tilde_lpdf_update_vcov(p);
   return mcmclib_mvnorm_lpdf_compute(p->mvnorm, x);
+}
+
+/* Givens angles and eigenvalues representation of a pos.def. matrix.
+   Result goes in M */
+static void givens_representation(gsl_matrix* M, gsl_vector* alpha, gsl_vector* sigma) {
+  int n = M->size1;
+
+  gsl_matrix* A = gsl_matrix_alloc(n, n);
+  mcmclib_Givens_rotations(A, alpha);
+  gsl_matrix* D = gsl_matrix_alloc(n, n);
+  gsl_matrix_set_zero(D);
+  for(int i=0; i<n; i++)
+    gsl_matrix_set(D, i, i, gsl_vector_get(sigma, i));
+  gsl_matrix* AD = gsl_matrix_alloc(n, n);
+  gsl_matrix_set_zero(AD);
+  gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, A, D, 0.0, AD);
+  gsl_matrix_set_zero(M);
+  gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, AD, A, 0.0, M);
+
+  gsl_matrix_free(AD);
+  gsl_matrix_free(D);
+  gsl_matrix_free(A);
+}
+
+void mcmclib_mcar_tilde_lpdf_update_Gamma(mcmclib_mcar_tilde_lpdf* p) {
+  int P = p->p;
+  gsl_vector_view alphav = gsl_vector_subvector(p->alphasigmag, 0, P * (P-1) / 2);
+  gsl_vector_view sigmav = gsl_vector_subvector(p->alphasigmag, P * (P-1) / 2, P);
+  givens_representation(p->Gamma, &alphav.vector, &sigmav.vector);	
 }
