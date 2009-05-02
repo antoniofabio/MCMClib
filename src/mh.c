@@ -7,6 +7,7 @@
  *  the Free Software Foundation; either version 2 of the License, or
  *  (at your option) any later version.
  */
+#include <gsl/gsl_math.h>
 #include "mh.h"
 
 mcmclib_mh* mcmclib_mh_alloc(gsl_rng* r,
@@ -28,10 +29,17 @@ void mcmclib_mh_free(mcmclib_mh* p) {
   free(p);
 }
 
+static int vector_finite(gsl_vector* x) {
+  for(int i=0; i<x->size; i++)
+    if(!gsl_finite(gsl_vector_get(x, i)))
+      return 0;
+  return 1;
+}
+
 int mcmclib_mh_update(mcmclib_mh* p) {
   gsl_vector_memcpy(p->x_old, p->x);
   mcmclib_mh_q_sample(p->q, p->x);
-  if(!gsl_finite(p->x))
+  if(!vector_finite(p->x))
     GSL_ERROR("sampled a non-finite vector value", GSL_EDOM);
   p->last_accepted = mcmclib_mh_generic_step(p->r, p->x_old, p->x,
 					     p->logdistr, p->logdistr_data,
