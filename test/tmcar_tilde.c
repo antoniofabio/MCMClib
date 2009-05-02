@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
   for(int i=0; i<(N-1); i++)
     DECL_AD(i, i+1);
   
-  p = mcmclib_mcar_tilde_lpdf_alloc(P, N, W);
+  p = mcmclib_mcar_tilde_lpdf_alloc(P, W);
   for(int i=0; i<N; i++) {
     int count = 0;
     for(int j=0; j<N; j++)

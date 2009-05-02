@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
   for(int i=0; i<(N-1); i++)
     DECL_AD(i, i+1);
 
-  mcmclib_mcar_tilde_lpdf* llik = mcmclib_mcar_tilde_lpdf_alloc(P, N, W);
+  mcmclib_mcar_tilde_lpdf* llik = mcmclib_mcar_tilde_lpdf_alloc(P, W);
   gsl_vector* e = gsl_vector_alloc(N*P);
   gsl_vector_set_all(e, 2.0);
   p = mcmclib_mcar_model_alloc(llik, e);

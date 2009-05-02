@@ -42,10 +42,9 @@ typedef struct {
 
 /** Alloc extra data for an mcar_tilde distribution
     @param p dimension
-    @param n spatial locations
     @param M adiancency matrix (n x n)
 */
-mcmclib_mcar_tilde_lpdf* mcmclib_mcar_tilde_lpdf_alloc(int p, int n, gsl_matrix* M);
+mcmclib_mcar_tilde_lpdf* mcmclib_mcar_tilde_lpdf_alloc(int p, gsl_matrix* M);
 
 void mcmclib_mcar_tilde_lpdf_set_alpha(mcmclib_mcar_tilde_lpdf* p,
 				       gsl_vector* alpha1, gsl_vector* alpha2);

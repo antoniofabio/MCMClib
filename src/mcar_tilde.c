@@ -15,10 +15,11 @@
 #include <gsl/gsl_linalg.h>
 #include "mcar_tilde.h"
 
-mcmclib_mcar_tilde_lpdf* mcmclib_mcar_tilde_lpdf_alloc(int p, int n, gsl_matrix* M) {
+mcmclib_mcar_tilde_lpdf* mcmclib_mcar_tilde_lpdf_alloc(int p, gsl_matrix* M) {
   mcmclib_mcar_tilde_lpdf* a = (mcmclib_mcar_tilde_lpdf*) malloc(sizeof(mcmclib_mcar_tilde_lpdf));
   assert(p>0);
-  assert(n>0);
+  assert(M->size1 == M->size2);
+  int n = M->size1;
   a->p = p;
   a->n = n;
   a->B_tilde = gsl_matrix_alloc(p, p);
