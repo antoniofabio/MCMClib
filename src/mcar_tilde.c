@@ -267,7 +267,7 @@ double mcmclib_mcar_tilde_lpdf_compute(void* in_p, gsl_vector* x) {
   if(!is_positive_definite(p))
     return log(0.0);
   mcmclib_mcar_tilde_lpdf_update_B_tilde(p);
-	mcmclib_mcar_tilde_lpdf_update_Gamma(p);
+  mcmclib_mcar_tilde_lpdf_update_Gamma(p);
   mcmclib_mcar_tilde_lpdf_update_vcov(p);
   return mcmclib_mvnorm_lpdf_compute(p->mvnorm, x);
 }
