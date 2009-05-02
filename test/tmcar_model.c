@@ -99,6 +99,11 @@ int main(int argc, char** argv) {
   gsl_matrix_free(AGamma);
   gsl_matrix_free(Gamma);
 
+  gsl_vector* alphasigma = gsl_vector_alloc(P * (P-1) / 2 + P);
+  gsl_vector_set_zero(alphasigma);
+  printf("%f -> %f\n", 0.0, mcmclib_mcar_model_alphasigma_lpdf(p, alphasigma));
+  gsl_vector_free(alphasigma);
+
   mcmclib_mcar_model_free(p);
   gsl_vector_free(e);
   mcmclib_mcar_tilde_lpdf_free(llik);
