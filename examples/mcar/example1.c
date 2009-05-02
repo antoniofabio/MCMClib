@@ -12,7 +12,7 @@
 #define V0 4.0
 
 #define P 3
-#define DIM 95
+#define DIM 2
 #define ALPHAP P*(P-1)/2
 
 gsl_vector *alpha1, *alpha2, *sigma, *Gammav;
@@ -64,13 +64,11 @@ void free_chains() {
 int main(int argc, char** argv) {
   /* model setup */
   gsl_matrix* W = gsl_matrix_alloc(DIM, DIM);
-  FILE* W_file = fopen("W.txt", "r");
-  if(!W_file) {
-    printf("file 'W.txt' not found\n");
-    exit(1);
-  } 
-  gsl_matrix_fscanf(W_file, W);
-  fclose(W_file);
+  gsl_matrix_set_zero(W);
+  for(int i=0; i<(DIM-1); i++) {
+    gsl_matrix_set(W, i, i+1, 1.0);
+    gsl_matrix_set(W, i+1, i, 1.0);
+  }
   lpdf = mcmclib_mcar_tilde_lpdf_alloc(P, DIM, W);
   gsl_matrix_free(W);
   gsl_vector* e = gsl_vector_alloc(P * DIM);
