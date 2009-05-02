@@ -112,19 +112,26 @@ double mcmclib_mcar_model_alphasigma_lpdf(mcmclib_mcar_model* p, gsl_vector* alp
   gsl_vector* alpha1 = gsl_vector_alloc(P*(P-1)/2);
   for(int i=0; i<P*(P-1)/2; i++) {
     double bi = exp(gsl_vector_get(alpha, i));
-    gsl_vector_set(alpha1, i, M_PI_2 * (bi - 1.0) / (bi + 1.0));
+    bi = M_PI_2 * (bi - 1.0) / (bi + 1.0);
+    if(!gsl_finite(bi))
+      return log(0.0);
+    gsl_vector_set(alpha1, i, bi);
   }
   gsl_vector_view sigma_v = gsl_vector_subvector(alphasigma, P*(P-1)/2, P);
   gsl_vector* sigma = &sigma_v.vector;
   gsl_vector* sigma1 = gsl_vector_alloc(P);
-  for(int i=0; i<P; i++)
-    gsl_vector_set(sigma1, i, exp(gsl_vector_get(sigma, i)));
+  for(int i=0; i<P; i++) {
+    double bi = exp(gsl_vector_get(sigma, i));
+    if(!gsl_finite(bi))
+      return log(0.0);
+    gsl_vector_set(sigma1, i, bi);
+  }
   givens_representation(Gamma, alpha1, sigma1);
-  gsl_vector_free(sigma1);
-  gsl_vector_free(alpha1);
   gsl_vector_view gamma_v = gsl_vector_view_array(Gamma->data, P*P);
   double ans = mcmclib_mcar_model_Gamma_lpdf(p, &gamma_v.vector);
   gsl_matrix_free(Gamma);
+  gsl_vector_free(sigma1);
+  gsl_vector_free(alpha1);
   return ans;
 }
 
