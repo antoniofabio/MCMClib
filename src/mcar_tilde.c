@@ -275,9 +275,7 @@ double mcmclib_mcar_tilde_lpdf_compute(void* in_p, gsl_vector* x) {
   return mcmclib_mvnorm_lpdf_compute(p->mvnorm, x);
 }
 
-/* Givens angles and eigenvalues representation of a pos.def. matrix.
-   Result goes in M */
-static void givens_representation(gsl_matrix* M, gsl_vector* alpha, gsl_vector* sigma) {
+void mcmclib_Givens_representation(gsl_matrix* M, gsl_vector* alpha, gsl_vector* sigma) {
   int n = M->size1;
 
   gsl_matrix* A = gsl_matrix_alloc(n, n);
@@ -301,5 +299,5 @@ void mcmclib_mcar_tilde_lpdf_update_Gamma(mcmclib_mcar_tilde_lpdf* p) {
   int P = p->p;
   gsl_vector_view alphav = gsl_vector_subvector(p->alphasigmag, 0, P * (P-1) / 2);
   gsl_vector_view sigmav = gsl_vector_subvector(p->alphasigmag, P * (P-1) / 2, P);
-  givens_representation(p->Gamma, &alphav.vector, &sigmav.vector);	
+  mcmclib_Givens_representation(p->Gamma, &alphav.vector, &sigmav.vector);	
 }
