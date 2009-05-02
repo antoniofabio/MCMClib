@@ -44,8 +44,7 @@ void init_chains() {
 				      model, sigma, Sigma0, T0);
   gsl_matrix_free(Sigma0);
 
-  Gammav = gsl_vector_alloc(ALPHAP + P);
-  gsl_vector_set_zero(Gammav);
+  Gammav = lpdf->alphasigmag;
   Sigma0 = gsl_matrix_alloc(ALPHAP + P, ALPHAP + P);
   gsl_matrix_set_identity(Sigma0);
   gsl_matrix_scale(Sigma0, V0 / (ALPHAP + P));

@@ -43,9 +43,6 @@ mcmclib_mcar_tilde_lpdf* mcmclib_mcar_tilde_lpdf_alloc(int p, gsl_matrix* M) {
   }
   a->alphasigmag = gsl_vector_alloc(p * (p-1)/2 + p);
   gsl_vector_set_all(a->alphasigmag, 0.0);
-  for(int i=p * (p-1)/2; i<p * (p-1)/2 + p; i++) {
-    gsl_vector_set(a->alphasigmag, i, 0.5);
-  }
 
   a->vcov = gsl_matrix_alloc(p*n, p*n);
   gsl_matrix_set_identity(a->vcov);
@@ -277,13 +274,26 @@ double mcmclib_mcar_tilde_lpdf_compute(void* in_p, gsl_vector* x) {
 
 void mcmclib_Givens_representation(gsl_matrix* M, gsl_vector* alpha, gsl_vector* sigma) {
   int n = M->size1;
+  int P = n;
+
+  gsl_vector* alpha1 = gsl_vector_alloc(P*(P-1)/2);
+  for(int i=0; i<P*(P-1)/2; i++) {
+    double bi = exp(gsl_vector_get(alpha, i));
+    bi = M_PI_2 * (bi - 1.0) / (bi + 1.0);
+    gsl_vector_set(alpha1, i, bi);
+  }
+  gsl_vector* sigma1 = gsl_vector_alloc(P);
+  for(int i=0; i<P; i++) {
+    double bi = exp(gsl_vector_get(sigma, i));
+    gsl_vector_set(sigma1, i, bi);
+  }
 
   gsl_matrix* A = gsl_matrix_alloc(n, n);
-  mcmclib_Givens_rotations(A, alpha);
+  mcmclib_Givens_rotations(A, alpha1);
   gsl_matrix* D = gsl_matrix_alloc(n, n);
   gsl_matrix_set_zero(D);
   for(int i=0; i<n; i++)
-    gsl_matrix_set(D, i, i, gsl_vector_get(sigma, i));
+    gsl_matrix_set(D, i, i, gsl_vector_get(sigma1, i));
   gsl_matrix* AD = gsl_matrix_alloc(n, n);
   gsl_matrix_set_zero(AD);
   gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, A, D, 0.0, AD);
@@ -293,6 +303,8 @@ void mcmclib_Givens_representation(gsl_matrix* M, gsl_vector* alpha, gsl_vector*
   gsl_matrix_free(AD);
   gsl_matrix_free(D);
   gsl_matrix_free(A);
+  gsl_vector_free(alpha1);
+  gsl_vector_free(sigma1);
 }
 
 void mcmclib_mcar_tilde_lpdf_update_Gamma(mcmclib_mcar_tilde_lpdf* p) {
