@@ -42,6 +42,13 @@ void mcmclib_iwishart_lpdf_free(mcmclib_iwishart_lpdf* p) {
   free(p);
 }
 
+static double trace(gsl_matrix* A) {
+  double ans = 0.0;
+  for(int i=0; i<A->size1; i++)
+    ans += gsl_matrix_get(A, i, i);
+  return ans;
+}
+
 double mcmclib_iwishart_lpdf_compute(void* in_p, gsl_vector* x) {
   mcmclib_iwishart_lpdf* p = (mcmclib_iwishart_lpdf*) in_p;
   int n = p->Psi->size1;
@@ -50,17 +57,11 @@ double mcmclib_iwishart_lpdf_compute(void* in_p, gsl_vector* x) {
   gsl_matrix* X1 = p->X1;
   gsl_matrix_memcpy(X1, X);
   gsl_linalg_cholesky_decomp(X1);
-  double Xdet = 0.0;
+  double Xdet2 = 0.0;
   for(int i=0; i<n; i++)
-    Xdet += log(gsl_matrix_get(X1, i, i));
-  Xdet *= - (1.0 + n + p->m);
+    Xdet2 += log(gsl_matrix_get(X1, i, i));
   gsl_linalg_cholesky_invert(X1);
   gsl_matrix* PsiX = p->PsiX;
   gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, p->Psi, X1, 0.0, PsiX);
-  double ans = 0.0;
-  for(int i=0; i<n; i++)
-    ans += gsl_matrix_get(PsiX, i, i);
-  ans *= -0.5;
-  ans += Xdet + p->PsiDet;
-  return ans;
+  return p->PsiDet - (p->m + n + 1.0) * Xdet2 -0.5 * trace(PsiX);
 }
