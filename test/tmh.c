@@ -56,7 +56,7 @@ int main(int argc, char** argv) {
   int count = 0;
   for(int n=0; n<10000; n++) {
     gsl_vector_set(x, 0, 0.0);
-    s->flag = 0;
+    mcmclib_mh_reset(s);
     mcmclib_mh_update(s);
     count += check_dequal(x0, inc);
   }

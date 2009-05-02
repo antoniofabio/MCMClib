@@ -20,9 +20,13 @@ mcmclib_mh* mcmclib_mh_alloc(gsl_rng* r,
   p->q = q;
   p->x = x;
   p->x_old = gsl_vector_alloc(x->size);
-  p->flag = 0;
   p->last_accepted = 0;
+  mcmclib_mh_reset(p);
   return p;
+}
+
+void mcmclib_mh_reset(mcmclib_mh* p) {
+  p->logdistr_old = p->logdistr(p->logdistr_data, p->x);
 }
 
 void mcmclib_mh_free(mcmclib_mh* p) {
@@ -42,10 +46,6 @@ int mcmclib_mh_update(mcmclib_mh* p) {
   mcmclib_mh_q_sample(p->q, p->x);
   if(!vector_finite(p->x))
     GSL_ERROR("sampled a non-finite vector value", GSL_EDOM);
-  if(!p->flag) {
-    p->logdistr_old = p->logdistr(p->logdistr_data, p->x_old);
-    p->flag=1;
-  }
   p->last_accepted = mcmclib_mh_generic_step(p->r, p->x_old, p->x,
 					     p->logdistr, p->logdistr_data,
 					     &p->logdistr_old,
