@@ -12,7 +12,7 @@
 #define V0 4.0
 
 #define P 3
-#define DIM 5
+#define DIM 95
 #define ALPHAP P*(P-1)/2
 
 gsl_vector *alpha1, *alpha2, *sigma, *Gammav;
