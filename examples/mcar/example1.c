@@ -11,17 +11,8 @@
 #define V0 4.0
 
 #define P 3
-#define DIM 10
+#define DIM 5
 #define ALPHAP P*(P-1)/2
-
-mcmclib_mcar_model* mcmclib_mcar_model_alloc(mcmclib_mcar_tilde_lpdf* m, gsl_vector* e);
-void mcmclib_mcar_model_free(mcmclib_mcar_model* p);
-
-double mcmclib_mcar_model_alpha1_lpdf(mcmclib_mcar_model* p, gsl_vector* alpha1);
-double mcmclib_mcar_model_alpha2_lpdf(mcmclib_mcar_model* p, gsl_vector* alpha2);
-double mcmclib_mcar_model_sigma_lpdf(mcmclib_mcar_model* p, gsl_vector* sigma);
-double mcmclib_mcar_model_Gamma_lpdf(mcmclib_mcar_model* p, gsl_vector* gamma);
-double mcmclib_mcar_model_alphasigma_lpdf(mcmclib_mcar_model* p, gsl_vector* alphasigma);
 
 gsl_vector *alpha1, *alpha2, *sigma, *Gammav;
 gsl_rng* rng;
@@ -89,8 +80,12 @@ int main(int argc, char** argv) {
   gsl_vector* e = gsl_vector_alloc(P * DIM);
   model = mcmclib_mcar_model_alloc(lpdf, e);
 
-  /*init chains*/
   init_chains();
+  for(int i=0; i<N; i++) {
+    for(int j=0; j<4; j++) {
+      mcmclib_amh_update(sampler[j]);
+    }
+  }
 
   free_chains();
   mcmclib_mcar_model_free(model);
