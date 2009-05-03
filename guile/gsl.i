@@ -1,4 +1,28 @@
 /*
+Error handling
+*/
+%{
+#include <string.h>
+#include <libguile.h>
+#include <gsl/gsl_errno.h>
+
+static void guile_gsl_err_handler(const char * reason,
+				  const char * file,
+				  int line,
+				  int gsl_errno) {
+  static char msg[2048];
+  sprintf(msg, "%s:%d", file, line);
+  scm_error_scm(scm_misc_error_key,
+		scm_from_locale_string(msg),
+		scm_from_locale_string(reason), SCM_BOOL_F, SCM_BOOL_F);
+}
+%}
+
+%init %{
+  gsl_set_error_handler(guile_gsl_err_handler);
+%}
+
+/*
 GSL_VECTOR
 */
 typedef struct {
