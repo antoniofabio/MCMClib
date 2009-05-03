@@ -11,6 +11,7 @@
 #define __MCMCLIB_MCAR_TILDE_H__
 
 #include "mvnorm.h"
+#include "givens.h"
 /**\addtogroup distributions
  @{*/
 
@@ -65,11 +66,6 @@ double mcmclib_mcar_tilde_lpdf_compute(void* in_p, gsl_vector* x);
 
 /** Compute matrix inverse by LU factorization */
 void mcmclib_matrix_inverse(gsl_matrix* A);
-/** Build an ortogonal matrix from its Givens angles */
-void mcmclib_Givens_rotations(gsl_matrix* A, gsl_vector* alpha);
-/* Givens angles and eigenvalues representation of a pos.def. matrix.
-   Result goes in M */
-void mcmclib_Givens_representation(gsl_matrix* M, gsl_vector* alpha, gsl_vector* sigma);
 
 /** update current vcov matrix value \internal */
 void mcmclib_mcar_tilde_lpdf_update_B_tilde(mcmclib_mcar_tilde_lpdf* p);
