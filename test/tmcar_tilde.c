@@ -81,6 +81,7 @@ int main(int argc, char** argv) {
 
   mcmclib_mcar_tilde_lpdf_update_blocks(p);
   mcmclib_mcar_tilde_lpdf_update_vcov(p);
+  gsl_matrix_fprintf(stdout, p->vcov, "%f");
   assert(check_dequal(gsl_matrix_get(p->vcov, 0, 0), 1.363636));
   assert(check_dequal(gsl_matrix_get(p->vcov, 1, 3), 0.290909));
   assert(check_dequal(gsl_matrix_get(p->vcov, 4, 1), 0.109091));
