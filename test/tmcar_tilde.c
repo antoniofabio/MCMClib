@@ -68,6 +68,8 @@ int main(int argc, char** argv) {
   gsl_vector* x = gsl_vector_alloc(N*P);
   gsl_vector_set_all(x, 1.0);
   mcmclib_mcar_tilde_lpdf_compute(p, x);
+  gsl_vector_set_all(p->sigma, 0.7);
+  mcmclib_mcar_tilde_lpdf_compute(p, x);
   gsl_vector_free(x);
 
   mcmclib_mcar_tilde_lpdf_free(p);

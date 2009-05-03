@@ -36,6 +36,35 @@ mcmclib_mcar_model* p;
     gsl_matrix_set(W, j, i, 1.0);		\
   }
 
+double lpdf_alpha1(double s) {
+  gsl_vector* alpha_h = gsl_vector_alloc(P * (P-1) / 2);
+  gsl_vector_set_all(alpha_h, s);
+  double ans = mcmclib_mcar_model_alpha1_lpdf(p, alpha_h);
+  printf("%f -> %f\n", s, ans);
+  gsl_vector_free(alpha_h);
+  return ans;
+}
+
+double lpdf_alpha2(double s) {
+  gsl_vector* alpha_h = gsl_vector_alloc(P * (P-1) / 2);
+  gsl_vector_set_all(alpha_h, s);
+  double ans = mcmclib_mcar_model_alpha2_lpdf(p, alpha_h);
+  printf("%f -> %f\n", s, ans);
+  gsl_vector_free(alpha_h);
+  return ans;
+}
+
+double lpdf_sigma(double s) {
+  gsl_vector* sigma = gsl_vector_alloc(P);
+  gsl_vector_set_all(sigma, s);
+  gsl_vector_set_all(sigma, 0.0);
+  gsl_vector_set(sigma, 0, s);
+  double ans = mcmclib_mcar_model_sigma_lpdf(p, sigma);
+  printf("%f -> %f\n", s, ans);
+  gsl_vector_free(sigma);
+  return ans;
+}
+
 int main(int argc, char** argv) {
   gsl_matrix* W = gsl_matrix_alloc(N, N);
   gsl_matrix_set_zero(W);
@@ -43,25 +72,35 @@ int main(int argc, char** argv) {
     DECL_AD(i, i+1);
 
   mcmclib_mcar_tilde_lpdf* llik = mcmclib_mcar_tilde_lpdf_alloc(P, W);
-  gsl_vector* e = gsl_vector_alloc(N*P);
+  gsl_vector* e = gsl_vector_alloc(N * P);
   gsl_vector_set_all(e, 2.0);
   p = mcmclib_mcar_model_alloc(llik, e);
 
+  lpdf_sigma(0.68);
+  exit(1);
+
   gsl_vector* alpha_h = gsl_vector_alloc(P * (P-1) / 2);
   gsl_vector_set_all(alpha_h, 10.0);
-  printf("%f -> %f\n", 10.0, mcmclib_mcar_model_alpha1_lpdf(p, alpha_h));
-  gsl_vector_set_all(alpha_h, 5.0);
-  printf("%f -> %f\n", 5.0, mcmclib_mcar_model_alpha1_lpdf(p, alpha_h));
-  gsl_vector_set_all(alpha_h, -10.0);
-  printf("%f -> %f\n", -10.0, mcmclib_mcar_model_alpha1_lpdf(p, alpha_h));
-  gsl_vector_set_all(alpha_h, 10.0);
-  printf("%f -> %f\n", 10.0, mcmclib_mcar_model_alpha1_lpdf(p, alpha_h));
-  gsl_vector_free(alpha_h);
+  printf("alpha1:\n");
+  double l1 = lpdf_alpha1(10.0);
+  lpdf_alpha1(5.0);
+  lpdf_alpha1(-10.0);
+  assert(l1 == lpdf_alpha1(10.0));
+
+  printf("alpha2:\n");
+  l1 = lpdf_alpha2(10.0);
+  lpdf_alpha2(5.0);
+  lpdf_alpha2(-10.0);
+  assert(l1 == lpdf_alpha2(10.0));
+
+  printf("sigma:\n");
+  for(double s=0.625; s<0.673; s+=0.005)
+    lpdf_sigma(s);
 
   gsl_vector* sigma = gsl_vector_alloc(P);
   gsl_vector_set_all(sigma, 0.0);
   gsl_vector_set(sigma, 1, -1.0);
-  double l1 = mcmclib_mcar_model_sigma_lpdf(p, sigma);
+  l1 = mcmclib_mcar_model_sigma_lpdf(p, sigma);
   gsl_vector_set_all(sigma, 0.0);
   gsl_vector_set(sigma, 0, -1.0);
   double l2 = mcmclib_mcar_model_sigma_lpdf(p, sigma);
