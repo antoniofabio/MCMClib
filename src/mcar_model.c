@@ -85,26 +85,28 @@ double mcmclib_mcar_model_sigma_lpdf(void* in_p, gsl_vector* sigma) {
   return ans;
 }
 
+static double iwishart_alphasigma(mcmclib_iwishart_lpdf* p, gsl_vector* as) {
+  int n = p->Psi->size1;
+  gsl_matrix* Gamma = gsl_matrix_alloc(n, n);
+  mcmclib_Givens_representation(Gamma, as);
+  gsl_vector_view gamma_v = gsl_vector_view_array(Gamma->data, n*n);
+  double ans = mcmclib_iwishart_lpdf_compute(p, &gamma_v.vector);
+  gsl_matrix_free(Gamma);
+  return ans;
+}
+
 double mcmclib_mcar_model_alphasigma_lpdf(void* in_p, gsl_vector* alphasigma) {
   mcmclib_mcar_model* p = (mcmclib_mcar_model*) in_p;
-  int P = p->lpdf->p;
+
+  double ans = iwishart_alphasigma(p->w, alphasigma);
 
   gsl_vector* tmp = gsl_vector_alloc(alphasigma->size);
   gsl_vector_memcpy(tmp, p->lpdf->alphasigmag);
   gsl_vector_memcpy(p->lpdf->alphasigmag, alphasigma);
-
-  gsl_matrix* Gamma = gsl_matrix_alloc(P, P);
-  gsl_vector_view alpha1_v = gsl_vector_subvector(alphasigma, 0, P*(P-1)/2);
-  gsl_vector_view sigma1_v = gsl_vector_subvector(alphasigma, P*(P-1)/2, P);
-  mcmclib_Givens_representation(Gamma, &alpha1_v.vector, &sigma1_v.vector);
-  gsl_vector_view gamma_v = gsl_vector_view_array(Gamma->data, P*P);
-  double ans = mcmclib_iwishart_lpdf_compute(p->w, &gamma_v.vector);
-
   if(gsl_finite(ans))
     ans += mcmclib_mcar_tilde_lpdf_compute(p->lpdf, p->e);
 
   gsl_vector_memcpy(p->lpdf->alphasigmag, tmp);
-  gsl_matrix_free(Gamma);
   gsl_vector_free(tmp);
   return ans;
 }

@@ -58,20 +58,19 @@ void mcmclib_Givens_rotations(gsl_matrix* A, const gsl_vector* alpha) {
 }
 
 void mcmclib_Givens_representation(gsl_matrix* M,
-				   const gsl_vector* alpha,
-				   const gsl_vector* sigma) {
+				   const gsl_vector* alpha_sigma) {
   int n = M->size1;
-  int P = n;
+  int offset = n * (n-1) / 2;
 
-  gsl_vector* alpha1 = gsl_vector_alloc(P*(P-1)/2);
-  for(int i=0; i<P*(P-1)/2; i++) {
-    double bi = exp(gsl_vector_get(alpha, i));
+  gsl_vector* alpha1 = gsl_vector_alloc(offset);
+  for(int i=0; i<offset; i++) {
+    double bi = exp(gsl_vector_get(alpha_sigma, i));
     bi = M_PI_2 * (bi - 1.0) / (bi + 1.0);
     gsl_vector_set(alpha1, i, bi);
   }
-  gsl_vector* sigma1 = gsl_vector_alloc(P);
-  for(int i=0; i<P; i++) {
-    double bi = exp(gsl_vector_get(sigma, i));
+  gsl_vector* sigma1 = gsl_vector_alloc(n);
+  for(int i=0; i<n; i++) {
+    double bi = exp(gsl_vector_get(alpha_sigma, i + offset));
     gsl_vector_set(sigma1, i, bi);
   }
 

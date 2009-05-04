@@ -22,11 +22,11 @@ void mcmclib_Givens_rotations(gsl_matrix* A, const gsl_vector* alpha);
 
     'alpha' and 'sigma' vectors are reparametrized to have support (-inf, inf).
     @param M result
-    @param alpha N x (N - 1) / 2 Givens angles
-    @param sigma N eigenvalues
+    @param alpha_sigma real-valued vector. First N x (N - 1) / 2 elmts. are
+     Givens angles. Last N eltmts are eigenvalues.
 */
-void mcmclib_Givens_representation(gsl_matrix* M, const gsl_vector* alpha,
-				   const gsl_vector* sigma);
+void mcmclib_Givens_representation(gsl_matrix* M, const gsl_vector* alpha_sigma);
+
 
 /**@}*/
 #endif

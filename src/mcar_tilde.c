@@ -231,8 +231,5 @@ double mcmclib_mcar_tilde_lpdf_compute(void* in_p, gsl_vector* x) {
 }
 
 void mcmclib_mcar_tilde_lpdf_update_Gamma(mcmclib_mcar_tilde_lpdf* p) {
-  int P = p->p;
-  gsl_vector_view alphav = gsl_vector_subvector(p->alphasigmag, 0, P * (P-1) / 2);
-  gsl_vector_view sigmav = gsl_vector_subvector(p->alphasigmag, P * (P-1) / 2, P);
-  mcmclib_Givens_representation(p->Gamma, &alphav.vector, &sigmav.vector);	
+  mcmclib_Givens_representation(p->Gamma, p->alphasigmag);
 }
