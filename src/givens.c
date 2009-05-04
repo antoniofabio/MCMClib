@@ -12,6 +12,7 @@
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_blas.h>
 #include <gsl/gsl_permutation.h>
+#include <gsl/gsl_sort_vector.h>
 #include <gsl/gsl_linalg.h>
 #include "givens.h"
 
@@ -59,6 +60,12 @@ void mcmclib_Givens_rotations(gsl_matrix* A, const gsl_vector* alpha) {
     gsl_matrix_free(S[h]);
 }
 
+static void vSortDesc(gsl_vector* v) {
+  gsl_vector_scale(v, -1.0);
+  gsl_sort_vector(v);
+  gsl_vector_scale(v, -1.0);
+}
+
 void mcmclib_Givens_representation(gsl_matrix* M,
 				   const gsl_vector* alpha_sigma) {
   int n = M->size1;
@@ -72,6 +79,7 @@ void mcmclib_Givens_representation(gsl_matrix* M,
     double bi = exp(gsl_vector_get(alpha_sigma, i + offset));
     gsl_vector_set(sigma1, i, bi);
   }
+  vSortDesc(sigma1);
 
   gsl_matrix* A = gsl_matrix_alloc(n, n);
   mcmclib_Givens_rotations(A, alpha1);
@@ -116,9 +124,13 @@ void mcmclib_Givens_representation_asymm(gsl_matrix* M, const gsl_vector* alpha1
   gsl_vector_const_view alpha1 = gsl_vector_const_subvector(alpha12_sigma, 0, offset);
   gsl_vector_const_view alpha2 = gsl_vector_const_subvector(alpha12_sigma, offset, offset);
   gsl_vector_const_view sigma = gsl_vector_const_subvector(alpha12_sigma, 2*offset, n);
+  gsl_vector* sigmas = gsl_vector_alloc(n);
+  gsl_vector_memcpy(sigmas, &sigma.vector);
+  vSortDesc(sigmas);
   mcmclib_Givens_rotations(P1, &alpha1.vector);
   mcmclib_Givens_rotations(P2, &alpha2.vector);
-  anti_SVD(M, P1, P2, &sigma.vector);
+  anti_SVD(M, P1, P2, sigmas);
+  gsl_vector_free(sigmas);
   gsl_matrix_free(P1);
   gsl_matrix_free(P2);
 }
