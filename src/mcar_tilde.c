@@ -79,7 +79,7 @@ static int is_positive_definite(mcmclib_mcar_tilde_lpdf* p) {
   int offset = p->p;
   offset = offset * (offset-1) / 2;
   double sigma_0 = gsl_vector_get(p->alpha12sigma, 2*offset);
-  if((sigma_0 <= 0.0) || (sigma_0 >= 1.0))
+  if(sigma_0 > 0.0)
     return 0;
   return 1;
 }
