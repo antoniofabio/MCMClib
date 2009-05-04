@@ -7,9 +7,9 @@
 #include <mcar_tilde.h>
 #include <mcar_model.h>
 
-#define N 1
+#define N 10
 #define T0 50
-#define V0 4.0
+#define V0 0.4
 
 #define P 3
 #define DIM 2
@@ -37,7 +37,7 @@ void init_chains() {
   Sigma0 = gsl_matrix_alloc(P*(P-1)/2 + P, P*(P-1)/2 + P);
   gsl_matrix_set_identity(Sigma0);
   gsl_matrix_scale(Sigma0, V0 / (double) (P*(P-1)/2 + P));
-  sampler[3] = mcmclib_gauss_am_alloc(rng, mcmclib_mcar_model_alphasigma_lpdf,
+  sampler[1] = mcmclib_gauss_am_alloc(rng, mcmclib_mcar_model_alphasigma_lpdf,
 				      model, alphasigmag, Sigma0, T0);
   gsl_matrix_free(Sigma0);
 }
