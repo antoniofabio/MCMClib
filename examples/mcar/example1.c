@@ -13,51 +13,37 @@
 
 #define P 3
 #define DIM 2
-#define ALPHAP P*(P-1)/2
 
-gsl_vector *alpha1, *alpha2, *sigma, *Gammav;
+gsl_vector *alpha12sigma, *alphasigmag;
 gsl_rng* rng;
 mcmclib_mcar_tilde_lpdf* lpdf;
 mcmclib_mcar_model* model;
-mcmclib_amh* sampler[4];
+mcmclib_amh* sampler[2];
 
 void init_chains() {
   rng = gsl_rng_alloc(gsl_rng_default);
 
-  alpha1 = lpdf->alpha1;
-  gsl_matrix* Sigma0 = gsl_matrix_alloc(ALPHAP, ALPHAP);
+  alpha12sigma = lpdf->alpha12sigma;
+  gsl_matrix* Sigma0 = gsl_matrix_alloc(P*P, P*P);
   gsl_matrix_set_identity(Sigma0);
-  gsl_matrix_scale(Sigma0, V0 / ALPHAP);
-  sampler[0] = mcmclib_gauss_am_alloc(rng, mcmclib_mcar_model_alpha1_lpdf,
-				      model, alpha1, Sigma0, T0);
-
-  alpha2 = lpdf->alpha2;
-  sampler[1] = mcmclib_gauss_am_alloc(rng, mcmclib_mcar_model_alpha2_lpdf,
-				      model, alpha2, Sigma0, T0);
+  gsl_matrix_scale(Sigma0, V0 / ((double)(P * P)));
+  sampler[0] = mcmclib_gauss_am_alloc(rng, mcmclib_mcar_model_alpha12sigma_lpdf,
+				      model, alpha12sigma, Sigma0, T0);
   gsl_matrix_free(Sigma0);
 
-  sigma = lpdf->sigma;
-  Sigma0 = gsl_matrix_alloc(P, P);
+  alphasigmag = lpdf->alphasigmag;
+  Sigma0 = gsl_matrix_alloc(P*(P-1)/2 + P, P*(P-1)/2 + P);
   gsl_matrix_set_identity(Sigma0);
-  gsl_matrix_scale(Sigma0, V0 / P);
-  sampler[2] = mcmclib_gauss_am_alloc(rng, mcmclib_mcar_model_sigma_lpdf,
-				      model, sigma, Sigma0, T0);
-  gsl_matrix_free(Sigma0);
-
-  Gammav = lpdf->alphasigmag;
-  Sigma0 = gsl_matrix_alloc(ALPHAP + P, ALPHAP + P);
-  gsl_matrix_set_identity(Sigma0);
-  gsl_matrix_scale(Sigma0, V0 / (ALPHAP + P));
+  gsl_matrix_scale(Sigma0, V0 / (double) (P*(P-1)/2 + P));
   sampler[3] = mcmclib_gauss_am_alloc(rng, mcmclib_mcar_model_alphasigma_lpdf,
-				      model, Gammav, Sigma0, T0);
+				      model, alphasigmag, Sigma0, T0);
   gsl_matrix_free(Sigma0);
 }
 
 void free_chains() {
-  for(int i=0; i<4; i++)
+  for(int i=0; i<2; i++)
     mcmclib_gauss_am_free(sampler[i]);
   gsl_rng_free(rng);
-  gsl_vector_free(Gammav);
 }
 
 int main(int argc, char** argv) {
@@ -76,7 +62,7 @@ int main(int argc, char** argv) {
 
   init_chains();
   for(int i=0; i<N; i++) {
-    for(int j=0; j<4; j++) {
+    for(int j=0; j<2; j++) {
       mcmclib_amh_update(sampler[j]);
     }
   }
