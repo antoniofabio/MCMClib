@@ -27,6 +27,15 @@ void mcmclib_Givens_rotations(gsl_matrix* A, const gsl_vector* alpha);
 */
 void mcmclib_Givens_representation(gsl_matrix* M, const gsl_vector* alpha_sigma);
 
+/** \brief Givens angles and sing. values representation of a non-symm. matrix
+
+    'alpha' and 'sigma' vectors are reparametrized to have support (-inf, inf).
+    @param M result
+    @param alpha12_sigma real-valued vector. First N x (N - 1) / 2 elmts. are
+     Givens angles of matrix A, second N x (N - 1) / 2 elmts. are
+     Givens angles of matrix B, Last N eltmts are singular values.
+*/
+void mcmclib_Givens_representation_asymm(gsl_matrix* M, const gsl_vector* alpha12_sigma);
 
 /**@}*/
 #endif
