@@ -69,12 +69,15 @@ int main(int argc, char** argv) {
   model = mcmclib_mcar_model_alloc(lpdf, e);
 
   init_chains();
+  FILE* out = fopen("chain_alpha12sigma.dat", "w");
   for(int i=0; i<N; i++) {
+    gsl_vector_fprintf(out, alpha12sigma, "%f");
     for(int j=0; j<2; j++) {
       mcmclib_amh_update(sampler[j]);
       assert(gsl_finite(sampler[j]->mh->logdistr_old));
     }
   }
+  fclose(out);
 
   free_chains();
   mcmclib_mcar_model_free(model);
