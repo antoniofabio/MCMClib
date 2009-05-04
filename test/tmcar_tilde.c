@@ -30,7 +30,7 @@ int is_pos_def(gsl_matrix* A) {
     if(gsl_matrix_get(A, i, i) <= 0.0)
       return 0;
     for(int j=(i+1); j<n; j++)
-      if(gsl_matrix_get(A, i, j) != gsl_matrix_get(A, j, i))
+      if(fabs(gsl_matrix_get(A, i, j) - gsl_matrix_get(A, j, i)) >= TOL)
 	return 0;
   }
   return 1;
@@ -85,6 +85,13 @@ int main(int argc, char** argv) {
   assert(is_pos_def(p->vcov));
 
   gsl_vector_set_all(p->alpha12sigma, 0.7);
+  mcmclib_mcar_tilde_lpdf_update_blocks(p);
+  printf("B_tilde(0.7):\n");
+  mprint(p->B_tilde);
+  printf("Blocks(0.7):\n");
+  mprint(p->vcov);
+  mcmclib_mcar_tilde_lpdf_update_blocks(p);
+
   mcmclib_mcar_tilde_lpdf_update_vcov(p);
   printf("VCOV(0.7):\n");
   mprint(p->vcov);
