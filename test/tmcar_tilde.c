@@ -72,36 +72,24 @@ int main(int argc, char** argv) {
   gsl_vector_set_all(p->alphasigmag, 0.0);
   gsl_vector_set_all(p->alpha12sigma, -1.0);
 
-  mcmclib_mcar_tilde_lpdf_update_blocks(p);
-  printf("Gamma:\n");
-  mprint(p->Gamma);
-  printf("B_tilde:\n");
-  mprint(p->B_tilde);
-  printf("Blocks:\n");
-  mprint(p->vcov);
   mcmclib_mcar_tilde_lpdf_update_vcov(p);
-  printf("VCOV:\n");
-  mprint(p->vcov);
   assert(is_pos_def(p->vcov));
 
-  gsl_vector_set_all(p->alpha12sigma, 0.7);
+  gsl_vector_set_all(p->alpha12sigma, -0.7);
   mcmclib_mcar_tilde_lpdf_update_blocks(p);
-  printf("B_tilde(0.7):\n");
-  mprint(p->B_tilde);
-  printf("Blocks(0.7):\n");
-  mprint(p->vcov);
   mcmclib_mcar_tilde_lpdf_update_blocks(p);
 
   mcmclib_mcar_tilde_lpdf_update_vcov(p);
-  printf("VCOV(0.7):\n");
-  mprint(p->vcov);
   assert(is_pos_def(p->vcov));
 
   x = gsl_vector_alloc(N*P);
-  printf("%f -> %f\n", 0.0, lpdf(0.0));
-  printf("%f -> %f\n", 1.0, lpdf(1.0));
-  gsl_vector_set_all(p->alpha12sigma, 0.7);
-  printf("%f -> %f\n", 1.0, lpdf(1.0));
+  gsl_vector_set_all(p->alpha12sigma, -2.0);
+  double l1 = lpdf(0.0);
+  assert(gsl_finite(l1));
+  assert(gsl_finite(lpdf(1.0)));
+  assert(l1 = lpdf(-0.5)); /*check for side-effects*/
+  gsl_vector_set_all(p->alpha12sigma, 0.1);
+  assert(!gsl_finite(lpdf(1.0)));
 
   gsl_vector_free(x);
 
