@@ -23,10 +23,9 @@ typedef struct {
   int p; /**< dimension */
   int n; /**< number of points */
 
-  gsl_vector* alpha1; /**< Givens angles for P1 */
-  gsl_vector* alpha2; /**< Givens angles for P2 */
-  gsl_vector* sigma; /**< B_tilde singular values (p) */
   gsl_matrix* B_tilde; /**< variance par. matrix (p x p) */
+  gsl_vector* alpha12sigma; /**< Givens angles and sing. values repr. of
+			       B_tilde */
   gsl_matrix* Gamma; /**< 'variance of variance' par. matrix (p x p) */
   gsl_vector *alphasigmag; /**< Givens angles and eigenv. repr. of Gamma */
 
@@ -47,11 +46,6 @@ typedef struct {
     @param M adiancency matrix (n x n)
 */
 mcmclib_mcar_tilde_lpdf* mcmclib_mcar_tilde_lpdf_alloc(int p, gsl_matrix* M);
-
-void mcmclib_mcar_tilde_lpdf_set_alpha(mcmclib_mcar_tilde_lpdf* p,
-				       gsl_vector* alpha1, gsl_vector* alpha2);
-void mcmclib_mcar_tilde_lpdf_set_sigma(mcmclib_mcar_tilde_lpdf* p,
-				       gsl_vector* sigma);
 
 /** Free extra data for an mcar_tilde distribution
     @param p
