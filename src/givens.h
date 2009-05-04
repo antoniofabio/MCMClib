@@ -15,7 +15,8 @@
 /**\addtogroup misc
  @{*/
 
-/** Build an ortogonal matrix from its Givens angles */
+/** Build an ortogonal matrix from its Givens angles. Angles are transformed to
+    have support (-inf, inf) */
 void mcmclib_Givens_rotations(gsl_matrix* A, const gsl_vector* alpha);
 
 /** \brief Givens angles and eigenvalues representation of a positive definite matrix
