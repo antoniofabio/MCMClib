@@ -38,7 +38,7 @@ mcmclib_mcar_tilde_lpdf* mcmclib_mcar_tilde_lpdf_alloc(int p, gsl_matrix* M) {
     gsl_vector_set(a->m, i, (double) count);
   }
   a->alphasigmag = gsl_vector_alloc(p * (p-1)/2 + p);
-  gsl_vector_set_all(a->alphasigmag, 0.0);
+  gsl_vector_set_all(a->alphasigmag, -1.0);
 
   a->vcov = gsl_matrix_alloc(p*n, p*n);
   gsl_matrix_set_identity(a->vcov);

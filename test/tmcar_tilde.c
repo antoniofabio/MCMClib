@@ -56,7 +56,7 @@ int main(int argc, char** argv) {
   }
 
   gsl_vector_set_all(p->alphasigmag, 0.0);
-  gsl_vector_set_all(p->alpha12sigma, 0.0);
+  gsl_vector_set_all(p->alpha12sigma, -1.0);
 
   mcmclib_mcar_tilde_lpdf_update_blocks(p);
   printf("Gamma:\n");
