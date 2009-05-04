@@ -68,7 +68,7 @@ void mcmclib_Givens_representation(gsl_matrix* M,
   for(int i=0; i<offset; i++)
     gsl_vector_set(alpha1, i, gsl_vector_get(alpha_sigma, i));
   gsl_vector* sigma1 = gsl_vector_alloc(n);
-  for(int i=0; i<n; i++)
+  for(int i=0; i<n; i++) {
     double bi = exp(gsl_vector_get(alpha_sigma, i + offset));
     gsl_vector_set(sigma1, i, bi);
   }
@@ -93,16 +93,16 @@ void mcmclib_Givens_representation(gsl_matrix* M,
 }
 
 /* rebuild asymm. matrix from its SVD decomposition */
-static void anti_SVD(gsl_matrix* A, gsl_matrix* P1, gsl_matrix* P2, gsl_vector* sigma) {
+static void anti_SVD(gsl_matrix* A, gsl_matrix* P1, gsl_matrix* P2, const gsl_vector* sigma) {
   int p = A->size1;
-  gsl_matrix_set_zero(A);
   gsl_matrix* Delta = gsl_matrix_alloc(p, p);
-  gsl_matrix* P1Delta = gsl_matrix_alloc(p, p);
   gsl_matrix_set_zero(Delta);
   for(int i=0; i<p; i++)
     gsl_matrix_set(Delta, i, i, exp(gsl_vector_get(sigma, i)));
+  gsl_matrix* P1Delta = gsl_matrix_alloc(p, p);
   gsl_matrix_set_zero(P1Delta);
   gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, P1, Delta, 0.0, P1Delta);
+  gsl_matrix_set_zero(A);
   gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, P1Delta, P2, 0.0, A);
   gsl_matrix_free(Delta);
   gsl_matrix_free(P1Delta);
@@ -113,9 +113,9 @@ void mcmclib_Givens_representation_asymm(gsl_matrix* M, const gsl_vector* alpha1
   int offset = n*(n-1)/2;
   gsl_matrix* P1 = gsl_matrix_alloc(n, n);
   gsl_matrix* P2 = gsl_matrix_alloc(n, n);
-  gsl_vector_view alpha1 = gsl_vector_subvector(alpha12_sigma, 0, offset);
-  gsl_vector_view alpha2 = gsl_vector_subvector(alpha12_sigma, offset, offset);
-  gsl_vector_view sigma = gsl_vector_subvector(alpha12_sigma, 2*offset, n);
+  gsl_vector_const_view alpha1 = gsl_vector_const_subvector(alpha12_sigma, 0, offset);
+  gsl_vector_const_view alpha2 = gsl_vector_const_subvector(alpha12_sigma, offset, offset);
+  gsl_vector_const_view sigma = gsl_vector_const_subvector(alpha12_sigma, 2*offset, n);
   mcmclib_Givens_rotations(P1, &alpha1.vector);
   mcmclib_Givens_rotations(P2, &alpha2.vector);
   anti_SVD(M, P1, P2, &sigma.vector);
