@@ -31,12 +31,11 @@ void mcmclib_mcar_model_free(mcmclib_mcar_model* p) {
 
 double mcmclib_mcar_model_alpha12sigma_lpdf(void* in_p, gsl_vector* alpha12sigma) {
   mcmclib_mcar_model* p = (mcmclib_mcar_model*) in_p;
-  int P = p->lpdf->p;
-  gsl_vector* tmp = gsl_vector_alloc(alpha12->size);
+  gsl_vector* tmp = gsl_vector_alloc(alpha12sigma->size);
   gsl_vector_memcpy(tmp, p->lpdf->alpha12sigma);
   gsl_vector_memcpy(p->lpdf->alpha12sigma, alpha12sigma);
   double ans = mcmclib_mcar_tilde_lpdf_compute(p->lpdf, p->e);
-  gsl_vector_memcpy(p->lpdf->alpha1, tmp);
+  gsl_vector_memcpy(p->lpdf->alpha12sigma, tmp);
   gsl_vector_free(tmp);
   return ans;
 }
