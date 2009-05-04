@@ -1,5 +1,7 @@
 /**Adaptive Gaussian Random Walk on an MCAR model example*/
 #include <stdio.h>
+#include <assert.h>
+#include <gsl/gsl_math.h>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
@@ -7,12 +9,12 @@
 #include <mcar_tilde.h>
 #include <mcar_model.h>
 
-#define N 10
-#define T0 50
+#define N 10 /* 1.23 secs per iteration*/
+#define T0 5000
 #define V0 0.4
 
 #define P 3
-#define DIM 2
+#define DIM 95
 
 gsl_vector *alpha12sigma, *alphasigmag;
 gsl_rng* rng;
@@ -66,6 +68,7 @@ int main(int argc, char** argv) {
   for(int i=0; i<N; i++) {
     for(int j=0; j<2; j++) {
       mcmclib_amh_update(sampler[j]);
+      assert(gsl_finite(sampler[j]->mh->logdistr_old));
     }
   }
 
