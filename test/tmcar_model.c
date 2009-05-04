@@ -52,7 +52,6 @@ double lpdf_alpha12sigma(double s) {
   gsl_vector* alpha12sigma = gsl_vector_alloc(P * P);
   gsl_vector_set_all(alpha12sigma, s);
   double ans = mcmclib_mcar_model_alpha12sigma_lpdf(p, alpha12sigma);
-  printf("%f -> %f\n", s, ans);
   gsl_vector_free(alpha12sigma);
   return ans;
 }
@@ -68,13 +67,18 @@ int main(int argc, char** argv) {
   gsl_vector_set_all(e, 2.0);
   p = mcmclib_mcar_model_alloc(llik, e);
 
-  double l1 = lpdf_alpha12sigma(5.0);
-  lpdf_alpha12sigma(-10.0);
-  assert(l1 == lpdf_alpha12sigma(5.0));
+  double l1 = lpdf_alpha12sigma(-5.0);
+  double l2 = lpdf_alpha12sigma(-10.0);
+  assert(gsl_finite(l1));
+  assert(gsl_finite(l2));
+  assert(l1 > l2);
+  assert(l1 == lpdf_alpha12sigma(-5.0));
 
   gsl_vector* alphasigma = gsl_vector_alloc(P * (P-1) / 2 + P);
-  gsl_vector_set_zero(alphasigma);
-  printf("%f -> %f\n", 0.0, mcmclib_mcar_model_alphasigma_lpdf(p, alphasigma));
+  gsl_vector_set_all(llik->alpha12sigma, -1.0);
+  gsl_vector_set_all(alphasigma, 0.0);
+  l1 = mcmclib_mcar_model_alphasigma_lpdf(p, alphasigma);
+  assert(gsl_finite(l1));
   gsl_vector_free(alphasigma);
 
   mcmclib_mcar_model_free(p);

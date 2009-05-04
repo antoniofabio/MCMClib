@@ -40,6 +40,16 @@ double mcmclib_mcar_model_alpha12sigma_lpdf(void* in_p, gsl_vector* alpha12sigma
   return ans;
 }
 
+static void mprint(gsl_matrix* A) {
+  int n = A->size1;
+  int p = A->size2;
+  for(int i=0; i<n; i++) {
+    for(int j=0; j<p; j++)
+      printf("%.3f, ", gsl_matrix_get(A, i, j));
+    printf("\n");
+  }
+}
+
 static double iwishart_alphasigma(mcmclib_iwishart_lpdf* p, gsl_vector* as) {
   int n = p->Psi->size1;
   gsl_matrix* Gamma = gsl_matrix_alloc(n, n);
@@ -54,12 +64,14 @@ double mcmclib_mcar_model_alphasigma_lpdf(void* in_p, gsl_vector* alphasigma) {
   mcmclib_mcar_model* p = (mcmclib_mcar_model*) in_p;
 
   double ans = iwishart_alphasigma(p->w, alphasigma);
+  if(!gsl_finite(ans))
+    return ans;
 
   gsl_vector* tmp = gsl_vector_alloc(alphasigma->size);
   gsl_vector_memcpy(tmp, p->lpdf->alphasigmag);
   gsl_vector_memcpy(p->lpdf->alphasigmag, alphasigma);
-  if(gsl_finite(ans))
-    ans += mcmclib_mcar_tilde_lpdf_compute(p->lpdf, p->e);
+  double lik = mcmclib_mcar_tilde_lpdf_compute(p->lpdf, p->e);
+  ans += lik;
 
   gsl_vector_memcpy(p->lpdf->alphasigmag, tmp);
   gsl_vector_free(tmp);
