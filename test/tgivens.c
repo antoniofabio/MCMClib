@@ -33,6 +33,11 @@ static void sRepresentation(double s) {
   gsl_linalg_cholesky_decomp(A);
 }
 
+static void sRepresentationAsymm(double s) {
+  gsl_vector_set_all(alphasigma, s);
+  mcmclib_Givens_representation_asymm(A, alphasigma);
+}
+
 int main(int argc, char** argv) {
   gsl_vector* alpha = gsl_vector_alloc(3);
   gsl_vector_set(alpha, 0, -0.5);
@@ -50,8 +55,13 @@ int main(int argc, char** argv) {
   alphasigma = gsl_vector_alloc(6);
   for(double s=-4.0; s<=4.0; s+=0.1)
     sRepresentation(s);
-
   gsl_vector_free(alphasigma);
+
+  alphasigma = gsl_vector_alloc(9);
+  for(double s=-4.0; s<=4.0; s+=0.1)
+    sRepresentationAsymm(s);
+  gsl_vector_free(alphasigma);
+
   gsl_matrix_free(A1);
   gsl_matrix_free(A);
   gsl_vector_free(alpha);
