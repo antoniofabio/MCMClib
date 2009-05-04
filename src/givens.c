@@ -108,8 +108,12 @@ static void anti_SVD(gsl_matrix* A,
   int p = A->size1;
   gsl_matrix* Delta = gsl_matrix_alloc(p, p);
   gsl_matrix_set_zero(Delta);
+  gsl_vector* sigma1 = gsl_vector_alloc(p);
+  gsl_vector_memcpy(sigma1, sigma);
+  vSortDesc(sigma1);
   for(int i=0; i<p; i++)
-    gsl_matrix_set(Delta, i, i, exp(gsl_vector_get(sigma, i)));
+    gsl_matrix_set(Delta, i, i, exp(gsl_vector_get(sigma1, i)));
+  gsl_vector_free(sigma1);
   gsl_matrix* P1Delta = gsl_matrix_alloc(p, p);
   gsl_matrix_set_zero(P1Delta);
   gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, P1, Delta, 0.0, P1Delta);
