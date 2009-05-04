@@ -19,6 +19,11 @@ mcmclib_amh* mcmclib_amh_alloc(mcmclib_mh* mh, void* suff,
   return p;
 }
 
+void mcmclib_amh_reset(mcmclib_amh* p) {
+  mcmclib_mh_reset(p->mh);
+  p->n = 0;
+}
+
 void mcmclib_amh_free(mcmclib_amh* p) {
   free(p);
 }

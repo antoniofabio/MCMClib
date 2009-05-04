@@ -8,7 +8,7 @@
 #include <mcar_tilde.h>
 
 #define TOL 1e-6
-static int check_dequal(double a, double b) {
+int check_dequal(double a, double b) {
   return (fabs(a-b) < TOL);
 }
 
@@ -35,29 +35,13 @@ mcmclib_mcar_tilde_lpdf* p;
     gsl_matrix_set(W, j, i, 1.0);		\
   }
 
-int main(int argc, char** argv) {
-  /************************/
-  /*check Givens rotations*/
-  /************************/
-  gsl_vector* alpha = gsl_vector_alloc(3);
-  gsl_vector_set(alpha, 0, -0.5);
-  gsl_vector_set(alpha, 1, 0.1);
-  gsl_vector_set(alpha, 2, 0.5);
-  gsl_matrix* A = gsl_matrix_alloc(3, 3);
-  mcmclib_Givens_rotations(A, alpha);
-  gsl_matrix* A1 = gsl_matrix_alloc(3, 3);
-  gsl_matrix_memcpy(A1, A);
-  mcmclib_matrix_inverse(A1);
-  for(int i=0; i<3; i++)
-    for(int j=0; j<3; j++)
-      assert(check_dequal(gsl_matrix_get(A, i, j), gsl_matrix_get(A1, j, i)));
-  gsl_matrix_free(A1);
-  gsl_matrix_free(A);
-  gsl_vector_free(alpha);
+gsl_vector* x;
+static double lpdf(double s) {
+  gsl_vector_set_all(x, s);
+  return mcmclib_mcar_tilde_lpdf_compute(p, x);
+}
 
-  /************************/
-  /*check MCAR distrib.   */
-  /************************/
+int main(int argc, char** argv) {
   gsl_vector* mu = gsl_vector_alloc(N * P);
   gsl_vector_set_zero(mu);
   gsl_matrix* W = gsl_matrix_alloc(N, N);
@@ -65,7 +49,7 @@ int main(int argc, char** argv) {
   for(int i=0; i<(N-1); i++)
     DECL_AD(i, i+1);
   
-  p = mcmclib_mcar_tilde_lpdf_alloc(P, N, W);
+  p = mcmclib_mcar_tilde_lpdf_alloc(P, W);
   for(int i=0; i<N; i++) {
     int count = 0;
     for(int j=0; j<N; j++)
@@ -73,22 +57,19 @@ int main(int argc, char** argv) {
     assert(gsl_vector_get(p->m, i) == (double) count);
   }
 
-  for(int i=0; i<(P-1); i++)
-    for(int j=i+1; j<P; j++) {
-      gsl_matrix_set(p->Gamma, i, j, 0.6);
-      gsl_matrix_set(p->Gamma, j, i, 0.6);
-    }
+  gsl_vector_set_all(p->alphasigmag, 0.0);
+  gsl_vector_set_all(p->alpha12sigma, 0.0);
 
   mcmclib_mcar_tilde_lpdf_update_blocks(p);
   mcmclib_mcar_tilde_lpdf_update_vcov(p);
-  assert(check_dequal(gsl_matrix_get(p->vcov, 0, 0), 1.363636));
-  assert(check_dequal(gsl_matrix_get(p->vcov, 1, 3), 0.290909));
-  assert(check_dequal(gsl_matrix_get(p->vcov, 4, 1), 0.109091));
-  assert(check_dequal(gsl_matrix_get(p->vcov, 5, 3), 0.145455));
+  gsl_matrix_fprintf(stdout, p->vcov, "%f");
 
-  gsl_vector* x = gsl_vector_alloc(N*P);
-  gsl_vector_set_all(x, 1.0);
-  mcmclib_mcar_tilde_lpdf_compute(p, x);
+  x = gsl_vector_alloc(N*P);
+  printf("%f -> %f\n", 0.0, lpdf(0.0));
+  printf("%f -> %f\n", 1.0, lpdf(1.0));
+  gsl_vector_set_all(p->alpha12sigma, 0.7);
+  printf("%f -> %f\n", 1.0, lpdf(1.0));
+
   gsl_vector_free(x);
 
   mcmclib_mcar_tilde_lpdf_free(p);

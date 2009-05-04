@@ -11,6 +11,7 @@
 #define __MCMCLIB_MCAR_TILDE_H__
 
 #include "mvnorm.h"
+#include "givens.h"
 /**\addtogroup distributions
  @{*/
 
@@ -22,11 +23,11 @@ typedef struct {
   int p; /**< dimension */
   int n; /**< number of points */
 
-  gsl_vector* alpha1; /**< Givens angles for P1 */
-  gsl_vector* alpha2; /**< Givens angles for P2 */
-  gsl_vector* sigma; /**< B_tilde singular values (p) */
   gsl_matrix* B_tilde; /**< variance par. matrix (p x p) */
+  gsl_vector* alpha12sigma; /**< Givens angles and sing. values repr. of
+			       B_tilde */
   gsl_matrix* Gamma; /**< 'variance of variance' par. matrix (p x p) */
+  gsl_vector *alphasigmag; /**< Givens angles and eigenv. repr. of Gamma */
 
   gsl_matrix* M; /**< adiancency matrix (n x n)*/
   gsl_vector* m; /**< adiancency weights (n)*/
@@ -42,15 +43,9 @@ typedef struct {
 
 /** Alloc extra data for an mcar_tilde distribution
     @param p dimension
-    @param n spatial locations
     @param M adiancency matrix (n x n)
 */
-mcmclib_mcar_tilde_lpdf* mcmclib_mcar_tilde_lpdf_alloc(int p, int n, gsl_matrix* M);
-
-void mcmclib_mcar_tilde_lpdf_set_alpha(mcmclib_mcar_tilde_lpdf* p,
-				       gsl_vector* alpha1, gsl_vector* alpha2);
-void mcmclib_mcar_tilde_lpdf_set_sigma(mcmclib_mcar_tilde_lpdf* p,
-				       gsl_vector* sigma);
+mcmclib_mcar_tilde_lpdf* mcmclib_mcar_tilde_lpdf_alloc(int p, gsl_matrix* M);
 
 /** Free extra data for an mcar_tilde distribution
     @param p
@@ -65,8 +60,6 @@ double mcmclib_mcar_tilde_lpdf_compute(void* in_p, gsl_vector* x);
 
 /** Compute matrix inverse by LU factorization */
 void mcmclib_matrix_inverse(gsl_matrix* A);
-/** Build an ortogonal matrix from its Givens angles */
-void mcmclib_Givens_rotations(gsl_matrix* A, gsl_vector* alpha);
 
 /** update current vcov matrix value \internal */
 void mcmclib_mcar_tilde_lpdf_update_B_tilde(mcmclib_mcar_tilde_lpdf* p);
@@ -74,6 +67,8 @@ void mcmclib_mcar_tilde_lpdf_update_B_tilde(mcmclib_mcar_tilde_lpdf* p);
 void mcmclib_mcar_tilde_lpdf_update_blocks(mcmclib_mcar_tilde_lpdf* p);
 /** update current vcov matrix value \internal */
 void mcmclib_mcar_tilde_lpdf_update_vcov(mcmclib_mcar_tilde_lpdf* p);
+/** update current Gamma matrix value \internal */
+void mcmclib_mcar_tilde_lpdf_update_Gamma(mcmclib_mcar_tilde_lpdf* p);
 
 /**@}*/
 /**@}*/

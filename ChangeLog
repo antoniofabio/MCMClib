@@ -1,4 +1,7 @@
 Version 0.15 A. F. Di Narzo <antonio.fabio@gmail.com>
+	* added utility mh_reset and amh_reset methods
+	* improved mh_update: now calls logdistr 50% less times!
+	* robustified mh_update method: now stops on non-finite vector values
 	* added MCAR model (based on MCAR_tilde likelihood)
 	* added MCAR_tilde (Greco and Trivisano, 2009) distribution
 	* added Wishart distribution

@@ -29,6 +29,7 @@ typedef struct {
   mcmclib_mh_q* q; /**< proposal kernel object*/
   gsl_vector* x; /**< current chain value*/
   gsl_vector* x_old; /**< old chain value*/
+  double logdistr_old; /**< log-distrib. of old chain value */
   int last_accepted; /**< flag: last move has been accepted?*/
 } mcmclib_mh;
 
@@ -51,9 +52,13 @@ void mcmclib_mh_free(mcmclib_mh* p);
 \return 1 if move accepted, 0 if rejected*/
 int mcmclib_mh_update(mcmclib_mh* p);
 
+/**\brief reset chain */
+void mcmclib_mh_reset(mcmclib_mh* p);
+
 /**\brief Generic (non-symmetric) M-H step \internal*/
 int mcmclib_mh_generic_step(const gsl_rng* r, gsl_vector* old, gsl_vector* x,
-			    distrfun_p logdistr, void* data, mcmclib_mh_q* q);
+			    distrfun_p logdistr, void* data,
+			    double* plogdistr_old, mcmclib_mh_q* q);
 /**@}*/
 /**@}*/
 
