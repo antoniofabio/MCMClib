@@ -12,16 +12,14 @@ int check_dequal(double a, double b) {
   return (fabs(a-b) < TOL);
 }
 
-void matrix_printf(gsl_matrix* m) {
-  int p = m->size1;
-  int q = m->size2;
-  for(int i=0; i<p; i++) {
-    for(int j=0; j<q; j++)
-      printf("\t%f", gsl_matrix_get(m, i, j));
+void mprint(gsl_matrix* A) {
+  int n = A->size1;
+  int p = A->size2;
+  for(int i=0; i<n; i++) {
+    for(int j=0; j<p; j++)
+      printf("%.3f, ", gsl_matrix_get(A, i, j));
     printf("\n");
   }
-  printf("\n");
-  fflush(stdout);
 }
 
 #define P 2
@@ -61,8 +59,22 @@ int main(int argc, char** argv) {
   gsl_vector_set_all(p->alpha12sigma, 0.0);
 
   mcmclib_mcar_tilde_lpdf_update_blocks(p);
+  printf("Gamma:\n");
+  mprint(p->Gamma);
+  printf("B_tilde:\n");
+  mprint(p->B_tilde);
+  printf("Blocks:\n");
+  mprint(p->vcov);
   mcmclib_mcar_tilde_lpdf_update_vcov(p);
-  gsl_matrix_fprintf(stdout, p->vcov, "%f");
+  printf("VCOV:\n");
+  mprint(p->vcov);
+  for(int i=0; i<3; i++)
+    assert(gsl_matrix_get(p->vcov, i, i) > 0.0);
+
+  gsl_vector_set_all(p->alpha12sigma, 0.7);
+  mcmclib_mcar_tilde_lpdf_update_vcov(p);
+  printf("VCOV(0.7):\n");
+  mprint(p->vcov);
 
   x = gsl_vector_alloc(N*P);
   printf("%f -> %f\n", 0.0, lpdf(0.0));

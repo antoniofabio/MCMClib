@@ -100,21 +100,20 @@ void mcmclib_matrix_inverse(gsl_matrix* A) {
   gsl_permutation_free(p);
 }
 
-static void get_Lambda_LU(gsl_matrix* Lambda_LU, int flag, gsl_matrix* A, gsl_matrix* B_tilde) {
+static void get_Lambda_LU(gsl_matrix* Lambda_LU, int flag,
+			  gsl_matrix* A, gsl_matrix* A1,
+			  gsl_matrix* B_tilde) {
   int p = A->size1;
   gsl_matrix_set_zero(Lambda_LU);
   gsl_matrix* AB = gsl_matrix_alloc(p, p);
   gsl_matrix_set_zero(AB);
-  if(flag)
+  if(flag) {
     gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, A, B_tilde, 0.0, AB);
-  else
+  } else {
     gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, A, B_tilde, 0.0, AB);
-  gsl_matrix* A1 = gsl_matrix_alloc(p, p);
-  gsl_matrix_memcpy(A1, A);
-  mcmclib_matrix_inverse(A1);
+  }
   gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, AB, A1, 0.0, Lambda_LU);
   gsl_matrix_free(AB);
-  gsl_matrix_free(A1);
 }
 
 static void block_memcpy(gsl_matrix* dest, int i, int j, gsl_matrix* src) {
@@ -123,6 +122,16 @@ static void block_memcpy(gsl_matrix* dest, int i, int j, gsl_matrix* src) {
   for(int i1 = 0; i1 < p; i1++)
     for(int j1 = 0; j1 < q; j1++)
       gsl_matrix_set(dest, i1+i, j1+j, gsl_matrix_get(src, i1, j1));
+}
+
+static void mprint(gsl_matrix* A) {
+  int n = A->size1;
+  int p = A->size2;
+  for(int i=0; i<n; i++) {
+    for(int j=0; j<p; j++)
+      printf("%.3f, ", gsl_matrix_get(A, i, j));
+    printf("\n");
+  }
 }
 
 void mcmclib_mcar_tilde_lpdf_update_blocks(mcmclib_mcar_tilde_lpdf* p) {
@@ -135,41 +144,45 @@ void mcmclib_mcar_tilde_lpdf_update_blocks(mcmclib_mcar_tilde_lpdf* p) {
   gsl_matrix* A = gsl_matrix_alloc(p->p, p->p);
   gsl_matrix_memcpy(A, p->Gamma);
   gsl_linalg_cholesky_decomp(A);
+  gsl_matrix* A1 = gsl_matrix_alloc(p->p, p->p);
+  gsl_matrix_memcpy(A1, A);
+  gsl_linalg_cholesky_invert(A1);
   for(int i=0; i<(p->p - 1); i++)
     for (int j=i+1; j < p->p; j++)
       gsl_matrix_set(A, i, j, 0.0);
 
   gsl_matrix* Lambda_L = gsl_matrix_alloc(p->p, p->p);
-  get_Lambda_LU(Lambda_L, 0, A, p->B_tilde);
+  get_Lambda_LU(Lambda_L, 0, A, A1, p->B_tilde);
   gsl_matrix* Lambda_U = gsl_matrix_alloc(p->p, p->p);
-  get_Lambda_LU(Lambda_U, 1, A, p->B_tilde);
+  get_Lambda_LU(Lambda_U, 1, A, A1, p->B_tilde);
+  gsl_matrix_free(A1);
+  gsl_matrix_free(A);
 
+  gsl_matrix_set_zero(p->vcov);
   for(int i=0; i<n; i++) {
     gsl_matrix_memcpy(Gammai, p->Gamma);
     get_inverse(Gammai);
     gsl_matrix_scale(Gammai, gsl_vector_get(p->m, i));
-    for(int j=0; j<n; j++) {
+    for(int j=i; j<n; j++) {
       gsl_matrix_set_zero(Block);
-      if((gsl_matrix_get(p->M, i, j) == 1.0) || (i==j)) {
-	if(i<j) {
-	  gsl_matrix_memcpy(Lambda_ij, Lambda_U);
-	  gsl_matrix_scale(Lambda_ij, 1.0 / gsl_vector_get(p->m, i));
-	} else if(i>j) {
-	  gsl_matrix_memcpy(Lambda_ij, Lambda_L);
-	  gsl_matrix_scale(Lambda_ij, 1.0 / gsl_vector_get(p->m, j));
-	} else {
-	  gsl_matrix_set_identity(Lambda_ij);
-	  gsl_matrix_scale(Lambda_ij, -1.0);
-	}
-	gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, -1.0, Gammai, Lambda_ij, 0.0, Block);
+      if(i == j) {
+	block_memcpy(p->vcov, i * p->p, j * p->p, Gammai);
+      } else if (gsl_matrix_get(p->M, i, j) == 1.0) {
+	double mi = gsl_vector_get(p->m, i);
+	gsl_matrix_memcpy(Lambda_ij, Lambda_U);
+	gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, -1.0 / mi,
+		       Gammai, Lambda_ij, 0.0, Block);
+	block_memcpy(p->vcov, i * p->p, j * p->p, Block);
+	gsl_matrix_memcpy(Lambda_ij, Lambda_L);
+	gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, -1.0 / mi,
+		       Gammai, Lambda_ij, 0.0, Block);
+	block_memcpy(p->vcov, j * p->p, i * p->p, Block);
       }
-      block_memcpy(p->vcov, i * p->p, j * p->p, Block);
     }
   }
 
   gsl_matrix_free(Lambda_L);
   gsl_matrix_free(Lambda_U);
-  gsl_matrix_free(A);
 }
 
 void mcmclib_mcar_tilde_lpdf_update_vcov(mcmclib_mcar_tilde_lpdf* p) {
