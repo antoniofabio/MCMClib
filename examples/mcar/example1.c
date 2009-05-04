@@ -14,6 +14,7 @@
   P=3, DIM=5:  0.00044 secs per iteration
 */
 #define N 5000
+#define THIN 10
 #define T0 1000
 #define V0 4.0
 
@@ -71,7 +72,8 @@ int main(int argc, char** argv) {
   init_chains();
   FILE* out = fopen("chain_alpha12sigma.dat", "w");
   for(int i=0; i<N; i++) {
-    gsl_vector_fprintf(out, alpha12sigma, "%f");
+    if (( (i+1) % THIN ) == 0)
+      gsl_vector_fprintf(out, alpha12sigma, "%f");
     for(int j=0; j<2; j++) {
       mcmclib_amh_update(sampler[j]);
       assert(gsl_finite(sampler[j]->mh->logdistr_old));
