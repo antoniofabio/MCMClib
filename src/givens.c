@@ -16,15 +16,20 @@
 #include <gsl/gsl_linalg.h>
 #include "givens.h"
 
-static int ALPHA(int i, int j, int p) {
-  assert(i < j);
-  if(i == 0)
-    return (j - i) - 1;
-  return p - i - 1 + ALPHA(i-1, j, p);
+/*sum of the numbers from 'b' to 'a'*/
+static int partsum(int a, int b) {
+  if(b>a)
+    return 0;
+  return (a*(a+1) - b*(b-1))/2;
 }
 
-static double alpha_get(const gsl_vector* a, int i, int j) {
-  return gsl_vector_get(a, ALPHA(i, j, a->size));
+static int ALPHA(int i, int j, int p) {
+  assert(i < j);
+  return partsum(p-1, p-i) + j - i - 1;
+}
+
+static double alpha_get(const gsl_vector* a, int i, int j, int p) {
+  return gsl_vector_get(a, ALPHA(i, j, p));
 }
 
 static void Givens_set_Shij(gsl_matrix* S, int i, int j, double alpha_ij) {
@@ -46,7 +51,7 @@ void mcmclib_Givens_rotations(gsl_matrix* A, const gsl_vector* alpha) {
 
   for(int i=0; i<(p-1); i++) {
     for(int j=i+1; j<p; j++) {
-      double bi = exp(alpha_get(alpha, i, j));
+      double bi = exp(alpha_get(alpha, i, j, p));
       bi = M_PI_2 * (bi - 1.0) / (bi + 1.0);
       Givens_set_Shij(S[0], i, j, bi);
       gsl_matrix_set_zero(A);
