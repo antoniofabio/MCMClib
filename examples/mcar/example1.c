@@ -9,12 +9,16 @@
 #include <mcar_tilde.h>
 #include <mcar_model.h>
 
-#define N 10 /* 1.23 secs per iteration*/
-#define T0 5000
-#define V0 0.4
+/*P=3, DIM=95: 1.23000 secs per iteration
+  P=3, DIM=10: 0.00191 secs per iteration
+  P=3, DIM=5:  0.00044 secs per iteration
+*/
+#define N 5000
+#define T0 1000
+#define V0 4.0
 
 #define P 3
-#define DIM 95
+#define DIM 5
 
 gsl_vector *alpha12sigma, *alphasigmag;
 gsl_rng* rng;
