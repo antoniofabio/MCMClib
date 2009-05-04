@@ -101,7 +101,10 @@ void mcmclib_Givens_representation(gsl_matrix* M,
 }
 
 /* rebuild asymm. matrix from its SVD decomposition */
-static void anti_SVD(gsl_matrix* A, gsl_matrix* P1, gsl_matrix* P2, const gsl_vector* sigma) {
+static void anti_SVD(gsl_matrix* A,
+		     const gsl_matrix* P1,
+		     const gsl_matrix* P2,
+		     const gsl_vector* sigma) {
   int p = A->size1;
   gsl_matrix* Delta = gsl_matrix_alloc(p, p);
   gsl_matrix_set_zero(Delta);
