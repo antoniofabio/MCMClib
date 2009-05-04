@@ -22,6 +22,20 @@ void mprint(gsl_matrix* A) {
   }
 }
 
+int is_pos_def(gsl_matrix* A) {
+  if(A->size1 != A->size2)
+    return 0;
+  int n = A->size1;
+  for(int i=0; i<(n-1); i++) {
+    if(gsl_matrix_get(A, i, i) <= 0.0)
+      return 0;
+    for(int j=(i+1); j<n; j++)
+      if(gsl_matrix_get(A, i, j) != gsl_matrix_get(A, j, i))
+	return 0;
+  }
+  return 1;
+}
+
 #define P 2
 #define N 3
 
@@ -68,13 +82,13 @@ int main(int argc, char** argv) {
   mcmclib_mcar_tilde_lpdf_update_vcov(p);
   printf("VCOV:\n");
   mprint(p->vcov);
-  for(int i=0; i<3; i++)
-    assert(gsl_matrix_get(p->vcov, i, i) > 0.0);
+  assert(is_pos_def(p->vcov));
 
   gsl_vector_set_all(p->alpha12sigma, 0.7);
   mcmclib_mcar_tilde_lpdf_update_vcov(p);
   printf("VCOV(0.7):\n");
   mprint(p->vcov);
+  assert(is_pos_def(p->vcov));
 
   x = gsl_vector_alloc(N*P);
   printf("%f -> %f\n", 0.0, lpdf(0.0));
