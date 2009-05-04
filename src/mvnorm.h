@@ -23,8 +23,8 @@
 @param out result vector
 */
 void mcmclib_mvnorm(const gsl_rng* r,
-	const gsl_matrix* sigma,
-	gsl_vector* out);
+		    const gsl_matrix* sigma,
+		    gsl_vector* out);
 
 /** Multivariate gassian variate, with known cholesky decomposition.
 \internal
@@ -64,8 +64,9 @@ void mcmclib_mvnorm_lpdf_free(mcmclib_mvnorm_lpdf* p);
 double mcmclib_mvnorm_lpdf_compute(void* in_p, gsl_vector* x);
 
 /**update cholesky decomposition info
+   @return !0 if non pos.def. covariance matrix
 \internal*/
-void mcmclib_mvnorm_lpdf_chol(mcmclib_mvnorm_lpdf* p);
+int mcmclib_mvnorm_lpdf_chol(mcmclib_mvnorm_lpdf* p);
 
 /**compute log-distrib without recomputing cholesky decomposition
 \internal*/
