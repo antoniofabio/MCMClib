@@ -18,6 +18,8 @@ mcmclib_amh* mcmclib_gauss_am_alloc(gsl_rng* r,
 				    const gsl_matrix* sigma_zero, int t0) {
   mcmclib_gauss_am_suff* suff = (mcmclib_gauss_am_suff*)
     malloc(sizeof(mcmclib_gauss_am_suff));
+  assert(sigma_zero->size1 == sigma_zero->size2);
+  assert(start_x->size == sigma_zero->size1);
   int d = start_x->size;
   suff->Sigma_zero = gsl_matrix_alloc(d, d);
   gsl_matrix_memcpy(suff->Sigma_zero, sigma_zero);
