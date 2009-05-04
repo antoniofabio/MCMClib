@@ -24,6 +24,7 @@ void init_chains() {
   rng = gsl_rng_alloc(gsl_rng_default);
 
   alpha12sigma = lpdf->alpha12sigma;
+  gsl_vector_set_all(alpha12sigma, -1.0);
   gsl_matrix* Sigma0 = gsl_matrix_alloc(P*P, P*P);
   gsl_matrix_set_identity(Sigma0);
   gsl_matrix_scale(Sigma0, V0 / ((double)(P * P)));
@@ -32,6 +33,7 @@ void init_chains() {
   gsl_matrix_free(Sigma0);
 
   alphasigmag = lpdf->alphasigmag;
+  gsl_vector_set_all(alphasigmag, -1.0);
   Sigma0 = gsl_matrix_alloc(P*(P-1)/2 + P, P*(P-1)/2 + P);
   gsl_matrix_set_identity(Sigma0);
   gsl_matrix_scale(Sigma0, V0 / (double) (P*(P-1)/2 + P));
