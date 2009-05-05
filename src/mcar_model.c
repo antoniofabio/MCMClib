@@ -8,7 +8,6 @@
  *  (at your option) any later version.
  */
 #include <gsl/gsl_math.h>
-#include <gsl/gsl_sort_vector.h>
 #include "mcar_model.h"
 
 mcmclib_mcar_model* mcmclib_mcar_model_alloc(mcmclib_mcar_tilde_lpdf* m, gsl_vector* e) {
