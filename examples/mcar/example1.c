@@ -8,15 +8,16 @@
 #include <gauss_am.h>
 #include <mcar_tilde.h>
 #include <mcar_model.h>
+#include <matrix.h>
 
 /*P=3, DIM=95: 1.23000 secs per iteration
   P=3, DIM=10: 0.00191 secs per iteration
   P=3, DIM=5:  0.00044 secs per iteration
 */
-#define N 5000
+#define N 10000
 #define THIN 10
-#define T0 1000
-#define V0 4.0
+#define T0 2000
+#define V0 0.4
 
 #define P 3
 #define DIM 5
@@ -71,9 +72,12 @@ int main(int argc, char** argv) {
 
   init_chains();
   FILE* out = fopen("chain_alpha12sigma.dat", "w");
+  FILE* out_lpdf = fopen("chain_lpdf.dat", "w");
   for(int i=0; i<N; i++) {
-    if (( (i+1) % THIN ) == 0)
+    if (( (i+1) % THIN ) == 0) {
       gsl_vector_fprintf(out, alpha12sigma, "%f");
+      fprintf(out_lpdf, "%f\n", mcmclib_mcar_model_alpha12sigma_lpdf(model, alpha12sigma));
+    }
     for(int j=0; j<2; j++) {
       mcmclib_amh_update(sampler[j]);
       assert(gsl_finite(sampler[j]->mh->logdistr_old));
