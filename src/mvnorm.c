@@ -29,8 +29,8 @@ void mcmclib_mvnorm_chol(const gsl_rng* r,
 			 const gsl_matrix* sigma_chol,
 			 gsl_vector* out) {
   /*generate d iid values*/
-  for(int n= (sigma_chol->size1 - 1); n>=0; n--)
-    gsl_vector_set(out, n, gsl_ran_gaussian(r, 1.0));
+  for(int n=0; n < sigma_chol->size1; n++)
+    gsl_vector_set(out, sigma_chol->size1 - n - 1, gsl_ran_gaussian(r, 1.0));
 
   /*rotate them according to the cholesky 'square root' of sigma*/
   gsl_blas_dtrmv(CblasLower, CblasNoTrans, CblasNonUnit, sigma_chol, out);
