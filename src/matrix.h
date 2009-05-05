@@ -9,6 +9,7 @@
  */
 #ifndef __MCMCLIB_MATRIX_H__
 #define __MCMCLIB_MATRIX_H__
+#include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 
 /**\addtogroup misc
@@ -16,6 +17,9 @@
 
 /** Compute matrix inverse in-place, by LU factorization */
 void mcmclib_matrix_inverse(gsl_matrix* A);
+
+/** Print vector 'v' on stdout */
+void mcmclib_vector_printf(gsl_vector* v);
 
 /** Print matrix 'A' on stdout */
 void mcmclib_matrix_printf(gsl_matrix* A);

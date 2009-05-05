@@ -12,12 +12,19 @@ void mcmclib_matrix_inverse(gsl_matrix* A) {
   gsl_permutation_free(p);
 }
 
+void mcmclib_vector_printf(gsl_vector* v) {
+  int n = v->size;
+  printf("%.3f", gsl_vector_get(v, 0));
+  for(int i=0; i<n; i++) {
+    printf(", %.3f", gsl_vector_get(v, i));
+  }
+  printf("\n");
+}
+
 void mcmclib_matrix_printf(gsl_matrix* A) {
   int n = A->size1;
-  int p = A->size2;
   for(int i=0; i<n; i++) {
-    for(int j=0; j<p; j++)
-      printf("%.3f, ", gsl_matrix_get(A, i, j));
-    printf("\n");
+    gsl_vector_view row = gsl_matrix_row(A, i);
+    mcmclib_vector_printf(&row.vector);
   }
 }
