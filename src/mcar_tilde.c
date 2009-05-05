@@ -12,6 +12,7 @@
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_blas.h>
 #include <gsl/gsl_linalg.h>
+#include "matrix.h"
 #include "mcar_tilde.h"
 
 mcmclib_mcar_tilde_lpdf* mcmclib_mcar_tilde_lpdf_alloc(int p, gsl_matrix* M) {
@@ -81,16 +82,6 @@ static int is_positive_definite(mcmclib_mcar_tilde_lpdf* p) {
   if(sigma_0 > 0.0)
     return 0;
   return 1;
-}
-
-static int get_inverse(gsl_matrix* A) {
-  gsl_error_handler_t *hnd = gsl_set_error_handler_off();
-  int status = gsl_linalg_cholesky_decomp(A);
-  gsl_set_error_handler(hnd);
-  if(status != GSL_SUCCESS)
-    return status;
-  gsl_linalg_cholesky_invert(A);
-  return GSL_SUCCESS;
 }
 
 static void get_Lambda_LU(gsl_matrix* Lambda_LU, int flag,
@@ -168,7 +159,7 @@ void mcmclib_mcar_tilde_lpdf_update_blocks(mcmclib_mcar_tilde_lpdf* p) {
 
 int mcmclib_mcar_tilde_lpdf_update_vcov(mcmclib_mcar_tilde_lpdf* p) {
   mcmclib_mcar_tilde_lpdf_update_blocks(p);
-  return get_inverse(p->vcov);
+  return mcmclib_cholesky_inverse(p->vcov);
 }
 
 double mcmclib_mcar_tilde_lpdf_compute(void* in_p, gsl_vector* x) {

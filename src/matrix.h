@@ -15,6 +15,14 @@
 /**\addtogroup misc
  @{*/
 
+/** Compute Cholesky dec. in place.
+    @return !GSL_SUCCESS if the cholesky decomposition fails */
+int mcmclib_cholesky_decomp(gsl_matrix* A);
+
+/** Compute matrix inverse in-place, by Cholesky dec.
+    @return !GSL_SUCCESS if the cholesky decomposition fails */
+int mcmclib_cholesky_inverse(gsl_matrix* A);
+
 /** Compute matrix inverse in-place, by LU factorization */
 void mcmclib_matrix_inverse(gsl_matrix* A);
 
