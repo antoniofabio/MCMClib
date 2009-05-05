@@ -89,8 +89,10 @@ static double alphasigma_logderiv(int p, const gsl_vector* x) {
   int offset = p*(p-1)/2;
   for(int n=0; n < offset; n++)
     ans += alphaij_logderiv(gsl_vector_get(x, n));
-  for(int n=offset; n < x->size; n++)
-    ans += gsl_vector_get(x, n);
+  for(int n=offset; n < x->size; n++) {
+    double xn = gsl_vector_get(x, n);
+    ans -= 0.5 * ( exp(xn) - xn ); /*1 deg. of freedom chisq. distrib. on log(x)*/
+  }
   return ans;
 }
 
