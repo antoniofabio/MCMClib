@@ -38,6 +38,24 @@ static double mvgauss(gsl_vector* x, double sigma) {
   return ans;
 }
 
+static double alphaij_logderiv(double x) {
+  return x - 2 * log(exp(x) + 1.0);
+}
+
+static double alpha12sigma_logderiv(int p, const gsl_vector* x) {
+  double ans = 0.0;
+  const int offset = p*(p-1);
+  for(int n=offset; n < x->size; n++) {
+    double xn = gsl_vector_get(x, n);
+    if(xn >= 0.0)
+      return log(0.0);
+    ans += xn;
+  }
+  for(int n=0; n < offset; n++)
+    ans += alphaij_logderiv(gsl_vector_get(x, n));
+  return ans;
+}
+
 double mcmclib_mcar_model_alpha12sigma_lpdf(void* in_p, gsl_vector* alpha12sigma) {
   mcmclib_mcar_model* p = (mcmclib_mcar_model*) in_p;
   int n = p->lpdf->p;
@@ -50,7 +68,7 @@ double mcmclib_mcar_model_alpha12sigma_lpdf(void* in_p, gsl_vector* alpha12sigma
   double ans = mcmclib_mcar_tilde_lpdf_compute(p->lpdf, p->e);
   gsl_vector_memcpy(p->lpdf->alpha12sigma, tmp);
   gsl_vector_free(tmp);
-  return ans + mvgauss(alpha12sigma, 10.0);
+  return ans + alpha12sigma_logderiv(n, alpha12sigma);
 }
 
 static double iwishart_alphasigma(mcmclib_iwishart_lpdf* p, gsl_vector* as) {
@@ -66,11 +84,20 @@ static double iwishart_alphasigma(mcmclib_iwishart_lpdf* p, gsl_vector* as) {
   return ans;
 }
 
+static double alphasigma_logderiv(int p, const gsl_vector* x) {
+  double ans = 0.0;
+  int offset = p*(p-1)/2;
+  for(int n=0; n < offset; n++)
+    ans += alphaij_logderiv(gsl_vector_get(x, n));
+  for(int n=offset; n < x->size; n++)
+    ans += gsl_vector_get(x, n);
+  return ans;
+}
+
 double mcmclib_mcar_model_alphasigma_lpdf(void* in_p, gsl_vector* alphasigma) {
   mcmclib_mcar_model* p = (mcmclib_mcar_model*) in_p;
 
-  //double ans = iwishart_alphasigma(p->w, alphasigma);
-  double ans = mvgauss(alphasigma, 3.0);
+  double ans = alphasigma_logderiv(p->lpdf->p, alphasigma);
   if(!gsl_finite(ans))
     return ans;
 
