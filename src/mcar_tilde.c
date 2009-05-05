@@ -15,98 +15,6 @@
 #include <gsl/gsl_linalg.h>
 #include "mcar_tilde.h"
 
-/* avoids runtime error, for checking matrix for positive definiteness */
-static inline double quiet_sqrt (double x) {
-  return (x >= 0) ? sqrt(x) : GSL_NAN;
-}
-
-static int try_cholesky (gsl_matrix * A) {
-  const size_t M = A->size1;
-
-  size_t i,j,k;
-
-  /* Do the first 2 rows explicitly.  It is simple, and faster.  And
-   * one can return if the matrix has only 1 or 2 rows.
-   */
-  double A_00 = gsl_matrix_get (A, 0, 0);
-  double L_00 = quiet_sqrt(A_00);
-
-  if (A_00 <= 0) {
-    return GSL_EDOM;
-  }
-
-  gsl_matrix_set (A, 0, 0, L_00);
-
-  if (M > 1) {
-    double A_10 = gsl_matrix_get (A, 1, 0);
-    double A_11 = gsl_matrix_get (A, 1, 1);
-
-    double L_10 = A_10 / L_00;
-    double diag = A_11 - L_10 * L_10;
-    double L_11 = quiet_sqrt(diag);
-
-    if (diag <= 0) {
-      return GSL_EDOM;
-    }
-
-    gsl_matrix_set (A, 1, 0, L_10);
-    gsl_matrix_set (A, 1, 1, L_11);
-  }
-
-  for (k = 2; k < M; k++) {
-    double A_kk = gsl_matrix_get (A, k, k);
-
-    for (i = 0; i < k; i++) {
-      double sum = 0;
-
-      double A_ki = gsl_matrix_get (A, k, i);
-      double A_ii = gsl_matrix_get (A, i, i);
-
-      gsl_vector_view ci = gsl_matrix_row (A, i);
-      gsl_vector_view ck = gsl_matrix_row (A, k);
-
-      if (i > 0) {
-	gsl_vector_view di = gsl_vector_subvector(&ci.vector, 0, i);
-	gsl_vector_view dk = gsl_vector_subvector(&ck.vector, 0, i);
-
-	gsl_blas_ddot (&di.vector, &dk.vector, &sum);
-      }
-
-      A_ki = (A_ki - sum) / A_ii;
-      gsl_matrix_set (A, k, i, A_ki);
-    }
-
-    {
-      gsl_vector_view ck = gsl_matrix_row (A, k);
-      gsl_vector_view dk = gsl_vector_subvector (&ck.vector, 0, k);
-
-      double sum = gsl_blas_dnrm2 (&dk.vector);
-      double diag = A_kk - sum * sum;
-
-      double L_kk = quiet_sqrt(diag);
-
-      if (diag <= 0) {
-	return GSL_EDOM;
-      }
-
-      gsl_matrix_set (A, k, k, L_kk);
-    }
-  }
-
-  /* Now copy the transposed lower triangle to the upper triangle,
-   * the diagonal is common.
-   */
-
-  for (i = 1; i < M; i++) {
-    for (j = 0; j < i; j++) {
-      double A_ij = gsl_matrix_get (A, i, j);
-      gsl_matrix_set (A, j, i, A_ij);
-    }
-  }
-
-  return GSL_SUCCESS;
-}
-
 mcmclib_mcar_tilde_lpdf* mcmclib_mcar_tilde_lpdf_alloc(int p, gsl_matrix* M) {
   mcmclib_mcar_tilde_lpdf* a = (mcmclib_mcar_tilde_lpdf*) malloc(sizeof(mcmclib_mcar_tilde_lpdf));
   assert(p>0);
@@ -177,8 +85,10 @@ static int is_positive_definite(mcmclib_mcar_tilde_lpdf* p) {
 }
 
 static int get_inverse(gsl_matrix* A) {
-  int status = try_cholesky(A);
-  if(status)
+  gsl_error_handler_t *hnd = gsl_set_error_handler_off();
+  int status = gsl_linalg_cholesky_decomp(A);
+  gsl_set_error_handler(hnd);
+  if(status != GSL_SUCCESS)
     return status;
   gsl_linalg_cholesky_invert(A);
   return GSL_SUCCESS;
