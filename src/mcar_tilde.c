@@ -109,7 +109,7 @@ static void get_Lambda_LU(gsl_matrix* Lambda_LU, int flag,
   gsl_matrix_free(AB);
 }
 
-static void block_memcpy(gsl_matrix* dest, int i, int j, const gsl_matrix* src) {
+static inline void block_memcpy(gsl_matrix* dest, int i, int j, const gsl_matrix* src) {
   gsl_matrix_view block_view = gsl_matrix_submatrix(dest, i, j,
 						    src->size1, src->size2);
   gsl_matrix_memcpy(&block_view.matrix, src);
