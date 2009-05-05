@@ -11,7 +11,6 @@
 #include <math.h>
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_blas.h>
-#include <gsl/gsl_permutation.h>
 #include <gsl/gsl_linalg.h>
 #include "mcar_tilde.h"
 
@@ -139,13 +138,11 @@ void mcmclib_mcar_tilde_lpdf_update_blocks(mcmclib_mcar_tilde_lpdf* p) {
   get_Lambda_LU(Lambda_L, 0, A, A1, p->B_tilde);
   gsl_matrix* Lambda_U = gsl_matrix_alloc(p->p, p->p);
   get_Lambda_LU(Lambda_U, 1, A, A1, p->B_tilde);
-  gsl_matrix_free(A1);
   gsl_matrix_free(A);
 
   gsl_matrix_set_zero(p->vcov);
   for(int i=0; i<n; i++) {
-    gsl_matrix_memcpy(Gammai, p->Gamma);
-    get_inverse(Gammai);
+    gsl_matrix_memcpy(Gammai, A1);
     gsl_matrix_scale(Gammai, gsl_vector_get(p->m, i));
     for(int j=i; j<n; j++) {
       gsl_matrix_set_zero(Block);
@@ -165,6 +162,7 @@ void mcmclib_mcar_tilde_lpdf_update_blocks(mcmclib_mcar_tilde_lpdf* p) {
     }
   }
 
+  gsl_matrix_free(A1);
   gsl_matrix_free(Lambda_L);
   gsl_matrix_free(Lambda_U);
 }
