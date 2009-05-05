@@ -140,18 +140,19 @@ void mcmclib_mcar_tilde_lpdf_update_blocks(mcmclib_mcar_tilde_lpdf* p) {
 
   gsl_matrix_set_zero(p->vcov);
   for(int i=0; i<n; i++) {
+    double mi = gsl_vector_get(p->m, i);
     gsl_matrix_memcpy(Gammai, A1);
-    gsl_matrix_scale(Gammai, gsl_vector_get(p->m, i));
+    gsl_matrix_scale(Gammai, mi);
     for(int j=i; j<n; j++) {
-      gsl_matrix_set_zero(Block);
       if(i == j) {
 	block_memcpy(p->vcov, i * p->p, j * p->p, Gammai);
       } else if (gsl_matrix_get(p->M, i, j) == 1.0) {
-	double mi = gsl_vector_get(p->m, i);
+	gsl_matrix_set_zero(Block);
 	gsl_matrix_memcpy(Lambda_ij, Lambda_U);
 	gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, -1.0 / mi,
 		       Gammai, Lambda_ij, 0.0, Block);
 	block_memcpy(p->vcov, i * p->p, j * p->p, Block);
+	gsl_matrix_set_zero(Block);
 	gsl_matrix_memcpy(Lambda_ij, Lambda_L);
 	gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, -1.0 / mi,
 		       Gammai, Lambda_ij, 0.0, Block);
