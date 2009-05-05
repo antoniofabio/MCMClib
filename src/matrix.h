@@ -18,6 +18,9 @@
 /** Compute matrix inverse in-place, by LU factorization */
 void mcmclib_matrix_inverse(gsl_matrix* A);
 
+/** check if vector 'v' is sorted in descending order */
+int mcmclib_vector_is_sorted_desc(gsl_vector* v);
+
 /** Print vector 'v' on stdout */
 void mcmclib_vector_printf(gsl_vector* v);
 

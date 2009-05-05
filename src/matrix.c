@@ -12,6 +12,17 @@ void mcmclib_matrix_inverse(gsl_matrix* A) {
   gsl_permutation_free(p);
 }
 
+int mcmclib_vector_is_sorted_desc(gsl_vector* v) {
+  double m = gsl_vector_get(v, 0);
+  for(int i=1; i<v->size; i++) {
+    double n = gsl_vector_get(v, i);
+    if(n > m)
+      return 0;
+    m = n;
+  }
+  return 1;
+}
+
 void mcmclib_vector_printf(gsl_vector* v) {
   int n = v->size;
   printf("%.3f", gsl_vector_get(v, 0));

@@ -8,6 +8,7 @@
  *  (at your option) any later version.
  */
 #include <gsl/gsl_math.h>
+#include "matrix.h"
 #include "mcar_model.h"
 
 mcmclib_mcar_model* mcmclib_mcar_model_alloc(mcmclib_mcar_tilde_lpdf* m, gsl_vector* e) {
@@ -28,22 +29,11 @@ void mcmclib_mcar_model_free(mcmclib_mcar_model* p) {
   free(p);
 }
 
-static int is_sorted(gsl_vector* v) {
-  double m = gsl_vector_get(v, 0);
-  for(int i=1; i<v->size; i++) {
-    double n = gsl_vector_get(v, i);
-    if(n > m)
-      return 0;
-    m = n;
-  }
-  return 1;
-}
-
 double mcmclib_mcar_model_alpha12sigma_lpdf(void* in_p, gsl_vector* alpha12sigma) {
   mcmclib_mcar_model* p = (mcmclib_mcar_model*) in_p;
   int n = p->lpdf->p;
   gsl_vector_view s_v = gsl_vector_subvector(alpha12sigma, n*(n-1), n);
-  if(!is_sorted(&s_v.vector))
+  if(!mcmclib_vector_is_sorted_desc(&s_v.vector))
     return log(0.0);
   gsl_vector* tmp = gsl_vector_alloc(alpha12sigma->size);
   gsl_vector_memcpy(tmp, p->lpdf->alpha12sigma);
@@ -57,7 +47,7 @@ double mcmclib_mcar_model_alpha12sigma_lpdf(void* in_p, gsl_vector* alpha12sigma
 static double iwishart_alphasigma(mcmclib_iwishart_lpdf* p, gsl_vector* as) {
   int n = p->Psi->size1;
   gsl_vector_view s_v = gsl_vector_subvector(as, n*(n-1)/2, n);
-  if(!is_sorted(&s_v.vector))
+  if(!mcmclib_vector_is_sorted_desc(&s_v.vector))
     return log(0.0);
   gsl_matrix* Gamma = gsl_matrix_alloc(n, n);
   mcmclib_Givens_representation(Gamma, as);
