@@ -94,17 +94,6 @@ static int get_inverse(gsl_matrix* A) {
   return GSL_SUCCESS;
 }
 
-void mcmclib_matrix_inverse(gsl_matrix* A) {
-  gsl_permutation* p = gsl_permutation_alloc(A->size1);
-  gsl_matrix* A1 = gsl_matrix_alloc(A->size1, A->size1);
-  int tmp=0;
-  gsl_matrix_memcpy(A1, A);
-  gsl_linalg_LU_decomp(A1, p, &tmp);
-  gsl_linalg_LU_invert(A1, p, A);
-  gsl_matrix_free(A1);
-  gsl_permutation_free(p);
-}
-
 static void get_Lambda_LU(gsl_matrix* Lambda_LU, int flag,
 			  gsl_matrix* A, gsl_matrix* A1,
 			  gsl_matrix* B_tilde) {
@@ -127,16 +116,6 @@ static void block_memcpy(gsl_matrix* dest, int i, int j, gsl_matrix* src) {
   for(int i1 = 0; i1 < p; i1++)
     for(int j1 = 0; j1 < q; j1++)
       gsl_matrix_set(dest, i1+i, j1+j, gsl_matrix_get(src, i1, j1));
-}
-
-static void mprint(gsl_matrix* A) {
-  int n = A->size1;
-  int p = A->size2;
-  for(int i=0; i<n; i++) {
-    for(int j=0; j<p; j++)
-      printf("%.3f, ", gsl_matrix_get(A, i, j));
-    printf("\n");
-  }
 }
 
 void mcmclib_mcar_tilde_lpdf_update_blocks(mcmclib_mcar_tilde_lpdf* p) {

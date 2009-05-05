@@ -55,16 +55,6 @@ double mcmclib_mcar_model_alpha12sigma_lpdf(void* in_p, gsl_vector* alpha12sigma
   return ans;
 }
 
-static void mprint(gsl_matrix* A) {
-  int n = A->size1;
-  int p = A->size2;
-  for(int i=0; i<n; i++) {
-    for(int j=0; j<p; j++)
-      printf("%.3f, ", gsl_matrix_get(A, i, j));
-    printf("\n");
-  }
-}
-
 static double iwishart_alphasigma(mcmclib_iwishart_lpdf* p, gsl_vector* as) {
   int n = p->Psi->size1;
   gsl_vector_view s_v = gsl_vector_subvector(as, n*(n-1)/2, n);
