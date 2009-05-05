@@ -109,12 +109,10 @@ static void get_Lambda_LU(gsl_matrix* Lambda_LU, int flag,
   gsl_matrix_free(AB);
 }
 
-static void block_memcpy(gsl_matrix* dest, int i, int j, gsl_matrix* src) {
-  int p = src->size1;
-  int q = src->size2;
-  for(int i1 = 0; i1 < p; i1++)
-    for(int j1 = 0; j1 < q; j1++)
-      gsl_matrix_set(dest, i1+i, j1+j, gsl_matrix_get(src, i1, j1));
+static void block_memcpy(gsl_matrix* dest, int i, int j, const gsl_matrix* src) {
+  gsl_matrix_view block_view = gsl_matrix_submatrix(dest, i, j,
+						    src->size1, src->size2);
+  gsl_matrix_memcpy(&block_view.matrix, src);
 }
 
 void mcmclib_mcar_tilde_lpdf_update_blocks(mcmclib_mcar_tilde_lpdf* p) {
