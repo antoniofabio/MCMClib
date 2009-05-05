@@ -15,7 +15,7 @@ void mcmclib_matrix_inverse(gsl_matrix* A) {
 void mcmclib_vector_printf(gsl_vector* v) {
   int n = v->size;
   printf("%.3f", gsl_vector_get(v, 0));
-  for(int i=0; i<n; i++) {
+  for(int i=1; i<n; i++) {
     printf(", %.3f", gsl_vector_get(v, i));
   }
   printf("\n");
