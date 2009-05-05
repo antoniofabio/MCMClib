@@ -56,7 +56,8 @@ double mcmclib_iwishart_lpdf_compute(void* in_p, gsl_vector* x) {
   gsl_matrix* X = &(X_v.matrix);
   gsl_matrix* X1 = p->X1;
   gsl_matrix_memcpy(X1, X);
-  gsl_linalg_cholesky_decomp(X1);
+  if(mcmclib_cholesky_decomp(X1) != GSL_SUCCESS)
+    return log(0.0);
   double Xdet2 = 0.0;
   for(int i=0; i<n; i++)
     Xdet2 += log(gsl_matrix_get(X1, i, i));
