@@ -7,7 +7,9 @@
  *  the Free Software Foundation; either version 2 of the License, or
  *  (at your option) any later version.
  */
+#include <assert.h>
 #include <gsl/gsl_math.h>
+#include <gsl/gsl_randist.h>
 #include "matrix.h"
 #include "mcar_model.h"
 
@@ -29,6 +31,13 @@ void mcmclib_mcar_model_free(mcmclib_mcar_model* p) {
   free(p);
 }
 
+static double mvgauss(gsl_vector* x, double sigma) {
+  double ans = 0.0;
+  for(int i=0; i<x->size; i++)
+    ans += log(gsl_ran_gaussian_pdf(gsl_vector_get(x, i), sigma));
+  return ans;
+}
+
 double mcmclib_mcar_model_alpha12sigma_lpdf(void* in_p, gsl_vector* alpha12sigma) {
   mcmclib_mcar_model* p = (mcmclib_mcar_model*) in_p;
   int n = p->lpdf->p;
@@ -41,7 +50,7 @@ double mcmclib_mcar_model_alpha12sigma_lpdf(void* in_p, gsl_vector* alpha12sigma
   double ans = mcmclib_mcar_tilde_lpdf_compute(p->lpdf, p->e);
   gsl_vector_memcpy(p->lpdf->alpha12sigma, tmp);
   gsl_vector_free(tmp);
-  return ans;
+  return ans + mvgauss(alpha12sigma, 10.0);
 }
 
 static double iwishart_alphasigma(mcmclib_iwishart_lpdf* p, gsl_vector* as) {
@@ -60,7 +69,8 @@ static double iwishart_alphasigma(mcmclib_iwishart_lpdf* p, gsl_vector* as) {
 double mcmclib_mcar_model_alphasigma_lpdf(void* in_p, gsl_vector* alphasigma) {
   mcmclib_mcar_model* p = (mcmclib_mcar_model*) in_p;
 
-  double ans = iwishart_alphasigma(p->w, alphasigma);
+  //double ans = iwishart_alphasigma(p->w, alphasigma);
+  double ans = mvgauss(alphasigma, 3.0);
   if(!gsl_finite(ans))
     return ans;
 
