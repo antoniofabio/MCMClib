@@ -16,11 +16,11 @@
 */
 #define N 10000
 #define THIN 10
-#define T0 2000
+#define T0 5000
 #define V0 0.4
 
-#define P 3
-#define DIM 5
+#define P 6
+#define DIM 10
 
 gsl_vector *alpha12sigma, *alphasigmag;
 gsl_rng* rng;
@@ -71,11 +71,13 @@ int main(int argc, char** argv) {
   model = mcmclib_mcar_model_alloc(lpdf, e);
 
   init_chains();
-  FILE* out = fopen("chain_alpha12sigma.dat", "w");
+  FILE* out_a12s = fopen("chain_alpha12sigma.dat", "w");
+  FILE* out_as = fopen("chain_alphasigma.dat", "w");
   FILE* out_lpdf = fopen("chain_lpdf.dat", "w");
   for(int i=0; i<N; i++) {
     if (( (i+1) % THIN ) == 0) {
-      gsl_vector_fprintf(out, alpha12sigma, "%f");
+      gsl_vector_fprintf(out_a12s, alpha12sigma, "%f");
+      gsl_vector_fprintf(out_as, alphasigmag, "%f");
       fprintf(out_lpdf, "%f\n", mcmclib_mcar_model_alpha12sigma_lpdf(model, alpha12sigma));
     }
     for(int j=0; j<2; j++) {
@@ -83,7 +85,8 @@ int main(int argc, char** argv) {
       assert(gsl_finite(sampler[j]->mh->logdistr_old));
     }
   }
-  fclose(out);
+  fclose(out_a12s);
+  fclose(out_lpdf);
 
   free_chains();
   mcmclib_mcar_model_free(model);
