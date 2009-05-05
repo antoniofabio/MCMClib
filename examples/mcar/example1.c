@@ -29,8 +29,6 @@ mcmclib_mcar_model* model;
 mcmclib_amh* sampler[2];
 
 void init_chains() {
-  rng = gsl_rng_alloc(gsl_rng_default);
-
   alpha12sigma = lpdf->alpha12sigma;
   gsl_vector_set_all(alpha12sigma, -1.0);
   gsl_matrix* Sigma0 = gsl_matrix_alloc(P*P, P*P);
@@ -57,6 +55,8 @@ void free_chains() {
 }
 
 int main(int argc, char** argv) {
+  rng = gsl_rng_alloc(gsl_rng_default);
+
   /* model setup */
   gsl_matrix* W = gsl_matrix_alloc(DIM, DIM);
   gsl_matrix_set_zero(W);
@@ -67,7 +67,8 @@ int main(int argc, char** argv) {
   lpdf = mcmclib_mcar_tilde_lpdf_alloc(P, W);
   gsl_matrix_free(W);
   gsl_vector* e = gsl_vector_alloc(P * DIM);
-  gsl_vector_set_zero(e);
+  for(int i=0; i<P*DIM; i++)
+    gsl_vector_set(e, i, gsl_ran_gaussian(rng, 1.0));
   model = mcmclib_mcar_model_alloc(lpdf, e);
 
   init_chains();
