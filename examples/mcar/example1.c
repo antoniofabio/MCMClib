@@ -10,9 +10,10 @@
 #include <mcar_model.h>
 #include <matrix.h>
 
-/*P=3, DIM=95: 1.23000 secs per iteration
-  P=3, DIM=10: 0.00191 secs per iteration
-  P=3, DIM=5:  0.00044 secs per iteration
+/*P=3, DIM=95: 0.07379 secs per iteration
+  P=6, DIM=10: 0.00232 secs per iteration
+  P=3, DIM=10: 0.00039 secs per iteration
+  P=3, DIM=5:  0.00016 secs per iteration
 */
 #define N 10000
 #define THIN 10

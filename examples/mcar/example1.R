@@ -1,4 +1,4 @@
-P <- 6
+P <- 3
 THIN <- 10
 offset <- P*(P-1)
 offset2 <- P*(P-1)/2
