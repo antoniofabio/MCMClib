@@ -167,13 +167,22 @@ int mcmclib_mcar_tilde_lpdf_update_vcov(mcmclib_mcar_tilde_lpdf* p) {
 /* Normal distrib. with 0 mean, no normalizing factors
    P is assumed to be the cholesky dec. of the precision matrix.
  */
-static inline double _mvnorm(const gsl_matrix* P, const gsl_vector* e,
-			     double ldet, gsl_vector* work) {
+static inline double _mvnorm(const gsl_matrix* P, const gsl_vector* e) {
+  int n = e->size;
+  gsl_matrix* tmp = gsl_matrix_alloc(n, n);
+  gsl_matrix_memcpy(tmp, P);
+  int status = mcmclib_cholesky_decomp(tmp);
+  double ldet = 2.0 * mcmclib_matrix_logtrace(tmp);
+  gsl_matrix_free(tmp);
+  if(status)
+    return log(0.0);
+  gsl_vector* work = gsl_vector_alloc(n);
   gsl_vector_set_zero(work);
   gsl_blas_dsymv(CblasUpper, 1.0, P, e, 0.0, work);
   double ans = 0.0;
   gsl_blas_ddot(e, work, &ans);
-  return -0.5 * ( ans + ldet );
+  gsl_vector_free(work);
+  return 0.5 * ( ldet - ans );
 }
 
 double mcmclib_mcar_tilde_lpdf_compute(void* in_p, gsl_vector* x) {
@@ -185,15 +194,7 @@ double mcmclib_mcar_tilde_lpdf_compute(void* in_p, gsl_vector* x) {
   int status = mcmclib_mcar_tilde_lpdf_update_blocks(p);
   if(status)
     return log(0.0);
-  gsl_vector* work = gsl_vector_alloc(x->size);
-  gsl_matrix* tmp = gsl_matrix_alloc(x->size, x->size);
-  gsl_matrix_memcpy(tmp, p->vcov);
-  mcmclib_cholesky_decomp(tmp);
-  double ldet = mcmclib_matrix_logtrace(tmp);
-  gsl_matrix_free(tmp);
-  double ans = _mvnorm(p->vcov, x, ldet, work);
-  gsl_vector_free(work);
-  return ans;
+  return _mvnorm(p->vcov, x);
 }
 
 void mcmclib_mcar_tilde_lpdf_update_Gamma(mcmclib_mcar_tilde_lpdf* p) {
