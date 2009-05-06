@@ -1,3 +1,4 @@
+#include <gsl/gsl_math.h>
 #include <gsl/gsl_linalg.h>
 #include "matrix.h"
 
@@ -16,6 +17,13 @@ int mcmclib_cholesky_inverse(gsl_matrix* A) {
     return status;
   gsl_linalg_cholesky_invert(A);
   return GSL_SUCCESS;
+}
+
+double mcmclib_matrix_logtrace(const gsl_matrix* A) {
+  double ans = 0.0;
+  for(int i=0; i < A->size1; i++)
+    ans += log(gsl_matrix_get(A, i, i));
+  return ans;
 }
 
 void mcmclib_matrix_inverse(gsl_matrix* A) {

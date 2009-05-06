@@ -23,6 +23,9 @@ int mcmclib_cholesky_decomp(gsl_matrix* A);
     @return !GSL_SUCCESS if the cholesky decomposition fails */
 int mcmclib_cholesky_inverse(gsl_matrix* A);
 
+/** Trace of the logarithm of matrix 'A' */
+double mcmclib_matrix_logtrace(const gsl_matrix* A);
+
 /** Compute matrix inverse in-place, by LU factorization */
 void mcmclib_matrix_inverse(gsl_matrix* A);
 
