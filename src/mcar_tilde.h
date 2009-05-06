@@ -32,10 +32,7 @@ typedef struct {
   gsl_matrix* M; /**< adiancency matrix (n x n)*/
   gsl_vector* m; /**< adiancency weights (n)*/
 
-  /*internal stuff*/
-  gsl_vector* mu;
-  gsl_matrix* vcov;
-  mcmclib_mvnorm_lpdf* mvnorm; /**< normal density object */
+  gsl_matrix* vcov; /**< precision matrix */
 
   /*workspace memory*/
   gsl_matrix *Lambda_ij, *Gammai, *Block; /**< used in fun 'vcov_blockij' */

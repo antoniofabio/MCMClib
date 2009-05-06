@@ -42,9 +42,6 @@ mcmclib_mcar_tilde_lpdf* mcmclib_mcar_tilde_lpdf_alloc(int p, gsl_matrix* M) {
 
   a->vcov = gsl_matrix_alloc(p*n, p*n);
   gsl_matrix_set_identity(a->vcov);
-  a->mu = gsl_vector_alloc(p*n);
-  gsl_vector_set_zero(a->mu);
-  a->mvnorm = mcmclib_mvnorm_lpdf_alloc(a->mu, a->vcov->data);
 
   a->Lambda_ij = gsl_matrix_alloc(p, p);
   a->Gammai = gsl_matrix_alloc(p, p);
@@ -55,9 +52,7 @@ mcmclib_mcar_tilde_lpdf* mcmclib_mcar_tilde_lpdf_alloc(int p, gsl_matrix* M) {
 }
 
 void mcmclib_mcar_tilde_lpdf_free(mcmclib_mcar_tilde_lpdf* p) {
-  mcmclib_mvnorm_lpdf_free(p->mvnorm);
   gsl_matrix_free(p->vcov);
-  gsl_vector_free(p->mu);
   gsl_vector_free(p->m);
   gsl_matrix_free(p->M);
   gsl_vector_free(p->alpha12sigma);
@@ -169,15 +164,36 @@ int mcmclib_mcar_tilde_lpdf_update_vcov(mcmclib_mcar_tilde_lpdf* p) {
   return mcmclib_cholesky_inverse(p->vcov);
 }
 
+/* Normal distrib. with 0 mean, no normalizing factors
+   P is assumed to be the cholesky dec. of the precision matrix.
+ */
+static inline double _mvnorm(const gsl_matrix* P, const gsl_vector* e,
+			     double ldet, gsl_vector* work) {
+  gsl_vector_set_zero(work);
+  gsl_blas_dsymv(CblasUpper, 1.0, P, e, 0.0, work);
+  double ans = 0.0;
+  gsl_blas_ddot(e, work, &ans);
+  return -0.5 * ( ans + ldet );
+}
+
 double mcmclib_mcar_tilde_lpdf_compute(void* in_p, gsl_vector* x) {
   mcmclib_mcar_tilde_lpdf* p = (mcmclib_mcar_tilde_lpdf*) in_p;
   if(!is_positive_definite(p))
     return log(0.0);
   mcmclib_mcar_tilde_lpdf_update_B_tilde(p);
   mcmclib_mcar_tilde_lpdf_update_Gamma(p);
-  if(mcmclib_mcar_tilde_lpdf_update_vcov(p))
+  int status = mcmclib_mcar_tilde_lpdf_update_blocks(p);
+  if(status)
     return log(0.0);
-  return mcmclib_mvnorm_lpdf_compute(p->mvnorm, x);
+  gsl_vector* work = gsl_vector_alloc(x->size);
+  gsl_matrix* tmp = gsl_matrix_alloc(x->size, x->size);
+  gsl_matrix_memcpy(tmp, p->vcov);
+  mcmclib_cholesky_decomp(tmp);
+  double ldet = mcmclib_matrix_logtrace(tmp);
+  gsl_matrix_free(tmp);
+  double ans = _mvnorm(p->vcov, x, ldet, work);
+  gsl_vector_free(work);
+  return ans;
 }
 
 void mcmclib_mcar_tilde_lpdf_update_Gamma(mcmclib_mcar_tilde_lpdf* p) {
