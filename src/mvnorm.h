@@ -79,6 +79,9 @@ void mcmclib_mvnorm_lpdf_inverse(mcmclib_mvnorm_lpdf* p);
 \internal*/
 double mcmclib_mvnorm_lpdf_compute_noinv(mcmclib_mvnorm_lpdf* p, gsl_vector* x);
 
+/** multivariate zero-mean normal log-density based on precision matrix */
+double mcmclib_mvnormzp_lpdf(const gsl_matrix* Psi, const gsl_vector* y);
+
 /**@}*/
 /**@}*/
 #endif

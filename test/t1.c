@@ -5,6 +5,7 @@
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
+#include <matrix.h>
 #include <mvnorm.h>
 
 #define TOL 1e-6
@@ -70,6 +71,16 @@ int main(int argc, char** argv) {
   for(int i=0; i<DIM; i++)
     gsl_vector_set(x, i, pow(-1, i+1));
   assert(check_dequal(mcmclib_mvnorm_lpdf_compute(p, x), -125.512443));
+  mcmclib_mvnorm_lpdf_free(p);
+
+  gsl_vector_set_all(mu, 0.0);
+  gsl_vector_set_all(x, 0.0);
+  p = mcmclib_mvnorm_lpdf_alloc(mu, Sigma->data);
+  double check = mcmclib_mvnorm_lpdf_compute(p, x);
+  assert(!mcmclib_cholesky_inverse(Sigma));
+  assert(check_dequal(mcmclib_mvnormzp_lpdf(Sigma, x), check));
+  mcmclib_mvnorm_lpdf_free(p);
+
   gsl_vector_free(x);
   gsl_vector_free(mu);
   gsl_matrix_free(Sigma);

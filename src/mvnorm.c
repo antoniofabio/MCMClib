@@ -9,6 +9,7 @@
  */
 #include <math.h>
 #include <gsl/gsl_math.h>
+#include "matrix.h"
 #include "mvnorm.h"
 
 void mcmclib_mvnorm(const gsl_rng* r,
@@ -133,4 +134,23 @@ double mcmclib_mvnorm_lpdf_compute_noinv(mcmclib_mvnorm_lpdf* p, gsl_vector* x) 
   ans *= -0.5;
 
   return ans;
+}
+
+double mcmclib_mvnormzp_lpdf(const gsl_matrix* Psi, const gsl_vector* y) {
+  int n = y->size;
+  gsl_matrix* tmp = gsl_matrix_alloc(n, n);
+  gsl_matrix_memcpy(tmp, Psi);
+  int status = mcmclib_cholesky_decomp(tmp);
+  double ldet = - 2.0 * mcmclib_matrix_logtrace(tmp);
+  gsl_matrix_free(tmp);
+  if(status)
+    return log(0.0);
+  gsl_vector* PsiY = gsl_vector_alloc(n);
+  gsl_vector_set_zero(PsiY);
+  gsl_blas_dsymv(CblasLower, 1.0, Psi, y, 0.0, PsiY);
+  double ans = 0.0;
+  gsl_blas_ddot(y, PsiY, &ans);
+  gsl_vector_free(PsiY);
+  ans += ((double) n) * log(2.0 * M_PI) + ldet;
+  return -0.5 * ans;
 }
