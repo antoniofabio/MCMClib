@@ -13,6 +13,9 @@
 #include "matrix.h"
 #include "mcar_model.h"
 
+/* tolerance for pos. def. conditions */
+#define TOL 1e-4
+
 mcmclib_mcar_model* mcmclib_mcar_model_alloc(mcmclib_mcar_tilde_lpdf* m, gsl_vector* e) {
   mcmclib_mcar_model* a = (mcmclib_mcar_model*) malloc(sizeof(mcmclib_mcar_model));
   a->lpdf = m;
@@ -45,14 +48,18 @@ static double alphaij_logderiv(double x) {
 static double alpha12sigma_logderiv(int p, const gsl_vector* x) {
   double ans = 0.0;
   const int offset = p*(p-1);
+  for(int n=0; n < offset; n++) {
+    double xn = gsl_vector_get(x, n);
+    if(abs(xn) >= log(M_PI / TOL - 1.0))
+      return log(0.0);
+    ans += alphaij_logderiv(xn);
+  }
   for(int n=offset; n < x->size; n++) {
     double xn = gsl_vector_get(x, n);
-    if(xn >= 0.0)
+    if((xn <= log(TOL)) || (xn >= log(1.0 - TOL)))
       return log(0.0);
     ans += xn;
   }
-  for(int n=0; n < offset; n++)
-    ans += alphaij_logderiv(gsl_vector_get(x, n));
   return ans;
 }
 
@@ -87,10 +94,16 @@ static double iwishart_alphasigma(mcmclib_iwishart_lpdf* p, gsl_vector* as) {
 static double alphasigma_logderiv(int p, const gsl_vector* x) {
   double ans = 0.0;
   int offset = p*(p-1)/2;
-  for(int n=0; n < offset; n++)
-    ans += alphaij_logderiv(gsl_vector_get(x, n));
+  for(int n=0; n < offset; n++) {
+    double xn = gsl_vector_get(x, n);
+    if(abs(xn) >= log(M_PI / TOL - 1.0))
+      return log(0.0);
+    ans += alphaij_logderiv(xn);
+  }
   for(int n=offset; n < x->size; n++) {
     double xn = gsl_vector_get(x, n);
+    if(xn <= log(TOL))
+      return log(0.0);
     ans -= 0.5 * ( exp(xn) - xn ); /*1 deg. of freedom chisq. distrib. on log(x)*/
   }
   return ans;

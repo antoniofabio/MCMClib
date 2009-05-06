@@ -67,12 +67,12 @@ int main(int argc, char** argv) {
   gsl_vector_set_all(e, 2.0);
   p = mcmclib_mcar_model_alloc(llik, e);
 
-  double l1 = lpdf_alpha12sigma(-5.0);
-  double l2 = lpdf_alpha12sigma(-10.0);
+  double l1 = lpdf_alpha12sigma(-2.0);
+  double l2 = lpdf_alpha12sigma(-5.0);
   assert(gsl_finite(l1));
   assert(gsl_finite(l2));
   assert(l1 > l2);
-  assert(l1 == lpdf_alpha12sigma(-5.0));
+  assert(l1 == lpdf_alpha12sigma(-2.0));
 
   gsl_vector* alphasigma = gsl_vector_alloc(P * (P-1) / 2 + P);
   gsl_vector_set_all(llik->alpha12sigma, -1.0);
