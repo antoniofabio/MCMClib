@@ -87,6 +87,7 @@ int main(int argc, char** argv) {
     }
   }
   fclose(out_a12s);
+  fclose(out_as);
   fclose(out_lpdf);
 
   free_chains();
