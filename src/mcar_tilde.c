@@ -102,7 +102,6 @@ int mcmclib_mcar_tilde_lpdf_update_blocks(mcmclib_mcar_tilde_lpdf* p) {
   gsl_matrix* Block = p->Block;
 
   int n = p->n;
-  mcmclib_mcar_tilde_lpdf_update_B_tilde(p);
   gsl_matrix* A = gsl_matrix_alloc(p->p, p->p);
   gsl_matrix_memcpy(A, p->Gamma);
   int status = mcmclib_cholesky_decomp(A);
@@ -142,6 +141,8 @@ int mcmclib_mcar_tilde_lpdf_update_blocks(mcmclib_mcar_tilde_lpdf* p) {
 }
 
 int mcmclib_mcar_tilde_lpdf_update_vcov(mcmclib_mcar_tilde_lpdf* p) {
+  mcmclib_mcar_tilde_lpdf_update_Gamma(p);
+  mcmclib_mcar_tilde_lpdf_update_B_tilde(p);
   int status = mcmclib_mcar_tilde_lpdf_update_blocks(p);
   if(status)
     return status;
@@ -152,8 +153,8 @@ double mcmclib_mcar_tilde_lpdf_compute(void* in_p, gsl_vector* x) {
   mcmclib_mcar_tilde_lpdf* p = (mcmclib_mcar_tilde_lpdf*) in_p;
   if(!is_positive_definite(p))
     return log(0.0);
-  mcmclib_mcar_tilde_lpdf_update_B_tilde(p);
   mcmclib_mcar_tilde_lpdf_update_Gamma(p);
+  mcmclib_mcar_tilde_lpdf_update_B_tilde(p);
   int status = mcmclib_mcar_tilde_lpdf_update_blocks(p);
   if(status)
     return log(0.0);
