@@ -79,19 +79,14 @@ static int is_positive_definite(mcmclib_mcar_tilde_lpdf* p) {
   return 1;
 }
 
-static void get_Lambda_LU(gsl_matrix* Lambda_LU, int flag,
-			  gsl_matrix* A, gsl_matrix* A1,
-			  gsl_matrix* B_tilde) {
+static void get_Lambda_L(gsl_matrix* Lambda_L, gsl_matrix* A, gsl_matrix* A1,
+			 gsl_matrix* B_tilde) {
   int p = A->size1;
-  gsl_matrix_set_zero(Lambda_LU);
+  gsl_matrix_set_zero(Lambda_L);
   gsl_matrix* AB = gsl_matrix_alloc(p, p);
   gsl_matrix_set_zero(AB);
-  if(flag) {
-    gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, A, B_tilde, 0.0, AB);
-  } else {
-    gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, A, B_tilde, 0.0, AB);
-  }
-  gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, AB, A1, 0.0, Lambda_LU);
+  gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, A, B_tilde, 0.0, AB);
+  gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, AB, A1, 0.0, Lambda_L);
   gsl_matrix_free(AB);
 }
 
@@ -122,10 +117,7 @@ int mcmclib_mcar_tilde_lpdf_update_blocks(mcmclib_mcar_tilde_lpdf* p) {
     for (int j=i+1; j < p->p; j++)
       gsl_matrix_set(A, i, j, 0.0);
 
-  gsl_matrix* Lambda_L = gsl_matrix_alloc(p->p, p->p);
-  get_Lambda_LU(Lambda_L, 0, A, A1, p->B_tilde);
-  gsl_matrix* Lambda_U = gsl_matrix_alloc(p->p, p->p);
-  get_Lambda_LU(Lambda_U, 1, A, A1, p->B_tilde);
+  get_Lambda_L(Lambda_ij, A, A1, p->B_tilde);
   gsl_matrix_free(A);
 
   gsl_matrix_set_zero(p->vcov);
@@ -138,22 +130,14 @@ int mcmclib_mcar_tilde_lpdf_update_blocks(mcmclib_mcar_tilde_lpdf* p) {
 	block_memcpy(p->vcov, i * p->p, j * p->p, Gammai);
       } else if (gsl_matrix_get(p->M, i, j) == 1.0) {
 	gsl_matrix_set_zero(Block);
-	gsl_matrix_memcpy(Lambda_ij, Lambda_U);
 	gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, -1.0 / mi,
 		       Gammai, Lambda_ij, 0.0, Block);
-	block_memcpy(p->vcov, i * p->p, j * p->p, Block);
-	gsl_matrix_set_zero(Block);
-	gsl_matrix_memcpy(Lambda_ij, Lambda_L);
-	gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, -1.0 / mi,
-		       Gammai, Lambda_ij, 0.0, Block);
-	block_memcpy(p->vcov, j * p->p, i * p->p, Block);
+		       block_memcpy(p->vcov, j * p->p, i * p->p, Block);
       }
     }
   }
 
   gsl_matrix_free(A1);
-  gsl_matrix_free(Lambda_L);
-  gsl_matrix_free(Lambda_U);
   return GSL_SUCCESS;
 }
 
