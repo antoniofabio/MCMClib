@@ -1,12 +1,25 @@
-Version 0.15 A. F. Di Narzo <antonio.fabio@gmail.com>
+Version 0.15 8-05-2009 A. F. Di Narzo <antonio.fabio@gmail.com>
+	* added MCAR model (based on MCAR_tilde likelihood)
+	* added MCAR_tilde (Greco and Trivisano, 2009) distribution
+	* added utility mvnormzp: mvnorm distrib. with zero mean, precision matrix
 	* improved mvnorm distribution: now returns -Inf on non-pos.def.
 		cov. matrices
 	* added utility mh_reset and amh_reset methods
 	* improved mh_update: now calls logdistr 50% less times!
 	* robustified mh_update method: now stops on non-finite vector values
-	* added MCAR model (based on MCAR_tilde likelihood)
-	* added MCAR_tilde (Greco and Trivisano, 2009) distribution
+	* fixed buglet in SCAM
+	* added some utility vector functions:
+		- check if vector is sorted in descending order
+		- print on stdout
+	* added some utility matrix functions:
+		- Chol. dec. with quiet error reporting
+		- Chol. based inversion with quiet error reporting
+		- log-trace
+		- inverse by LU decomposition
+		- print on stdout
+	* added Givens rotations representation utility functions
 	* added Wishart and Invere-Wishart distributions
+	* added copyright notice to all source files
 	* added missing distrfun_p typedef documentation
 	* improved release tarballs naming scheme
 
