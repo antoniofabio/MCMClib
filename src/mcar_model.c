@@ -34,13 +34,6 @@ void mcmclib_mcar_model_free(mcmclib_mcar_model* p) {
   free(p);
 }
 
-static double mvgauss(gsl_vector* x, double sigma) {
-  double ans = 0.0;
-  for(int i=0; i<x->size; i++)
-    ans += log(gsl_ran_gaussian_pdf(gsl_vector_get(x, i), sigma));
-  return ans;
-}
-
 static double alphaij_logderiv(double x) {
   return x - 2 * log(exp(x) + 1.0);
 }
@@ -76,19 +69,6 @@ double mcmclib_mcar_model_alpha12sigma_lpdf(void* in_p, gsl_vector* alpha12sigma
   gsl_vector_memcpy(p->lpdf->alpha12sigma, tmp);
   gsl_vector_free(tmp);
   return ans + alpha12sigma_logderiv(n, alpha12sigma);
-}
-
-static double iwishart_alphasigma(mcmclib_iwishart_lpdf* p, gsl_vector* as) {
-  int n = p->Psi->size1;
-  gsl_vector_view s_v = gsl_vector_subvector(as, n*(n-1)/2, n);
-  if(!mcmclib_vector_is_sorted_desc(&s_v.vector))
-    return log(0.0);
-  gsl_matrix* Gamma = gsl_matrix_alloc(n, n);
-  mcmclib_Givens_representation(Gamma, as);
-  gsl_vector_view gamma_v = gsl_vector_view_array(Gamma->data, n*n);
-  double ans = mcmclib_iwishart_lpdf_compute(p, &gamma_v.vector);
-  gsl_matrix_free(Gamma);
-  return ans;
 }
 
 static double alphasigma_logderiv(int p, const gsl_vector* x) {
