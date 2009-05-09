@@ -23,7 +23,6 @@ typedef struct {
 
 mcmclib_gauss_mrw_gamma* mcmclib_gauss_mrw_gamma_alloc(gsl_rng* r, const gsl_matrix* Sigma);
 void mcmclib_gauss_mrw_gamma_free(mcmclib_gauss_mrw_gamma* p);
-void mcmclib_gauss_mrw_sample(void* in_p, gsl_vector* x);
 double mcmclib_gauss_mrw_qd(void* ignore, gsl_vector* x, gsl_vector* y);
 
 mcmclib_mh_q* mcmclib_gauss_mrw_q_alloc(gsl_rng* r, const gsl_matrix* Sigma);
@@ -46,11 +45,11 @@ void mcmclib_gauss_mrw_free(mcmclib_mh* p);
 /** GRW proposal log-density (fake) \internal*/
 double mcmclib_gauss_mrw_qd(void* ignore, gsl_vector* x, gsl_vector* y);
 
-/** GRW proposal sampler \internal
-@param in_p ptr to a variance-covariance matrix
+/** GRW proposal sampler
+@param q ptr to an mh_q object allocated by 'mcmclib_gauss_mrw_q_alloc'
 @param x object in which to put result
 */
-void mcmclib_gauss_mrw_sample(void* in_p, gsl_vector* x);
+void mcmclib_gauss_mrw_sample(mcmclib_mh_q* q, gsl_vector* x);
 
 /**@}*/
 /**@}*/
