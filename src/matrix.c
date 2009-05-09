@@ -37,7 +37,7 @@ void mcmclib_matrix_inverse(gsl_matrix* A) {
   gsl_permutation_free(p);
 }
 
-int mcmclib_vector_is_finite(gsl_vector* x) {
+int mcmclib_vector_is_finite(const gsl_vector* x) {
   for(int i=0; i < x->size; i++)
     if(!gsl_finite(gsl_vector_get(x, i)))
       return 0;
