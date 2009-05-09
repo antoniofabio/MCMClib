@@ -1,4 +1,5 @@
 Version 0.16 A. F. Di Narzo <antonio.fabio@gmail.com>
+	* added utility vector_is_finite function
 	* added missing mh_q_alloc doc
 	* polished mh_q object API: no more hakish void ptr
 		as 'sampler' 1st argument

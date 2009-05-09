@@ -29,6 +29,9 @@ double mcmclib_matrix_logtrace(const gsl_matrix* A);
 /** Compute matrix inverse in-place, by LU factorization */
 void mcmclib_matrix_inverse(gsl_matrix* A);
 
+/** check if all elements of 'v' are finite real numbers */
+int mcmclib_vector_is_finite(gsl_vector* x);
+
 /** check if vector 'v' is sorted in descending order */
 int mcmclib_vector_is_sorted_desc(gsl_vector* v);
 

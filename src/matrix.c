@@ -37,6 +37,13 @@ void mcmclib_matrix_inverse(gsl_matrix* A) {
   gsl_permutation_free(p);
 }
 
+int mcmclib_vector_is_finite(gsl_vector* x) {
+  for(int i=0; i < x->size; i++)
+    if(!gsl_finite(gsl_vector_get(x, i)))
+      return 0;
+  return 1;
+}
+
 int mcmclib_vector_is_sorted_desc(gsl_vector* v) {
   double m = gsl_vector_get(v, 0);
   for(int i=1; i<v->size; i++) {
