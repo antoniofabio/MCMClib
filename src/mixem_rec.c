@@ -11,6 +11,7 @@
 #include<gsl/gsl_vector.h>
 #include<gsl/gsl_matrix.h>
 #include<gsl/gsl_blas.h>
+#include<gsl/gsl_math.h>
 #include "mixem_rec.h"
 #include "mvnorm.h"
 #include "mixnorm.h"
@@ -83,12 +84,17 @@ void mcmclib_mixem_rec_add(mcmclib_mixem_rec* p, gsl_vector* y) {
 }
 
 /*update theta estimates basing on current accumulated values*/
-void mcmclib_mixem_rec_update(mcmclib_mixem_rec* p) {
+int mcmclib_mixem_rec_update(mcmclib_mixem_rec* p) {
   int K = p->beta->size;
   if(p->n < 2)
-    return;
+    return GSL_SUCCESS;
   for(int k=0; k<K; k++) {
     double wik = 1.0 / gsl_vector_get(p->beta_sum, k);
+    if(!gsl_finite(wik)) {
+      static char err_msg[1024];
+      sprintf(err_msg, "non-finite weight for component %d", k);
+      GSL_ERROR(err_msg, GSL_EDOM);
+    }
 
     gsl_vector_memcpy(p->mu[k], p->X_sum[k]);
     gsl_vector_scale(p->mu[k], wik);
@@ -101,4 +107,5 @@ void mcmclib_mixem_rec_update(mcmclib_mixem_rec* p) {
   }
   gsl_vector_memcpy(p->beta, p->beta_sum);
   gsl_vector_scale(p->beta, 1.0 / (double) p->n);
+  return GSL_SUCCESS;
 }
