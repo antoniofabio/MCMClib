@@ -15,9 +15,16 @@
 #include "mixnorm.h"
 #include "mixem_rec.h"
 
+static int mixem_rec_quiet(mcmclib_mixem_rec* m) {
+  gsl_error_handler_t *hnd = gsl_set_error_handler_off();
+  int status = mcmclib_mixem_rec_update(m);
+  gsl_set_error_handler(hnd);
+  return status;
+}
+
 /**Fitting a gaussian mixture distribution by the EM algorithm
 */
-void mcmclib_mixem_fit(gsl_matrix* X,
+int mcmclib_mixem_fit(gsl_matrix* X,
 		       gsl_vector** mu, gsl_matrix** Sigma,
 		       gsl_vector* w, int NITER) {
   int K = w->size;
@@ -33,11 +40,18 @@ void mcmclib_mixem_fit(gsl_matrix* X,
     }
     
     /*update means and variances estimates*/
-    mcmclib_mixem_rec_update(m);
+    int status = mixem_rec_quiet(m);
+    if(status) {
+      static char err_msg[1024];
+      sprintf(err_msg, "error \"%s\" during EM iteration %d", gsl_strerror(status), ITER);
+      GSL_ERROR(err_msg, status);
+    }
 
     for(int k=0; k<K; k++)
       assert(gsl_vector_get(w, k) <= 1.0);
 
     mcmclib_mixem_rec_free(m);
   }
+
+  return GSL_SUCCESS;
 }

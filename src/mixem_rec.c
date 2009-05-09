@@ -93,7 +93,7 @@ int mcmclib_mixem_rec_update(mcmclib_mixem_rec* p) {
     if(!gsl_finite(wik)) {
       static char err_msg[1024];
       sprintf(err_msg, "non-finite weight for component %d", k);
-      GSL_ERROR(err_msg, GSL_EDOM);
+      GSL_ERROR(err_msg, GSL_EZERODIV);
     }
 
     gsl_vector_memcpy(p->mu[k], p->X_sum[k]);

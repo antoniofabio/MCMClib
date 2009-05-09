@@ -22,10 +22,11 @@
 @param P probability of belonging to each mixt. component, one row per point
 @param w mixture weights
 @param NITER desired number of iterations
+@return GSL_SUCCESS if all goes right, a GSL error code otherwise
 */
-void mcmclib_mixem_fit(gsl_matrix* X,
-		       gsl_vector** mu, gsl_matrix** Sigma,
-		       gsl_vector* w, int NITER);
+int mcmclib_mixem_fit(gsl_matrix* X,
+		      gsl_vector** mu, gsl_matrix** Sigma,
+		      gsl_vector* w, int NITER);
 
 /**@}*/
 #endif
