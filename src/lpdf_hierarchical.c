@@ -43,7 +43,7 @@ double mcmclib_post_lpdf_compute(void* data, gsl_vector* x) {
     gsl_vector_memcpy(d->x, d->workspace);
     return(ans);
   }
-  for(int i=0; d->childs[i] != NULL; i++) {
+  for(int i=0; i < d->nchilds; i++) {
     ans += d->loglik(d->child_parms[i], d->childs[i]);
     if(!isfinite(ans))
       break;
