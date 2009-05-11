@@ -32,17 +32,15 @@ void mcmclib_post_lpdf_free(mcmclib_post_lpdf* p) {
 double mcmclib_post_lpdf_compute(void* data, gsl_vector* x) {
   mcmclib_post_lpdf* d = (mcmclib_post_lpdf*) data;
   double ans = 0.0;
+
+  ans += d->prior(d->parms, x);
+  if(!isfinite(ans))
+    return(ans);
+
   /*store old value*/
   gsl_vector_memcpy(d->workspace, d->x);
   /*set new value*/
   gsl_vector_memcpy(d->x, x);
-
-  ans += d->prior(d->parms, d->x);
-  if(!isfinite(ans)) {
-    /*restore old value*/
-    gsl_vector_memcpy(d->x, d->workspace);
-    return(ans);
-  }
   for(int i=0; i < d->nchilds; i++) {
     ans += d->loglik(d->child_parms[i], d->childs[i]);
     if(!isfinite(ans))
