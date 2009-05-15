@@ -19,12 +19,26 @@
 
 /**\brief Linear regression model with conjugte priors */
 typedef struct {
+  gsl_matrix* X;
+  gsl_vector* y;
+  gsl_vector* beta;
+  gsl_vector* sigmasq;
+
+  gsl_vector* b0;
+  gsl_matrix* B0;
+  double c0, d0;
+
+  gsl_matrix* XX;
+  gsl_matrix* XXchol;
+  gsl_matrix* XXinv;
+  gsl_vector* Xy;
 } mcmclib_lm;
 
 /** Alloc extra data for an lm model
     @param X design matrix
  */
-mcmclib_lm* mcmclib_lm_alloc(const gsl_matrix* X);
+mcmclib_lm* mcmclib_lm_alloc(const gsl_matrix* X, gsl_vector* y,
+			     gsl_vector* beta, gsl_vector* sigmasq);
 
 /** Free extra data for an lm object */
 void mcmclib_lm_free(mcmclib_lm* p);

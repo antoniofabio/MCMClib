@@ -11,11 +11,39 @@
 #include "matrix.h"
 #include "lm.h"
 
-mcmclib_lm* mcmclib_lm_alloc(const gsl_matrix* X) {
-  mcmclib_lm* ans;
-  return ans;
+mcmclib_lm* mcmclib_lm_alloc(const gsl_matrix* X, gsl_vector* y,
+			     gsl_vector* beta, gsl_vector* sigmasq) {
+  mcmclib_lm* a = (mcmclib_lm*) malloc(sizeof(mcmclib_lm));
+  const int n = X->size1;
+  const int k = X->size2;
+  assert(y->size == n);
+  assert(beta->size == k);
+  a->X = gsl_matrix_alloc(n, k);
+  gsl_matrix_memcpy(a->X, X);
+  a->y = y;
+  a->beta = beta;
+  a->sigmasq = sigmasq;
+
+  a->XX = gsl_matrix_alloc(k, k);
+  gsl_matrix_set_zero(a->XX);
+  gsl_blas_dgemm(CblasTrans, CblasNoTrans, 1.0, X, X, 0.0, a->XX);
+  a->XXchol = gsl_matrix_alloc(k, k);
+  gsl_matrix_memcpy(a->XXchol, a->XX);
+  gsl_linalg_cholesky_decomp(a->XXchol);
+  a->XXinv = gsl_matrix_alloc(k, k);
+  gsl_matrix_memcpy(a->XXinv, a->XXchol);
+  gsl_linalg_cholesky_invert(a->XXinv);
+  a->Xy = gsl_vector_alloc(k);
+  gsl_vector_set_zero(a->Xy);
+  gsl_blas_dgemv(CblasTrans, 1.0, X, y, 0.0, a->Xy);
+  return a;
 }
 void mcmclib_lm_free(mcmclib_lm* p) {
+  gsl_vector_free(p->Xy);
+  gsl_matrix_free(p->XXinv);
+  gsl_matrix_free(p->XXchol);
+  gsl_matrix_free(p->XX);
+  gsl_matrix_free(p->X);
   free(p);
 }
 
