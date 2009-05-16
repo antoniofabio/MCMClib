@@ -31,6 +31,7 @@ mcmclib_pois_model* mcmclib_pois_model_alloc(const gsl_matrix* X, const gsl_vect
   a->mu = gsl_vector_alloc(n);
   a->work1 = gsl_vector_alloc(p);
   a->work2 = gsl_vector_alloc(p);
+  a->offset = NULL;
   gsl_matrix* tmp = gsl_matrix_alloc(p, p);
   gsl_matrix_set_identity(tmp);
   gsl_matrix_scale(tmp, 0.01);
@@ -61,6 +62,11 @@ int mcmclib_pois_model_set_prior_var(mcmclib_pois_model* p, const gsl_matrix* B0
   gsl_matrix_memcpy(p->B0, B0);
   return GSL_SUCCESS;
 }
+int mcmclib_pois_model_set_offset(mcmclib_pois_model* p, const gsl_vector* offset) {
+  assert(offset->size == p->X->size1);
+  p->offset = offset;
+  return GSL_SUCCESS;
+}
 
 static double lpois(double k, double lmu) {
   return lmu * k - gsl_sf_lnfact((int) k) - exp(lmu);
@@ -70,6 +76,8 @@ double mcmclib_pois_model_llik(mcmclib_pois_model* p, gsl_vector* x) {
   double ans = 0.0;
   gsl_vector_set_zero(p->mu);
   gsl_blas_dgemv(CblasNoTrans, 1.0, p->X, p->beta, 0.0, p->mu);
+  if(p->offset)
+    gsl_vector_add(p->mu, p->offset);
   for(int i=0; i < p->X->size1; i++)
     ans += lpois(gsl_vector_get(p->y, i), gsl_vector_get(p->mu, i));
   return ans;

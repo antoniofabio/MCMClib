@@ -62,6 +62,11 @@ int main(int argc, char** argv) {
   mcmclib_pois_model_set_prior_var(mod, B0);
   gsl_matrix_free(B0);
 
+  gsl_vector* offset = gsl_vector_alloc(N);
+  gsl_vector_set_all(offset, -1.0);
+  mcmclib_pois_model_set_offset(mod, offset);
+  llik(1.0);
+
   mcmclib_pois_model_free(mod);
   gsl_vector_free(y);
 }

@@ -22,6 +22,7 @@ typedef struct {
   /*internal*/
   gsl_matrix* X; /**< regression matrix */
   const gsl_vector* y; /**< observed values */
+  const gsl_vector* offset; /**< (optional) offset on the mean */
   gsl_vector* b0; /**< prior beta mean */
   gsl_matrix* B0; /**< prior beta precision */
   gsl_vector* mu; /**< log-means (= X beta) */
@@ -33,6 +34,7 @@ mcmclib_pois_model* mcmclib_pois_model_alloc(const gsl_matrix* X, const gsl_vect
 void mcmclib_pois_model_free(mcmclib_pois_model* p);
 int mcmclib_pois_model_set_prior_mean(mcmclib_pois_model* p, const gsl_vector* b0);
 int mcmclib_pois_model_set_prior_var(mcmclib_pois_model* p, const gsl_matrix* B0);
+int mcmclib_pois_model_set_offset(mcmclib_pois_model* p, const gsl_vector* offset);
 
 double mcmclib_pois_model_llik(mcmclib_pois_model* p, gsl_vector* x);
 double mcmclib_pois_model_lprior(mcmclib_pois_model* p, gsl_vector* x);
