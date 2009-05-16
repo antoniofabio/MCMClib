@@ -116,21 +116,27 @@ void mcmclib_mvnorm_lpdf_inverse(mcmclib_mvnorm_lpdf* p) {
 }
 
 double mcmclib_mvnorm_lpdf_compute_noinv(mcmclib_mvnorm_lpdf* p, gsl_vector* x) {
-  int d = x->size;
+  return mcmclib_mvnorm_lpdf_noinv(p->mean, p->rooti, x,
+				   p->determinant, p->x_mu, p->mahal);
+}
 
+double mcmclib_mvnorm_lpdf_noinv(gsl_vector* mu, gsl_matrix* iSigma, gsl_vector* x,
+				 double ldet, gsl_vector* work1, gsl_vector* work2) {
+  int d = x->size;
   /*compute mahlanobis distance between 'x' and 'mu'*/
-  gsl_vector* x_mu = p->x_mu;
+  gsl_vector* x_mu = work1;
   gsl_vector_memcpy(x_mu, x);
-  gsl_vector_sub(x_mu, p->mean); /*x - mu*/
+  gsl_vector_sub(x_mu, mu); /*x - mu*/
+  gsl_vector* mahal = work2;
   /*mahal = inv(Sigma) (x - mu)*/
-  gsl_blas_dgemv(CblasNoTrans, 1.0, p->rooti, p->x_mu, 0.0, p->mahal);
+  gsl_blas_dgemv(CblasNoTrans, 1.0, iSigma, x_mu, 0.0, mahal);
   double ans = 0.0;
   /*ans = t(mahal) * (x - mu)*/
-  gsl_blas_ddot(p->mahal, x_mu, &ans);
+  gsl_blas_ddot(mahal, x_mu, &ans);
 
   /*compute log-density as:
     -0.5 * (mahaldist + log(2*pi)*d + logdet) */
-  ans += log(2.0 * M_PI) * ((double) d) + p->determinant;
+  ans += log(2.0 * M_PI) * ((double) d) + ldet;
   ans *= -0.5;
 
   return ans;

@@ -79,6 +79,18 @@ void mcmclib_mvnorm_lpdf_inverse(mcmclib_mvnorm_lpdf* p);
 \internal*/
 double mcmclib_mvnorm_lpdf_compute_noinv(mcmclib_mvnorm_lpdf* p, gsl_vector* x);
 
+/** Multivariate normal distribution from precision matrix
+    @param mu mean
+    @param iSigma precision matrix
+    @param x
+    @param ldet log-determinant of var/cov matrix
+    @param work1 workspace vector of size equal to that of 'x'
+    @param work2 same as work1
+    @return log-pdf
+ */
+double mcmclib_mvnorm_lpdf_noinv(gsl_vector* mu, gsl_matrix* iSigma, gsl_vector* x,
+				 double ldet, gsl_vector* work1, gsl_vector* work2);
+
 /** multivariate zero-mean normal log-density based on precision matrix
     
     The lower triangular part of 'Psi' is referenced. The upper triangular part
