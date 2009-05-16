@@ -62,8 +62,8 @@ int mcmclib_pois_model_set_prior_var(mcmclib_pois_model* p, const gsl_matrix* B0
   return GSL_SUCCESS;
 }
 
-static double lpois(double k, double mu) {
-  return log(mu) * k - gsl_sf_lnfact((int) k) - mu;
+static double lpois(double k, double lmu) {
+  return lmu * k - gsl_sf_lnfact((int) k) - exp(lmu);
 }
 
 double mcmclib_pois_model_llik(mcmclib_pois_model* p, gsl_vector* x) {
@@ -71,7 +71,7 @@ double mcmclib_pois_model_llik(mcmclib_pois_model* p, gsl_vector* x) {
   gsl_vector_set_zero(p->mu);
   gsl_blas_dgemv(CblasNoTrans, 1.0, p->X, p->beta, 0.0, p->mu);
   for(int i=0; i < p->X->size1; i++)
-    ans += lpois(gsl_vector_get(p->y, i), exp(gsl_vector_get(p->mu, i)));
+    ans += lpois(gsl_vector_get(p->y, i), gsl_vector_get(p->mu, i));
   return ans;
 }
 
