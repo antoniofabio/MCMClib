@@ -6,20 +6,11 @@
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 #include <mcar_tilde.h>
+#include <matrix.h>
 
 #define TOL 1e-6
 int check_dequal(double a, double b) {
   return (fabs(a-b) < TOL);
-}
-
-void mprint(gsl_matrix* A) {
-  int n = A->size1;
-  int p = A->size2;
-  for(int i=0; i<n; i++) {
-    for(int j=0; j<p; j++)
-      printf("%.3f, ", gsl_matrix_get(A, i, j));
-    printf("\n");
-  }
 }
 
 int is_pos_def(gsl_matrix* A) {
