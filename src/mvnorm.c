@@ -43,7 +43,7 @@ void mcmclib_mvnorm_cholprec(const gsl_rng* r,
 			     const gsl_matrix* Psi,
 			     gsl_vector* out) {
   mcmclib_mvnorm_iid(r, out);
-  gsl_blas_dtrsv(CblasLower, CblasNoTrans, CblasNonUnit, 1.0, Psi, out);
+  gsl_blas_dtrsv(CblasLower, CblasNoTrans, CblasNonUnit, Psi, out);
 }
 
 void mcmclib_mvnorm_precision(const gsl_rng* r,

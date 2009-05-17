@@ -118,11 +118,7 @@ int main(int argc, char** argv) {
       assert(gsl_finite(sampler[j]->mh->logdistr_old));
     }
     mcmclib_mcar_tilde_lpdf_update_vcov(mcar_lpdf);
-    gsl_matrix* tmp = gsl_matrix_alloc(P*DIM, P*DIM);
-    gsl_matrix_memcpy(tmp, mcar_lpdf->vcov);
-    gsl_linalg_cholesky_decomp(tmp);
-    mcmclib_mvnorm_precision(rng, tmp, mcar_phi);
-    gsl_matrix_free(tmp);
+    mcmclib_mvnorm_precision(rng, mcar_lpdf->vcov, mcar_phi);
     mcmclib_pmodel_sampler_update(model);
   }
   fclose(out_a12s);
