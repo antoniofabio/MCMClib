@@ -16,9 +16,6 @@
 #define n 6
 #define P 3
 
-gsl_rng* rng;
-mcmclib_pmodel_sampler* model;
-
 int main(int argc, char** argv) {
   gsl_rng* rng = gsl_rng_alloc(gsl_rng_default);
   gsl_matrix* X = gsl_matrix_alloc(n, P);
@@ -27,7 +24,7 @@ int main(int argc, char** argv) {
     gsl_matrix_set(X, i, i, 1.0);
   gsl_vector* y = gsl_vector_alloc(n);
   gsl_vector_set_all(y, 3.0);
-  model = mcmclib_pmodel_sampler_alloc(X, y, NULL, rng, V0, T0);
+  mcmclib_pmodel_sampler* model = mcmclib_pmodel_sampler_alloc(X, y, NULL, rng, V0, T0);
 
   FILE* out = fopen("chain_beta.dat", "w");
   for(int i=0; i<N; i++) {
@@ -38,4 +35,7 @@ int main(int argc, char** argv) {
   fclose(out);
 
   mcmclib_pmodel_sampler_free(model);
+  gsl_vector_free(y);
+  gsl_matrix_free(X);
+  gsl_rng_free(rng);
 }
