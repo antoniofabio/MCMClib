@@ -73,14 +73,9 @@ int main(int argc, char** argv) {
   gsl_vector_set_all(p->alpha12sigma, -1.0);
 
   mcmclib_mcar_tilde_lpdf_update_vcov(p);
-  assert(is_pos_def(p->vcov));
 
   gsl_vector_set_all(p->alpha12sigma, -0.7);
   mcmclib_mcar_tilde_lpdf_update_blocks(p);
-  mcmclib_mcar_tilde_lpdf_update_blocks(p);
-
-  mcmclib_mcar_tilde_lpdf_update_vcov(p);
-  assert(is_pos_def(p->vcov));
 
   x = gsl_vector_alloc(N*P);
   gsl_vector_set_all(p->alpha12sigma, -2.0);

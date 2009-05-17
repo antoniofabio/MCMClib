@@ -143,19 +143,14 @@ int mcmclib_mcar_tilde_lpdf_update_blocks(mcmclib_mcar_tilde_lpdf* p) {
 int mcmclib_mcar_tilde_lpdf_update_vcov(mcmclib_mcar_tilde_lpdf* p) {
   mcmclib_mcar_tilde_lpdf_update_Gamma(p);
   mcmclib_mcar_tilde_lpdf_update_B_tilde(p);
-  int status = mcmclib_mcar_tilde_lpdf_update_blocks(p);
-  if(status)
-    return status;
-  return mcmclib_cholesky_inverse(p->vcov);
+  return mcmclib_mcar_tilde_lpdf_update_blocks(p);
 }
 
 double mcmclib_mcar_tilde_lpdf_compute(void* in_p, gsl_vector* x) {
   mcmclib_mcar_tilde_lpdf* p = (mcmclib_mcar_tilde_lpdf*) in_p;
   if(!is_positive_definite(p))
     return log(0.0);
-  mcmclib_mcar_tilde_lpdf_update_Gamma(p);
-  mcmclib_mcar_tilde_lpdf_update_B_tilde(p);
-  int status = mcmclib_mcar_tilde_lpdf_update_blocks(p);
+  int status = mcmclib_mcar_tilde_lpdf_update_vcov(p);
   if(status)
     return log(0.0);
   return mcmclib_mvnormzp_lpdf(p->vcov, x);
