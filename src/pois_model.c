@@ -102,7 +102,8 @@ mcmclib_pmodel_sampler* mcmclib_pmodel_sampler_alloc(const gsl_matrix* X,
 						     int burnin) {
   mcmclib_pmodel_sampler* a = (mcmclib_pmodel_sampler*) malloc(sizeof(mcmclib_pmodel_sampler));
   a->model = mcmclib_pois_model_alloc(X, y);
-  mcmclib_pois_model_set_offset(a->model, offset);
+  if(offset)
+    mcmclib_pois_model_set_offset(a->model, offset);
   gsl_matrix* S0 = gsl_matrix_alloc(X->size2, X->size2);
   gsl_matrix_set_identity(S0);
   gsl_matrix_scale(S0, sigma0);

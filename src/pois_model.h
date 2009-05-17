@@ -57,7 +57,7 @@ void mcmclib_pmodel_sampler_free(mcmclib_pmodel_sampler* p);
 
 int mcmclib_pmodel_sampler_update(mcmclib_pmodel_sampler* p);
 
-#define mcmclib_pmodel_sampler_beta(p) (p)->model->beta;
+#define mcmclib_pmodel_sampler_beta(p) (p)->model->beta
 
 /**@}*/
 /**@}*/
