@@ -56,12 +56,11 @@ void init_chains() {
 				      mcar_model, alphasigmag, Sigma0, T0);
   gsl_matrix_free(Sigma0);
 
-  model = mcmclib_pmodel_sampler_alloc(X, y, mcar_phi, rng, 1e-6, T0);
+  model = mcmclib_pmodel_sampler_alloc(X, y, mcar_phi, rng, 1e-3, T0);
   gsl_vector_set_all(model->model->beta, 0.0);
   gsl_vector_set(model->model->beta, 0, -1.0);
   gsl_vector_set(model->model->beta, 2, 1.0);
   sampler[2] = model->sampler;
-  mcmclib_amh_reset(sampler[2]);
 }
 
 void free_chains() {
