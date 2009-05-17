@@ -1,4 +1,4 @@
-Version 0.16 A. F. Di Narzo <antonio.fabio@gmail.com>
+Version 0.16 17-05-2009 A. F. Di Narzo <antonio.fabio@gmail.com>
 	* fixed bad conceptual bug in core mh function:
 		logdistrib needs to be computed twice, no way
 	* fixed weird bug in mcar_tilde
