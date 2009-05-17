@@ -79,14 +79,16 @@ static int is_positive_definite(mcmclib_mcar_tilde_lpdf* p) {
   return 1;
 }
 
-static void get_Lambda_L(gsl_matrix* Lambda_L, gsl_matrix* A, gsl_matrix* A1,
-			 gsl_matrix* B_tilde) {
+static void get_Lambda_L(gsl_matrix* Lambda_L, const gsl_matrix* A,
+			 const gsl_matrix* B_tilde) {
   int p = A->size1;
   gsl_matrix_set_zero(Lambda_L);
   gsl_matrix* AB = gsl_matrix_alloc(p, p);
   gsl_matrix_set_zero(AB);
   gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, A, B_tilde, 0.0, AB);
-  gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, AB, A1, 0.0, Lambda_L);
+  gsl_blas_dtrsm(CblasRight, CblasLower, CblasNoTrans, CblasNonUnit, 1.0, AB, A);
+  //gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, AB, A1, 0.0, Lambda_L);
+  gsl_matrix_memcpy(Lambda_L, AB);
   gsl_matrix_free(AB);
 }
 
@@ -116,7 +118,7 @@ int mcmclib_mcar_tilde_lpdf_update_blocks(mcmclib_mcar_tilde_lpdf* p) {
     for (int j=i+1; j < p->p; j++)
       gsl_matrix_set(A, i, j, 0.0);
 
-  get_Lambda_L(Lambda_ij, A, A1, p->B_tilde);
+  get_Lambda_L(Lambda_ij, A, p->B_tilde);
   gsl_matrix_free(A);
 
   gsl_matrix_set_zero(p->vcov);
