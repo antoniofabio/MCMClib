@@ -45,7 +45,7 @@ makePrecision <- function(W, Gamma, B) {
 Psi <- makePrecision(W, Gamma, B)
 psi <- asMatrix(Psi)
 
-phi.true <- solve(chol(psi)) %*% rnorm(P*DIM)
+phi.true <- chol(solve(psi)) %*% rnorm(P*DIM)
 beta.true <- 1:3 - 2
 X <- matrix(, DIM*P, P)
 for(i in 1:DIM)
@@ -56,8 +56,6 @@ write.table(y, file="y.dat", row.names=FALSE, col.names=FALSE)
 
 summary(glm(y ~ X-1, family=poisson))
 
-g <- function(x) (pi/2) * (exp(x) - 1) / (exp(x) + 1)
-
 library(coda)
 xx <- mcmc(cbind(matrix(read.table("chain_beta.dat")[[1]],
                     byrow=TRUE, ncol=P),
@@ -66,10 +64,21 @@ xx <- mcmc(cbind(matrix(read.table("chain_beta.dat")[[1]],
                  thin=THIN)
 plot(xx)
 
+g <- function(x) (pi/2) * (exp(x) - 1) / (exp(x) + 1)
 as <- mcmc(matrix(read.table("chain_alphasigma.dat")[[1]],
                   byrow=TRUE, ncol=P*(P-1)/2 + P), thin=THIN)
-plot(exp(as[,4:6]))
+as[,seq_len(P*(P-1)/2)] <- g(as[,seq_len(P*(P-1)/2)])
+as[,P*(P-1)/2 + 1:P] <- exp(as[,P*(P-1)/2 + 1:P])
+plot(as[,4:6])
+
+a12s <- mcmc(matrix(read.table("chain_alpha12sigma.dat")[[1]],
+                  byrow=TRUE, ncol=P*P), thin=THIN)
+a12s[,seq_len(P*(P-1))] <- g(a12s[,seq_len(P*(P-1))])
+a12s[,P*(P-1) + 1:P] <- exp(a12s[,P*(P-1) + 1:P])
+plot(a12s[,7:9])
+summary(a12s[,7:9])
 
 phi <- mcmc(matrix(read.table("chain_phi.dat")[[1]],
                   byrow=TRUE, ncol=DIM*P), thin=THIN)
 plot(phi[,1:3])
+vphi <- var(phi)

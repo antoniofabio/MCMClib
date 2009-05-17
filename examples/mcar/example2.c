@@ -112,6 +112,8 @@ int main(int argc, char** argv) {
       fflush(out_beta);
       fflush(out_lpdf);
       fflush(out_phi);
+      fflush(out_a12s);
+      fflush(out_as);
     }
     for(int j=0; j<2; j++) {
       mcmclib_amh_update(sampler[j]);
