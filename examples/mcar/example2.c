@@ -14,7 +14,7 @@
 #include <gauss_am.h>
 #include <raptor.h>
 
-/*P=3, DIM=95: 0.21009 secs per iteration
+/*P=3, DIM=95: 0.30769 secs per iteration
   P=6, DIM=10: 0.00396 secs per iteration
   P=3, DIM=10: 0.00085 secs per iteration
   P=3, DIM=5:  0.00016 secs per iteration
