@@ -37,6 +37,17 @@ void mcmclib_mvnorm_chol(const gsl_rng* r,
   gsl_blas_dtrmv(CblasLower, CblasNoTrans, CblasNonUnit, sigma_chol, out);
 }
 
+void mcmclib_mvnorm_precision(const gsl_rng* r,
+			      const gsl_matrix* Psi,
+			      gsl_vector* out) {
+  int n = Psi->size1;
+  gsl_matrix* tmp = gsl_matrix_alloc(n, n);
+  gsl_matrix_memcpy(tmp, Psi);
+  gsl_linalg_cholesky_invert(tmp);
+  mcmclib_mvnorm(r, tmp, out);
+  gsl_matrix_free(tmp);
+}
+
 mcmclib_mvnorm_lpdf* mcmclib_mvnorm_lpdf_alloc(gsl_vector* mean, double* vcov) {
   int d = mean->size;
   mcmclib_mvnorm_lpdf* ans = (mcmclib_mvnorm_lpdf*) malloc(sizeof(mcmclib_mvnorm_lpdf));

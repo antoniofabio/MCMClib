@@ -36,6 +36,15 @@ void mcmclib_mvnorm_chol(const gsl_rng* r,
 	const gsl_matrix* sigma_chol,
 	gsl_vector* out);
 
+/** Multivariate gassian variate, with known cholesky dec. of the precision matrix.
+@param r RNG state
+@param Psi cholesky decomposition of the precision matrix
+@param out result vector
+*/
+void mcmclib_mvnorm_precision(const gsl_rng* r,
+			      const gsl_matrix* Psi,
+			      gsl_vector* out);
+
 /**\brief Multivariate Gaussian distribution*/
 typedef struct {
   gsl_vector* mean; /**< distribution mean*/
