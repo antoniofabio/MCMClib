@@ -1,4 +1,6 @@
 Version 0.16 A. F. Di Narzo <antonio.fabio@gmail.com>
+	* fixed bad conceptual bug in core mh function:
+		logdistrib needs to be computed twice, no way
 	* fixed weird bug in mcar_tilde
 	* fixed buggy update_vcov mcar_tilde method
 	* added multivariate normal lpdf func. from precision matrix
