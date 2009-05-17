@@ -1,4 +1,5 @@
 Version 0.17 A. F. Di Narzo <antonio.fabio@gmail.com>
+	* optimized mvnorm rng generation from known precision matrix
 	* fixed buglet in mcar_model: now Gamma sing. values restricted
 		to be sorted.
 

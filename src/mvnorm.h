@@ -17,6 +17,13 @@
 /**\addtogroup multivariate
  @{*/
 
+
+/** iid multivariate gaussian variate
+@param r RNG state
+@param out result vector
+*/
+void mcmclib_mvnorm_iid(const gsl_rng* r, gsl_vector* out);
+
 /** Multivariate gaussian variate
 @param r RNG state
 @param sigma variance/covariance matrix
@@ -36,14 +43,23 @@ void mcmclib_mvnorm_chol(const gsl_rng* r,
 	const gsl_matrix* sigma_chol,
 	gsl_vector* out);
 
-/** Multivariate gassian variate, with known cholesky dec. of the precision matrix.
+/** Multivariate gassian variate, with known precision matrix
 @param r RNG state
-@param Psi cholesky decomposition of the precision matrix
+@param Psi precision matrix
 @param out result vector
 */
 void mcmclib_mvnorm_precision(const gsl_rng* r,
 			      const gsl_matrix* Psi,
 			      gsl_vector* out);
+
+/** Multivariate gassian variate, with known cholesky dec. of the precision matrix.
+@param r RNG state
+@param Psi cholesky decomposition of the precision matrix
+@param out result vector
+*/
+void mcmclib_mvnorm_cholprec(const gsl_rng* r,
+			     const gsl_matrix* Psi,
+			     gsl_vector* out);
 
 /**\brief Multivariate Gaussian distribution*/
 typedef struct {

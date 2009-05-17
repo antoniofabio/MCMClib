@@ -12,6 +12,11 @@
 #include "matrix.h"
 #include "mvnorm.h"
 
+void mcmclib_mvnorm_iid(const gsl_rng* r, gsl_vector* out) {
+  for(int n=0; n < out->size; n++)
+    gsl_vector_set(out, out->size - n - 1, gsl_ran_gaussian(r, 1.0));
+}
+
 void mcmclib_mvnorm(const gsl_rng* r,
 		    const gsl_matrix* sigma,
 		    gsl_vector* out) {
@@ -29,12 +34,16 @@ void mcmclib_mvnorm(const gsl_rng* r,
 void mcmclib_mvnorm_chol(const gsl_rng* r,
 			 const gsl_matrix* sigma_chol,
 			 gsl_vector* out) {
-  /*generate d iid values*/
-  for(int n=0; n < sigma_chol->size1; n++)
-    gsl_vector_set(out, sigma_chol->size1 - n - 1, gsl_ran_gaussian(r, 1.0));
-
-  /*rotate them according to the cholesky 'square root' of sigma*/
+  mcmclib_mvnorm_iid(r, out);
+  /*rotate the iid values according to the cholesky 'square root' of sigma*/
   gsl_blas_dtrmv(CblasLower, CblasNoTrans, CblasNonUnit, sigma_chol, out);
+}
+
+void mcmclib_mvnorm_cholprec(const gsl_rng* r,
+			     const gsl_matrix* Psi,
+			     gsl_vector* out) {
+  mcmclib_mvnorm_iid(r, out);
+  gsl_blas_dtrsv(CblasLower, CblasNoTrans, CblasNonUnit, 1.0, Psi, out);
 }
 
 void mcmclib_mvnorm_precision(const gsl_rng* r,
@@ -43,8 +52,8 @@ void mcmclib_mvnorm_precision(const gsl_rng* r,
   int n = Psi->size1;
   gsl_matrix* tmp = gsl_matrix_alloc(n, n);
   gsl_matrix_memcpy(tmp, Psi);
-  gsl_linalg_cholesky_invert(tmp);
-  mcmclib_mvnorm(r, tmp, out);
+  gsl_linalg_cholesky_decomp(tmp);
+  mcmclib_mvnorm_cholprec(r, tmp, out);
   gsl_matrix_free(tmp);
 }
 
