@@ -84,10 +84,9 @@ static void get_Lambda_L(gsl_matrix* Lambda_L, const gsl_matrix* A,
   int p = A->size1;
   gsl_matrix_set_zero(Lambda_L);
   gsl_matrix* AB = gsl_matrix_alloc(p, p);
-  gsl_matrix_set_zero(AB);
-  gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, A, B_tilde, 0.0, AB);
-  gsl_blas_dtrsm(CblasRight, CblasLower, CblasNoTrans, CblasNonUnit, 1.0, AB, A);
-  //gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, AB, A1, 0.0, Lambda_L);
+  gsl_matrix_memcpy(AB, B_tilde);
+  gsl_blas_dtrmm(CblasLeft, CblasLower, CblasNoTrans, CblasNonUnit, 1.0, A, AB);
+  gsl_blas_dtrsm(CblasRight, CblasLower, CblasNoTrans, CblasNonUnit, 1.0, A, AB);
   gsl_matrix_memcpy(Lambda_L, AB);
   gsl_matrix_free(AB);
 }
