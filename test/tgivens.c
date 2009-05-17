@@ -11,9 +11,6 @@ static int check_dequal(double a, double b) {
   return (fabs(a-b) < TOL);
 }
 
-#define P 2
-#define N 3
-
 static double backTransform(double a) {
   return log((M_PI_2 + a) / (M_PI_2 - a));
 }
@@ -27,12 +24,6 @@ void backTransformVector(gsl_vector* v) {
 gsl_matrix* A;
 gsl_vector* alphasigma;
 
-static void sRepresentation(double s) {
-  gsl_vector_set_all(alphasigma, s);
-  mcmclib_Givens_representation(A, alphasigma);
-  gsl_linalg_cholesky_decomp(A);
-}
-
 static void singValues(gsl_matrix* A, gsl_vector* values) {
   int n = A->size1;
   gsl_vector* work = gsl_vector_alloc(n);
@@ -43,6 +34,16 @@ static void singValues(gsl_matrix* A, gsl_vector* values) {
   gsl_matrix_free(V);
   gsl_matrix_free(A1);
   gsl_vector_free(work);
+}
+
+static void sRepresentation(double s) {
+  gsl_vector_set_all(alphasigma, s);
+  mcmclib_Givens_representation(A, alphasigma);
+  gsl_vector* vals = gsl_vector_alloc(3);
+  singValues(A, vals);
+  for(int i=0; i<3; i++)
+    assert(check_dequal(gsl_vector_get(vals, i), exp(s)));
+  gsl_linalg_cholesky_decomp(A);
 }
 
 static void sRepresentationAsymm(double s) {
