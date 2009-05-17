@@ -1,4 +1,5 @@
 Version 0.16 A. F. Di Narzo <antonio.fabio@gmail.com>
+	* fixed weird bug in mcar_tilde
 	* fixed buggy update_vcov mcar_tilde method
 	* added multivariate normal lpdf func. from precision matrix
 	* added Poisson model
