@@ -92,6 +92,11 @@ static double alphasigma_logderiv(int p, const gsl_vector* x) {
 double mcmclib_mcar_model_alphasigma_lpdf(void* in_p, gsl_vector* alphasigma) {
   mcmclib_mcar_model* p = (mcmclib_mcar_model*) in_p;
 
+  const int n = p->lpdf->p;
+  gsl_vector_view s_v = gsl_vector_subvector(alphasigma, n*(n-1)/2, n);
+  if(!mcmclib_vector_is_sorted_desc(&s_v.vector))
+    return log(0.0);
+
   double ans = alphasigma_logderiv(p->lpdf->p, alphasigma);
   if(!gsl_finite(ans))
     return ans;

@@ -79,6 +79,8 @@ int main(int argc, char** argv) {
   gsl_vector_set_all(alphasigma, 0.0);
   l1 = mcmclib_mcar_model_alphasigma_lpdf(p, alphasigma);
   assert(gsl_finite(l1));
+  gsl_vector_set(alphasigma, P+1, 1.0);
+  assert(!gsl_finite(mcmclib_mcar_model_alphasigma_lpdf(p, alphasigma)));
   gsl_vector_free(alphasigma);
 
   mcmclib_mcar_model_free(p);
