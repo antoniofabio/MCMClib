@@ -14,18 +14,18 @@
 #include <gauss_am.h>
 #include <raptor.h>
 
-/*P=3, DIM=95: 0.07379 secs per iteration
+/*P=3, DIM=95: 0.21009 secs per iteration
   P=6, DIM=10: 0.00396 secs per iteration
   P=3, DIM=10: 0.00085 secs per iteration
   P=3, DIM=5:  0.00016 secs per iteration
 */
-#define N 10000
+#define N 50000
 #define THIN 10
-#define T0 5000
+#define T0 1000
 #define V0 0.4
 
 #define P 3
-#define DIM 10
+#define DIM 95
 
 gsl_rng* rng;
 gsl_vector *alpha12sigma, *alphasigmag;
@@ -56,8 +56,12 @@ void init_chains() {
 				      mcar_model, alphasigmag, Sigma0, T0);
   gsl_matrix_free(Sigma0);
 
-  model = mcmclib_pmodel_sampler_alloc(X, y, mcar_phi, rng, V0, T0);
+  model = mcmclib_pmodel_sampler_alloc(X, y, mcar_phi, rng, 1e-6, T0);
+  gsl_vector_set_all(model->model->beta, 0.0);
+  gsl_vector_set(model->model->beta, 0, -1.0);
+  gsl_vector_set(model->model->beta, 2, 1.0);
   sampler[2] = model->sampler;
+  mcmclib_amh_reset(sampler[2]);
 }
 
 void free_chains() {
@@ -84,30 +88,36 @@ int main(int argc, char** argv) {
   mcar_model = mcmclib_mcar_model_alloc(mcar_lpdf, mcar_phi);
 
   y = gsl_vector_alloc(P * DIM);
-  gsl_vector_set_all(y, 3.0);
+  FILE* in_y = fopen("y.dat", "r");
+  gsl_vector_fscanf(in_y, y);
+  fclose(in_y);
   X = gsl_matrix_alloc(P * DIM, P);
   gsl_matrix_set_zero(X);
-  for(int d=0; d<DIM; d++) {
+  for(int d=0; d<DIM; d++)
     for(int i=0; i<P; i++)
       gsl_matrix_set(X, d*P + i, i, 1.0);
-  }
 
   init_chains();
   FILE* out_a12s = fopen("chain_alpha12sigma.dat", "w");
   FILE* out_as = fopen("chain_alphasigma.dat", "w");
   FILE* out_beta = fopen("chain_beta.dat", "w");
+  FILE* out_phi = fopen("chain_phi.dat", "w");
   FILE* out_lpdf = fopen("chain_lpdf.dat", "w");
   for(int i=0; i<N; i++) {
     if (( (i+1) % THIN ) == 0) {
       gsl_vector_fprintf(out_a12s, alpha12sigma, "%f");
       gsl_vector_fprintf(out_as, alphasigmag, "%f");
       gsl_vector_fprintf(out_beta, sampler[2]->mh->x, "%f");
-      fprintf(out_lpdf, "%f\n", mcmclib_mcar_model_alpha12sigma_lpdf(mcar_model, alpha12sigma));
+      fprintf(out_lpdf, "%f\n", mcmclib_pois_model_lpdf(model->model, sampler[2]->mh->x));
+      gsl_vector_fprintf(out_phi, mcar_phi, "%f");
+      fflush(out_beta);
+      fflush(out_lpdf);
+      fflush(out_phi);
     }
     for(int j=0; j<2; j++) {
       mcmclib_amh_update(sampler[j]);
       assert(gsl_finite(sampler[j]->mh->logdistr_old));
-      }
+    }
     mcmclib_mcar_tilde_lpdf_update_vcov(mcar_lpdf);
     gsl_matrix* tmp = gsl_matrix_alloc(P*DIM, P*DIM);
     gsl_matrix_memcpy(tmp, mcar_lpdf->vcov);
@@ -119,6 +129,7 @@ int main(int argc, char** argv) {
   fclose(out_a12s);
   fclose(out_as);
   fclose(out_beta);
+  fclose(out_phi);
   fclose(out_lpdf);
 
   free_chains();
