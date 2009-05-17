@@ -15,6 +15,7 @@
  @{*/
 
 #include <gsl/gsl_matrix.h>
+#include "amh.h"
 
 typedef struct {
   gsl_vector* beta;
@@ -38,7 +39,23 @@ int mcmclib_pois_model_set_offset(mcmclib_pois_model* p, const gsl_vector* offse
 
 double mcmclib_pois_model_llik(mcmclib_pois_model* p, gsl_vector* x);
 double mcmclib_pois_model_lprior(mcmclib_pois_model* p, gsl_vector* x);
-double mcmclib_pois_model_lpdf(mcmclib_pois_model* p, gsl_vector* x);
+double mcmclib_pois_model_lpdf(void* in_p, gsl_vector* x);
+
+typedef struct {
+  mcmclib_pois_model* model;
+  mcmclib_amh* sampler;
+} mcmclib_pmodel_sampler;
+
+mcmclib_pmodel_sampler* mcmclib_pmodel_sampler_alloc(const gsl_matrix* X,
+						     const gsl_vector* y,
+						     const gsl_vector* offset,
+						     gsl_rng* rng,
+						     double sigma0,
+						     int burnin);
+
+void mcmclib_pmodel_sampler_free(mcmclib_pmodel_sampler* p);
+
+int mcmclib_pmodel_sampler_update(mcmclib_pmodel_sampler* p);
 
 /**@}*/
 /**@}*/

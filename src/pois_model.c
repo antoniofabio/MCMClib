@@ -9,11 +9,13 @@
  */
 #include <assert.h>
 #include <gsl/gsl_math.h>
+#include <gsl/gsl_rng.h>
 #include <gsl/gsl_sf.h>
 #include <gsl/gsl_blas.h>
 #include "matrix.h"
 #include "mvnorm.h"
 #include "pois_model.h"
+#include "gauss_am.h"
 
 mcmclib_pois_model* mcmclib_pois_model_alloc(const gsl_matrix* X, const gsl_vector* y) {
   mcmclib_pois_model* a = (mcmclib_pois_model*) malloc(sizeof(mcmclib_pois_model));
@@ -87,6 +89,36 @@ double mcmclib_pois_model_lprior(mcmclib_pois_model* p, gsl_vector* x) {
   return mcmclib_mvnorm_lpdf_noinv(p->b0, p->B0, x, p->ldet, p->work1, p->work2);
 }
 
-double mcmclib_pois_model_lpdf(mcmclib_pois_model* p, gsl_vector* x) {
+double mcmclib_pois_model_lpdf(void* in_p, gsl_vector* x) {
+  mcmclib_pois_model* p = (mcmclib_pois_model*) in_p;
   return mcmclib_pois_model_lprior(p, x) + mcmclib_pois_model_llik(p, x);
+}
+
+mcmclib_pmodel_sampler* mcmclib_pmodel_sampler_alloc(const gsl_matrix* X,
+						     const gsl_vector* y,
+						     const gsl_vector* offset,
+						     gsl_rng* rng,
+						     double sigma0,
+						     int burnin) {
+  mcmclib_pmodel_sampler* a = (mcmclib_pmodel_sampler*) malloc(sizeof(mcmclib_pmodel_sampler));
+  a->model = mcmclib_pois_model_alloc(X, y);
+  mcmclib_pois_model_set_offset(a->model, offset);
+  gsl_matrix* S0 = gsl_matrix_alloc(X->size2, X->size2);
+  gsl_matrix_set_identity(S0);
+  gsl_matrix_scale(S0, sigma0);
+  a->sampler = mcmclib_gauss_am_alloc(rng, mcmclib_pois_model_lpdf,
+				      a->model, a->model->beta,
+				      S0, burnin);
+  gsl_matrix_free(S0);
+  return a;
+}
+
+void mcmclib_pmodel_sampler_free(mcmclib_pmodel_sampler* p) {
+  mcmclib_gauss_am_free(p->sampler);
+  mcmclib_pois_model_free(p->model);
+  free(p);
+}
+
+int mcmclib_pmodel_sampler_update(mcmclib_pmodel_sampler* p) {
+  return mcmclib_amh_update(p->sampler);
 }

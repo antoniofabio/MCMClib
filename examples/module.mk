@@ -1,5 +1,5 @@
 EXES := spatial/example1 wrapped/example1 wrapped/regression\
-	mcar/example1
+	mcar/example1 poisson/example1
 
 EXAMPLES_BIN := $(EXES:%=examples/%)
 TOCLEAN += $(EXAMPLES_BIN)

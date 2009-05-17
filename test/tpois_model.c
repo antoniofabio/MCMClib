@@ -42,7 +42,6 @@ int main(int argc, char** argv) {
   gsl_vector* y = gsl_vector_alloc(N);
   gsl_vector_set_all(y, 2.0);
   mod = mcmclib_pois_model_alloc(X, y);
-  gsl_matrix_free(X);
 
   assert(mod->beta->size == P);
   x = gsl_vector_alloc(P);
@@ -67,6 +66,15 @@ int main(int argc, char** argv) {
   mcmclib_pois_model_set_offset(mod, offset);
   llik(1.0);
 
+  gsl_rng* rng = gsl_rng_alloc(gsl_rng_default);
+  mcmclib_pmodel_sampler* ms = mcmclib_pmodel_sampler_alloc(X, y, offset, rng, 0.4, 100);
+  mcmclib_pmodel_sampler_update(ms);
+
+  mcmclib_pmodel_sampler_free(ms);
+  gsl_rng_free(rng);
   mcmclib_pois_model_free(mod);
+  gsl_vector_free(offset);
   gsl_vector_free(y);
+  gsl_matrix_free(X);
+  gsl_vector_free(x);
 }
