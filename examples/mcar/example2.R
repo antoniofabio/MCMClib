@@ -60,6 +60,7 @@ library(coda)
 beta <- mcmc(matrix(read.table("chain_beta.dat")[[1]],
                   byrow=TRUE, ncol=P), thin=THIN)
 plot(beta)
+
 lpdf <- mcmc(matrix(read.table("chain_lpdf.dat")[[1]],
                     byrow=TRUE, ncol=1), thin=THIN)
 plot(lpdf)
@@ -82,3 +83,7 @@ phi <- mcmc(matrix(read.table("chain_phi.dat")[[1]],
                   byrow=TRUE, ncol=DIM*P), thin=THIN)
 plot(phi[,1:3])
 vphi <- var(phi)
+
+phi <- window(phi, start=2000)
+round(diag(var(phi))[1:6], 3)
+round(diag(solve(psi))[1:6], 3)
