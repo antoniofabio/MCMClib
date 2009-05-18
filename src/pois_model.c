@@ -71,7 +71,7 @@ int mcmclib_pois_model_set_offset(mcmclib_pois_model* p, const gsl_vector* offse
 }
 
 static double lpois(double k, double lmu) {
-  return lmu * k - gsl_sf_lnfact((int) k) - exp(lmu);
+  return lmu * k - exp(lmu);
 }
 
 double mcmclib_pois_model_llik(mcmclib_pois_model* p, gsl_vector* x) {
