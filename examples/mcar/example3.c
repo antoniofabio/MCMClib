@@ -112,11 +112,12 @@ int main(int argc, char** argv) {
   mcar_phi = gsl_vector_alloc(P * DIM);
   gsl_vector_set_zero(mcar_phi);
   denom = gsl_vector_alloc(P * DIM);
-  gsl_vector_set_all(denom, 0.0);
   offset = gsl_vector_alloc(P * DIM);
   FILE* in_offset = fopen("offset_2.dat", "r");
-  gsl_vector_fscanf(in_offset, offset);
+  gsl_vector_fscanf(in_offset, denom);
   fclose(in_offset);
+  for(int i=0; i < P*DIM; i++)
+    gsl_vector_set(denom, i, log(gsl_vector_get(denom, i)));
   update_offset();
   mcar_model = mcmclib_mcar_model_alloc(mcar_lpdf, mcar_phi);
 
