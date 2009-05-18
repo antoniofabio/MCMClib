@@ -84,7 +84,9 @@ static double alphasigma_logderiv(int p, const gsl_vector* x) {
     double xn = gsl_vector_get(x, n);
     if(xn <= log(TOL))
       return log(0.0);
-    ans -= 0.5 * ( exp(xn) - xn ); /*1 deg. of freedom chisq. distrib. on log(x)*/
+    const double beta = 4.0 / 3.0;
+    const double alpha = 7.0 / 3.0;
+    ans += xn - beta / exp(xn) - (alpha + 1.0) * xn; /*igamma with mean 1, var. 3*/
   }
   return ans;
 }
