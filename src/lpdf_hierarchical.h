@@ -24,6 +24,7 @@ typedef struct {
   distrfun_p loglik;
   gsl_vector** childs;
   void** child_parms;
+  int nchilds;
   gsl_vector* workspace;
 } mcmclib_post_lpdf;
 
@@ -34,9 +35,11 @@ typedef struct {
 @param loglik (common) likelihood function
 @param childs null-terminated array of pointers to child vectors
 @param child_parms vector of parameters for each child vector
+@param nchilds number of childs
 */
 mcmclib_post_lpdf* mcmclib_post_lpdf_alloc(gsl_vector* x, distrfun_p prior, void* parms,
-	distrfun_p loglik, gsl_vector** childs, void** child_parms);
+					   distrfun_p loglik, gsl_vector** childs,
+					   void** child_parms, int nchilds);
 
 /** free logposterior extra data*/
 void mcmclib_post_lpdf_free(mcmclib_post_lpdf* p);

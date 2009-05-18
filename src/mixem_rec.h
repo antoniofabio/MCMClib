@@ -11,7 +11,7 @@
 #define __MCMCLIB_MIXEM_REC_H__
 /** \addtogroup misc
 @{
-\addtogroup mixemrec Recursive mixture fitting (deprecated)
+\addtogroup mixemrec Recursive mixture fitting
 @{
 */
 
@@ -50,8 +50,10 @@ void mcmclib_mixem_rec_free(mcmclib_mixem_rec* p);
 /**accumulate a new datapoint infos to mixem_rec data*/
 void mcmclib_mixem_rec_add(mcmclib_mixem_rec* p, gsl_vector* y);
 
-/**update mixem_rec estimates using currently accumulated data*/
-void mcmclib_mixem_rec_update(mcmclib_mixem_rec* p);
+/**update mixem_rec estimates using currently accumulated data
+   @return GSL_SUCCESS if all goes right
+ */
+int mcmclib_mixem_rec_update(mcmclib_mixem_rec* p);
 
 /**@}@}*/
 #endif

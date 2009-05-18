@@ -25,8 +25,7 @@ gsl_vector* k; /*latent coefficients*/
 gsl_vector* x_theta;
 gsl_vector* x_k;
 
-void sampk(void* data, gsl_vector* out) {
-  mcmclib_mh_q* q = data;
+void sampk(mcmclib_mh_q* q, gsl_vector* out) {
   for(int s=0; s<S; s++) {
     int coin = gsl_rng_uniform(q->r) <= 0.1;
     if(coin) {

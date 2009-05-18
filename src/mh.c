@@ -7,6 +7,7 @@
  *  the Free Software Foundation; either version 2 of the License, or
  *  (at your option) any later version.
  */
+#include <assert.h>
 #include <gsl/gsl_math.h>
 #include "mh.h"
 
@@ -42,6 +43,8 @@ static int vector_finite(gsl_vector* x) {
 }
 
 int mcmclib_mh_update(mcmclib_mh* p) {
+  //assert(p->logdistr(p->logdistr_data, p->x) == p->logdistr_old);
+  p->logdistr_old = p->logdistr(p->logdistr_data, p->x);
   gsl_vector_memcpy(p->x_old, p->x);
   mcmclib_mh_q_sample(p->q, p->x);
   if(!vector_finite(p->x))

@@ -25,13 +25,14 @@
 */
 typedef double (*proposal_distr_t) (void* data, gsl_vector* x, gsl_vector* y);
 
+struct mcmclib_mh_q_t;
 /** pointer to a sampler function
 @param data ptr to an mcmclib_mh_q object
 */
-typedef void (*samplerfun_p) (void* data, gsl_vector* x);
+typedef void (*samplerfun_p) (struct mcmclib_mh_q_t* data, gsl_vector* x);
 
 /**\brief Metropolis-Hastings proposal kernel*/
-typedef struct {
+typedef struct mcmclib_mh_q_t {
   gsl_rng* r; /**< RNG used by the sampler function*/
   samplerfun_p sampler_fun; /**< proposal sampler fun*/
   void* sampler_data; /**< proposal sampler data*/
@@ -40,7 +41,14 @@ typedef struct {
   void* gamma; /**< misc kernel parameters data*/
 } mcmclib_mh_q;
 
-/**\brief alloc a new M-H proposal kernel*/
+/**\brief alloc a new M-H proposal kernel
+   @param r RNG
+   @param sampler_fun proposal sampler fun
+   @param sampler_data proposal sampler data
+   @param qd_fun proposal density fun
+   @param qd_data proposal density data
+   @param gamma misc kernel parameters data
+ */
 mcmclib_mh_q* mcmclib_mh_q_alloc(gsl_rng* r,
 				 samplerfun_p sampler_fun, void* sampler_data,
 				 proposal_distr_t qd_fun, void* qd_data,

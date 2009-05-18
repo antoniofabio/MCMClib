@@ -1,66 +1,63 @@
 /**Adaptive Gaussian Random Walk on an MCAR model example*/
 #include <stdio.h>
+#include <assert.h>
+#include <gsl/gsl_math.h>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 #include <gauss_am.h>
 #include <mcar_tilde.h>
 #include <mcar_model.h>
+#include <matrix.h>
 
-#define N 1
-#define T0 50
-#define V0 4.0
+/*P=3, DIM=95: 0.07379 secs per iteration
+  P=6, DIM=10: 0.00232 secs per iteration
+  P=3, DIM=10: 0.00039 secs per iteration
+  P=3, DIM=5:  0.00016 secs per iteration
+*/
+#define N 10000
+#define THIN 10
+#define T0 5000
+#define V0 0.4
 
-#define P 3
-#define DIM 2
-#define ALPHAP P*(P-1)/2
+#define P 6
+#define DIM 10
 
-gsl_vector *alpha1, *alpha2, *sigma, *Gammav;
+gsl_vector *alpha12sigma, *alphasigmag;
 gsl_rng* rng;
 mcmclib_mcar_tilde_lpdf* lpdf;
 mcmclib_mcar_model* model;
-mcmclib_amh* sampler[4];
+mcmclib_amh* sampler[2];
 
 void init_chains() {
-  rng = gsl_rng_alloc(gsl_rng_default);
-
-  alpha1 = lpdf->alpha1;
-  gsl_matrix* Sigma0 = gsl_matrix_alloc(ALPHAP, ALPHAP);
+  alpha12sigma = lpdf->alpha12sigma;
+  gsl_vector_set_all(alpha12sigma, -1.0);
+  gsl_matrix* Sigma0 = gsl_matrix_alloc(P*P, P*P);
   gsl_matrix_set_identity(Sigma0);
-  gsl_matrix_scale(Sigma0, V0 / ALPHAP);
-  sampler[0] = mcmclib_gauss_am_alloc(rng, mcmclib_mcar_model_alpha1_lpdf,
-				      model, alpha1, Sigma0, T0);
-
-  alpha2 = lpdf->alpha2;
-  sampler[1] = mcmclib_gauss_am_alloc(rng, mcmclib_mcar_model_alpha2_lpdf,
-				      model, alpha2, Sigma0, T0);
+  gsl_matrix_scale(Sigma0, V0 / ((double)(P * P)));
+  sampler[0] = mcmclib_gauss_am_alloc(rng, mcmclib_mcar_model_alpha12sigma_lpdf,
+				      model, alpha12sigma, Sigma0, T0);
   gsl_matrix_free(Sigma0);
 
-  sigma = lpdf->sigma;
-  Sigma0 = gsl_matrix_alloc(P, P);
+  alphasigmag = lpdf->alphasigmag;
+  gsl_vector_set_all(alphasigmag, -1.0);
+  Sigma0 = gsl_matrix_alloc(P*(P-1)/2 + P, P*(P-1)/2 + P);
   gsl_matrix_set_identity(Sigma0);
-  gsl_matrix_scale(Sigma0, V0 / P);
-  sampler[2] = mcmclib_gauss_am_alloc(rng, mcmclib_mcar_model_sigma_lpdf,
-				      model, sigma, Sigma0, T0);
-  gsl_matrix_free(Sigma0);
-
-  Gammav = lpdf->alphasigmag;
-  Sigma0 = gsl_matrix_alloc(ALPHAP + P, ALPHAP + P);
-  gsl_matrix_set_identity(Sigma0);
-  gsl_matrix_scale(Sigma0, V0 / (ALPHAP + P));
-  sampler[3] = mcmclib_gauss_am_alloc(rng, mcmclib_mcar_model_alphasigma_lpdf,
-				      model, Gammav, Sigma0, T0);
+  gsl_matrix_scale(Sigma0, V0 / (double) (P*(P-1)/2 + P));
+  sampler[1] = mcmclib_gauss_am_alloc(rng, mcmclib_mcar_model_alphasigma_lpdf,
+				      model, alphasigmag, Sigma0, T0);
   gsl_matrix_free(Sigma0);
 }
 
 void free_chains() {
-  for(int i=0; i<4; i++)
+  for(int i=0; i<2; i++)
     mcmclib_gauss_am_free(sampler[i]);
   gsl_rng_free(rng);
-  gsl_vector_free(Gammav);
 }
 
 int main(int argc, char** argv) {
+  rng = gsl_rng_alloc(gsl_rng_default);
+
   /* model setup */
   gsl_matrix* W = gsl_matrix_alloc(DIM, DIM);
   gsl_matrix_set_zero(W);
@@ -71,15 +68,28 @@ int main(int argc, char** argv) {
   lpdf = mcmclib_mcar_tilde_lpdf_alloc(P, W);
   gsl_matrix_free(W);
   gsl_vector* e = gsl_vector_alloc(P * DIM);
-  gsl_vector_set_zero(e);
+  for(int i=0; i<P*DIM; i++)
+    gsl_vector_set(e, i, gsl_ran_gaussian(rng, 1.0));
   model = mcmclib_mcar_model_alloc(lpdf, e);
 
   init_chains();
+  FILE* out_a12s = fopen("chain_alpha12sigma.dat", "w");
+  FILE* out_as = fopen("chain_alphasigma.dat", "w");
+  FILE* out_lpdf = fopen("chain_lpdf.dat", "w");
   for(int i=0; i<N; i++) {
-    for(int j=0; j<4; j++) {
+    if (( (i+1) % THIN ) == 0) {
+      gsl_vector_fprintf(out_a12s, alpha12sigma, "%f");
+      gsl_vector_fprintf(out_as, alphasigmag, "%f");
+      fprintf(out_lpdf, "%f\n", mcmclib_mcar_model_alpha12sigma_lpdf(model, alpha12sigma));
+    }
+    for(int j=0; j<2; j++) {
       mcmclib_amh_update(sampler[j]);
+      assert(gsl_finite(sampler[j]->mh->logdistr_old));
     }
   }
+  fclose(out_a12s);
+  fclose(out_as);
+  fclose(out_lpdf);
 
   free_chains();
   mcmclib_mcar_model_free(model);

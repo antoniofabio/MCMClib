@@ -17,14 +17,21 @@
 /**\addtogroup multivariate
  @{*/
 
+
+/** iid multivariate gaussian variate
+@param r RNG state
+@param out result vector
+*/
+void mcmclib_mvnorm_iid(const gsl_rng* r, gsl_vector* out);
+
 /** Multivariate gaussian variate
 @param r RNG state
 @param sigma variance/covariance matrix
 @param out result vector
 */
 void mcmclib_mvnorm(const gsl_rng* r,
-	const gsl_matrix* sigma,
-	gsl_vector* out);
+		    const gsl_matrix* sigma,
+		    gsl_vector* out);
 
 /** Multivariate gassian variate, with known cholesky decomposition.
 \internal
@@ -35,6 +42,24 @@ void mcmclib_mvnorm(const gsl_rng* r,
 void mcmclib_mvnorm_chol(const gsl_rng* r,
 	const gsl_matrix* sigma_chol,
 	gsl_vector* out);
+
+/** Multivariate gassian variate, with known precision matrix
+@param r RNG state
+@param Psi precision matrix
+@param out result vector
+*/
+void mcmclib_mvnorm_precision(const gsl_rng* r,
+			      const gsl_matrix* Psi,
+			      gsl_vector* out);
+
+/** Multivariate gassian variate, with known cholesky dec. of the precision matrix.
+@param r RNG state
+@param Psi cholesky decomposition of the precision matrix
+@param out result vector
+*/
+void mcmclib_mvnorm_cholprec(const gsl_rng* r,
+			     const gsl_matrix* Psi,
+			     gsl_vector* out);
 
 /**\brief Multivariate Gaussian distribution*/
 typedef struct {
@@ -64,8 +89,9 @@ void mcmclib_mvnorm_lpdf_free(mcmclib_mvnorm_lpdf* p);
 double mcmclib_mvnorm_lpdf_compute(void* in_p, gsl_vector* x);
 
 /**update cholesky decomposition info
+   @return !0 if non pos.def. covariance matrix
 \internal*/
-void mcmclib_mvnorm_lpdf_chol(mcmclib_mvnorm_lpdf* p);
+int mcmclib_mvnorm_lpdf_chol(mcmclib_mvnorm_lpdf* p);
 
 /**compute log-distrib without recomputing cholesky decomposition
 \internal*/
@@ -77,6 +103,24 @@ void mcmclib_mvnorm_lpdf_inverse(mcmclib_mvnorm_lpdf* p);
 /**compute log-distrib by exploiting previously computed inverse
 \internal*/
 double mcmclib_mvnorm_lpdf_compute_noinv(mcmclib_mvnorm_lpdf* p, gsl_vector* x);
+
+/** Multivariate normal distribution from precision matrix
+    @param mu mean
+    @param iSigma precision matrix
+    @param x
+    @param ldet log-determinant of var/cov matrix
+    @param work1 workspace vector of size equal to that of 'x'
+    @param work2 same as work1
+    @return log-pdf
+ */
+double mcmclib_mvnorm_lpdf_noinv(gsl_vector* mu, gsl_matrix* iSigma, gsl_vector* x,
+				 double ldet, gsl_vector* work1, gsl_vector* work2);
+
+/** multivariate zero-mean normal log-density based on precision matrix
+    
+    The lower triangular part of 'Psi' is referenced. The upper triangular part
+    is ignored. */
+double mcmclib_mvnormzp_lpdf(const gsl_matrix* Psi, const gsl_vector* y);
 
 /**@}*/
 /**@}*/

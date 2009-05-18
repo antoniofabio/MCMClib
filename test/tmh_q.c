@@ -15,8 +15,7 @@ static double qd(void* in_inc, gsl_vector* x, gsl_vector* y) {
   return (*inc) * (v0(x) - v0(y));
 }
 
-static void sampler(void* state, gsl_vector* x) {
-  mcmclib_mh_q* q = (mcmclib_mh_q*) state;
+static void sampler(mcmclib_mh_q* q, gsl_vector* x) {
   double* o = (double*) q->gamma;
   gsl_vector_set(x, 0, x0 + (*o));
 }

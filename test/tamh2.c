@@ -26,8 +26,7 @@ static double qd(void* ignore, gsl_vector* x, gsl_vector* y) {
   return 0.0;
 }
 
-static void sampler(void* state, gsl_vector* x) {
-  mcmclib_mh_q* q = (mcmclib_mh_q*) state;
+static void sampler(mcmclib_mh_q* q, gsl_vector* x) {
   gsl_rng* r = (gsl_rng*) q->gamma;
   double coin = gsl_rng_uniform(r);
   if(coin < 0.5)

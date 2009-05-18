@@ -66,7 +66,7 @@ void mcmclib_rapt_gamma_free(mcmclib_rapt_gamma* p) {
   free(p);
 }
 
-void mcmclib_rapt_q_sample(void* in_p, gsl_vector* x);
+void mcmclib_rapt_q_sample(mcmclib_mh_q* q, gsl_vector* x);
 double mcmclib_rapt_q_d(void* gamma, gsl_vector* x, gsl_vector* y);
 
 mcmclib_mh_q* mcmclib_rapt_q_alloc(gsl_rng* r,
@@ -101,8 +101,7 @@ static int sample(gsl_rng* r, gsl_vector* probs) {
   return(K-1);
 }
 
-void mcmclib_rapt_q_sample(void* in_p, gsl_vector* x) {
-  mcmclib_mh_q* q = (mcmclib_mh_q*) in_p;
+void mcmclib_rapt_q_sample(mcmclib_mh_q* q, gsl_vector* x) {
   mcmclib_rapt_gamma* g = (mcmclib_rapt_gamma*) q->gamma;
 
   g->which_region_old = g->which_region_x = g->which_region(x, g->which_region_data);

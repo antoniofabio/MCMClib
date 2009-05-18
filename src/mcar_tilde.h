@@ -32,10 +32,7 @@ typedef struct {
   gsl_matrix* M; /**< adiancency matrix (n x n)*/
   gsl_vector* m; /**< adiancency weights (n)*/
 
-  /*internal stuff*/
-  gsl_vector* mu;
-  gsl_matrix* vcov;
-  mcmclib_mvnorm_lpdf* mvnorm; /**< normal density object */
+  gsl_matrix* vcov; /**< precision matrix */
 
   /*workspace memory*/
   gsl_matrix *Lambda_ij, *Gammai, *Block; /**< used in fun 'vcov_blockij' */
@@ -58,15 +55,12 @@ void mcmclib_mcar_tilde_lpdf_free(mcmclib_mcar_tilde_lpdf* p);
 */
 double mcmclib_mcar_tilde_lpdf_compute(void* in_p, gsl_vector* x);
 
-/** Compute matrix inverse by LU factorization */
-void mcmclib_matrix_inverse(gsl_matrix* A);
-
 /** update current vcov matrix value \internal */
 void mcmclib_mcar_tilde_lpdf_update_B_tilde(mcmclib_mcar_tilde_lpdf* p);
 /** update current inverse vcov matrix value \internal */
-void mcmclib_mcar_tilde_lpdf_update_blocks(mcmclib_mcar_tilde_lpdf* p);
+int mcmclib_mcar_tilde_lpdf_update_blocks(mcmclib_mcar_tilde_lpdf* p);
 /** update current vcov matrix value \internal */
-void mcmclib_mcar_tilde_lpdf_update_vcov(mcmclib_mcar_tilde_lpdf* p);
+int mcmclib_mcar_tilde_lpdf_update_vcov(mcmclib_mcar_tilde_lpdf* p);
 /** update current Gamma matrix value \internal */
 void mcmclib_mcar_tilde_lpdf_update_Gamma(mcmclib_mcar_tilde_lpdf* p);
 
