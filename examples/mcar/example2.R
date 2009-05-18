@@ -57,12 +57,12 @@ write.table(y, file="y.dat", row.names=FALSE, col.names=FALSE)
 summary(glm(y ~ X-1, family=poisson))
 
 library(coda)
-xx <- mcmc(cbind(matrix(read.table("chain_beta.dat")[[1]],
-                    byrow=TRUE, ncol=P),
-                 matrix(read.table("chain_lpdf.dat")[[1]],
-                        byrow=TRUE, ncol=1)),
-                 thin=THIN)
-plot(xx)
+beta <- mcmc(matrix(read.table("chain_beta.dat")[[1]],
+                  byrow=TRUE, ncol=P), thin=THIN)
+plot(beta)
+lpdf <- mcmc(matrix(read.table("chain_lpdf.dat")[[1]],
+                    byrow=TRUE, ncol=1), thin=THIN)
+plot(lpdf)
 
 g <- function(x) (pi/2) * (exp(x) - 1) / (exp(x) + 1)
 as <- mcmc(matrix(read.table("chain_alphasigma.dat")[[1]],
