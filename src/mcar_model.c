@@ -111,3 +111,28 @@ double mcmclib_mcar_model_alphasigma_lpdf(void* in_p, gsl_vector* alphasigma) {
   gsl_vector_free(tmp);
   return ans;
 }
+
+double mcmclib_mcar_model_phi_fcond(mcmclib_mcar_model* in_p, int i, gsl_vector* x) {
+  mcmclib_mcar_tilde_lpdf* lpdf = in_p->lpdf;
+  const int p = lpdf->p;
+  assert(x->size == p);
+  gsl_matrix* W = lpdf->M;
+  const double mi = 1.0 / gsl_vector_get(lpdf->m, i);
+  gsl_matrix* Lambdaij = lpdf->Lambda_ij;
+  gsl_vector* mean = gsl_vector_alloc(p);
+  gsl_vector_set_zero(mean);
+  for(int j=(i+1); j<p; j++) {
+    if(gsl_matrix_get(W, i, j) == 1.0) {
+      gsl_vector_view phij_v = gsl_vector_subvector(in_p->e, i*p, p);
+      gsl_blas_dgemv(CblasNoTrans, mi, Lambdaij, &phij_v.vector, 1.0, mean);
+    }
+  }
+  gsl_matrix* Gammai = lpdf->Gammai;
+  gsl_matrix_memcpy(Gammai, lpdf->Gamma);
+  gsl_matrix_scale(Gammai, mi);
+  mcmclib_mvnorm_lpdf* tmp = mcmclib_mvnorm_lpdf_alloc(mean, Gammai->data);
+  double ans = mcmclib_mvnorm_lpdf_compute(tmp, x);
+  gsl_vector_free(mean);
+  mcmclib_mvnorm_lpdf_free(tmp);
+  return ans;
+}
