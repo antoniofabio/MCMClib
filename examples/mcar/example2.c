@@ -35,7 +35,22 @@ gsl_vector* mcar_phi;
 gsl_vector* y;
 gsl_matrix* X;
 mcmclib_pmodel_sampler* model;
-mcmclib_amh* sampler[3];
+mcmclib_amh* sampler[3 + DIM];
+int util_j[DIM];
+gsl_vector_view phij[DIM];
+
+static double phij_lpdf(void* pj, gsl_vector* phij) {
+  int j = ((int*) pj)[0];
+  double prior = mcmclib_mcar_model_phi_fcond(mcar_model, j, phij);
+  gsl_vector* phi_old = gsl_vector_alloc(DIM * P);
+  gsl_vector_memcpy(phi_old, mcar_phi);
+  gsl_vector_view phiv = gsl_vector_subvector(mcar_phi, j*P, P);
+  gsl_vector_memcpy(&phiv.vector, phij);
+  double lik = mcmclib_pois_model_llik(model->model, model->sampler->mh->x);
+  gsl_vector_memcpy(mcar_phi, phi_old);
+  gsl_vector_free(phi_old);
+  return prior + lik;
+}
 
 void init_chains() {
   alpha12sigma = mcar_lpdf->alpha12sigma;
@@ -61,6 +76,17 @@ void init_chains() {
   gsl_vector_set(model->model->beta, 0, -1.0);
   gsl_vector_set(model->model->beta, 2, 1.0);
   sampler[2] = model->sampler;
+
+  Sigma0 = gsl_matrix_alloc(P, P);
+  gsl_matrix_set_identity(Sigma0);
+  gsl_matrix_scale(Sigma0, V0 / (double) (P));
+  for(int j=0; j<DIM; j++) {
+    util_j[j] = j;
+    phij[j] = gsl_vector_subvector(mcar_phi, j*P, P);
+    sampler[j+3] = mcmclib_gauss_am_alloc(rng, phij_lpdf, util_j + j, &phij[j].vector,
+					  Sigma0, T0);
+  }
+  gsl_matrix_free(Sigma0);
 }
 
 void free_chains() {
@@ -115,13 +141,11 @@ int main(int argc, char** argv) {
       fflush(out_a12s);
       fflush(out_as);
     }
-    for(int j=0; j<2; j++) {
+    for(int j=0; j<DIM+3; j++) {
       mcmclib_amh_update(sampler[j]);
       assert(gsl_finite(sampler[j]->mh->logdistr_old));
+      mcmclib_mcar_tilde_lpdf_update_vcov(mcar_lpdf);
     }
-    mcmclib_mcar_tilde_lpdf_update_vcov(mcar_lpdf);
-    mcmclib_mvnorm_precision(rng, mcar_lpdf->vcov, mcar_phi);
-    mcmclib_pmodel_sampler_update(model);
   }
   fclose(out_a12s);
   fclose(out_as);
