@@ -121,7 +121,7 @@ double mcmclib_mcar_model_phi_fcond(mcmclib_mcar_model* in_p, int i, gsl_vector*
   gsl_matrix* Lambdaij = lpdf->Lambda_ij;
   gsl_vector* mean = gsl_vector_alloc(p);
   gsl_vector_set_zero(mean);
-  for(int j=(i+1); j<p; j++) {
+  for(int j=0; j < lpdf->n; j++) {
     if(gsl_matrix_get(W, i, j) == 1.0) {
       gsl_vector_view phij_v = gsl_vector_subvector(in_p->e, i*p, p);
       gsl_blas_dgemv(CblasNoTrans, mi, Lambdaij, &phij_v.vector, 1.0, mean);
