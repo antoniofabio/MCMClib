@@ -28,12 +28,19 @@ gsl_vector *alpha12sigma, *alphasigmag;
 mcmclib_mcar_tilde_lpdf* mcar_lpdf;
 mcmclib_mcar_model* mcar_model;
 gsl_vector* mcar_phi;
+gsl_vector* denom;
+gsl_vector* offset;
 gsl_vector* y;
 gsl_matrix* X;
 mcmclib_pmodel_sampler* model;
 mcmclib_amh* sampler[3 + DIM];
 int util_j[DIM];
 gsl_vector_view phij[DIM];
+
+static void update_offset() {
+  gsl_vector_memcpy(offset, denom);
+  gsl_vector_add(offset, mcar_phi);
+}
 
 static double phij_lpdf(void* pj, gsl_vector* phij) {
   int j = ((int*) pj)[0];
@@ -42,8 +49,10 @@ static double phij_lpdf(void* pj, gsl_vector* phij) {
   gsl_vector_memcpy(phi_old, mcar_phi);
   gsl_vector_view phiv = gsl_vector_subvector(mcar_phi, j*P, P);
   gsl_vector_memcpy(&phiv.vector, phij);
+  update_offset();
   double lik = mcmclib_pois_model_llik(model->model, model->sampler->mh->x);
   gsl_vector_memcpy(mcar_phi, phi_old);
+  update_offset();
   gsl_vector_free(phi_old);
   return prior + lik;
 }
@@ -67,7 +76,7 @@ void init_chains() {
 				      mcar_model, alphasigmag, Sigma0, T0);
   gsl_matrix_free(Sigma0);
 
-  model = mcmclib_pmodel_sampler_alloc(X, y, mcar_phi, rng, 1e-3, T0);
+  model = mcmclib_pmodel_sampler_alloc(X, y, offset, rng, 1e-3, T0);
   gsl_vector_set_all(model->model->beta, 0.0);
   gsl_vector_set(model->model->beta, 0, -1.0);
   gsl_vector_set(model->model->beta, 2, 1.0);
@@ -106,6 +115,10 @@ int main(int argc, char** argv) {
   gsl_matrix_free(W);
   mcar_phi = gsl_vector_alloc(P * DIM);
   gsl_vector_set_zero(mcar_phi);
+  denom = gsl_vector_alloc(P * DIM);
+  gsl_vector_set_all(denom, 0.0);
+  offset = gsl_vector_alloc(P * DIM);
+  update_offset();
   mcar_model = mcmclib_mcar_model_alloc(mcar_lpdf, mcar_phi);
 
   y = gsl_vector_alloc(P * DIM);
@@ -140,6 +153,7 @@ int main(int argc, char** argv) {
     for(int j=0; j<DIM+3; j++) {
       mcmclib_amh_update(sampler[j]);
       assert(gsl_finite(sampler[j]->mh->logdistr_old));
+      update_offset();
       mcmclib_mcar_tilde_lpdf_update_vcov(mcar_lpdf);
     }
   }
