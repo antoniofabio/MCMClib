@@ -4,7 +4,7 @@
 (define (l2v ll)
   (let*
       ((n (length ll))
-       (v (gsl-vector-alloc n)))
+       (v (new-gsl-vector n)))
     (let loop ((i 0))
       (gsl-vector-set v i (list-ref ll i))
       (if (< i (- n 1)) (loop (+ i 1))))
@@ -14,7 +14,7 @@
 (define (M2v M)
   (let* ((n (gsl-matrix-size1-get M))
          (p (gsl-matrix-size2-get M))
-         (v (gsl-vector-alloc (* n p))))
+         (v (new-gsl-vector (* n p))))
     (let loop-i ((i 0))
       (let loop-j ((j 0))
         (gsl-vector-set v
@@ -28,7 +28,7 @@
 (define (ll2M ll)
   (let* ((n (length ll))
          (p (length (car ll)))
-         (M (gsl-matrix-alloc n p)))
+         (M (new-gsl-matrix n p)))
     (let loop-i ((i 0))
       (let loop-j ((j 0))
         (let ((row (list-ref ll i)))
@@ -78,11 +78,11 @@
 (define (dM M) (display (M2ll M)) (newline))
 
 (define P 3)
-(define Psi (gsl-matrix-alloc P P))
+(define Psi (new-gsl-matrix P P))
 (gsl-matrix-set-identity Psi)
 (define m P)
 (define p (mcmclib-iwishart-lpdf-alloc Psi m))
 
-(define v (gsl-vector-alloc (* P P)))
+(define v (new-gsl-vector (* P P)))
 (gsl-vector-set-all v 1.0)
 (mcmclib-iwishart-lpdf-compute p v)
