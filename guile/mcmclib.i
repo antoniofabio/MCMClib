@@ -10,10 +10,28 @@
 
 %{
 #include <lpdf_iwishart.h>
+#include <amh.h>
 #include <mcar_tilde.h>
 #include <mcar_model.h>
 #include <pois_model.h>
+
+  static double guile_distrfun(SCM closure, gsl_vector* in_x) {
+    SCM x = SWIG_NewPointerObj (x, SWIGTYPE_p_gsl_vector, 0);
+    return scm_to_double(scm_call_1(closure, x));
+  }
 %}
+
+const distrfun_p guile_distrfun;
+
+typedef struct {
+  mcmclib_mh* mh;
+  void* suff; /**< sufficient data accumulated up to current iteration*/
+  mcmclib_amh_update_gamma_p update_gamma;
+  int n; /**< current iteration number*/
+} mcmclib_amh;
+
+int mcmclib_amh_update(mcmclib_amh* p);
+void mcmclib_amh_reset(mcmclib_amh* p);
 
 mcmclib_iwishart_lpdf* mcmclib_iwishart_lpdf_alloc(gsl_matrix* Psi, int m);
 void mcmclib_iwishart_lpdf_free(mcmclib_iwishart_lpdf* p);
