@@ -11,6 +11,7 @@
 %{
 #include <lpdf_iwishart.h>
 #include <amh.h>
+#include <gauss_am.h>
 #include <mcar_tilde.h>
 #include <mcar_model.h>
 #include <pois_model.h>
@@ -32,6 +33,17 @@ typedef struct {
 
 int mcmclib_amh_update(mcmclib_amh* p);
 void mcmclib_amh_reset(mcmclib_amh* p);
+
+mcmclib_amh* mcmclib_gauss_am_alloc(gsl_rng* r,
+				    distrfun_p logdistr, void* logdistr_data,
+				    gsl_vector* x,
+				    const gsl_matrix* sigma_zero, int t0);
+
+/** AM gamma update function \internal
+@param in_p ptr to an mcmclib_amh object
+*/
+void mcmclib_gauss_am_update_gamma(void* in_p);
+
 
 mcmclib_iwishart_lpdf* mcmclib_iwishart_lpdf_alloc(gsl_matrix* Psi, int m);
 void mcmclib_iwishart_lpdf_free(mcmclib_iwishart_lpdf* p);

@@ -1349,6 +1349,7 @@ static void intArray_setitem(int *ary, int index, int value) {
 
 #include <lpdf_iwishart.h>
 #include <amh.h>
+#include <gauss_am.h>
 #include <mcar_tilde.h>
 #include <mcar_model.h>
 #include <pois_model.h>
@@ -6459,6 +6460,74 @@ _wrap_mcmclib_amh_reset (SCM s_0)
 
 
 static SCM
+_wrap_mcmclib_gauss_am_alloc (SCM s_0, SCM s_1, SCM s_2, SCM s_3, SCM s_4, SCM s_5)
+{
+#define FUNC_NAME "mcmclib-gauss-am-alloc"
+  gsl_rng *arg1 = (gsl_rng *) 0 ;
+  distrfun_p arg2 ;
+  void *arg3 = (void *) 0 ;
+  gsl_vector *arg4 = (gsl_vector *) 0 ;
+  gsl_matrix *arg5 = (gsl_matrix *) 0 ;
+  int arg6 ;
+  distrfun_p *argp2 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  mcmclib_amh *result = 0 ;
+  
+  {
+    arg1 = (gsl_rng *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_gsl_rng, 1, 0);
+  }
+  {
+    argp2 = (distrfun_p *)SWIG_MustGetPtr(s_1, SWIGTYPE_p_distrfun_p, 2, 0);
+    arg2 = *argp2;
+  }
+  {
+    arg3 = (void *)SWIG_MustGetPtr(s_2, NULL, 3, 0);
+  }
+  {
+    arg4 = (gsl_vector *)SWIG_MustGetPtr(s_3, SWIGTYPE_p_gsl_vector, 4, 0);
+  }
+  {
+    arg5 = (gsl_matrix *)SWIG_MustGetPtr(s_4, SWIGTYPE_p_gsl_matrix, 5, 0);
+  }
+  {
+    arg6 = (int) scm_num2int(s_5, SCM_ARG1, FUNC_NAME);
+  }
+  result = (mcmclib_amh *)mcmclib_gauss_am_alloc(arg1,arg2,arg3,arg4,(gsl_matrix const *)arg5,arg6);
+  {
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_mcmclib_amh, 0);
+  }
+  
+  
+  
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_gauss_am_update_gamma (SCM s_0)
+{
+#define FUNC_NAME "mcmclib-gauss-am-update-gamma"
+  void *arg1 = (void *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  
+  {
+    arg1 = (void *)SWIG_MustGetPtr(s_0, NULL, 1, 0);
+  }
+  mcmclib_gauss_am_update_gamma(arg1);
+  gswig_result = SCM_UNSPECIFIED;
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
 _wrap_mcmclib_iwishart_lpdf_alloc (SCM s_0, SCM s_1)
 {
 #define FUNC_NAME "mcmclib-iwishart-lpdf-alloc"
@@ -9029,6 +9098,8 @@ SWIG_init(void)
   scm_c_define_gsubr("delete-mcmclib-amh", 1, 0, 0, (swig_guile_proc) _wrap_delete_mcmclib_amh);
   scm_c_define_gsubr("mcmclib-amh-update", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_amh_update);
   scm_c_define_gsubr("mcmclib-amh-reset", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_amh_reset);
+  scm_c_define_gsubr("mcmclib-gauss-am-alloc", 6, 0, 0, (swig_guile_proc) _wrap_mcmclib_gauss_am_alloc);
+  scm_c_define_gsubr("mcmclib-gauss-am-update-gamma", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_gauss_am_update_gamma);
   scm_c_define_gsubr("mcmclib-iwishart-lpdf-alloc", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_iwishart_lpdf_alloc);
   scm_c_define_gsubr("mcmclib-iwishart-lpdf-free", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_iwishart_lpdf_free);
   scm_c_define_gsubr("mcmclib-iwishart-lpdf-compute", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_iwishart_lpdf_compute);
