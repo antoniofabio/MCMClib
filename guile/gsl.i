@@ -5,6 +5,9 @@ Error handling
 #include <string.h>
 #include <libguile.h>
 #include <gsl/gsl_errno.h>
+#include <gsl/gsl_vector.h>
+#include <gsl/gsl_matrix.h>
+#include <gsl/gsl_rng.h>
 
 static void guile_gsl_err_handler(const char * reason,
 				  const char * file,
@@ -30,8 +33,6 @@ typedef struct {
   size_t stride;
   double *data;
 } gsl_vector;
-
-gsl_vector *gsl_vector_alloc (const size_t n);
 
 double gsl_vector_get (const gsl_vector * v, const size_t i);
 void gsl_vector_set (gsl_vector * v, const size_t i, double x);
@@ -76,6 +77,15 @@ int gsl_vector_ispos (const gsl_vector * v);
 int gsl_vector_isneg (const gsl_vector * v);
 int gsl_vector_isnonneg (const gsl_vector * v);
 
+%extend gsl_vector {
+  gsl_vector(size_t n) {
+    return gsl_vector_alloc(n);
+  }
+  ~gsl_vector() {
+    gsl_vector_free($self);
+  }
+};
+
 /*
 GSL_MATRIX
 */
@@ -85,9 +95,6 @@ typedef struct {
   size_t tda;
   double * data;
 } gsl_matrix;
-
-gsl_matrix * 
-gsl_matrix_alloc (const size_t n1, const size_t n2);
 
 gsl_matrix * 
 gsl_matrix_calloc (const size_t n1, const size_t n2);
@@ -113,8 +120,6 @@ gsl_vector_alloc_row_from_matrix (gsl_matrix * m,
 gsl_vector * 
 gsl_vector_alloc_col_from_matrix (gsl_matrix * m,
                                         const size_t j);
-
-void gsl_matrix_free (gsl_matrix * m);
 
 /* Views */
 
@@ -271,6 +276,15 @@ int gsl_matrix_scale (gsl_matrix * a, const double x);
 int gsl_matrix_add_constant (gsl_matrix * a, const double x);
 int gsl_matrix_add_diagonal (gsl_matrix * a, const double x);
 
+%extend gsl_matrix {
+  gsl_matrix(size_t n1, size_t n2) {
+    return gsl_matrix_alloc(n1, n2);
+  }
+  ~gsl_matrix() {
+    gsl_matrix_free($self);
+  }
+};
+
 /*
 RNG
 */
@@ -341,4 +355,13 @@ const gsl_rng_type ** gsl_rng_types_setup(void);
 
 const gsl_rng_type *gsl_rng_default;
 
-gsl_rng *gsl_rng_alloc (const gsl_rng_type * T);
+typedef struct {} gsl_rng;
+
+%extend gsl_rng {
+  gsl_rng(gsl_rng_type* type) {
+    return gsl_rng_alloc(type);
+  }
+  ~gsl_rng() {
+    gsl_rng_free($self);
+  }
+}
