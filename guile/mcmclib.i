@@ -47,9 +47,11 @@ void mcmclib_gauss_am_update_gamma(void* in_p);
 
 mcmclib_iwishart_lpdf* mcmclib_iwishart_lpdf_alloc(gsl_matrix* Psi, int m);
 void mcmclib_iwishart_lpdf_free(mcmclib_iwishart_lpdf* p);
+%callback("%s_cb");
 double mcmclib_iwishart_lpdf_compute(void* p, gsl_vector* x);
 
 double mcmclib_mcar_tilde_lpdf_compute(void* in_p, gsl_vector* x);
+%nocallback;
 void mcmclib_mcar_tilde_lpdf_update_B_tilde(mcmclib_mcar_tilde_lpdf* p);
 int mcmclib_mcar_tilde_lpdf_update_blocks(mcmclib_mcar_tilde_lpdf* p);
 int mcmclib_mcar_tilde_lpdf_update_vcov(mcmclib_mcar_tilde_lpdf* p);
@@ -82,9 +84,11 @@ typedef struct {
   }
 }
 
+%callback("%s_cb");
 double mcmclib_mcar_model_alpha12sigma_lpdf(void* in_p, gsl_vector* alpha12sigma);
 double mcmclib_mcar_model_alphasigma_lpdf(void* in_p, gsl_vector* alphasigma);
 double mcmclib_mcar_model_phi_fcond(mcmclib_mcar_model* in_p, int i, gsl_vector* x);
+%nocallback;
 
 typedef struct {
   mcmclib_mcar_tilde_lpdf* lpdf; /**< log-likelihood component */
@@ -105,7 +109,9 @@ int mcmclib_pois_model_set_offset(mcmclib_pois_model* p, const gsl_vector* offse
 
 double mcmclib_pois_model_llik(mcmclib_pois_model* p, gsl_vector* x);
 double mcmclib_pois_model_lprior(mcmclib_pois_model* p, gsl_vector* x);
+%callback("%s_cb");
 double mcmclib_pois_model_lpdf(void* in_p, gsl_vector* x);
+%nocallback;
 
 typedef struct {
   gsl_vector* beta;
