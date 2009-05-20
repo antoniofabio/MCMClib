@@ -49,3 +49,8 @@ phi <- mcmc(matrix(read.table("chain_phi.dat")[[1]],
                   byrow=TRUE, ncol=DIM*P), thin=THIN)
 round(apply(phi, 2, var), 3)[1:24]
 plot(phi[,1:3])
+
+gg <- mcmc(matrix(read.table("chain_gammaii.dat")[[1]], byrow=TRUE, ncol=P), thin=THIN)
+plot(gg)
+bb <- mcmc(matrix(read.table("chain_bii.dat")[[1]], byrow=TRUE, ncol=P), thin=THIN)
+plot(bb)

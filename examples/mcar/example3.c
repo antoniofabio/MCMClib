@@ -137,6 +137,10 @@ int main(int argc, char** argv) {
   FILE* out_beta = fopen("chain_beta.dat", "w");
   FILE* out_phi = fopen("chain_phi.dat", "w");
   FILE* out_lpdf = fopen("chain_lpdf.dat", "w");
+  FILE* out_gii = fopen("chain_gammaii.dat", "w");
+  FILE* out_bii = fopen("chain_bii.dat", "w");
+  gsl_vector_view gii_v = gsl_matrix_diagonal(mcar_lpdf->Gamma);
+  gsl_vector_view bii_v = gsl_matrix_diagonal(mcar_lpdf->B_tilde);
   for(int i=0; i<N; i++) {
     if (( (i+1) % THIN ) == 0) {
       gsl_vector_fprintf(out_a12s, alpha12sigma, "%f");
@@ -144,17 +148,25 @@ int main(int argc, char** argv) {
       gsl_vector_fprintf(out_beta, sampler[2]->mh->x, "%f");
       fprintf(out_lpdf, "%f\n", mcmclib_pois_model_lpdf(model->model, sampler[2]->mh->x));
       gsl_vector_fprintf(out_phi, mcar_phi, "%f");
+      gsl_vector_fprintf(out_gii, &gii_v.vector, "%f");
+      gsl_vector_fprintf(out_bii, &bii_v.vector, "%f");
       fflush(out_beta);
       fflush(out_lpdf);
       fflush(out_phi);
       fflush(out_a12s);
       fflush(out_as);
+      fflush(out_gii);
+      fflush(out_bii);
     }
-    for(int j=0; j<DIM+3; j++) {
+    for(int j=0; j<2; j++) {
+      mcmclib_amh_update(sampler[j]);
+      assert(gsl_finite(sampler[j]->mh->logdistr_old));
+      mcmclib_mcar_tilde_lpdf_update_vcov(mcar_lpdf);
+    }
+    for(int j=2; j<DIM+3; j++) {
       mcmclib_amh_update(sampler[j]);
       assert(gsl_finite(sampler[j]->mh->logdistr_old));
       update_offset();
-      mcmclib_mcar_tilde_lpdf_update_vcov(mcar_lpdf);
     }
   }
   fclose(out_a12s);
@@ -162,6 +174,8 @@ int main(int argc, char** argv) {
   fclose(out_beta);
   fclose(out_phi);
   fclose(out_lpdf);
+  fclose(out_gii);
+  fclose(out_bii);
 
   free_chains();
   mcmclib_mcar_model_free(mcar_model);
