@@ -16,7 +16,7 @@ offset <- offset[id]
 X <- matrix(, DIM*P, P)
 for(i in 1:DIM)
   X[(i-1)*P + 1:P, 1:P] <- diag(P)
-#m <- glm(y~X-1, family=poisson, offset=offset)
+m <- glm(y~X-1, family=poisson, offset=log(offset))
 
 write.table(y, file="y_2.dat", row.names=FALSE, col.names=FALSE)
 write.table(offset, file="offset_2.dat", row.names=FALSE, col.names=FALSE)
@@ -49,3 +49,8 @@ phi <- mcmc(matrix(read.table("chain_phi.dat")[[1]],
                   byrow=TRUE, ncol=DIM*P), thin=THIN)
 round(apply(phi, 2, var), 3)[1:24]
 plot(phi[,1:3])
+
+gg <- mcmc(matrix(read.table("chain_gammaii.dat")[[1]], byrow=TRUE, ncol=P), thin=THIN)
+plot(gg)
+bb <- mcmc(matrix(read.table("chain_bii.dat")[[1]], byrow=TRUE, ncol=P), thin=THIN)
+plot(bb)
