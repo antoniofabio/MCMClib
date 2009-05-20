@@ -11,6 +11,7 @@
 (define *n* 95)
 (define *np* (* *n* *p*))
 
+(define *rng* (new-gsl-rng (gsl-rng-default)))
 (define *samplers* (list))
 (define *W* (new-gsl-matrix *n* *n*))
 (define *mcar-lik* (new-mcmclib-mcar-tilde-lpdf *p* *W*))
@@ -28,7 +29,35 @@
   (lambda (phij)
     (mcmclib_mcar_model_phi_fcond *mcar_model* j phij)))
 
-(define (init-chains))
-(define (free-chains))
+(define *alpha12sigma* '())
+(define *alphasigmag* '())
 
-(define (main))
+(define (Sigma0 dim)
+  (let ((ans (new-gsl-matrix dim dim)))
+    (gsl-matrix-set-identity ans)
+    (gsl-matrix-scale ans (/ *V0* dim))
+    ans))
+
+(define (am-sampler lpdf lpdf-data x)
+  (mcmclib-gauss-am-alloc *rng* lpdf lpdf-data x
+                          (Sigma0 (gsl-vector-size-get x))
+                          *T0*))
+
+(define (init-chains)
+  (set! *alpha12sigma* (mcmclib-mcar-tilde-lpdf-alpha12sigma-get *mcar-lik*))
+  (gsl-vector-set-all *alpha12sigma* -1.0)
+  (set! *alphasigmag* (mcmclib-mcar-tilde-lpdf-alphasigmag-get *mcar-lik*))
+  (gsl-vector-set-all *alphasigmag* -1.0)
+  (set! *samplers*
+        (list
+         (am-sampler (mcmclib-mcar-model-alpha12sigma-lpdf-cb)
+                     *mcar-model*
+                     *alpha12sigma*)
+         (am-sampler (mcmclib-mcar-model-alphasigma-lpdf-cb)
+                     *mcar-model*
+                     *alphasigmag*)
+         (mcmclib-pmodel-sampler-alloc *X* *y* *offset* *rng* 1e-3 *T0*))))
+
+(define (free-chains) '())
+
+(define (main) '())
