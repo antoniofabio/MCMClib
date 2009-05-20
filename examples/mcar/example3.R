@@ -16,7 +16,7 @@ offset <- offset[id]
 X <- matrix(, DIM*P, P)
 for(i in 1:DIM)
   X[(i-1)*P + 1:P, 1:P] <- diag(P)
-#m <- glm(y~X-1, family=poisson, offset=offset)
+m <- glm(y~X-1, family=poisson, offset=log(offset))
 
 write.table(y, file="y_2.dat", row.names=FALSE, col.names=FALSE)
 write.table(offset, file="offset_2.dat", row.names=FALSE, col.names=FALSE)
