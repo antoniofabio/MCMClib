@@ -34,8 +34,10 @@ typedef struct {
 int mcmclib_amh_update(mcmclib_amh* p);
 void mcmclib_amh_reset(mcmclib_amh* p);
 
+typedef double (distrfun_p*)(void*, gsl_vector*);
+
 mcmclib_amh* mcmclib_gauss_am_alloc(gsl_rng* r,
-				    distrfun_p logdistr, void* logdistr_data,
+				    double (*)(void*, gsl_vector*), void* logdistr_data,
 				    gsl_vector* x,
 				    const gsl_matrix* sigma_zero, int t0);
 

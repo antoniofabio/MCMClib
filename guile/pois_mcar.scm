@@ -43,6 +43,10 @@
                           (Sigma0 (gsl-vector-size-get x))
                           *T0*))
 
+(define *X* (new-gsl-matrix (* *n* *p*) *p*))
+(define *y* (new-gsl-vector (* *n* *p*)))
+(define *offset* (new-gsl-vector (* *n* *p*)))
+
 (define (init-chains)
   (set! *alpha12sigma* (mcmclib-mcar-tilde-lpdf-alpha12sigma-get *mcar-lik*))
   (gsl-vector-set-all *alpha12sigma* -1.0)
@@ -56,8 +60,11 @@
          (am-sampler (mcmclib-mcar-model-alphasigma-lpdf-cb)
                      *mcar-model*
                      *alphasigmag*)
-         (mcmclib-pmodel-sampler-alloc *X* *y* *offset* *rng* 1e-3 *T0*))))
+         (mcmclib-pmodel-sampler-sampler-get
+          (mcmclib-pmodel-sampler-alloc *X* *y* *offset* *rng* 1e-3 *T0*)))))
 
-(define (free-chains) '())
+(define (update) (map mcmclib-amh-update *samplers*))
 
-(define (main) '())
+(define (main)
+  (init-chains)
+  (update))
