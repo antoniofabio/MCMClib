@@ -68,7 +68,7 @@
          (am-sampler (mcmclib-mcar-model-alphasigma-lpdf-cb)
                      *mcar-model*
                      *alphasigmag*)))
-  (do ((i 0 (1+ i))) ((> i *n*))
+  (do ((i 0 (1+ i))) ((>= i *n*))
     (vector-set! *phi-i-vecs* i (new-gsl-vector *p*))
     (vector-set! *phi-i-samplers* i
                  (am-sampler (guile-distrfun)
