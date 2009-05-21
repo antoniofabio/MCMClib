@@ -115,6 +115,11 @@ double mcmclib_mcar_model_alphasigma_lpdf(void* in_p, gsl_vector* alphasigma) {
 double mcmclib_mcar_model_phi_fcond(mcmclib_mcar_model* in_p, int i, gsl_vector* x) {
   mcmclib_mcar_tilde_lpdf* lpdf = in_p->lpdf;
   const int p = lpdf->p;
+  if(x->size != p) {
+    static char msg[1024];
+    sprintf(msg, "'x' vector size is %d, it should be %d", x->size, p);
+    GSL_ERROR(msg, GSL_FAILURE);
+  }
   assert(x->size == p);
   gsl_matrix* W = lpdf->M;
   const double mi = 1.0 / gsl_vector_get(lpdf->m, i);
