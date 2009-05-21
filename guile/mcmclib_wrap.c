@@ -1398,6 +1398,58 @@ SWIGINTERN void delete_mcmclib_pmodel_sampler(mcmclib_pmodel_sampler *self){
     mcmclib_pmodel_sampler_free(self);
   }
 static SCM
+_wrap_fopen (SCM s_0, SCM s_1)
+{
+#define FUNC_NAME "fopen"
+  char *arg1 = (char *) 0 ;
+  char *arg2 = (char *) 0 ;
+  int must_free1 = 0 ;
+  int must_free2 = 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  FILE *result = 0 ;
+  
+  {
+    arg1 = (char *)SWIG_scm2str(s_0);
+    must_free1 = 1;
+  }
+  {
+    arg2 = (char *)SWIG_scm2str(s_1);
+    must_free2 = 1;
+  }
+  result = (FILE *)fopen((char const *)arg1,(char const *)arg2);
+  {
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_FILE, 0);
+  }
+  if (must_free1 && arg1) SWIG_free(arg1);
+  if (must_free2 && arg2) SWIG_free(arg2);
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_fclose (SCM s_0)
+{
+#define FUNC_NAME "fclose"
+  FILE *arg1 = (FILE *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  
+  {
+    arg1 = (FILE *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_FILE, 1, 0);
+  }
+  fclose(arg1);
+  gswig_result = SCM_UNSPECIFIED;
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
 _wrap_gsl_vector_size_set (SCM s_0, SCM s_1)
 {
 #define FUNC_NAME "gsl-vector-size-set"
@@ -9014,6 +9066,8 @@ SWIG_init(void)
   
   gsl_set_error_handler(guile_gsl_err_handler);
   
+  scm_c_define_gsubr("fopen", 2, 0, 0, (swig_guile_proc) _wrap_fopen);
+  scm_c_define_gsubr("fclose", 1, 0, 0, (swig_guile_proc) _wrap_fclose);
   SWIG_TypeClientData(SWIGTYPE_p_gsl_vector, (void *) &_swig_guile_clientdatagsl_vector);
   scm_c_define_gsubr("gsl-vector-size-set", 2, 0, 0, (swig_guile_proc) _wrap_gsl_vector_size_set);
   scm_c_define_gsubr("gsl-vector-size-get", 1, 0, 0, (swig_guile_proc) _wrap_gsl_vector_size_get);

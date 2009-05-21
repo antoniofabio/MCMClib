@@ -25,6 +25,9 @@ static void guile_gsl_err_handler(const char * reason,
   gsl_set_error_handler(guile_gsl_err_handler);
 %}
 
+FILE* fopen(const char*, const char*);
+void fclose(FILE*);
+
 /*
 GSL_VECTOR
 */
