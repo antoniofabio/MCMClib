@@ -1252,13 +1252,12 @@ static swig_guile_clientdata _swig_guile_clientdatamcmclib_pmodel_sampler = { NU
 #define SWIGTYPE_p_mcmclib_pmodel_sampler swig_types[21]
 #define SWIGTYPE_p_mcmclib_pois_model swig_types[22]
 #define SWIGTYPE_p_p_char swig_types[23]
-#define SWIGTYPE_p_p_distrfun_p swig_types[24]
-#define SWIGTYPE_p_p_gsl_rng_type swig_types[25]
-#define SWIGTYPE_p_size_t swig_types[26]
-#define SWIGTYPE_p_unsigned_long swig_types[27]
-#define SWIGTYPE_p_void swig_types[28]
-static swig_type_info *swig_types[30];
-static swig_module_info swig_module = {swig_types, 29, 0, 0, 0, 0};
+#define SWIGTYPE_p_p_gsl_rng_type swig_types[24]
+#define SWIGTYPE_p_size_t swig_types[25]
+#define SWIGTYPE_p_unsigned_long swig_types[26]
+#define SWIGTYPE_p_void swig_types[27]
+static swig_type_info *swig_types[29];
+static swig_module_info swig_module = {swig_types, 28, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -1362,6 +1361,12 @@ static void intArray_setitem(int *ary, int index, int value) {
     return scm_to_double(scm_call_1(closure, x));
   }
 
+
+  void* makeVoidPtr(SCM obj) {
+    return (void*) obj;
+  }
+
+static double (*gswig_const_guile_distrfun)(void *,gsl_vector *) = guile_distrfun;
 static double (*gswig_const_mcmclib_iwishart_lpdf_compute_cb)(void *,gsl_vector *) = (double (*)(void *p,gsl_vector *x))(mcmclib_iwishart_lpdf_compute);
 static double (*gswig_const_mcmclib_mcar_tilde_lpdf_compute_cb)(void *,gsl_vector *) = (double (*)(void *in_p,gsl_vector *x))(mcmclib_mcar_tilde_lpdf_compute);
 SWIGINTERN mcmclib_mcar_tilde_lpdf *new_mcmclib_mcar_tilde_lpdf(int p,gsl_matrix *M){
@@ -6192,16 +6197,33 @@ _wrap_intArray_setitem (SCM s_0, SCM s_1, SCM s_2)
 
 
 static SCM
+_wrap_makeVoidPtr (SCM s_0)
+{
+#define FUNC_NAME "makeVoidPtr"
+  SCM arg1 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  void *result = 0 ;
+  
+  arg1=s_0;
+  result = (void *)makeVoidPtr(arg1);
+  {
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_void, 0);
+  }
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
 _wrap_guile_distrfun(SCM s_0)
 {
 #define FUNC_NAME "guile-distrfun"
   SCM gswig_result;
   
   {
-    distrfun_p * resultptr;
-    resultptr = (distrfun_p *) malloc(sizeof(distrfun_p const));
-    memmove(resultptr, &guile_distrfun, sizeof(distrfun_p const));
-    gswig_result = SWIG_NewPointerObj(resultptr, SWIGTYPE_p_distrfun_p, 0);
+    gswig_result = SWIG_NewPointerObj (gswig_const_guile_distrfun, SWIGTYPE_p_f_p_void_p_gsl_vector__double, 0);
   }
   
   return gswig_result;
@@ -6473,7 +6495,7 @@ _wrap_mcmclib_gauss_am_alloc (SCM s_0, SCM s_1, SCM s_2, SCM s_3, SCM s_4, SCM s
 {
 #define FUNC_NAME "mcmclib-gauss-am-alloc"
   gsl_rng *arg1 = (gsl_rng *) 0 ;
-  double (*arg2)(void *,gsl_vector *) = (double (*)(void *,gsl_vector *)) 0 ;
+  distrfun_p arg2 ;
   void *arg3 = (void *) 0 ;
   gsl_vector *arg4 = (gsl_vector *) 0 ;
   gsl_matrix *arg5 = (gsl_matrix *) 0 ;
@@ -6486,7 +6508,7 @@ _wrap_mcmclib_gauss_am_alloc (SCM s_0, SCM s_1, SCM s_2, SCM s_3, SCM s_4, SCM s
     arg1 = (gsl_rng *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_gsl_rng, 1, 0);
   }
   {
-    arg2 = (double (*)(void *,gsl_vector *))SWIG_MustGetPtr(s_1, SWIGTYPE_p_f_p_void_p_gsl_vector__double, 2, 0);
+    arg2 = (distrfun_p) SCM_CELL_WORD_1(SWIG_Guile_GetSmob(s_1));
   }
   {
     arg3 = (void *)SWIG_MustGetPtr(s_2, NULL, 3, 0);
@@ -6504,7 +6526,6 @@ _wrap_mcmclib_gauss_am_alloc (SCM s_0, SCM s_1, SCM s_2, SCM s_3, SCM s_4, SCM s
   {
     gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_mcmclib_amh, 0);
   }
-  
   
   
   
@@ -8647,7 +8668,6 @@ static swig_type_info _swigt__p_mcmclib_mh = {"_p_mcmclib_mh", "mcmclib_mh *", 0
 static swig_type_info _swigt__p_mcmclib_pmodel_sampler = {"_p_mcmclib_pmodel_sampler", "mcmclib_pmodel_sampler *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_mcmclib_pois_model = {"_p_mcmclib_pois_model", "mcmclib_pois_model *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_char = {"_p_p_char", "char **", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_p_distrfun_p = {"_p_p_distrfun_p", "distrfun_p **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_gsl_rng_type = {"_p_p_gsl_rng_type", "gsl_rng_type **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_size_t = {"_p_size_t", "size_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_long = {"_p_unsigned_long", "SCM *|unsigned long *", 0, 0, (void*)0, 0};
@@ -8678,7 +8698,6 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_mcmclib_pmodel_sampler,
   &_swigt__p_mcmclib_pois_model,
   &_swigt__p_p_char,
-  &_swigt__p_p_distrfun_p,
   &_swigt__p_p_gsl_rng_type,
   &_swigt__p_size_t,
   &_swigt__p_unsigned_long,
@@ -8709,7 +8728,6 @@ static swig_cast_info _swigc__p_mcmclib_mh[] = {  {&_swigt__p_mcmclib_mh, 0, 0, 
 static swig_cast_info _swigc__p_mcmclib_pmodel_sampler[] = {  {&_swigt__p_mcmclib_pmodel_sampler, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_mcmclib_pois_model[] = {  {&_swigt__p_mcmclib_pois_model, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_char[] = {  {&_swigt__p_p_char, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_p_distrfun_p[] = {  {&_swigt__p_p_distrfun_p, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_gsl_rng_type[] = {  {&_swigt__p_p_gsl_rng_type, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_size_t[] = {  {&_swigt__p_size_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_unsigned_long[] = {  {&_swigt__p_unsigned_long, 0, 0, 0},{0, 0, 0, 0}};
@@ -8740,7 +8758,6 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_mcmclib_pmodel_sampler,
   _swigc__p_mcmclib_pois_model,
   _swigc__p_p_char,
-  _swigc__p_p_distrfun_p,
   _swigc__p_p_gsl_rng_type,
   _swigc__p_size_t,
   _swigc__p_unsigned_long,
@@ -9194,6 +9211,7 @@ SWIG_init(void)
   scm_c_define_gsubr("delete-intArray", 1, 0, 0, (swig_guile_proc) _wrap_delete_intArray);
   scm_c_define_gsubr("intArray-getitem", 2, 0, 0, (swig_guile_proc) _wrap_intArray_getitem);
   scm_c_define_gsubr("intArray-setitem", 3, 0, 0, (swig_guile_proc) _wrap_intArray_setitem);
+  scm_c_define_gsubr("makeVoidPtr", 1, 0, 0, (swig_guile_proc) _wrap_makeVoidPtr);
   scm_c_define_gsubr("guile-distrfun", 0, 0, 0, (swig_guile_proc) _wrap_guile_distrfun);
   SWIG_TypeClientData(SWIGTYPE_p_mcmclib_amh, (void *) &_swig_guile_clientdatamcmclib_amh);
   scm_c_define_gsubr("mcmclib-amh-mh-set", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_amh_mh_set);

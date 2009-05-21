@@ -22,7 +22,18 @@
   }
 %}
 
-const distrfun_p guile_distrfun;
+%inline %{
+  void* makeVoidPtr(SCM obj) {
+    return (void*) obj;
+  }
+%}
+
+%constant double guile_distrfun(void*, gsl_vector*);
+
+/* workaround too strict SWIG type checks */
+%typemap(in) distrfun_p {
+  $1 = (distrfun_p) SCM_CELL_WORD_1(SWIG_Guile_GetSmob($input));
+  }
 
 typedef struct {
   mcmclib_mh* mh;
@@ -34,10 +45,8 @@ typedef struct {
 int mcmclib_amh_update(mcmclib_amh* p);
 void mcmclib_amh_reset(mcmclib_amh* p);
 
-typedef double (distrfun_p*)(void*, gsl_vector*);
-
 mcmclib_amh* mcmclib_gauss_am_alloc(gsl_rng* r,
-				    double (*)(void*, gsl_vector*), void* logdistr_data,
+				    distrfun_p distrfun, void* logdistr_data,
 				    gsl_vector* x,
 				    const gsl_matrix* sigma_zero, int t0);
 
@@ -54,6 +63,7 @@ double mcmclib_iwishart_lpdf_compute(void* p, gsl_vector* x);
 
 double mcmclib_mcar_tilde_lpdf_compute(void* in_p, gsl_vector* x);
 %nocallback;
+
 void mcmclib_mcar_tilde_lpdf_update_B_tilde(mcmclib_mcar_tilde_lpdf* p);
 int mcmclib_mcar_tilde_lpdf_update_blocks(mcmclib_mcar_tilde_lpdf* p);
 int mcmclib_mcar_tilde_lpdf_update_vcov(mcmclib_mcar_tilde_lpdf* p);
