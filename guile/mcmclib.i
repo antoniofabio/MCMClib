@@ -17,7 +17,7 @@
 #include <pois_model.h>
 
   static double guile_distrfun(SCM closure, gsl_vector* in_x) {
-    SCM x = SWIG_NewPointerObj (x, SWIGTYPE_p_gsl_vector, 0);
+    SCM x = SWIG_NewPointerObj (in_x, SWIGTYPE_p_gsl_vector, 0);
     return scm_to_double(scm_call_1(closure, x));
   }
 %}
