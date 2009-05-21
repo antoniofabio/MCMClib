@@ -3,7 +3,7 @@
 ;;
 ;;Check Poisson modeling
 ;;
-(define *N* 50000)
+(define *N* 1000)
 (define *THIN* 10)
 (define *T0* 1000)
 (define *V0* 0.4)
@@ -33,8 +33,8 @@
    (lambda (phij)
      (mcmclib-mcar-model-phi-fcond *mcar-model* j phij))))
 
-(define *alpha12sigma* '())
-(define *alphasigmag* '())
+(define *alpha12sigma* (mcmclib-mcar-tilde-lpdf-alpha12sigma-get *mcar-lik*))
+(define *alphasigmag* (mcmclib-mcar-tilde-lpdf-alphasigmag-get *mcar-lik*))
 
 (define (Sigma0 dim)
   (let ((ans (new-gsl-matrix dim dim)))
@@ -48,17 +48,24 @@
                           *T0*))
 
 (define *X* (new-gsl-matrix (* *n* *p*) *p*))
+(gsl-matrix-set-zero *X*)
+(do ((i 0 (+ i *p*))) ((>= i (* *n* *p*)))
+  (do ((j 0 (1+ j))) ((>= j *p*))
+    (gsl-matrix-set *X* (+ i j) j 1.0)))
+
 (define *y* (new-gsl-vector (* *n* *p*)))
+(gsl-vector-fscanf (fopen "y_2.dat" "r") *y*)
 (define *offset* (new-gsl-vector (* *n* *p*)))
+(gsl-vector-fscanf (fopen "offset_2.dat" "r") *offset*)
+(do ((i 0 (1+ i))) ((>= i (* *n* *p*)))
+  (gsl-vector-set *offset* i (log (gsl-vector-get *offset* i))))
 
 (define (gsl-copy-subvec dest src offset)
   (do ((i 0 (1+ i))) ((>= i (gsl-vector-size-get src)))
     (gsl-vector-set dest (+ offset i) (gsl-vector-get src i))))
 
 (define (init-chains)
-  (set! *alpha12sigma* (mcmclib-mcar-tilde-lpdf-alpha12sigma-get *mcar-lik*))
   (gsl-vector-set-all *alpha12sigma* -1.0)
-  (set! *alphasigmag* (mcmclib-mcar-tilde-lpdf-alphasigmag-get *mcar-lik*))
   (gsl-vector-set-all *alphasigmag* -1.0)
   (set! *phi-par-samplers*
         (list
@@ -86,7 +93,7 @@
 
 (define (update-phi-pars)
   (map
-   (lambda (smp) (mcmclib-amh-update smp) (mcmclib-mcar-tile-update-vcov *mcar-lik*))
+   (lambda (smp) (mcmclib-amh-update smp) (mcmclib-mcar-tilde-lpdf-update-vcov *mcar-lik*))
    *phi-par-samplers*))
 
 (define (update-beta) (mcmclib-amh-update *beta-sampler*))
@@ -98,4 +105,8 @@
     (update-phi)
     (update-beta)))
 
-(init-chains)
+(define st (current-time))
+(main)
+(define en (current-time))
+(display "elapsed time (seconds):")(newline)
+(display (- en st))
