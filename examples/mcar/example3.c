@@ -146,7 +146,8 @@ int main(int argc, char** argv) {
       gsl_vector_fprintf(out_a12s, alpha12sigma, "%f");
       gsl_vector_fprintf(out_as, alphasigmag, "%f");
       gsl_vector_fprintf(out_beta, sampler[2]->mh->x, "%f");
-      fprintf(out_lpdf, "%f\n", mcmclib_pois_model_lpdf(model->model, sampler[2]->mh->x));
+      fprintf(out_lpdf, "%f\n",
+	      mcmclib_mcar_model_alpha12sigma_lpdf(mcar_model, alpha12sigma));
       gsl_vector_fprintf(out_phi, mcar_phi, "%f");
       gsl_vector_fprintf(out_gii, &gii_v.vector, "%f");
       gsl_vector_fprintf(out_bii, &bii_v.vector, "%f");
