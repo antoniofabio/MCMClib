@@ -117,7 +117,7 @@ double mcmclib_mcar_model_phi_fcond(mcmclib_mcar_model* in_p, int i, gsl_vector*
   const int p = lpdf->p;
   if(x->size != p) {
     static char msg[1024];
-    sprintf(msg, "'x' vector size is %d, it should be %d", x->size, p);
+    sprintf(msg, "'x' vector size is %ld, it should be %d", x->size, p);
     GSL_ERROR(msg, GSL_FAILURE);
   }
   assert(x->size == p);

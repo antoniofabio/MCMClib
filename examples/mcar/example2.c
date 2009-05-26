@@ -14,7 +14,8 @@
 #include <gauss_am.h>
 #include <raptor.h>
 
-/* P=3, DIM=95: 0.22500 secs per iteration */
+/*P=3, DIM=365: 10.397 secs per iteration
+  P=3, DIM=95: 0.22500 secs per iteration */
 #define N 50000
 #define THIN 10
 #define T0 1000
