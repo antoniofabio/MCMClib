@@ -49,7 +49,7 @@ static double alpha12sigma_logderiv(int p, const gsl_vector* x) {
   }
   for(int n=offset; n < x->size; n++) {
     double xn = gsl_vector_get(x, n);
-    if((xn <= log(TOL)) || (xn >= log(1.0 - TOL)))
+    if((xn <= log(TOL)) || (xn >= log(1.0 - 0.05)))
       return log(0.0);
     ans += xn;
   }
@@ -62,13 +62,16 @@ double mcmclib_mcar_model_alpha12sigma_lpdf(void* in_p, gsl_vector* alpha12sigma
   gsl_vector_view s_v = gsl_vector_subvector(alpha12sigma, n*(n-1), n);
   if(!mcmclib_vector_is_sorted_desc(&s_v.vector))
     return log(0.0);
+  double prior = alpha12sigma_logderiv(n, alpha12sigma);
+  if(!gsl_finite(prior))
+    return prior;
   gsl_vector* tmp = gsl_vector_alloc(alpha12sigma->size);
   gsl_vector_memcpy(tmp, p->lpdf->alpha12sigma);
   gsl_vector_memcpy(p->lpdf->alpha12sigma, alpha12sigma);
   double ans = mcmclib_mcar_tilde_lpdf_compute(p->lpdf, p->e);
   gsl_vector_memcpy(p->lpdf->alpha12sigma, tmp);
   gsl_vector_free(tmp);
-  return ans + alpha12sigma_logderiv(n, alpha12sigma);
+  return ans + prior;
 }
 
 static double alphasigma_logderiv(int p, const gsl_vector* x) {
