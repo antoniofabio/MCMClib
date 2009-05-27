@@ -17,7 +17,7 @@
 /* P=3, DIM=95: 0.22500 secs per iteration */
 #define N 50000
 #define THIN 10
-#define T0 1000
+#define T0 25000
 #define V0 0.4
 
 #define P 3
@@ -147,7 +147,7 @@ int main(int argc, char** argv) {
       gsl_vector_fprintf(out_as, alphasigmag, "%f");
       gsl_vector_fprintf(out_beta, sampler[2]->mh->x, "%f");
       fprintf(out_lpdf, "%f\n",
-	      mcmclib_mcar_model_alpha12sigma_lpdf(mcar_model, alpha12sigma));
+	      mcmclib_mcar_model_alphasigma_lpdf(mcar_model, alphasigmag));
       gsl_vector_fprintf(out_phi, mcar_phi, "%f");
       gsl_vector_fprintf(out_gii, &gii_v.vector, "%f");
       gsl_vector_fprintf(out_bii, &bii_v.vector, "%f");
