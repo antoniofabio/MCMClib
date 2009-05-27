@@ -17,7 +17,7 @@
 /* P=3, DIM=95: 0.22500 secs per iteration */
 #define N 50000
 #define THIN 10
-#define T0 25000
+#define T0 5000
 #define V0 0.4
 
 #define P 3
@@ -73,7 +73,7 @@ void init_chains() {
   gsl_matrix_set_identity(Sigma0);
   gsl_matrix_scale(Sigma0, V0 / (double) (P*(P-1)/2 + P));
   sampler[1] = mcmclib_gauss_am_alloc(rng, mcmclib_mcar_model_alphasigma_lpdf,
-				      mcar_model, alphasigmag, Sigma0, T0);
+				      mcar_model, alphasigmag, Sigma0, N);
   gsl_matrix_free(Sigma0);
 
   model = mcmclib_pmodel_sampler_alloc(X, y, offset, rng, 1e-3, T0);
