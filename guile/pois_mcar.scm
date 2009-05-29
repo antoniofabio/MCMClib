@@ -89,6 +89,7 @@
                      *alphasigmag*)))
   (do-ec (: i *n*)
          (let ((v (new-gsl-vector *p*)))
+           (gsl-vector-set-all v -1.0)
            (vector-set! *phi-i-samplers* i
                         (am-sampler (guile-distrfun)
                                     (make-phij-fcond i)
@@ -112,15 +113,23 @@
 
 (define (update-beta) (mcmclib-amh-update *beta-sampler*))
 
+(define tmp (list-ec (: i 10)
+                     (begin
+                       (update-phi-pars)
+                       (gsl-vector-get *phi* 0))))
+
+(define (update-all N)
+  (do-ec (: i N)
+         (begin
+           (update-phi-pars)
+           ;;    (update-phi)
+           (update-beta))))
 (define (main)
-  (do ((i 0 (1+ i))) ((>= i *N*))
-    (update-phi-pars)
-    (update-phi)
-    (update-beta)))
+  (update-all *N*))
 
 (init-chains)
 (define st (current-time))
 (main)
 (define en (current-time))
 (display "elapsed time (seconds):")(newline)
-(display (- en st))
+(display (- en st))(newline)
