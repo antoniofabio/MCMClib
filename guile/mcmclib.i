@@ -46,16 +46,14 @@ typedef struct {
 int mcmclib_amh_update(mcmclib_amh* p);
 void mcmclib_amh_reset(mcmclib_amh* p);
 
+%newobject mcmclib_gauss_am_alloc;
 mcmclib_amh* mcmclib_gauss_am_alloc(gsl_rng* r,
 				    distrfun_p distrfun, void* logdistr_data,
 				    gsl_vector* x,
 				    const gsl_matrix* sigma_zero, int t0);
-
-/** AM gamma update function \internal
-@param in_p ptr to an mcmclib_amh object
-*/
+%delobject mcmclib_gauss_am_free;
+void mcmclib_gauss_am_free(mcmclib_amh*);
 void mcmclib_gauss_am_update_gamma(void* in_p);
-
 
 mcmclib_iwishart_lpdf* mcmclib_iwishart_lpdf_alloc(gsl_matrix* Psi, int m);
 void mcmclib_iwishart_lpdf_free(mcmclib_iwishart_lpdf* p);
@@ -154,14 +152,6 @@ typedef struct {
   mcmclib_amh* sampler;
 } mcmclib_pmodel_sampler;
 
-mcmclib_pmodel_sampler* mcmclib_pmodel_sampler_alloc(const gsl_matrix* X,
-						     const gsl_vector* y,
-						     const gsl_vector* offset,
-						     gsl_rng* rng,
-						     double sigma0,
-						     int burnin);
-
-void mcmclib_pmodel_sampler_free(mcmclib_pmodel_sampler* p);
 int mcmclib_pmodel_sampler_update(mcmclib_pmodel_sampler* p);
 #define mcmclib_pmodel_sampler_beta(p) (p)->model->beta
 

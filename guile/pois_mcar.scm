@@ -96,7 +96,7 @@
            (vector-set! *phi-i-vecs* i v)))
   (set! *beta-sampler*
         (mcmclib-pmodel-sampler-sampler-get
-         (mcmclib-pmodel-sampler-alloc *X* *y* *offset* *rng* 1e-3 *T0*))))
+         (new-mcmclib-pmodel-sampler *X* *y* *offset* *rng* 1e-3 *T0*))))
 
 (define (update-phi)
   (do-ec (: i *n*)
