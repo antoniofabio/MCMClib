@@ -1,6 +1,7 @@
-/*
-Error handling
-*/
+%module gsl
+
+%scheme %{(load-extension "libguilegsl.so" "scm_init_swig_gsl_module")%}
+
 %{
 #include <string.h>
 #include <libguile.h>
