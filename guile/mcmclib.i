@@ -1,12 +1,6 @@
 %module mcmclib
 
-%include "typemaps.i"
-%include "carrays.i"
-%include "gsl.i"
-
-%array_functions(double, doubleArray);
-%array_functions(char *, stringArray);
-%array_functions(int, intArray);
+%scheme %{(load-extension "libguilemcmclib.so" "scm_init_swig_mcmclib_module")%}
 
 %{
 #include <lpdf_iwishart.h>

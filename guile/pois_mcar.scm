@@ -1,3 +1,15 @@
+(use-modules (ice-9 debugging traps)
+	     (ice-9 gds-client)
+	     (ice-9 debugging example-fns)
+	     (srfi srfi-42)
+             (swig mcmclib))
+
+;(do-ec (: i 3) (display i))
+
+;(install-trap (make <procedure-trap>
+;		#:behaviour gds-debug-trap
+;		#:procedure fact1))
+
 (load "main.scm")
 
 ;;
@@ -59,10 +71,6 @@
 (gsl-vector-fscanf (fopen "offset_2.dat" "r") *offset*)
 (do ((i 0 (1+ i))) ((>= i (* *n* *p*)))
   (gsl-vector-set *offset* i (log (gsl-vector-get *offset* i))))
-
-(define (gsl-copy-subvec dest src offset)
-  (do ((i 0 (1+ i))) ((>= i (gsl-vector-size-get src)))
-    (gsl-vector-set dest (+ offset i) (gsl-vector-get src i))))
 
 (define (init-chains)
   (gsl-vector-set-all *alpha12sigma* -1.0)

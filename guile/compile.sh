@@ -1,2 +1,0 @@
-swig -guile -scm -nodefaultctor mcmclib.i
-gcc -g -shared --std=gnu99 ${CFLAGS} -fPIC mcmclib_wrap.c -I../src -lgsl -lgslcblas -lm ${LDFLAGS} ../src/libmcmclib.a -o libschememcmclib.so

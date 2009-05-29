@@ -1,14 +1,13 @@
-(load-extension "./libschememcmclib.so" "SWIG_init")
+(use-modules (srfi srfi-1)
+	     (srfi srfi-42)
+             (swig gsl))
 
 ;;list -> g-vector
 (define (l2v ll)
   (let*
       ((n (length ll))
        (v (new-gsl-vector n)))
-    (let loop ((i 0))
-      (gsl-vector-set v i (list-ref ll i))
-      (if (< i (- n 1)) (loop (+ i 1))))
-    v))
+    (do-ec (: i n) (gsl-vector-set v i (list-ref ll i)))))
 
 ;;g-matrix -> g-vector
 (define (M2v M)
@@ -86,3 +85,7 @@
 (define v (new-gsl-vector (* P P)))
 (gsl-vector-set-all v 1.0)
 (mcmclib-iwishart-lpdf-compute p v)
+
+(define (gsl-copy-subvec dest src offset)
+  (do ((i 0 (1+ i))) ((>= i (gsl-vector-size-get src)))
+    (gsl-vector-set dest (+ offset i) (gsl-vector-get src i))))
