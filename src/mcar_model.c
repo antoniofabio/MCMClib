@@ -14,7 +14,7 @@
 #include "mcar_model.h"
 
 /* tolerance for pos. def. conditions */
-#define TOL 1e-4
+#define TOL 5e-2
 
 mcmclib_mcar_model* mcmclib_mcar_model_alloc(mcmclib_mcar_tilde_lpdf* m, gsl_vector* e) {
   mcmclib_mcar_model* a = (mcmclib_mcar_model*) malloc(sizeof(mcmclib_mcar_model));
@@ -49,7 +49,7 @@ static double alpha12sigma_logderiv(int p, const gsl_vector* x) {
   }
   for(int n=offset; n < x->size; n++) {
     double xn = gsl_vector_get(x, n);
-    if((xn <= log(TOL)) || (xn >= log(1.0 - 0.05)))
+    if((xn <= log(TOL)) || (xn >= log(1.0 - TOL)))
       return log(0.0);
     ans += xn;
   }
