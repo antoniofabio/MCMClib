@@ -1,8 +1,8 @@
-(use-modules (ice-9 debugging traps)
-	     (ice-9 gds-client)
-	     (ice-9 debugging example-fns)
-	     (srfi srfi-42)
-             (swig mcmclib))
+;(use-modules (ice-9 debugging traps)
+;	     (ice-9 gds-client)
+;	     (ice-9 debugging example-fns)
+;	     (srfi srfi-42)
+;             (swig mcmclib))
 
 ;(do-ec (: i 3) (display i))
 
@@ -24,7 +24,7 @@
 (define *np* (* *n* *p*))
 
 (define *rng* (new-gsl-rng (gsl-rng-default)))
-(define *phi-par-samplers* (list))
+(define *phi-par-samplers* (make-vector 2))
 (define *phi-i-samplers* (make-vector *n*))
 (define *phi-i-vecs* (make-vector *n*))
 (define *beta-sampler* (list))
@@ -40,10 +40,12 @@
   (gsl-vector-memcpy *offset* *denom*)
   (gsl-vector-add *offset* *phi*))
 
+(define *util-lambdas* (make-vector *n*)) ;this is needed to prevent garbage collection
 (define (make-phij-fcond j)
-  (makeVoidPtr
-   (lambda (phij)
-     (mcmclib-mcar-model-phi-fcond *mcar-model* j phij))))
+  (vector-set! *util-lambdas* j
+               (lambda (phij)
+                 (mcmclib-mcar-model-phi-fcond *mcar-model* j phij)))
+  (makeVoidPtr (vector-ref *util-lambdas* j)))
 
 (define *alpha12sigma* (mcmclib-mcar-tilde-lpdf-alpha12sigma-get *mcar-lik*))
 (define *alphasigmag* (mcmclib-mcar-tilde-lpdf-alphasigmag-get *mcar-lik*))
@@ -59,60 +61,64 @@
                           (Sigma0 (gsl-vector-size-get x))
                           *T0*))
 
-(define *X* (new-gsl-matrix (* *n* *p*) *p*))
+(define *X* (new-gsl-matrix *np* *p*))
 (gsl-matrix-set-zero *X*)
-(do ((i 0 (+ i *p*))) ((>= i (* *n* *p*)))
-  (do ((j 0 (1+ j))) ((>= j *p*))
-    (gsl-matrix-set *X* (+ i j) j 1.0)))
+(do-ec (: i *n*) (: j *p*)
+       (gsl-matrix-set *X*
+                       (+ j (* i *p*))
+                       j
+                       1.0))
 
-(define *y* (new-gsl-vector (* *n* *p*)))
+(define *y* (new-gsl-vector *np*))
 (gsl-vector-fscanf (fopen "y_2.dat" "r") *y*)
-(define *offset* (new-gsl-vector (* *n* *p*)))
+(define *offset* (new-gsl-vector *np*))
 (gsl-vector-fscanf (fopen "offset_2.dat" "r") *offset*)
-(do ((i 0 (1+ i))) ((>= i (* *n* *p*)))
-  (gsl-vector-set *offset* i (log (gsl-vector-get *offset* i))))
+(do-ec (: i *np*)
+       (gsl-vector-set *offset* i (log (gsl-vector-get *offset* i))))
 
 (define (init-chains)
   (gsl-vector-set-all *alpha12sigma* -1.0)
   (gsl-vector-set-all *alphasigmag* -1.0)
   (set! *phi-par-samplers*
-        (list
+        (vector
          (am-sampler (mcmclib-mcar-model-alpha12sigma-lpdf-cb)
                      *mcar-model*
                      *alpha12sigma*)
          (am-sampler (mcmclib-mcar-model-alphasigma-lpdf-cb)
                      *mcar-model*
                      *alphasigmag*)))
-  (do ((i 0 (1+ i))) ((>= i *n*))
-    (vector-set! *phi-i-vecs* i (new-gsl-vector *p*))
-    (vector-set! *phi-i-samplers* i
-                 (am-sampler (guile-distrfun)
-                             (make-phij-fcond i)
-                             (vector-ref *phi-i-vecs* i))))
+  (do-ec (: i *n*)
+         (let ((v (new-gsl-vector *p*)))
+           (vector-set! *phi-i-samplers* i
+                        (am-sampler (guile-distrfun)
+                                    (make-phij-fcond i)
+                                    v))
+           (vector-set! *phi-i-vecs* i v)))
   (set! *beta-sampler*
         (mcmclib-pmodel-sampler-sampler-get
          (mcmclib-pmodel-sampler-alloc *X* *y* *offset* *rng* 1e-3 *T0*))))
 
 (define (update-phi)
-  (do ((i 0 (1+ i))) ((>= i))
-    (mcmclib-amh-update (vector-ref *phi-i-samplers* i))
-    (gsl-copy-subvec *phi* (vector-ref *phi-i-vecs* i))
-    (update-offset)))
+  (do-ec (: i *n*)
+         (let ((smp (vector-ref *phi-i-samplers* i))
+               (v (vector-ref *phi-i-vecs* i)))
+           (mcmclib-amh-update smp)
+           (gsl-copy-subvec *phi* v (* i *p*))
+           (update-offset))))
 
 (define (update-phi-pars)
-  (map
-   (lambda (smp) (mcmclib-amh-update smp) (mcmclib-mcar-tilde-lpdf-update-vcov *mcar-lik*))
-   *phi-par-samplers*))
+  (do-ec (: i 2)
+         (mcmclib-amh-update (vector-ref *phi-par-samplers* i))))
 
 (define (update-beta) (mcmclib-amh-update *beta-sampler*))
 
 (define (main)
-  (init-chains)
   (do ((i 0 (1+ i))) ((>= i *N*))
     (update-phi-pars)
     (update-phi)
     (update-beta)))
 
+(init-chains)
 (define st (current-time))
 (main)
 (define en (current-time))

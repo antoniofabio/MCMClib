@@ -1256,16 +1256,21 @@ static swig_module_info swig_module = {swig_types, 16, 0, 0, 0, 0};
 #include <mcar_model.h>
 #include <pois_model.h>
 
-  static double guile_distrfun(SCM closure, gsl_vector* in_x) {
+
+   void* makeVoidPtr(SCM obj) {
+     return (void*) obj;
+   }
+
+
+  static double guile_distrfun(void* in_closure, gsl_vector* in_x) {
+    //printf("in function 'guile_distrfun'");
     SCM x = SWIG_NewPointerObj (in_x, SWIGTYPE_p_gsl_vector, 0);
-    return scm_to_double(scm_call_1(closure, x));
+    //printf("executing 'scm_call_1'...\n");
+    SCM ans = scm_call_1((SCM) in_closure, x);
+    //printf("\tdone.\n");
+    return scm_to_double(ans);
   }
-
-
-  void* makeVoidPtr(SCM obj) {
-    return (void*) obj;
-  }
-
+  
 static double (*gswig_const_guile_distrfun)(void *,gsl_vector *) = guile_distrfun;
 static double (*gswig_const_mcmclib_iwishart_lpdf_compute_cb)(void *,gsl_vector *) = (double (*)(void *p,gsl_vector *x))(mcmclib_iwishart_lpdf_compute);
 static double (*gswig_const_mcmclib_mcar_tilde_lpdf_compute_cb)(void *,gsl_vector *) = (double (*)(void *in_p,gsl_vector *x))(mcmclib_mcar_tilde_lpdf_compute);
@@ -1309,7 +1314,7 @@ _wrap_makeVoidPtr (SCM s_0)
   arg1=s_0;
   result = (void *)makeVoidPtr(arg1);
   {
-    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_void, 0);
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_void, 1);
   }
   
   return gswig_result;

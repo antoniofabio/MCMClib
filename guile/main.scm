@@ -56,7 +56,7 @@
 (M2ll (ll2M '((1 2 3) (4 5 6))))
 
 ;;display g-vector
-(define (dv v) (display (v2ll v)) (newline))
+(define (dv v) (display (v2l v)) (newline))
 ;;display g-Matrix
 (define (dM M) (display (M2ll M)) (newline))
 
