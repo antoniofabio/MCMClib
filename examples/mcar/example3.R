@@ -36,6 +36,7 @@ as <- mcmc(matrix(read.table("chain_alphasigma.dat")[[1]],
                   byrow=TRUE, ncol=P*(P-1)/2 + P), thin=THIN)
 as[,seq_len(P*(P-1)/2)] <- g(as[,seq_len(P*(P-1)/2)])
 as[,P*(P-1)/2 + 1:P] <- exp(as[,P*(P-1)/2 + 1:P])
+plot(as[,1:3])
 plot(as[,4:6])
 
 a12s <- mcmc(matrix(read.table("chain_alpha12sigma.dat")[[1]],
