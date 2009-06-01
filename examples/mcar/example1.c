@@ -19,9 +19,10 @@
 #define THIN 10
 #define T0 5000
 #define V0 0.4
+#define SF 0.2
 
-#define P 6
-#define DIM 10
+#define P 3
+#define DIM 95
 
 gsl_vector *alpha12sigma, *alphasigmag;
 gsl_rng* rng;
@@ -37,6 +38,7 @@ void init_chains() {
   gsl_matrix_scale(Sigma0, V0 / ((double)(P * P)));
   sampler[0] = mcmclib_gauss_am_alloc(rng, mcmclib_mcar_model_alpha12sigma_lpdf,
 				      model, alpha12sigma, Sigma0, T0);
+  ((mcmclib_gauss_am_suff*) sampler[0]->suff)->sf = SF;
   gsl_matrix_free(Sigma0);
 
   alphasigmag = lpdf->alphasigmag;
@@ -46,6 +48,7 @@ void init_chains() {
   gsl_matrix_scale(Sigma0, V0 / (double) (P*(P-1)/2 + P));
   sampler[1] = mcmclib_gauss_am_alloc(rng, mcmclib_mcar_model_alphasigma_lpdf,
 				      model, alphasigmag, Sigma0, T0);
+  ((mcmclib_gauss_am_suff*) sampler[1]->suff)->sf = SF;
   gsl_matrix_free(Sigma0);
 }
 
@@ -68,8 +71,9 @@ int main(int argc, char** argv) {
   lpdf = mcmclib_mcar_tilde_lpdf_alloc(P, W);
   gsl_matrix_free(W);
   gsl_vector* e = gsl_vector_alloc(P * DIM);
-  for(int i=0; i<P*DIM; i++)
-    gsl_vector_set(e, i, gsl_ran_gaussian(rng, 1.0));
+  FILE* phi_in = fopen("phi.dat", "r");
+  gsl_vector_fscanf(phi_in, e);
+  fclose(phi_in);
   model = mcmclib_mcar_model_alloc(lpdf, e);
 
   init_chains();
