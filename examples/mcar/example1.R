@@ -1,10 +1,10 @@
 P <- 3
-DIM <- 95
+DIM <- 50
 THIN <- 10
 
 B <- diag(3:1/4)
 set.seed(1234)
-Gamma <- crossprod(matrix(rnorm(P*P, sd=0.1), P))
+Gamma <- crossprod(matrix(rnorm(P*P, sd=1), P))
 W <- matrix(0, DIM, DIM)
 for(i in 1:(DIM-1))
   W[i,i+1] <- W[i+1,i] <- 1

@@ -15,14 +15,14 @@
   P=3, DIM=10: 0.00039 secs per iteration
   P=3, DIM=5:  0.00016 secs per iteration
 */
-#define N 10000
+#define N 100000
 #define THIN 10
 #define T0 5000
 #define V0 0.4
 #define SF 0.2
 
 #define P 3
-#define DIM 95
+#define DIM 50
 
 gsl_vector *alpha12sigma, *alphasigmag;
 gsl_rng* rng;
@@ -38,7 +38,7 @@ void init_chains() {
   gsl_matrix_scale(Sigma0, V0 / ((double)(P * P)));
   sampler[0] = mcmclib_gauss_am_alloc(rng, mcmclib_mcar_model_alpha12sigma_lpdf,
 				      model, alpha12sigma, Sigma0, T0);
-  ((mcmclib_gauss_am_suff*) sampler[0]->suff)->sf = SF;
+  mcmclib_gauss_am_set_sf(sampler[0], SF);
   gsl_matrix_free(Sigma0);
 
   alphasigmag = lpdf->alphasigmag;
@@ -48,7 +48,7 @@ void init_chains() {
   gsl_matrix_scale(Sigma0, V0 / (double) (P*(P-1)/2 + P));
   sampler[1] = mcmclib_gauss_am_alloc(rng, mcmclib_mcar_model_alphasigma_lpdf,
 				      model, alphasigmag, Sigma0, T0);
-  ((mcmclib_gauss_am_suff*) sampler[1]->suff)->sf = SF;
+  mcmclib_gauss_am_set_sf(sampler[1], SF);
   gsl_matrix_free(Sigma0);
 }
 
@@ -85,6 +85,9 @@ int main(int argc, char** argv) {
       gsl_vector_fprintf(out_a12s, alpha12sigma, "%f");
       gsl_vector_fprintf(out_as, alphasigmag, "%f");
       fprintf(out_lpdf, "%f\n", mcmclib_mcar_model_alpha12sigma_lpdf(model, alpha12sigma));
+      fflush(out_a12s);
+      fflush(out_as);
+      fflush(out_lpdf);
     }
     for(int j=0; j<2; j++) {
       mcmclib_amh_update(sampler[j]);
