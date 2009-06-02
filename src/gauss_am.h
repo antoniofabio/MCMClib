@@ -48,6 +48,9 @@ mcmclib_amh* mcmclib_gauss_am_alloc(gsl_rng* r,
 /** free extra AM data*/
 void mcmclib_gauss_am_free(mcmclib_amh* p);
 
+/** set scaling factor for the gaussian AM sampler 'p'*/
+void mcmclib_gauss_am_set_sf(mcmclib_amh* p, double sf);
+
 /** AM gamma update function \internal
 @param in_p ptr to an mcmclib_amh object
 */
