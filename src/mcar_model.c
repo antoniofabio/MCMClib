@@ -14,7 +14,7 @@
 #include "mcar_model.h"
 
 /* tolerance for pos. def. conditions */
-#define TOL 5e-2
+#define TOL 1e-4
 
 mcmclib_mcar_model* mcmclib_mcar_model_alloc(mcmclib_mcar_tilde_lpdf* m, gsl_vector* e) {
   mcmclib_mcar_model* a = (mcmclib_mcar_model*) malloc(sizeof(mcmclib_mcar_model));
