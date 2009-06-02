@@ -1,4 +1,9 @@
 Version 0.17 A. F. Di Narzo <antonio.fabio@gmail.com>
+	* added missing utility prototype to gauss_am header
+	* modified mcar_model priors on Gamma params
+	* fixes to mcar_phij full conditionals
+	* simplyfied pois_model loglik function
+	* added more mcar examples
 	* optimized mvnorm rng generation from known precision matrix
 	* fixed buglet in mcar_model: now Gamma sing. values restricted
 		to be sorted.
