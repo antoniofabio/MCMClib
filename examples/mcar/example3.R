@@ -46,11 +46,6 @@ a12s[,P*(P-1) + 1:P] <- exp(a12s[,P*(P-1) + 1:P])
 plot(a12s[,7:9])
 summary(a12s[,7:9])
 
-phi <- mcmc(matrix(read.table("chain_phi.dat")[[1]],
-                  byrow=TRUE, ncol=DIM*P), thin=THIN)
-round(apply(phi, 2, var), 3)[1:24]
-plot(phi[,1:3])
-
 gg <- mcmc(matrix(read.table("chain_gammaii.dat")[[1]], byrow=TRUE, ncol=P), thin=THIN)
 plot(gg)
 bb <- mcmc(matrix(read.table("chain_bii.dat")[[1]], byrow=TRUE, ncol=P), thin=THIN)
