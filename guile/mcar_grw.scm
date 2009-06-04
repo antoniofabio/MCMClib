@@ -21,6 +21,10 @@
 
 (define *alpha12sigma* (mcmclib-mcar-tilde-lpdf-alpha12sigma-get *mcar-lik*))
 (define *alphasigmag* (mcmclib-mcar-tilde-lpdf-alphasigmag-get *mcar-lik*))
+(define *monitors*
+  (vector
+   (new-mcmclib-monitor *alpha12sigma*)
+   (new-mcmclib-monitor *alphasigmag*)))
 
 (define (Sigma0 dim)
   (let ((ans (new-gsl-matrix dim dim)))
@@ -44,13 +48,16 @@
                   *mcar-model*
                   *alphasigmag*))))
 
-(define (update-phi-pars N)
+(define (update-all N)
   (do-ec (: n N)
          (do-ec (: i 2)
-                (mcmclib-mh-update (vector-ref *samplers* i)))))
+                (begin
+                  (mcmclib-mh-update (vector-ref *samplers* i))
+                  (mcmclib-monitor-update (vector-ref *monitors* i))
+                  ))))
 
 (define (main)
-  (update-phi-pars *N*))
+  (update-all *N*))
 
 (init-chains)
 (define st (current-time))
