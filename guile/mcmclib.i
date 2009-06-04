@@ -55,6 +55,16 @@ mcmclib_amh* mcmclib_gauss_am_alloc(gsl_rng* r,
 void mcmclib_gauss_am_free(mcmclib_amh*);
 void mcmclib_gauss_am_update_gamma(void* in_p);
 
+int mcmclib_mh_update(mcmclib_mh* p);
+
+%newobject mcmclib_gauss_mrw_alloc;
+mcmclib_mh* mcmclib_gauss_mrw_alloc(gsl_rng* r,
+				    distrfun_p distrfun, void* logdistr_data,
+				    gsl_vector* x,
+				    const gsl_matrix* sigma_zero);
+%delobject mcmclib_gauss_mrw_free;
+void mcmclib_gauss_mrw_free(mcmclib_mh*);
+
 mcmclib_iwishart_lpdf* mcmclib_iwishart_lpdf_alloc(gsl_matrix* Psi, int m);
 void mcmclib_iwishart_lpdf_free(mcmclib_iwishart_lpdf* p);
 %callback("%s_cb");
