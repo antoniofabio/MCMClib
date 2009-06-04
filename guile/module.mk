@@ -14,4 +14,4 @@ guile/%_wrap.c: guile/%.i
 	swig $(SWIG_FLAGS) -o $@ $<
 
 guile/swig/libguile%.so: guile/%_wrap.c src/libmcmclib.a
-	$(CC) -shared $(GUILE_CFLAGS) $(GUILE_LDFLAGS) -fPIC $^ -o $@
+	$(CC) -shared $(GUILE_CFLAGS) -fPIC $^ $(GUILE_LDFLAGS) -o $@
