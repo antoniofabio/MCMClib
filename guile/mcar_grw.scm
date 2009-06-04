@@ -5,7 +5,7 @@
 ;;
 (define *N* 1000)
 (define *THIN* 10)
-(define *V0* 0.05)
+(define *V0* 0.5)
 (define *p* 6)
 (define *n* 5)
 (define *np* (* *n* *p*))
@@ -21,10 +21,7 @@
 
 (define *alpha12sigma* (mcmclib-mcar-tilde-lpdf-alpha12sigma-get *mcar-lik*))
 (define *alphasigmag* (mcmclib-mcar-tilde-lpdf-alphasigmag-get *mcar-lik*))
-(define *monitors*
-  (vector
-   (new-mcmclib-monitor *alpha12sigma*)
-   (new-mcmclib-monitor *alphasigmag*)))
+(define *monitors* '())
 
 (define (Sigma0 dim)
   (let ((ans (new-gsl-matrix dim dim)))
@@ -46,7 +43,12 @@
                      *alpha12sigma*)
          (sampler (mcmclib-mcar-model-alphasigma-lpdf-cb)
                   *mcar-model*
-                  *alphasigmag*))))
+                  *alphasigmag*)))
+  (set! *monitors*
+    (vector
+     (new-mcmclib-monitor *alpha12sigma*)
+     (new-mcmclib-monitor *alphasigmag*)))
+  )
 
 (define (update-all N)
   (do-ec (: n N)
@@ -65,3 +67,18 @@
 (define en (current-time))
 (display "elapsed time (seconds):")(newline)
 (display (- en st))(newline)
+
+(define (get-ar)
+  (let
+      ((n1 (mcmclib-monitor-n-get (vector-ref *monitors* 0)))
+       (n2 (mcmclib-monitor-n-get (vector-ref *monitors* 1))))
+  (vector
+   (/
+    (gsl-vector-get (mcmclib-monitor-AR-get (vector-ref *monitors* 0)) 0)
+    n1)
+   (/
+    (gsl-vector-get (mcmclib-monitor-AR-get (vector-ref *monitors* 1)) 0)
+    n2))))
+
+(update-all 1000)
+(get-ar)
