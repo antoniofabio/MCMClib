@@ -17,8 +17,9 @@
 /* P=3, DIM=95: 0.22500 secs per iteration */
 #define N 50000
 #define THIN 10
-#define T0 1000
+#define T0 15000
 #define V0 0.4
+#define SF 0.2 /*scaling factor*/
 
 #define P 3
 #define DIM 95
@@ -65,6 +66,7 @@ void init_chains() {
   gsl_matrix_scale(Sigma0, V0 / ((double)(P * P)));
   sampler[0] = mcmclib_gauss_am_alloc(rng, mcmclib_mcar_model_alpha12sigma_lpdf,
 				      mcar_model, alpha12sigma, Sigma0, T0);
+  mcmclib_gauss_am_set_sf(sampler[0], SF);
   gsl_matrix_free(Sigma0);
 
   alphasigmag = mcar_lpdf->alphasigmag;
@@ -74,6 +76,7 @@ void init_chains() {
   gsl_matrix_scale(Sigma0, V0 / (double) (P*(P-1)/2 + P));
   sampler[1] = mcmclib_gauss_am_alloc(rng, mcmclib_mcar_model_alphasigma_lpdf,
 				      mcar_model, alphasigmag, Sigma0, T0);
+  mcmclib_gauss_am_set_sf(sampler[1], SF);
   gsl_matrix_free(Sigma0);
 
   model = mcmclib_pmodel_sampler_alloc(X, y, offset, rng, 1e-3, T0);
@@ -135,7 +138,6 @@ int main(int argc, char** argv) {
   FILE* out_a12s = fopen("chain_alpha12sigma.dat", "w");
   FILE* out_as = fopen("chain_alphasigma.dat", "w");
   FILE* out_beta = fopen("chain_beta.dat", "w");
-  FILE* out_phi = fopen("chain_phi.dat", "w");
   FILE* out_lpdf = fopen("chain_lpdf.dat", "w");
   FILE* out_gii = fopen("chain_gammaii.dat", "w");
   FILE* out_bii = fopen("chain_bii.dat", "w");
@@ -147,13 +149,11 @@ int main(int argc, char** argv) {
       gsl_vector_fprintf(out_as, alphasigmag, "%f");
       gsl_vector_fprintf(out_beta, sampler[2]->mh->x, "%f");
       fprintf(out_lpdf, "%f\n",
-	      mcmclib_mcar_model_alpha12sigma_lpdf(mcar_model, alpha12sigma));
-      gsl_vector_fprintf(out_phi, mcar_phi, "%f");
+	      mcmclib_mcar_model_alphasigma_lpdf(mcar_model, alphasigmag));
       gsl_vector_fprintf(out_gii, &gii_v.vector, "%f");
       gsl_vector_fprintf(out_bii, &bii_v.vector, "%f");
       fflush(out_beta);
       fflush(out_lpdf);
-      fflush(out_phi);
       fflush(out_a12s);
       fflush(out_as);
       fflush(out_gii);
@@ -173,7 +173,6 @@ int main(int argc, char** argv) {
   fclose(out_a12s);
   fclose(out_as);
   fclose(out_beta);
-  fclose(out_phi);
   fclose(out_lpdf);
   fclose(out_gii);
   fclose(out_bii);

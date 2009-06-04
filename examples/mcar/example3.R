@@ -1,6 +1,7 @@
 P <- 3
 DIM <- 95
 THIN <- 10
+T0 <- 15000
 
 info <- dget("adiacenze.txt")
 W <- info$W
@@ -25,6 +26,7 @@ write.table(W, file="W_2.dat", row.names=FALSE, col.names=FALSE)
 library(coda)
 beta <- mcmc(matrix(read.table("chain_beta.dat")[[1]],
                   byrow=TRUE, ncol=P), thin=THIN)
+beta <- window(beta, start=T0)
 plot(beta)
 
 lpdf <- mcmc(matrix(read.table("chain_lpdf.dat")[[1]],
@@ -34,23 +36,23 @@ plot(lpdf)
 g <- function(x) (pi/2) * (exp(x) - 1) / (exp(x) + 1)
 as <- mcmc(matrix(read.table("chain_alphasigma.dat")[[1]],
                   byrow=TRUE, ncol=P*(P-1)/2 + P), thin=THIN)
+as <- window(as, start=T0)
 as[,seq_len(P*(P-1)/2)] <- g(as[,seq_len(P*(P-1)/2)])
 as[,P*(P-1)/2 + 1:P] <- exp(as[,P*(P-1)/2 + 1:P])
+plot(as[,1:3])
 plot(as[,4:6])
 
 a12s <- mcmc(matrix(read.table("chain_alpha12sigma.dat")[[1]],
                   byrow=TRUE, ncol=P*P), thin=THIN)
+a12s <- window(a12s, start=T0)
 a12s[,seq_len(P*(P-1))] <- g(a12s[,seq_len(P*(P-1))])
 a12s[,P*(P-1) + 1:P] <- exp(a12s[,P*(P-1) + 1:P])
 plot(a12s[,7:9])
 summary(a12s[,7:9])
 
-phi <- mcmc(matrix(read.table("chain_phi.dat")[[1]],
-                  byrow=TRUE, ncol=DIM*P), thin=THIN)
-round(apply(phi, 2, var), 3)[1:24]
-plot(phi[,1:3])
-
 gg <- mcmc(matrix(read.table("chain_gammaii.dat")[[1]], byrow=TRUE, ncol=P), thin=THIN)
+gg <- window(gg, start=T0)
 plot(gg)
 bb <- mcmc(matrix(read.table("chain_bii.dat")[[1]], byrow=TRUE, ncol=P), thin=THIN)
+bb <- window(bb, start=T0)
 plot(bb)
