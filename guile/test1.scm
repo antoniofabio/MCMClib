@@ -19,3 +19,14 @@
 (do-ec (: i 1e5)
        (mcmclib-mh-update mh))
 (dv v)
+
+(define mon (new-mcmclib-monitor v))
+(define (update N)
+  (do-ec (: i N)
+         (begin
+           (mcmclib-mh-update mh)
+           (mcmclib-monitor-update mon))))
+
+(update 1e5)
+(mcmclib-monitor-fprintf-means mon (stdout))
+(mcmclib-monitor-fprintf-all mon (stdout))
