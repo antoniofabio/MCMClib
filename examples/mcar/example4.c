@@ -113,7 +113,7 @@ void init_chains() {
   sampler[1] = mcmclib_raptor_alloc(rng, mcmclib_mcar_model_alphasigma_lpdf,
 				    mcar_model, alphasigmag, T0,
 				    Sigma0, as_beta, as_mu, as_Sigma);
-  mcmclib_gauss_am_set_sf(sampler[1], SF);
+  mcmclib_raptor_set_sf(sampler[1], SF);
   gsl_matrix_free(Sigma0);
 
   model = mcmclib_pmodel_sampler_alloc(X, y, offset, rng, 1e-3, T0);
