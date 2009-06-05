@@ -80,5 +80,6 @@
     (gsl-vector-get (mcmclib-monitor-AR-get (vector-ref *monitors* 1)) 0)
     n2))))
 
+(init-chains)
 (update-all 1000)
 (get-ar)
