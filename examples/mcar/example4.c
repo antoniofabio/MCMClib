@@ -14,8 +14,8 @@
 #include <gauss_am.h>
 #include <raptor.h>
 
-/* P=3, DIM=95: 0.22500 secs per iteration */
-#define N 1000
+/* P=3, DIM=95: 0.06590 secs per iteration */
+#define N 50000
 #define THIN 10
 #define T0 15000
 #define V0 0.4
@@ -110,8 +110,8 @@ void init_chains() {
   Sigma0 = gsl_matrix_alloc(as_size, as_size);
   gsl_matrix_set_identity(Sigma0);
   gsl_matrix_scale(Sigma0, V0 / (double) as_size);
-  sampler[1] = mcmclib_raptor_alloc(rng, mcmclib_mcar_model_alpha12sigma_lpdf,
-				    mcar_model, alpha12sigma, T0,
+  sampler[1] = mcmclib_raptor_alloc(rng, mcmclib_mcar_model_alphasigma_lpdf,
+				    mcar_model, alphasigmag, T0,
 				    Sigma0, as_beta, as_mu, as_Sigma);
   mcmclib_gauss_am_set_sf(sampler[1], SF);
   gsl_matrix_free(Sigma0);
@@ -215,7 +215,7 @@ int main(int argc, char** argv) {
   fclose(out_gii);
   fclose(out_bii);
 
-  free_chains();
+  //  free_chains();
   free_mixture_params();
   mcmclib_mcar_model_free(mcar_model);
   gsl_vector_free(mcar_phi);
