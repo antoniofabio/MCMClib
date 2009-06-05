@@ -12,7 +12,6 @@
 #include <mcar_model.h>
 #include <pois_model.h>
 #include <gauss_am.h>
-#include <raptor.h>
 
 /*P=3, DIM=365: 10.397 secs per iteration
   P=3, DIM=95: 0.22500 secs per iteration */
