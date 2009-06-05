@@ -60,17 +60,6 @@
 ;;display g-Matrix
 (define (dM M) (display (M2ll M)) (newline))
 
-(use-modules (swig mcmclib))
-
-(define P 3)
-(define Psi (new-gsl-matrix P P))
-(gsl-matrix-set-identity Psi)
-(define p (mcmclib-iwishart-lpdf-alloc Psi P))
-
-(define v (new-gsl-vector (* P P)))
-(gsl-vector-set-all v 1.0)
-(mcmclib-iwishart-lpdf-compute p v)
-
 (define (gsl-copy-subvec dest src offset)
   (do-ec (: i (gsl-vector-size-get src))
          (gsl-vector-set dest (+ offset i) (gsl-vector-get src i))))
