@@ -1234,11 +1234,13 @@ static swig_guile_clientdata _swig_guile_clientdatagsl_rng = { NULL, SCM_EOL };
 #define SWIGTYPE_p_gsl_rng swig_types[8]
 #define SWIGTYPE_p_gsl_rng_type swig_types[9]
 #define SWIGTYPE_p_gsl_vector swig_types[10]
-#define SWIGTYPE_p_p_gsl_rng_type swig_types[11]
-#define SWIGTYPE_p_size_t swig_types[12]
-#define SWIGTYPE_p_unsigned_long swig_types[13]
-static swig_type_info *swig_types[15];
-static swig_module_info swig_module = {swig_types, 14, 0, 0, 0, 0};
+#define SWIGTYPE_p_p_gsl_matrix swig_types[11]
+#define SWIGTYPE_p_p_gsl_rng_type swig_types[12]
+#define SWIGTYPE_p_p_gsl_vector swig_types[13]
+#define SWIGTYPE_p_size_t swig_types[14]
+#define SWIGTYPE_p_unsigned_long swig_types[15]
+static swig_type_info *swig_types[17];
+static swig_module_info swig_module = {swig_types, 16, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -1269,12 +1271,44 @@ SWIGINTERN gsl_vector *new_gsl_vector(size_t n){
 SWIGINTERN void delete_gsl_vector(gsl_vector *self){
     gsl_vector_free(self);
   }
+
+static gsl_vector* *new_vectorArray(int nelements) { 
+  return (gsl_vector* *) calloc(nelements,sizeof(gsl_vector*)); 
+}
+
+static void delete_vectorArray(gsl_vector* *ary) { 
+  free(ary); 
+}
+
+static gsl_vector* vectorArray_getitem(gsl_vector* *ary, int index) {
+    return ary[index];
+}
+static void vectorArray_setitem(gsl_vector* *ary, int index, gsl_vector* value) {
+    ary[index] = value;
+}
+
 SWIGINTERN gsl_matrix *new_gsl_matrix(size_t n1,size_t n2){
     return gsl_matrix_alloc(n1, n2);
   }
 SWIGINTERN void delete_gsl_matrix(gsl_matrix *self){
     gsl_matrix_free(self);
   }
+
+static gsl_matrix* *new_matrixArray(int nelements) { 
+  return (gsl_matrix* *) calloc(nelements,sizeof(gsl_matrix*)); 
+}
+
+static void delete_matrixArray(gsl_matrix* *ary) { 
+  free(ary); 
+}
+
+static gsl_matrix* matrixArray_getitem(gsl_matrix* *ary, int index) {
+    return ary[index];
+}
+static void matrixArray_setitem(gsl_matrix* *ary, int index, gsl_matrix* value) {
+    ary[index] = value;
+}
+
 SWIGINTERN gsl_rng *new_gsl_rng(gsl_rng_type *type){
     return gsl_rng_alloc(type);
   }
@@ -1532,6 +1566,104 @@ _wrap_delete_gsl_vector (SCM s_0)
   gswig_result = SCM_UNSPECIFIED;
   
   SWIG_Guile_MarkPointerDestroyed(s_0);
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_new_vectorArray (SCM s_0)
+{
+#define FUNC_NAME "new-vectorArray"
+  int arg1 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  gsl_vector **result = 0 ;
+  
+  {
+    arg1 = (int) scm_num2int(s_0, SCM_ARG1, FUNC_NAME);
+  }
+  result = (gsl_vector **)new_vectorArray(arg1);
+  {
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_p_gsl_vector, 0);
+  }
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_delete_vectorArray (SCM s_0)
+{
+#define FUNC_NAME "delete-vectorArray"
+  gsl_vector **arg1 = (gsl_vector **) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  
+  {
+    arg1 = (gsl_vector **)SWIG_MustGetPtr(s_0, SWIGTYPE_p_p_gsl_vector, 1, 0);
+  }
+  delete_vectorArray(arg1);
+  gswig_result = SCM_UNSPECIFIED;
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_vectorArray_getitem (SCM s_0, SCM s_1)
+{
+#define FUNC_NAME "vectorArray-getitem"
+  gsl_vector **arg1 = (gsl_vector **) 0 ;
+  int arg2 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  gsl_vector *result = 0 ;
+  
+  {
+    arg1 = (gsl_vector **)SWIG_MustGetPtr(s_0, SWIGTYPE_p_p_gsl_vector, 1, 0);
+  }
+  {
+    arg2 = (int) scm_num2int(s_1, SCM_ARG1, FUNC_NAME);
+  }
+  result = (gsl_vector *)vectorArray_getitem(arg1,arg2);
+  {
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_gsl_vector, 0);
+  }
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_vectorArray_setitem (SCM s_0, SCM s_1, SCM s_2)
+{
+#define FUNC_NAME "vectorArray-setitem"
+  gsl_vector **arg1 = (gsl_vector **) 0 ;
+  int arg2 ;
+  gsl_vector *arg3 = (gsl_vector *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  
+  {
+    arg1 = (gsl_vector **)SWIG_MustGetPtr(s_0, SWIGTYPE_p_p_gsl_vector, 1, 0);
+  }
+  {
+    arg2 = (int) scm_num2int(s_1, SCM_ARG1, FUNC_NAME);
+  }
+  {
+    arg3 = (gsl_vector *)SWIG_MustGetPtr(s_2, SWIGTYPE_p_gsl_vector, 3, 0);
+  }
+  vectorArray_setitem(arg1,arg2,arg3);
+  gswig_result = SCM_UNSPECIFIED;
+  
+  
   
   return gswig_result;
 #undef FUNC_NAME
@@ -2587,6 +2719,104 @@ _wrap_delete_gsl_matrix (SCM s_0)
   gswig_result = SCM_UNSPECIFIED;
   
   SWIG_Guile_MarkPointerDestroyed(s_0);
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_new_matrixArray (SCM s_0)
+{
+#define FUNC_NAME "new-matrixArray"
+  int arg1 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  gsl_matrix **result = 0 ;
+  
+  {
+    arg1 = (int) scm_num2int(s_0, SCM_ARG1, FUNC_NAME);
+  }
+  result = (gsl_matrix **)new_matrixArray(arg1);
+  {
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_p_gsl_matrix, 0);
+  }
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_delete_matrixArray (SCM s_0)
+{
+#define FUNC_NAME "delete-matrixArray"
+  gsl_matrix **arg1 = (gsl_matrix **) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  
+  {
+    arg1 = (gsl_matrix **)SWIG_MustGetPtr(s_0, SWIGTYPE_p_p_gsl_matrix, 1, 0);
+  }
+  delete_matrixArray(arg1);
+  gswig_result = SCM_UNSPECIFIED;
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_matrixArray_getitem (SCM s_0, SCM s_1)
+{
+#define FUNC_NAME "matrixArray-getitem"
+  gsl_matrix **arg1 = (gsl_matrix **) 0 ;
+  int arg2 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  gsl_matrix *result = 0 ;
+  
+  {
+    arg1 = (gsl_matrix **)SWIG_MustGetPtr(s_0, SWIGTYPE_p_p_gsl_matrix, 1, 0);
+  }
+  {
+    arg2 = (int) scm_num2int(s_1, SCM_ARG1, FUNC_NAME);
+  }
+  result = (gsl_matrix *)matrixArray_getitem(arg1,arg2);
+  {
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_gsl_matrix, 0);
+  }
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_matrixArray_setitem (SCM s_0, SCM s_1, SCM s_2)
+{
+#define FUNC_NAME "matrixArray-setitem"
+  gsl_matrix **arg1 = (gsl_matrix **) 0 ;
+  int arg2 ;
+  gsl_matrix *arg3 = (gsl_matrix *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  
+  {
+    arg1 = (gsl_matrix **)SWIG_MustGetPtr(s_0, SWIGTYPE_p_p_gsl_matrix, 1, 0);
+  }
+  {
+    arg2 = (int) scm_num2int(s_1, SCM_ARG1, FUNC_NAME);
+  }
+  {
+    arg3 = (gsl_matrix *)SWIG_MustGetPtr(s_2, SWIGTYPE_p_gsl_matrix, 3, 0);
+  }
+  matrixArray_setitem(arg1,arg2,arg3);
+  gswig_result = SCM_UNSPECIFIED;
+  
+  
   
   return gswig_result;
 #undef FUNC_NAME
@@ -5990,7 +6220,9 @@ static swig_type_info _swigt__p_gsl_matrix = {"_p_gsl_matrix", "gsl_matrix *", 0
 static swig_type_info _swigt__p_gsl_rng = {"_p_gsl_rng", "gsl_rng *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_gsl_rng_type = {"_p_gsl_rng_type", "gsl_rng_type *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_gsl_vector = {"_p_gsl_vector", "gsl_vector *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_p_gsl_matrix = {"_p_p_gsl_matrix", "gsl_matrix **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_gsl_rng_type = {"_p_p_gsl_rng_type", "gsl_rng_type **", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_p_gsl_vector = {"_p_p_gsl_vector", "gsl_vector **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_size_t = {"_p_size_t", "size_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_long = {"_p_unsigned_long", "SCM *|unsigned long *", 0, 0, (void*)0, 0};
 
@@ -6006,7 +6238,9 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_gsl_rng,
   &_swigt__p_gsl_rng_type,
   &_swigt__p_gsl_vector,
+  &_swigt__p_p_gsl_matrix,
   &_swigt__p_p_gsl_rng_type,
+  &_swigt__p_p_gsl_vector,
   &_swigt__p_size_t,
   &_swigt__p_unsigned_long,
 };
@@ -6022,7 +6256,9 @@ static swig_cast_info _swigc__p_gsl_matrix[] = {  {&_swigt__p_gsl_matrix, 0, 0, 
 static swig_cast_info _swigc__p_gsl_rng[] = {  {&_swigt__p_gsl_rng, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_gsl_rng_type[] = {  {&_swigt__p_gsl_rng_type, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_gsl_vector[] = {  {&_swigt__p_gsl_vector, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_p_gsl_matrix[] = {  {&_swigt__p_p_gsl_matrix, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_gsl_rng_type[] = {  {&_swigt__p_p_gsl_rng_type, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_p_gsl_vector[] = {  {&_swigt__p_p_gsl_vector, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_size_t[] = {  {&_swigt__p_size_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_unsigned_long[] = {  {&_swigt__p_unsigned_long, 0, 0, 0},{0, 0, 0, 0}};
 
@@ -6038,7 +6274,9 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_gsl_rng,
   _swigc__p_gsl_rng_type,
   _swigc__p_gsl_vector,
+  _swigc__p_p_gsl_matrix,
   _swigc__p_p_gsl_rng_type,
+  _swigc__p_p_gsl_vector,
   _swigc__p_size_t,
   _swigc__p_unsigned_long,
 };
@@ -6306,6 +6544,10 @@ SWIG_init(void)
   scm_c_define_gsubr("new-gsl-vector", 1, 0, 0, (swig_guile_proc) _wrap_new_gsl_vector);
   ((swig_guile_clientdata *)(SWIGTYPE_p_gsl_vector->clientdata))->destroy = (guile_destructor) _wrap_delete_gsl_vector;
   scm_c_define_gsubr("delete-gsl-vector", 1, 0, 0, (swig_guile_proc) _wrap_delete_gsl_vector);
+  scm_c_define_gsubr("new-vectorArray", 1, 0, 0, (swig_guile_proc) _wrap_new_vectorArray);
+  scm_c_define_gsubr("delete-vectorArray", 1, 0, 0, (swig_guile_proc) _wrap_delete_vectorArray);
+  scm_c_define_gsubr("vectorArray-getitem", 2, 0, 0, (swig_guile_proc) _wrap_vectorArray_getitem);
+  scm_c_define_gsubr("vectorArray-setitem", 3, 0, 0, (swig_guile_proc) _wrap_vectorArray_setitem);
   scm_c_define_gsubr("gsl-vector-get", 2, 0, 0, (swig_guile_proc) _wrap_gsl_vector_get);
   scm_c_define_gsubr("gsl-vector-set", 3, 0, 0, (swig_guile_proc) _wrap_gsl_vector_set);
   scm_c_define_gsubr("gsl-vector-ptr", 2, 0, 0, (swig_guile_proc) _wrap_gsl_vector_ptr);
@@ -6349,6 +6591,10 @@ SWIG_init(void)
   scm_c_define_gsubr("new-gsl-matrix", 2, 0, 0, (swig_guile_proc) _wrap_new_gsl_matrix);
   ((swig_guile_clientdata *)(SWIGTYPE_p_gsl_matrix->clientdata))->destroy = (guile_destructor) _wrap_delete_gsl_matrix;
   scm_c_define_gsubr("delete-gsl-matrix", 1, 0, 0, (swig_guile_proc) _wrap_delete_gsl_matrix);
+  scm_c_define_gsubr("new-matrixArray", 1, 0, 0, (swig_guile_proc) _wrap_new_matrixArray);
+  scm_c_define_gsubr("delete-matrixArray", 1, 0, 0, (swig_guile_proc) _wrap_delete_matrixArray);
+  scm_c_define_gsubr("matrixArray-getitem", 2, 0, 0, (swig_guile_proc) _wrap_matrixArray_getitem);
+  scm_c_define_gsubr("matrixArray-setitem", 3, 0, 0, (swig_guile_proc) _wrap_matrixArray_setitem);
   scm_c_define_gsubr("gsl-matrix-calloc", 2, 0, 0, (swig_guile_proc) _wrap_gsl_matrix_calloc);
   scm_c_define_gsubr("gsl-matrix-alloc-from-block", 5, 0, 0, (swig_guile_proc) _wrap_gsl_matrix_alloc_from_block);
   scm_c_define_gsubr("gsl-matrix-alloc-from-matrix", 5, 0, 0, (swig_guile_proc) _wrap_gsl_matrix_alloc_from_matrix);

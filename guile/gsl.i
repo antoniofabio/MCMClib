@@ -41,7 +41,7 @@ typedef struct {
   double *data;
 } gsl_vector;
 
-%array_function(gsl_vector*, vectorArray);
+%array_functions(gsl_vector*, vectorArray);
 
 double gsl_vector_get (const gsl_vector * v, const size_t i);
 void gsl_vector_set (gsl_vector * v, const size_t i, double x);
@@ -105,7 +105,7 @@ typedef struct {
   double * data;
 } gsl_matrix;
 
-%array_function(gsl_matrix*, matrixArray);
+%array_functions(gsl_matrix*, matrixArray);
 
 gsl_matrix * 
 gsl_matrix_calloc (const size_t n1, const size_t n2);
