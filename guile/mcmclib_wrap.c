@@ -2221,26 +2221,6 @@ _wrap_delete_mcmclib_monitor (SCM s_0)
 
 
 static SCM
-_wrap_stdout(SCM s_0)
-{
-#define FUNC_NAME "stdout"
-  SCM gswig_result;
-  
-  if (s_0 != SCM_UNDEFINED) {
-    {
-      stdout = (FILE *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_FILE, 1, 0);
-    }
-  }
-  {
-    gswig_result = SWIG_NewPointerObj (stdout, SWIGTYPE_p_FILE, 0);
-  }
-  
-  return gswig_result;
-#undef FUNC_NAME
-}
-
-
-static SCM
 _wrap_mcmclib_monitor_update (SCM s_0)
 {
 #define FUNC_NAME "mcmclib-monitor-update"
@@ -3327,7 +3307,6 @@ SWIG_init(void)
   scm_c_define_gsubr("new-mcmclib-monitor", 1, 0, 0, (swig_guile_proc) _wrap_new_mcmclib_monitor);
   ((swig_guile_clientdata *)(SWIGTYPE_p_mcmclib_monitor->clientdata))->destroy = (guile_destructor) _wrap_delete_mcmclib_monitor;
   scm_c_define_gsubr("delete-mcmclib-monitor", 1, 0, 0, (swig_guile_proc) _wrap_delete_mcmclib_monitor);
-  scm_c_define_gsubr("stdout", 0, 1, 0, (swig_guile_proc) _wrap_stdout);
   scm_c_define_gsubr("mcmclib-monitor-update", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_monitor_update);
   scm_c_define_gsubr("mcmclib-monitor-get-means", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_monitor_get_means);
   scm_c_define_gsubr("mcmclib-monitor-get-vars", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_monitor_get_vars);

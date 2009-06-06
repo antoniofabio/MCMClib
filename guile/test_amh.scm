@@ -31,3 +31,30 @@
            (mcmclib-monitor-update mon))))
 (update 10000)
 (mcmclib-monitor-fprintf-all mon (stdout))
+
+(define beta (new-gsl-vector 2))
+(gsl-vector-set-all beta 0.5)
+(define muk (vector-ec (: k 2)
+                       (let
+                           ((v (new-gsl-vector 1)))
+                         (gsl-vector-set-all v 0.5)
+                         v)))
+(define Sigmak (vector-ec (: k 2)
+                       (let
+                           ((m (new-gsl-matrix 1 1)))
+                         (gsl-matrix-set-all m 0.1)
+                         m)))
+
+(define amh (mcmclib-raptor-alloc
+             rng
+             (mcmclib-guile-lpdf-cb)
+             (guile-to-voidptr dunif)
+             v
+             100
+             S
+             beta
+             (va2ca muk)
+             (ma2ca Sigmak)))
+
+(update 1000)
+(mcmclib-monitor-fprintf-all mon (stdout))
