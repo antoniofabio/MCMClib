@@ -87,8 +87,6 @@ typedef struct {
   }
 }
 
-const FILE* stdout;
-
 int mcmclib_monitor_update(mcmclib_monitor* p);
 void mcmclib_monitor_get_means(mcmclib_monitor* p, gsl_vector* out);
 void mcmclib_monitor_get_vars(mcmclib_monitor* p, gsl_vector* out);

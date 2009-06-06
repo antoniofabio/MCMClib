@@ -30,6 +30,7 @@ static void guile_gsl_err_handler(const char * reason,
 
 FILE* fopen(const char*, const char*);
 void fclose(FILE*);
+const FILE* stdout;
 
 /*
 GSL_VECTOR
