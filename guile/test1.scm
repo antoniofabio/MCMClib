@@ -38,3 +38,22 @@
 
 (define pf (guile-to-voidptr f))
 (mcmclib-guile-lpdf pf v)
+
+(define (dunif x)
+  (let
+      ((x0 (gsl-vector-get x 0)))
+    (if
+     (and
+      (>= x0 0)
+      (<= x0 1))
+     0.0
+     (log 0.0))))
+(define mh (mcmclib-gauss-mrw-alloc
+            rng
+            (mcmclib-guile-lpdf-cb)
+            (guile-to-voidptr dunif)
+            v
+            S))
+(define mon (new-mcmclib-monitor v))
+(update 10000)
+(mcmclib-monitor-fprintf-all mon (stdout))
