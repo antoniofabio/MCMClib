@@ -1262,6 +1262,19 @@ static double (*gswig_const_mcmclib_iwishart_lpdf_compute_cb)(void *,gsl_vector 
   }
 
 static double (*gswig_const_test_distrfun_cb)(void *,gsl_vector *) = (double (*)(void *p,gsl_vector *x))(test_distrfun);
+
+  static double mcmclib_guile_lpdf(void* p, gsl_vector* x) {
+    SCM sx = SWIG_NewPointerObj(x, SWIGTYPE_p_gsl_vector, 0);
+    SCM ans = scm_call_1((SCM) p, sx);
+    return scm_to_double(ans);
+  }
+
+
+  void* guile_to_voidptr(SCM p) {
+    return (void*) p;
+  }
+
+static double (*gswig_const_mcmclib_guile_lpdf_cb)(void *,gsl_vector *) = (double (*)(void *p,gsl_vector *x))(mcmclib_guile_lpdf);
 SWIGINTERN mcmclib_monitor *new_mcmclib_monitor(gsl_vector const *x){
     return mcmclib_monitor_alloc(x);
   }
@@ -1498,6 +1511,69 @@ _wrap_test_distrfun (SCM s_0, SCM s_1)
     arg2 = (gsl_vector *)SWIG_MustGetPtr(s_1, SWIGTYPE_p_gsl_vector, 2, 0);
   }
   result = (double)test_distrfun(arg1,arg2);
+  {
+    gswig_result = scm_make_real(result);
+  }
+  
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_guile_to_voidptr (SCM s_0)
+{
+#define FUNC_NAME "guile-to-voidptr"
+  SCM arg1 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  void *result = 0 ;
+  
+  arg1=s_0;
+  result = (void *)guile_to_voidptr(arg1);
+  {
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_void, 0);
+  }
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_guile_lpdf_cb(SCM s_0)
+{
+#define FUNC_NAME "mcmclib-guile-lpdf-cb"
+  SCM gswig_result;
+  
+  {
+    gswig_result = SWIG_NewPointerObj (gswig_const_mcmclib_guile_lpdf_cb, SWIGTYPE_p_f_p_void_p_gsl_vector__double, 0);
+  }
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_guile_lpdf (SCM s_0, SCM s_1)
+{
+#define FUNC_NAME "mcmclib-guile-lpdf"
+  void *arg1 = (void *) 0 ;
+  gsl_vector *arg2 = (gsl_vector *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  double result;
+  
+  {
+    arg1 = (void *)SWIG_MustGetPtr(s_0, NULL, 1, 0);
+  }
+  {
+    arg2 = (gsl_vector *)SWIG_MustGetPtr(s_1, SWIGTYPE_p_gsl_vector, 2, 0);
+  }
+  result = (double)mcmclib_guile_lpdf(arg1,arg2);
   {
     gswig_result = scm_make_real(result);
   }
@@ -2727,6 +2803,9 @@ SWIG_init(void)
   scm_c_define_gsubr("test-distrfun-alloc", 1, 0, 0, (swig_guile_proc) _wrap_test_distrfun_alloc);
   scm_c_define_gsubr("test-distrfun-cb", 0, 0, 0, (swig_guile_proc) _wrap_test_distrfun_cb);
   scm_c_define_gsubr("test-distrfun", 2, 0, 0, (swig_guile_proc) _wrap_test_distrfun);
+  scm_c_define_gsubr("guile-to-voidptr", 1, 0, 0, (swig_guile_proc) _wrap_guile_to_voidptr);
+  scm_c_define_gsubr("mcmclib-guile-lpdf-cb", 0, 0, 0, (swig_guile_proc) _wrap_mcmclib_guile_lpdf_cb);
+  scm_c_define_gsubr("mcmclib-guile-lpdf", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_guile_lpdf);
   SWIG_TypeClientData(SWIGTYPE_p_mcmclib_monitor, (void *) &_swig_guile_clientdatamcmclib_monitor);
   scm_c_define_gsubr("mcmclib-monitor-x-set", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_monitor_x_set);
   scm_c_define_gsubr("mcmclib-monitor-x-get", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_monitor_x_get);

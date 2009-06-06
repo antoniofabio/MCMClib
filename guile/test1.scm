@@ -30,3 +30,11 @@
 (update 1e5)
 (mcmclib-monitor-fprintf-means mon (stdout))
 (mcmclib-monitor-fprintf-all mon (stdout))
+
+(define (f x)
+  (if (< (gsl-vector-get x 0) 0)
+      (log 0.0)
+      0.0))
+
+(define pf (guile-to-voidptr f))
+(mcmclib-guile-lpdf pf v)

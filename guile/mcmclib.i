@@ -49,6 +49,23 @@ void* test_distrfun_alloc(double what);
 double test_distrfun(void* p, gsl_vector* x);
 %nocallback;
 
+%{
+  static double mcmclib_guile_lpdf(void* p, gsl_vector* x) {
+    SCM sx = SWIG_NewPointerObj(x, SWIGTYPE_p_gsl_vector, 0);
+    SCM ans = scm_call_1((SCM) p, sx);
+    return scm_to_double(ans);
+  }
+%}
+%inline %{
+  void* guile_to_voidptr(SCM p) {
+    return (void*) p;
+  }
+%}
+
+%callback("%s_cb");
+double mcmclib_guile_lpdf(void* p, gsl_vector* x);
+%nocallback;
+
 /** Scalar MCMC diagnostics on a 'monitored' vector */
 typedef struct {
   const gsl_vector* x; /**< current value */
