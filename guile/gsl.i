@@ -376,3 +376,9 @@ typedef struct {} gsl_rng;
     gsl_rng_free($self);
   }
 }
+
+const gsl_rng_type * gsl_rng_env_setup (void);
+void gsl_rng_set (const gsl_rng * r, unsigned long int seed);
+double gsl_rng_uniform (const gsl_rng * r);
+double gsl_rng_uniform_pos (const gsl_rng * r);
+unsigned long int gsl_rng_uniform_int (const gsl_rng * r, unsigned long int n);

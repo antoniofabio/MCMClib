@@ -1334,6 +1334,26 @@ _wrap_fclose (SCM s_0)
 
 
 static SCM
+_wrap_stdout(SCM s_0)
+{
+#define FUNC_NAME "stdout"
+  SCM gswig_result;
+  
+  if (s_0 != SCM_UNDEFINED) {
+    {
+      stdout = (FILE *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_FILE, 1, 0);
+    }
+  }
+  {
+    gswig_result = SWIG_NewPointerObj (stdout, SWIGTYPE_p_FILE, 0);
+  }
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
 _wrap_gsl_vector_size_set (SCM s_0, SCM s_1)
 {
 #define FUNC_NAME "gsl-vector-size-set"
@@ -5838,6 +5858,121 @@ _wrap_delete_gsl_rng (SCM s_0)
 }
 
 
+static SCM
+_wrap_gsl_rng_env_setup ()
+{
+#define FUNC_NAME "gsl-rng-env-setup"
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  gsl_rng_type *result = 0 ;
+  
+  result = (gsl_rng_type *)gsl_rng_env_setup();
+  {
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_gsl_rng_type, 0);
+  }
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_gsl_rng_set (SCM s_0, SCM s_1)
+{
+#define FUNC_NAME "gsl-rng-set"
+  gsl_rng *arg1 = (gsl_rng *) 0 ;
+  unsigned long arg2 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  
+  {
+    arg1 = (gsl_rng *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_gsl_rng, 1, 0);
+  }
+  {
+    arg2 = (unsigned long) scm_num2ulong(s_1, SCM_ARG1, FUNC_NAME);
+  }
+  gsl_rng_set((gsl_rng const *)arg1,arg2);
+  gswig_result = SCM_UNSPECIFIED;
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_gsl_rng_uniform (SCM s_0)
+{
+#define FUNC_NAME "gsl-rng-uniform"
+  gsl_rng *arg1 = (gsl_rng *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  double result;
+  
+  {
+    arg1 = (gsl_rng *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_gsl_rng, 1, 0);
+  }
+  result = (double)gsl_rng_uniform((gsl_rng const *)arg1);
+  {
+    gswig_result = scm_make_real(result);
+  }
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_gsl_rng_uniform_pos (SCM s_0)
+{
+#define FUNC_NAME "gsl-rng-uniform-pos"
+  gsl_rng *arg1 = (gsl_rng *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  double result;
+  
+  {
+    arg1 = (gsl_rng *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_gsl_rng, 1, 0);
+  }
+  result = (double)gsl_rng_uniform_pos((gsl_rng const *)arg1);
+  {
+    gswig_result = scm_make_real(result);
+  }
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_gsl_rng_uniform_int (SCM s_0, SCM s_1)
+{
+#define FUNC_NAME "gsl-rng-uniform-int"
+  gsl_rng *arg1 = (gsl_rng *) 0 ;
+  unsigned long arg2 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  unsigned long result;
+  
+  {
+    arg1 = (gsl_rng *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_gsl_rng, 1, 0);
+  }
+  {
+    arg2 = (unsigned long) scm_num2ulong(s_1, SCM_ARG1, FUNC_NAME);
+  }
+  result = (unsigned long)gsl_rng_uniform_int((gsl_rng const *)arg1,arg2);
+  {
+    gswig_result = scm_ulong2num(result);
+  }
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -6160,6 +6295,7 @@ SWIG_init(void)
   
   scm_c_define_gsubr("fopen", 2, 0, 0, (swig_guile_proc) _wrap_fopen);
   scm_c_define_gsubr("fclose", 1, 0, 0, (swig_guile_proc) _wrap_fclose);
+  scm_c_define_gsubr("stdout", 0, 1, 0, (swig_guile_proc) _wrap_stdout);
   SWIG_TypeClientData(SWIGTYPE_p_gsl_vector, (void *) &_swig_guile_clientdatagsl_vector);
   scm_c_define_gsubr("gsl-vector-size-set", 2, 0, 0, (swig_guile_proc) _wrap_gsl_vector_size_set);
   scm_c_define_gsubr("gsl-vector-size-get", 1, 0, 0, (swig_guile_proc) _wrap_gsl_vector_size_get);
@@ -6345,6 +6481,11 @@ SWIG_init(void)
   scm_c_define_gsubr("new-gsl-rng", 1, 0, 0, (swig_guile_proc) _wrap_new_gsl_rng);
   ((swig_guile_clientdata *)(SWIGTYPE_p_gsl_rng->clientdata))->destroy = (guile_destructor) _wrap_delete_gsl_rng;
   scm_c_define_gsubr("delete-gsl-rng", 1, 0, 0, (swig_guile_proc) _wrap_delete_gsl_rng);
+  scm_c_define_gsubr("gsl-rng-env-setup", 0, 0, 0, (swig_guile_proc) _wrap_gsl_rng_env_setup);
+  scm_c_define_gsubr("gsl-rng-set", 2, 0, 0, (swig_guile_proc) _wrap_gsl_rng_set);
+  scm_c_define_gsubr("gsl-rng-uniform", 1, 0, 0, (swig_guile_proc) _wrap_gsl_rng_uniform);
+  scm_c_define_gsubr("gsl-rng-uniform-pos", 1, 0, 0, (swig_guile_proc) _wrap_gsl_rng_uniform_pos);
+  scm_c_define_gsubr("gsl-rng-uniform-int", 2, 0, 0, (swig_guile_proc) _wrap_gsl_rng_uniform_int);
 }
 
 #ifdef __cplusplus
