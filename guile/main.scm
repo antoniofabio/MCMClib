@@ -63,3 +63,18 @@
 (define (gsl-copy-subvec dest src offset)
   (do-ec (: i (gsl-vector-size-get src))
          (gsl-vector-set dest (+ offset i) (gsl-vector-get src i))))
+
+(define (va2ca va)
+  (let*
+      ((n (vector-length va))
+       (ca (new-vectorArray n)))
+    (do-ec (: i n)
+           (vectorArray-setitem ca i (vector-ref va i)))
+    ca))
+(define (ma2ca ma)
+  (let*
+      ((n (vector-length ma))
+       (ca (new-matrixArray n)))
+    (do-ec (: i n)
+           (matrixArray-setitem ca i (vector-ref ma i)))
+    ca))
