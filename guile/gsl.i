@@ -1,5 +1,7 @@
 %module gsl
 
+%include "carrays.i"
+
 %scheme %{(load-extension "libguilegsl.so" "scm_init_swig_gsl_module")%}
 
 %{
@@ -37,6 +39,8 @@ typedef struct {
   size_t stride;
   double *data;
 } gsl_vector;
+
+%array_function(gsl_vector*, vectorArray);
 
 double gsl_vector_get (const gsl_vector * v, const size_t i);
 void gsl_vector_set (gsl_vector * v, const size_t i, double x);
@@ -99,6 +103,8 @@ typedef struct {
   size_t tda;
   double * data;
 } gsl_matrix;
+
+%array_function(gsl_matrix*, matrixArray);
 
 gsl_matrix * 
 gsl_matrix_calloc (const size_t n1, const size_t n2);
