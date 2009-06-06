@@ -10,6 +10,7 @@ TOCLEAN += $(GUILE_MODULES_TARGETS) $(GUILE_MODULES:%=guile/%_wrap.c)
 
 guile: $(GUILE_MODULES_TARGETS)
 
+guile/mcmclib_wrap.c: guile/amh.i
 guile/%_wrap.c: guile/%.i
 	swig $(SWIG_FLAGS) -o $@ $<
 
