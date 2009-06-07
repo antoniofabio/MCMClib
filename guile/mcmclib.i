@@ -100,5 +100,5 @@ void mcmclib_monitor_fprintf_AR(mcmclib_monitor* p, FILE* f);
 void mcmclib_monitor_fprintf_MSJD(mcmclib_monitor* p, FILE* f);
 void mcmclib_monitor_fprintf_all(mcmclib_monitor* p, FILE* f);
 
+%include "distrfuns.i"
 %include "amh.i"
-
