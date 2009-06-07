@@ -1,6 +1,7 @@
 %{
 #include <mvnorm.h>
 #include <mcar_tilde.h>
+#include <mcar_model.h>
 %}
 
 /*Multivariate normal distribution*/
@@ -71,3 +72,23 @@ void mcmclib_mcar_tilde_lpdf_update_B_tilde(mcmclib_mcar_tilde_lpdf* p);
 int mcmclib_mcar_tilde_lpdf_update_blocks(mcmclib_mcar_tilde_lpdf* p);
 int mcmclib_mcar_tilde_lpdf_update_vcov(mcmclib_mcar_tilde_lpdf* p);
 void mcmclib_mcar_tilde_lpdf_update_Gamma(mcmclib_mcar_tilde_lpdf* p);
+
+typedef struct {
+  mcmclib_mcar_tilde_lpdf* lpdf; /**< log-likelihood component */
+  gsl_vector* e; /**< observed residuals*/
+} mcmclib_mcar_model;
+
+%extend mcmclib_mcar_model {
+  mcmclib_mcar_model(mcmclib_mcar_tilde_lpdf* m, gsl_vector* e) {
+    return mcmclib_mcar_model_alloc(m, e);
+  }
+  ~mcmclib_mcar_model() {
+    mcmclib_mcar_model_free($self);
+  }
+}
+
+%callback("%s_cb");
+double mcmclib_mcar_model_alpha12sigma_lpdf(void* in_p, gsl_vector* alpha12sigma);
+double mcmclib_mcar_model_alphasigma_lpdf(void* in_p, gsl_vector* alphasigma);
+%nocallback;
+double mcmclib_mcar_model_phi_fcond(mcmclib_mcar_model* in_p, int i, gsl_vector* x);
