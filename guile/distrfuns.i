@@ -1,5 +1,6 @@
 %{
 #include <mvnorm.h>
+#include <mcar_tilde.h>
 %}
 
 /*Multivariate normal distribution*/
@@ -36,3 +37,37 @@ double mcmclib_mvnorm_lpdf_compute_noinv(mcmclib_mvnorm_lpdf* p, gsl_vector* x);
 double mcmclib_mvnorm_lpdf_noinv(gsl_vector* mu, gsl_matrix* iSigma, gsl_vector* x,
 				 double ldet, gsl_vector* work1, gsl_vector* work2);
 double mcmclib_mvnormzp_lpdf(const gsl_matrix* Psi, const gsl_vector* y);
+
+/*MCAR distribution*/
+typedef struct {
+  int p; /**< dimension */
+  int n; /**< number of points */
+
+  gsl_matrix* B_tilde; /**< variance par. matrix (p x p) */
+  gsl_vector* alpha12sigma; /**< Givens angles and sing. values repr. of
+			       B_tilde */
+  gsl_matrix* Gamma; /**< 'variance of variance' par. matrix (p x p) */
+  gsl_vector *alphasigmag; /**< Givens angles and eigenv. repr. of Gamma */
+
+  gsl_matrix* M; /**< adiancency matrix (n x n)*/
+  gsl_vector* m; /**< adiancency weights (n)*/
+
+  gsl_matrix* vcov; /**< precision matrix */
+} mcmclib_mcar_tilde_lpdf;
+
+%extend mcmclib_mcar_tilde_lpdf {
+  mcmclib_mcar_tilde_lpdf(int p, gsl_matrix* M) {
+    return mcmclib_mcar_tilde_lpdf_alloc(p, M);
+  }
+  ~mcmclib_mcar_tilde_lpdf() {
+    mcmclib_mcar_tilde_lpdf_free($self);
+  }
+}
+%callback("%s_cb");
+double mcmclib_mcar_tilde_lpdf_compute(void* in_p, gsl_vector* x);
+%nocallback;
+
+void mcmclib_mcar_tilde_lpdf_update_B_tilde(mcmclib_mcar_tilde_lpdf* p);
+int mcmclib_mcar_tilde_lpdf_update_blocks(mcmclib_mcar_tilde_lpdf* p);
+int mcmclib_mcar_tilde_lpdf_update_vcov(mcmclib_mcar_tilde_lpdf* p);
+void mcmclib_mcar_tilde_lpdf_update_Gamma(mcmclib_mcar_tilde_lpdf* p);

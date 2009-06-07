@@ -1219,6 +1219,7 @@ SWIG_Guile_GetArgs (SCM *dest, SCM rest,
 
 static swig_guile_clientdata _swig_guile_clientdatamcmclib_monitor = { NULL, SCM_EOL };
 static swig_guile_clientdata _swig_guile_clientdatamcmclib_mvnorm_lpdf = { NULL, SCM_EOL };
+static swig_guile_clientdata _swig_guile_clientdatamcmclib_mcar_tilde_lpdf = { NULL, SCM_EOL };
 static swig_guile_clientdata _swig_guile_clientdatamcmclib_amh = { NULL, SCM_EOL };
 
 /* -------- TYPES TABLE (BEGIN) -------- */
@@ -1232,15 +1233,16 @@ static swig_guile_clientdata _swig_guile_clientdatamcmclib_amh = { NULL, SCM_EOL
 #define SWIGTYPE_p_gsl_vector swig_types[6]
 #define SWIGTYPE_p_mcmclib_amh swig_types[7]
 #define SWIGTYPE_p_mcmclib_iwishart_lpdf swig_types[8]
-#define SWIGTYPE_p_mcmclib_mh swig_types[9]
-#define SWIGTYPE_p_mcmclib_monitor swig_types[10]
-#define SWIGTYPE_p_mcmclib_mvnorm_lpdf swig_types[11]
-#define SWIGTYPE_p_p_gsl_matrix swig_types[12]
-#define SWIGTYPE_p_p_gsl_vector swig_types[13]
-#define SWIGTYPE_p_unsigned_long swig_types[14]
-#define SWIGTYPE_p_void swig_types[15]
-static swig_type_info *swig_types[17];
-static swig_module_info swig_module = {swig_types, 16, 0, 0, 0, 0};
+#define SWIGTYPE_p_mcmclib_mcar_tilde_lpdf swig_types[9]
+#define SWIGTYPE_p_mcmclib_mh swig_types[10]
+#define SWIGTYPE_p_mcmclib_monitor swig_types[11]
+#define SWIGTYPE_p_mcmclib_mvnorm_lpdf swig_types[12]
+#define SWIGTYPE_p_p_gsl_matrix swig_types[13]
+#define SWIGTYPE_p_p_gsl_vector swig_types[14]
+#define SWIGTYPE_p_unsigned_long swig_types[15]
+#define SWIGTYPE_p_void swig_types[16]
+static swig_type_info *swig_types[18];
+static swig_module_info swig_module = {swig_types, 17, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -1291,6 +1293,7 @@ SWIGINTERN void delete_mcmclib_monitor(mcmclib_monitor *self){
   }
 
 #include <mvnorm.h>
+#include <mcar_tilde.h>
 
 SWIGINTERN mcmclib_mvnorm_lpdf *new_mcmclib_mvnorm_lpdf(gsl_vector *mean,double *vcov){
     return mcmclib_mvnorm_lpdf_alloc(mean, vcov);
@@ -1298,6 +1301,13 @@ SWIGINTERN mcmclib_mvnorm_lpdf *new_mcmclib_mvnorm_lpdf(gsl_vector *mean,double 
 SWIGINTERN void delete_mcmclib_mvnorm_lpdf(mcmclib_mvnorm_lpdf *self){
     mcmclib_mvnorm_lpdf_free(self);
   }
+SWIGINTERN mcmclib_mcar_tilde_lpdf *new_mcmclib_mcar_tilde_lpdf(int p,gsl_matrix *M){
+    return mcmclib_mcar_tilde_lpdf_alloc(p, M);
+  }
+SWIGINTERN void delete_mcmclib_mcar_tilde_lpdf(mcmclib_mcar_tilde_lpdf *self){
+    mcmclib_mcar_tilde_lpdf_free(self);
+  }
+static double (*gswig_const_mcmclib_mcar_tilde_lpdf_compute_cb)(void *,gsl_vector *) = (double (*)(void *in_p,gsl_vector *x))(mcmclib_mcar_tilde_lpdf_compute);
 
 #include <amh.h>
 #include <gauss_am.h>
@@ -2897,6 +2907,613 @@ _wrap_mcmclib_mvnormzp_lpdf (SCM s_0, SCM s_1)
 
 
 static SCM
+_wrap_mcmclib_mcar_tilde_lpdf_p_set (SCM s_0, SCM s_1)
+{
+#define FUNC_NAME "mcmclib-mcar-tilde-lpdf-p-set"
+  mcmclib_mcar_tilde_lpdf *arg1 = (mcmclib_mcar_tilde_lpdf *) 0 ;
+  int arg2 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  
+  {
+    arg1 = (mcmclib_mcar_tilde_lpdf *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_mcar_tilde_lpdf, 1, 0);
+  }
+  {
+    arg2 = (int) scm_num2int(s_1, SCM_ARG1, FUNC_NAME);
+  }
+  if (arg1) (arg1)->p = arg2;
+  gswig_result = SCM_UNSPECIFIED;
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_mcar_tilde_lpdf_p_get (SCM s_0)
+{
+#define FUNC_NAME "mcmclib-mcar-tilde-lpdf-p-get"
+  mcmclib_mcar_tilde_lpdf *arg1 = (mcmclib_mcar_tilde_lpdf *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  int result;
+  
+  {
+    arg1 = (mcmclib_mcar_tilde_lpdf *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_mcar_tilde_lpdf, 1, 0);
+  }
+  result = (int) ((arg1)->p);
+  {
+    gswig_result = scm_long2num(result);
+  }
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_mcar_tilde_lpdf_n_set (SCM s_0, SCM s_1)
+{
+#define FUNC_NAME "mcmclib-mcar-tilde-lpdf-n-set"
+  mcmclib_mcar_tilde_lpdf *arg1 = (mcmclib_mcar_tilde_lpdf *) 0 ;
+  int arg2 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  
+  {
+    arg1 = (mcmclib_mcar_tilde_lpdf *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_mcar_tilde_lpdf, 1, 0);
+  }
+  {
+    arg2 = (int) scm_num2int(s_1, SCM_ARG1, FUNC_NAME);
+  }
+  if (arg1) (arg1)->n = arg2;
+  gswig_result = SCM_UNSPECIFIED;
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_mcar_tilde_lpdf_n_get (SCM s_0)
+{
+#define FUNC_NAME "mcmclib-mcar-tilde-lpdf-n-get"
+  mcmclib_mcar_tilde_lpdf *arg1 = (mcmclib_mcar_tilde_lpdf *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  int result;
+  
+  {
+    arg1 = (mcmclib_mcar_tilde_lpdf *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_mcar_tilde_lpdf, 1, 0);
+  }
+  result = (int) ((arg1)->n);
+  {
+    gswig_result = scm_long2num(result);
+  }
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_mcar_tilde_lpdf_B_tilde_set (SCM s_0, SCM s_1)
+{
+#define FUNC_NAME "mcmclib-mcar-tilde-lpdf-B-tilde-set"
+  mcmclib_mcar_tilde_lpdf *arg1 = (mcmclib_mcar_tilde_lpdf *) 0 ;
+  gsl_matrix *arg2 = (gsl_matrix *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  
+  {
+    arg1 = (mcmclib_mcar_tilde_lpdf *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_mcar_tilde_lpdf, 1, 0);
+  }
+  {
+    arg2 = (gsl_matrix *)SWIG_MustGetPtr(s_1, SWIGTYPE_p_gsl_matrix, 2, 0);
+  }
+  if (arg1) (arg1)->B_tilde = arg2;
+  gswig_result = SCM_UNSPECIFIED;
+  
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_mcar_tilde_lpdf_B_tilde_get (SCM s_0)
+{
+#define FUNC_NAME "mcmclib-mcar-tilde-lpdf-B-tilde-get"
+  mcmclib_mcar_tilde_lpdf *arg1 = (mcmclib_mcar_tilde_lpdf *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  gsl_matrix *result = 0 ;
+  
+  {
+    arg1 = (mcmclib_mcar_tilde_lpdf *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_mcar_tilde_lpdf, 1, 0);
+  }
+  result = (gsl_matrix *) ((arg1)->B_tilde);
+  {
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_gsl_matrix, 0);
+  }
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_mcar_tilde_lpdf_alpha12sigma_set (SCM s_0, SCM s_1)
+{
+#define FUNC_NAME "mcmclib-mcar-tilde-lpdf-alpha12sigma-set"
+  mcmclib_mcar_tilde_lpdf *arg1 = (mcmclib_mcar_tilde_lpdf *) 0 ;
+  gsl_vector *arg2 = (gsl_vector *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  
+  {
+    arg1 = (mcmclib_mcar_tilde_lpdf *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_mcar_tilde_lpdf, 1, 0);
+  }
+  {
+    arg2 = (gsl_vector *)SWIG_MustGetPtr(s_1, SWIGTYPE_p_gsl_vector, 2, 0);
+  }
+  if (arg1) (arg1)->alpha12sigma = arg2;
+  gswig_result = SCM_UNSPECIFIED;
+  
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_mcar_tilde_lpdf_alpha12sigma_get (SCM s_0)
+{
+#define FUNC_NAME "mcmclib-mcar-tilde-lpdf-alpha12sigma-get"
+  mcmclib_mcar_tilde_lpdf *arg1 = (mcmclib_mcar_tilde_lpdf *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  gsl_vector *result = 0 ;
+  
+  {
+    arg1 = (mcmclib_mcar_tilde_lpdf *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_mcar_tilde_lpdf, 1, 0);
+  }
+  result = (gsl_vector *) ((arg1)->alpha12sigma);
+  {
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_gsl_vector, 0);
+  }
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_mcar_tilde_lpdf_Gamma_set (SCM s_0, SCM s_1)
+{
+#define FUNC_NAME "mcmclib-mcar-tilde-lpdf-Gamma-set"
+  mcmclib_mcar_tilde_lpdf *arg1 = (mcmclib_mcar_tilde_lpdf *) 0 ;
+  gsl_matrix *arg2 = (gsl_matrix *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  
+  {
+    arg1 = (mcmclib_mcar_tilde_lpdf *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_mcar_tilde_lpdf, 1, 0);
+  }
+  {
+    arg2 = (gsl_matrix *)SWIG_MustGetPtr(s_1, SWIGTYPE_p_gsl_matrix, 2, 0);
+  }
+  if (arg1) (arg1)->Gamma = arg2;
+  gswig_result = SCM_UNSPECIFIED;
+  
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_mcar_tilde_lpdf_Gamma_get (SCM s_0)
+{
+#define FUNC_NAME "mcmclib-mcar-tilde-lpdf-Gamma-get"
+  mcmclib_mcar_tilde_lpdf *arg1 = (mcmclib_mcar_tilde_lpdf *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  gsl_matrix *result = 0 ;
+  
+  {
+    arg1 = (mcmclib_mcar_tilde_lpdf *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_mcar_tilde_lpdf, 1, 0);
+  }
+  result = (gsl_matrix *) ((arg1)->Gamma);
+  {
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_gsl_matrix, 0);
+  }
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_mcar_tilde_lpdf_alphasigmag_set (SCM s_0, SCM s_1)
+{
+#define FUNC_NAME "mcmclib-mcar-tilde-lpdf-alphasigmag-set"
+  mcmclib_mcar_tilde_lpdf *arg1 = (mcmclib_mcar_tilde_lpdf *) 0 ;
+  gsl_vector *arg2 = (gsl_vector *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  
+  {
+    arg1 = (mcmclib_mcar_tilde_lpdf *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_mcar_tilde_lpdf, 1, 0);
+  }
+  {
+    arg2 = (gsl_vector *)SWIG_MustGetPtr(s_1, SWIGTYPE_p_gsl_vector, 2, 0);
+  }
+  if (arg1) (arg1)->alphasigmag = arg2;
+  gswig_result = SCM_UNSPECIFIED;
+  
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_mcar_tilde_lpdf_alphasigmag_get (SCM s_0)
+{
+#define FUNC_NAME "mcmclib-mcar-tilde-lpdf-alphasigmag-get"
+  mcmclib_mcar_tilde_lpdf *arg1 = (mcmclib_mcar_tilde_lpdf *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  gsl_vector *result = 0 ;
+  
+  {
+    arg1 = (mcmclib_mcar_tilde_lpdf *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_mcar_tilde_lpdf, 1, 0);
+  }
+  result = (gsl_vector *) ((arg1)->alphasigmag);
+  {
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_gsl_vector, 0);
+  }
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_mcar_tilde_lpdf_M_set (SCM s_0, SCM s_1)
+{
+#define FUNC_NAME "mcmclib-mcar-tilde-lpdf-M-set"
+  mcmclib_mcar_tilde_lpdf *arg1 = (mcmclib_mcar_tilde_lpdf *) 0 ;
+  gsl_matrix *arg2 = (gsl_matrix *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  
+  {
+    arg1 = (mcmclib_mcar_tilde_lpdf *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_mcar_tilde_lpdf, 1, 0);
+  }
+  {
+    arg2 = (gsl_matrix *)SWIG_MustGetPtr(s_1, SWIGTYPE_p_gsl_matrix, 2, 0);
+  }
+  if (arg1) (arg1)->M = arg2;
+  gswig_result = SCM_UNSPECIFIED;
+  
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_mcar_tilde_lpdf_M_get (SCM s_0)
+{
+#define FUNC_NAME "mcmclib-mcar-tilde-lpdf-M-get"
+  mcmclib_mcar_tilde_lpdf *arg1 = (mcmclib_mcar_tilde_lpdf *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  gsl_matrix *result = 0 ;
+  
+  {
+    arg1 = (mcmclib_mcar_tilde_lpdf *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_mcar_tilde_lpdf, 1, 0);
+  }
+  result = (gsl_matrix *) ((arg1)->M);
+  {
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_gsl_matrix, 0);
+  }
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_mcar_tilde_lpdf_m_set (SCM s_0, SCM s_1)
+{
+#define FUNC_NAME "mcmclib-mcar-tilde-lpdf-m-set"
+  mcmclib_mcar_tilde_lpdf *arg1 = (mcmclib_mcar_tilde_lpdf *) 0 ;
+  gsl_vector *arg2 = (gsl_vector *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  
+  {
+    arg1 = (mcmclib_mcar_tilde_lpdf *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_mcar_tilde_lpdf, 1, 0);
+  }
+  {
+    arg2 = (gsl_vector *)SWIG_MustGetPtr(s_1, SWIGTYPE_p_gsl_vector, 2, 0);
+  }
+  if (arg1) (arg1)->m = arg2;
+  gswig_result = SCM_UNSPECIFIED;
+  
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_mcar_tilde_lpdf_m_get (SCM s_0)
+{
+#define FUNC_NAME "mcmclib-mcar-tilde-lpdf-m-get"
+  mcmclib_mcar_tilde_lpdf *arg1 = (mcmclib_mcar_tilde_lpdf *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  gsl_vector *result = 0 ;
+  
+  {
+    arg1 = (mcmclib_mcar_tilde_lpdf *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_mcar_tilde_lpdf, 1, 0);
+  }
+  result = (gsl_vector *) ((arg1)->m);
+  {
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_gsl_vector, 0);
+  }
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_mcar_tilde_lpdf_vcov_set (SCM s_0, SCM s_1)
+{
+#define FUNC_NAME "mcmclib-mcar-tilde-lpdf-vcov-set"
+  mcmclib_mcar_tilde_lpdf *arg1 = (mcmclib_mcar_tilde_lpdf *) 0 ;
+  gsl_matrix *arg2 = (gsl_matrix *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  
+  {
+    arg1 = (mcmclib_mcar_tilde_lpdf *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_mcar_tilde_lpdf, 1, 0);
+  }
+  {
+    arg2 = (gsl_matrix *)SWIG_MustGetPtr(s_1, SWIGTYPE_p_gsl_matrix, 2, 0);
+  }
+  if (arg1) (arg1)->vcov = arg2;
+  gswig_result = SCM_UNSPECIFIED;
+  
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_mcar_tilde_lpdf_vcov_get (SCM s_0)
+{
+#define FUNC_NAME "mcmclib-mcar-tilde-lpdf-vcov-get"
+  mcmclib_mcar_tilde_lpdf *arg1 = (mcmclib_mcar_tilde_lpdf *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  gsl_matrix *result = 0 ;
+  
+  {
+    arg1 = (mcmclib_mcar_tilde_lpdf *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_mcar_tilde_lpdf, 1, 0);
+  }
+  result = (gsl_matrix *) ((arg1)->vcov);
+  {
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_gsl_matrix, 0);
+  }
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_new_mcmclib_mcar_tilde_lpdf (SCM s_0, SCM s_1)
+{
+#define FUNC_NAME "new-mcmclib-mcar-tilde-lpdf"
+  int arg1 ;
+  gsl_matrix *arg2 = (gsl_matrix *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  mcmclib_mcar_tilde_lpdf *result = 0 ;
+  
+  {
+    arg1 = (int) scm_num2int(s_0, SCM_ARG1, FUNC_NAME);
+  }
+  {
+    arg2 = (gsl_matrix *)SWIG_MustGetPtr(s_1, SWIGTYPE_p_gsl_matrix, 2, 0);
+  }
+  result = (mcmclib_mcar_tilde_lpdf *)new_mcmclib_mcar_tilde_lpdf(arg1,arg2);
+  {
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_mcmclib_mcar_tilde_lpdf, 1);
+  }
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_delete_mcmclib_mcar_tilde_lpdf (SCM s_0)
+{
+#define FUNC_NAME "delete-mcmclib-mcar-tilde-lpdf"
+  mcmclib_mcar_tilde_lpdf *arg1 = (mcmclib_mcar_tilde_lpdf *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  
+  {
+    arg1 = (mcmclib_mcar_tilde_lpdf *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_mcar_tilde_lpdf, 1, 0);
+  }
+  delete_mcmclib_mcar_tilde_lpdf(arg1);
+  gswig_result = SCM_UNSPECIFIED;
+  
+  SWIG_Guile_MarkPointerDestroyed(s_0);
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_mcar_tilde_lpdf_compute_cb(SCM s_0)
+{
+#define FUNC_NAME "mcmclib-mcar-tilde-lpdf-compute-cb"
+  SCM gswig_result;
+  
+  {
+    gswig_result = SWIG_NewPointerObj (gswig_const_mcmclib_mcar_tilde_lpdf_compute_cb, SWIGTYPE_p_f_p_void_p_gsl_vector__double, 0);
+  }
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_mcar_tilde_lpdf_compute (SCM s_0, SCM s_1)
+{
+#define FUNC_NAME "mcmclib-mcar-tilde-lpdf-compute"
+  void *arg1 = (void *) 0 ;
+  gsl_vector *arg2 = (gsl_vector *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  double result;
+  
+  {
+    arg1 = (void *)SWIG_MustGetPtr(s_0, NULL, 1, 0);
+  }
+  {
+    arg2 = (gsl_vector *)SWIG_MustGetPtr(s_1, SWIGTYPE_p_gsl_vector, 2, 0);
+  }
+  result = (double)mcmclib_mcar_tilde_lpdf_compute(arg1,arg2);
+  {
+    gswig_result = scm_make_real(result);
+  }
+  
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_mcar_tilde_lpdf_update_B_tilde (SCM s_0)
+{
+#define FUNC_NAME "mcmclib-mcar-tilde-lpdf-update-B-tilde"
+  mcmclib_mcar_tilde_lpdf *arg1 = (mcmclib_mcar_tilde_lpdf *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  
+  {
+    arg1 = (mcmclib_mcar_tilde_lpdf *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_mcar_tilde_lpdf, 1, 0);
+  }
+  mcmclib_mcar_tilde_lpdf_update_B_tilde(arg1);
+  gswig_result = SCM_UNSPECIFIED;
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_mcar_tilde_lpdf_update_blocks (SCM s_0)
+{
+#define FUNC_NAME "mcmclib-mcar-tilde-lpdf-update-blocks"
+  mcmclib_mcar_tilde_lpdf *arg1 = (mcmclib_mcar_tilde_lpdf *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  int result;
+  
+  {
+    arg1 = (mcmclib_mcar_tilde_lpdf *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_mcar_tilde_lpdf, 1, 0);
+  }
+  result = (int)mcmclib_mcar_tilde_lpdf_update_blocks(arg1);
+  {
+    gswig_result = scm_long2num(result);
+  }
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_mcar_tilde_lpdf_update_vcov (SCM s_0)
+{
+#define FUNC_NAME "mcmclib-mcar-tilde-lpdf-update-vcov"
+  mcmclib_mcar_tilde_lpdf *arg1 = (mcmclib_mcar_tilde_lpdf *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  int result;
+  
+  {
+    arg1 = (mcmclib_mcar_tilde_lpdf *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_mcar_tilde_lpdf, 1, 0);
+  }
+  result = (int)mcmclib_mcar_tilde_lpdf_update_vcov(arg1);
+  {
+    gswig_result = scm_long2num(result);
+  }
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_mcar_tilde_lpdf_update_Gamma (SCM s_0)
+{
+#define FUNC_NAME "mcmclib-mcar-tilde-lpdf-update-Gamma"
+  mcmclib_mcar_tilde_lpdf *arg1 = (mcmclib_mcar_tilde_lpdf *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  
+  {
+    arg1 = (mcmclib_mcar_tilde_lpdf *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_mcar_tilde_lpdf, 1, 0);
+  }
+  mcmclib_mcar_tilde_lpdf_update_Gamma(arg1);
+  gswig_result = SCM_UNSPECIFIED;
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
 _wrap_mcmclib_amh_mh_set (SCM s_0, SCM s_1)
 {
 #define FUNC_NAME "mcmclib-amh-mh-set"
@@ -3372,6 +3989,7 @@ static swig_type_info _swigt__p_gsl_rng = {"_p_gsl_rng", "gsl_rng *", 0, 0, (voi
 static swig_type_info _swigt__p_gsl_vector = {"_p_gsl_vector", "gsl_vector *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_mcmclib_amh = {"_p_mcmclib_amh", "mcmclib_amh *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_mcmclib_iwishart_lpdf = {"_p_mcmclib_iwishart_lpdf", "mcmclib_iwishart_lpdf *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_mcmclib_mcar_tilde_lpdf = {"_p_mcmclib_mcar_tilde_lpdf", "mcmclib_mcar_tilde_lpdf *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_mcmclib_mh = {"_p_mcmclib_mh", "mcmclib_mh *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_mcmclib_monitor = {"_p_mcmclib_monitor", "mcmclib_monitor *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_mcmclib_mvnorm_lpdf = {"_p_mcmclib_mvnorm_lpdf", "mcmclib_mvnorm_lpdf *", 0, 0, (void*)0, 0};
@@ -3390,6 +4008,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_gsl_vector,
   &_swigt__p_mcmclib_amh,
   &_swigt__p_mcmclib_iwishart_lpdf,
+  &_swigt__p_mcmclib_mcar_tilde_lpdf,
   &_swigt__p_mcmclib_mh,
   &_swigt__p_mcmclib_monitor,
   &_swigt__p_mcmclib_mvnorm_lpdf,
@@ -3408,6 +4027,7 @@ static swig_cast_info _swigc__p_gsl_rng[] = {  {&_swigt__p_gsl_rng, 0, 0, 0},{0,
 static swig_cast_info _swigc__p_gsl_vector[] = {  {&_swigt__p_gsl_vector, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_mcmclib_amh[] = {  {&_swigt__p_mcmclib_amh, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_mcmclib_iwishart_lpdf[] = {  {&_swigt__p_mcmclib_iwishart_lpdf, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_mcmclib_mcar_tilde_lpdf[] = {  {&_swigt__p_mcmclib_mcar_tilde_lpdf, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_mcmclib_mh[] = {  {&_swigt__p_mcmclib_mh, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_mcmclib_monitor[] = {  {&_swigt__p_mcmclib_monitor, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_mcmclib_mvnorm_lpdf[] = {  {&_swigt__p_mcmclib_mvnorm_lpdf, 0, 0, 0},{0, 0, 0, 0}};
@@ -3426,6 +4046,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_gsl_vector,
   _swigc__p_mcmclib_amh,
   _swigc__p_mcmclib_iwishart_lpdf,
+  _swigc__p_mcmclib_mcar_tilde_lpdf,
   _swigc__p_mcmclib_mh,
   _swigc__p_mcmclib_monitor,
   _swigc__p_mcmclib_mvnorm_lpdf,
@@ -3750,6 +4371,34 @@ SWIG_init(void)
   scm_c_define_gsubr("mcmclib-mvnorm-lpdf-compute-noinv", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_mvnorm_lpdf_compute_noinv);
   scm_c_define_gsubr("mcmclib-mvnorm-lpdf-noinv", 6, 0, 0, (swig_guile_proc) _wrap_mcmclib_mvnorm_lpdf_noinv);
   scm_c_define_gsubr("mcmclib-mvnormzp-lpdf", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_mvnormzp_lpdf);
+  SWIG_TypeClientData(SWIGTYPE_p_mcmclib_mcar_tilde_lpdf, (void *) &_swig_guile_clientdatamcmclib_mcar_tilde_lpdf);
+  scm_c_define_gsubr("mcmclib-mcar-tilde-lpdf-p-set", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_mcar_tilde_lpdf_p_set);
+  scm_c_define_gsubr("mcmclib-mcar-tilde-lpdf-p-get", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_mcar_tilde_lpdf_p_get);
+  scm_c_define_gsubr("mcmclib-mcar-tilde-lpdf-n-set", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_mcar_tilde_lpdf_n_set);
+  scm_c_define_gsubr("mcmclib-mcar-tilde-lpdf-n-get", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_mcar_tilde_lpdf_n_get);
+  scm_c_define_gsubr("mcmclib-mcar-tilde-lpdf-B-tilde-set", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_mcar_tilde_lpdf_B_tilde_set);
+  scm_c_define_gsubr("mcmclib-mcar-tilde-lpdf-B-tilde-get", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_mcar_tilde_lpdf_B_tilde_get);
+  scm_c_define_gsubr("mcmclib-mcar-tilde-lpdf-alpha12sigma-set", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_mcar_tilde_lpdf_alpha12sigma_set);
+  scm_c_define_gsubr("mcmclib-mcar-tilde-lpdf-alpha12sigma-get", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_mcar_tilde_lpdf_alpha12sigma_get);
+  scm_c_define_gsubr("mcmclib-mcar-tilde-lpdf-Gamma-set", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_mcar_tilde_lpdf_Gamma_set);
+  scm_c_define_gsubr("mcmclib-mcar-tilde-lpdf-Gamma-get", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_mcar_tilde_lpdf_Gamma_get);
+  scm_c_define_gsubr("mcmclib-mcar-tilde-lpdf-alphasigmag-set", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_mcar_tilde_lpdf_alphasigmag_set);
+  scm_c_define_gsubr("mcmclib-mcar-tilde-lpdf-alphasigmag-get", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_mcar_tilde_lpdf_alphasigmag_get);
+  scm_c_define_gsubr("mcmclib-mcar-tilde-lpdf-M-set", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_mcar_tilde_lpdf_M_set);
+  scm_c_define_gsubr("mcmclib-mcar-tilde-lpdf-M-get", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_mcar_tilde_lpdf_M_get);
+  scm_c_define_gsubr("mcmclib-mcar-tilde-lpdf-m-set", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_mcar_tilde_lpdf_m_set);
+  scm_c_define_gsubr("mcmclib-mcar-tilde-lpdf-m-get", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_mcar_tilde_lpdf_m_get);
+  scm_c_define_gsubr("mcmclib-mcar-tilde-lpdf-vcov-set", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_mcar_tilde_lpdf_vcov_set);
+  scm_c_define_gsubr("mcmclib-mcar-tilde-lpdf-vcov-get", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_mcar_tilde_lpdf_vcov_get);
+  scm_c_define_gsubr("new-mcmclib-mcar-tilde-lpdf", 2, 0, 0, (swig_guile_proc) _wrap_new_mcmclib_mcar_tilde_lpdf);
+  ((swig_guile_clientdata *)(SWIGTYPE_p_mcmclib_mcar_tilde_lpdf->clientdata))->destroy = (guile_destructor) _wrap_delete_mcmclib_mcar_tilde_lpdf;
+  scm_c_define_gsubr("delete-mcmclib-mcar-tilde-lpdf", 1, 0, 0, (swig_guile_proc) _wrap_delete_mcmclib_mcar_tilde_lpdf);
+  scm_c_define_gsubr("mcmclib-mcar-tilde-lpdf-compute-cb", 0, 0, 0, (swig_guile_proc) _wrap_mcmclib_mcar_tilde_lpdf_compute_cb);
+  scm_c_define_gsubr("mcmclib-mcar-tilde-lpdf-compute", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_mcar_tilde_lpdf_compute);
+  scm_c_define_gsubr("mcmclib-mcar-tilde-lpdf-update-B-tilde", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_mcar_tilde_lpdf_update_B_tilde);
+  scm_c_define_gsubr("mcmclib-mcar-tilde-lpdf-update-blocks", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_mcar_tilde_lpdf_update_blocks);
+  scm_c_define_gsubr("mcmclib-mcar-tilde-lpdf-update-vcov", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_mcar_tilde_lpdf_update_vcov);
+  scm_c_define_gsubr("mcmclib-mcar-tilde-lpdf-update-Gamma", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_mcar_tilde_lpdf_update_Gamma);
   SWIG_TypeClientData(SWIGTYPE_p_mcmclib_amh, (void *) &_swig_guile_clientdatamcmclib_amh);
   scm_c_define_gsubr("mcmclib-amh-mh-set", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_amh_mh_set);
   scm_c_define_gsubr("mcmclib-amh-mh-get", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_amh_mh_get);
