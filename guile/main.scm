@@ -12,6 +12,16 @@
        (v (new-gsl-vector n)))
     (do-ec (: i n) (gsl-vector-set v i (list-ref ll i)))
     v))
+;;vector <-> g-vector
+(define (v2gv v)
+  (let*
+      ((n (vector-length v))
+       (gv (new-gsl-vector n)))
+    (do-ec (: i n)
+           (gsl-vector-set gv i (vector-ref v i)))
+    gv))
+(define (gv2v gv)
+  (vector-eg (: i (gsl-vector-size-get gv)) (gsl-vector-get gv i)))
 
 ;;g-matrix -> g-vector
 (define (M2v M)
