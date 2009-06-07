@@ -32,7 +32,7 @@
 (do-ec (: i p)
        (gsl-vector-set y
                        (- (* p p) (+ i 1))
-                       (+ (* (/ i p) 0.9) 0.05)))
+                       (+ -2 (+ (* (/ i p) 0.9) 0.05))))
 (gsl-vector-memcpy a12s y)
 (gsl-vector-set-all as 0.0)
 (do-ec (: i p)
