@@ -45,17 +45,28 @@ gsl_vector *a12s_beta, *as_beta;
 gsl_vector *a12s_mu[2], *as_mu[2];
 gsl_matrix *a12s_Sigma[2], *as_Sigma[2];
 
+gsl_vector_view asmu_view[2];
+double asmu_data[2][6] = {{0.6402105,  1.6130955, -0.1238163, -0.1596428, -0.9227976, -2.6514444},
+			  {-0.4479953, 0.7868348, -0.3515181, -0.3648961, -1.0954467, -1.8379377}};
+
+gsl_vector_view a12smu_view[2];
+double a12smu_data[2][9] = {{-0.2546310, -0.3525798, 0.1891869, -0.2442633, 0.3454967, -0.0238164,
+			     -0.1346993, -0.3288677, -1.5137814},
+			    {-0.28717678, -0.18210887,  0.07761313, -0.60640886, -0.07559915, -0.11495301,
+			     -0.42148466, -1.24859913, -2.29223423}};
+
 static void init_mixture_params() {
   a12s_beta = gsl_vector_alloc(2);
   gsl_vector_set_all(a12s_beta, 0.5);
   as_beta = gsl_vector_alloc(2);
   gsl_vector_set_all(as_beta, 0.5);
   for(int k=0; k<2; k++) {
-    a12s_mu[k] = gsl_vector_alloc(a12s_size);
-    gsl_vector_set_all(a12s_mu[k], -2.0);
+    a12smu_view[k] = gsl_vector_view_array(a12smu_data[k], a12s_size);
+    a12s_mu[k] = &(a12smu_view[k].vector);
     a12s_Sigma[k] = gsl_matrix_alloc(a12s_size, a12s_size);
     gsl_matrix_set_identity(a12s_Sigma[k]);
-    as_mu[k] = gsl_vector_alloc(as_size);
+    asmu_view[k] = gsl_vector_view_array(asmu_data[k], as_size);
+    as_mu[k] = &(asmu_view[k].vector);
     gsl_vector_set_all(as_mu[k], 2.0);
     as_Sigma[k] = gsl_matrix_alloc(as_size, as_size);
     gsl_matrix_set_identity(as_Sigma[k]);
@@ -66,8 +77,6 @@ static void free_mixture_params() {
   gsl_vector_free(a12s_beta);
   gsl_vector_free(as_beta);
   for(int k=0; k<2; k++) {
-    gsl_vector_free(a12s_mu[k]);
-    gsl_vector_free(as_mu[k]);
     gsl_matrix_free(a12s_Sigma[k]);
     gsl_matrix_free(as_Sigma[k]);
   }
