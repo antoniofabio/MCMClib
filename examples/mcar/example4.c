@@ -111,7 +111,8 @@ void init_chains() {
   sampler[0] = mcmclib_raptor_alloc(rng, mcmclib_mcar_model_alpha12sigma_lpdf,
 				    mcar_model, alpha12sigma, T0,
 				    Sigma0, a12s_beta, a12s_mu, a12s_Sigma);
-  mcmclib_raptor_set_sf(sampler[0], SF);
+  mcmclib_raptor_set_sf_local(sampler[0], 1.0);
+  mcmclib_raptor_set_sf_global(sampler[0], SF);
   gsl_matrix_free(Sigma0);
 
   alphasigmag = mcar_lpdf->alphasigmag;
@@ -122,7 +123,8 @@ void init_chains() {
   sampler[1] = mcmclib_raptor_alloc(rng, mcmclib_mcar_model_alphasigma_lpdf,
 				    mcar_model, alphasigmag, T0,
 				    Sigma0, as_beta, as_mu, as_Sigma);
-  mcmclib_raptor_set_sf(sampler[1], SF);
+  mcmclib_raptor_set_sf_local(sampler[1], 1.0);
+  mcmclib_raptor_set_sf_global(sampler[1], SF);
   gsl_matrix_free(Sigma0);
 
   model = mcmclib_pmodel_sampler_alloc(X, y, offset, rng, 1e-3, T0);
