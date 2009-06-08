@@ -19,7 +19,7 @@
 #define THIN 10
 #define T0 15000
 #define V0 0.4
-#define SF 0.2 /*scaling factor*/
+#define SF 0.05 /*scaling factor*/
 
 #define P 3
 #define DIM 95
@@ -111,8 +111,9 @@ void init_chains() {
   sampler[0] = mcmclib_raptor_alloc(rng, mcmclib_mcar_model_alpha12sigma_lpdf,
 				    mcar_model, alpha12sigma, T0,
 				    Sigma0, a12s_beta, a12s_mu, a12s_Sigma);
-  mcmclib_raptor_set_sf_local(sampler[0], 1.0);
+  mcmclib_raptor_set_sf_local(sampler[0], SF * 1.5);
   mcmclib_raptor_set_sf_global(sampler[0], SF);
+  mcmclib_raptor_set_alpha(sampler[0], 0.8);
   gsl_matrix_free(Sigma0);
 
   alphasigmag = mcar_lpdf->alphasigmag;
@@ -123,8 +124,9 @@ void init_chains() {
   sampler[1] = mcmclib_raptor_alloc(rng, mcmclib_mcar_model_alphasigma_lpdf,
 				    mcar_model, alphasigmag, T0,
 				    Sigma0, as_beta, as_mu, as_Sigma);
-  mcmclib_raptor_set_sf_local(sampler[1], 1.0);
+  mcmclib_raptor_set_sf_local(sampler[1], SF);
   mcmclib_raptor_set_sf_global(sampler[1], SF);
+  mcmclib_raptor_set_alpha(sampler[1], 0.8);
   gsl_matrix_free(Sigma0);
 
   model = mcmclib_pmodel_sampler_alloc(X, y, offset, rng, 1e-3, T0);
