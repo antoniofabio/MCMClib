@@ -131,3 +131,8 @@ void mcmclib_raptor_update(void* in_p) {
 					 s->scaling_factor_local,
 					 s->scaling_factor_global);
 }
+
+void mcmclib_raptor_set_alpha(mcmclib_amh* p, double alpha) {
+  mcmclib_rapt_gamma *qg = (mcmclib_rapt_gamma *) p->mh->q->gamma;
+  mcmclib_rapt_gamma_set_alpha(qg, alpha);
+}
