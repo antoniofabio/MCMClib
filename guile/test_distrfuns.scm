@@ -47,3 +47,29 @@
                        (+ i 0.05)))
 
 (mcmclib-mcar-model-alpha12sigma-lpdf mod y)
+
+(define (make-fcond i)
+  (lambda (phi-i)
+    (mcmclib-mcar-model-phi-fcond mod i phi-i)))
+(define Si (new-gsl-matrix p p))
+(gsl-matrix-set-identity Si)
+(define fconds
+  (vector-ec (: i n) (make-fcond i)))
+(define phi-i
+  (vector-ec (: i n) (new-gsl-vector p)))
+(define rng (new-gsl-rng (gsl-rng-default)))
+(define (make-phi-sampler i)
+  (mcmclib-gauss-mrw-alloc
+   rng
+   (mcmclib-guile-lpdf-cb)
+   (guile-to-voidptr (vector-ref fconds i))
+   (vector-ref phi-i i)
+   Si))
+
+(define phi-samplers
+  (vector-ec (: i n)
+             (make-phi-sampler i)))
+
+(define (update N)
+  (do-ec (: j N)
+         (do-ec (: i n) (mcmclib-mh-update (vector-ref phi-samplers i)))))
