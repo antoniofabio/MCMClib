@@ -70,6 +70,19 @@
   (vector-ec (: i n)
              (make-phi-sampler i)))
 
-(define (update N)
-  (do-ec (: j N)
-         (do-ec (: i n) (mcmclib-mh-update (vector-ref phi-samplers i)))))
+;;Poisson model sampler
+(define X (new-gsl-matrix (* n p) p))
+(gsl-matrix-set-all X 0)
+(do-ec (: i n) (: j p)
+         (gsl-matrix-set X (+ i j 1) j 1))
+(define offset (new-gsl-vector (* n p)))
+(gsl-vector-set-all offset 2.0)
+(define y (new-gsl-vector (* n p)))
+(gsl-vector-set-all y 3.0)
+(define rng (new-gsl-rng (gsl-rng-default)))
+(define pms (new-mcmclib-pmodel-sampler X y offset rng 0.5 100))
+
+(define (update-beta N)
+  (do-ec (: i N)
+         (mcmclib-pmodel-sampler-update pms)))
+(update-beta 1000)

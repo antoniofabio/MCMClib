@@ -2,6 +2,7 @@
 #include <mvnorm.h>
 #include <mcar_tilde.h>
 #include <mcar_model.h>
+#include <pois_model.h>
 %}
 
 /*Multivariate normal distribution*/
@@ -92,3 +93,30 @@ double mcmclib_mcar_model_alpha12sigma_lpdf(void* in_p, gsl_vector* alpha12sigma
 double mcmclib_mcar_model_alphasigma_lpdf(void* in_p, gsl_vector* alphasigma);
 %nocallback;
 double mcmclib_mcar_model_phi_fcond(mcmclib_mcar_model* in_p, int i, gsl_vector* x);
+
+/*Poisson model sampler*/
+typedef struct {
+  mcmclib_pois_model* model;
+  mcmclib_amh* sampler;
+} mcmclib_pmodel_sampler;
+
+%extend mcmclib_pmodel_sampler {
+  mcmclib_pmodel_sampler(const gsl_matrix* X,
+			 const gsl_vector* y,
+			 const gsl_vector* offset,
+			 gsl_rng* rng,
+			 double sigma0,
+			 int burnin) {
+    return mcmclib_pmodel_sampler_alloc(X,
+					y,
+					offset,
+					rng,
+					sigma0,
+					burnin);
+  }
+  ~mcmclib_pmodel_sampler() {
+    mcmclib_pmodel_sampler_free($self);
+  }
+}
+int mcmclib_pmodel_sampler_update(mcmclib_pmodel_sampler* p);
+gsl_vector* mcmclib_pmodel_sampler_beta(mcmclib_pmodel_sampler* p);
