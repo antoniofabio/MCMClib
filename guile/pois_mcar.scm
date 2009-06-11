@@ -119,10 +119,9 @@
   (set! *phi-samplers*
         (vector-ec (: i *n*)
                    (make-phi-sampler i)))
-;  (set! *beta-save* (new-mcmclib-pmodel-sampler *X* *y* *offset* *rng* 1e-3 *T0*))
-;  (set! *beta-sampler*
-;        (mcmclib-pmodel-sampler-sampler-get *beta-save*))
-  )
+  (set! *beta-save* (new-mcmclib-pmodel-sampler *X* *y* *offset* *rng* 1e-3 *T0*))
+  (set! *beta-sampler*
+        (mcmclib-pmodel-sampler-sampler-get *beta-save*)))
 
 ;;Updating functions
 (define (update-phi)
@@ -138,8 +137,7 @@
          (begin
            (update-phi-pars)
            (update-phi)
-;           (update-beta)
-           )))
+           (update-beta))))
 
 (define (see-phi)
   (vector-ec (: i 10)
