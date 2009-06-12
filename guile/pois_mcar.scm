@@ -90,7 +90,7 @@
       (update-offset))))
 
 ;;Setup beta sampler
-(define *beta-save* (list))
+(define *beta* (list))
 (define *beta-sampler* (list))
 
 ;;Generic AM sampler builder
@@ -103,6 +103,18 @@
   (mcmclib-gauss-am-alloc *rng* lpdf lpdf-data x
                           (Sigma0 (gsl-vector-size-get x))
                           *T0*))
+
+;;setup monitors
+(define *a12s-monitor* (list))
+(define *as-monitor* (list))
+(define *beta-monitor* (list))
+(define (init-monitors)
+  (set! *a12s-monitor*
+        (new-mcmclib-monitor *alpha12sigma*))
+  (set! *as-monitor*
+        (new-mcmclib-monitor *alphasigmag*))
+  (set! *beta-monitor*
+        (new-mcmclib-monitor *beta*)))
 
 ;;Init chains: starting values and samplers
 (define (init-chains)
@@ -119,9 +131,9 @@
   (set! *phi-samplers*
         (vector-ec (: i *n*)
                    (make-phi-sampler i)))
-  (set! *beta-save* (new-mcmclib-pmodel-sampler *X* *y* *offset* *rng* 1e-3 *T0*))
   (set! *beta-sampler*
-        (mcmclib-pmodel-sampler-sampler-get *beta-save*)))
+        (new-mcmclib-pmodel-sampler *X* *y* *offset* *rng* 1e-3 *T0*))
+  (set! *beta* (mcmclib-pmodel-sampler-beta *beta-sampler*)))
 
 ;;Updating functions
 (define (update-phi)
@@ -130,18 +142,48 @@
 (define (update-phi-pars)
   (do-ec (: i 2)
          (mcmclib-amh-update (vector-ref *phi-par-samplers* i))))
-(define (update-beta) (mcmclib-amh-update *beta-sampler*))
+(define (update-beta) (mcmclib-pmodel-sampler-update *beta-sampler*))
 
 (define (update-all N)
   (do-ec (: i N)
          (begin
            (update-phi-pars)
+           (mcmclib-monitor-update *a12s-monitor*)
+           (mcmclib-monitor-update *as-monitor*)
            (update-phi)
-           (update-beta))))
+           (update-beta)
+           (mcmclib-monitor-update *beta-monitor*))))
 
 (define (see-phi)
   (vector-ec (: i 10)
              (gsl-vector-get *phi* i)))
 
+(define (print-monitor mon)
+  (display "means")
+  (newline)
+  (mcmclib-monitor-fprintf-means mon (stdout))
+  (display "vars")
+  (newline)
+  (mcmclib-monitor-fprintf-vars mon (stdout))
+  (display "AR")
+  (newline)
+  (mcmclib-monitor-fprintf-AR mon (stdout)))
+
+(define (see-monitors)
+  (display "alpha12sigma")
+  (newline)
+  (print-monitor *a12s-monitor*))
+
+(define (time fun)
+  (let*
+      ((start (current-time))
+       (thrash (fun))
+       (end (current-time)))
+    (- end start)))
+
 (init-chains)
-(update-all 1000)
+(init-monitors)
+(update-all 100)
+(see-monitors)
+(time (lambda () (update-all 100))) ;;about 7 secs
+(see-monitors)
