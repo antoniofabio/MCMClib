@@ -5,10 +5,11 @@
              (swig gsl)
              (swig mcmclib))
 
-(define *n* 2) ;;target distribution dimension
+(define *n* 5) ;;target distribution dimension
 (define *K* 2) ;;number of mixture components
-(define *T0* 10000) ;;burn-in length
-(define *N* 100000) ;;number of iterations after burn-in
+(define *T0* 100) ;;burn-in length
+(define *N* 1000) ;;number of iterations after burn-in
+(define *rng* (new-gsl-rng (gsl-rng-default))) ;;random number generator
 
 (define *beta-hat* (new-gsl-vector *K*)) ;;starting mixture weigths estimates
 (gsl-vector-set-all *beta-hat* (/ *K*))
@@ -49,15 +50,13 @@
 
 (define (simulate-amh d S sampler-builder)
   (let
-      ((rng (new-gsl-rng (gsl-rng-default))) ;;random number generator
-       (x (new-gsl-vector *n*)) ;;current chain state
+      ((x (new-gsl-vector *n*)) ;;current chain state
        (target (make-target d S))
        (sampler '())
        (monitor '()))
     (gsl-vector-set-all x 0.0)
     (set! monitor (new-mcmclib-monitor x))
-    (set! sampler (sampler-builder rng
-                                   (mcmclib-guile-lpdf-cb) (guile-to-voidptr target)
+    (set! sampler (sampler-builder (mcmclib-guile-lpdf-cb) (guile-to-voidptr target)
                                    x))
     (do-ec (: i *T0*)
            (mcmclib-amh-update sampler))
@@ -71,9 +70,9 @@
   (let*
       ((mu-hat (new-vectorArray *K*))
        (mu-vec (vector (new-gsl-vector *n*) (new-gsl-vector *n*)))
-       (raptor-builder (lambda (rng fun fun-data x)
+       (raptor-builder (lambda (fun fun-data x)
                          (mcmclib-raptor-alloc
-                          rng
+                          *rng*
                           fun fun-data
                           x *T0*
                           *Sigma-zero*
@@ -88,9 +87,9 @@
 
 (define (simulate-gauss-am d S)
   (let*
-      ((gauss-am-builder (lambda (rng fun fun-data x)
+      ((gauss-am-builder (lambda (fun fun-data x)
                         (mcmclib-gauss-am-alloc
-                         rng
+                         *rng*
                          fun fun-data
                          x *Sigma-zero* *T0*))))
   (simulate-amh d S gauss-am-builder)))
@@ -105,3 +104,32 @@
 (print-diags 0 4)
 (print-diags 3 1)
 (print-diags 3 4)
+
+;;MSE comparison
+(define (update-sum-sq curr-sum new-x)
+  (let
+      ((tmp-x (new-gsl-vector (gsl-vector-size-get new-x))))
+    (gsl-vector-memcpy tmp-x new-x)
+    (gsl-vector-mul tmp-x new-x)
+    (gsl-vector-add curr-sum tmp-x)))
+
+(define (estimate-MSE replicas simulator)
+  (let
+      ((mse (new-gsl-vector *n*))
+       (mean-i (new-gsl-vector *n*)))
+    (gsl-vector-set-all mse 0.0)
+    (do-ec (: i replicas)
+           (begin
+             (mcmclib-monitor-get-means (simulator) mean-i)
+             (update-sum-sq mse mean-i)))
+    (gsl-vector-scale mse (/ replicas))
+    mse))
+
+(gsl-vector-get (estimate-MSE 100 (lambda () (simulate-raptor 0 4))) 0)  ;; 0.055
+(gsl-vector-get (estimate-MSE 100 (lambda () (simulate-gauss-am 0 4))) 0) ;; 0.044
+
+(gsl-vector-get (estimate-MSE 100 (lambda () (simulate-raptor 3 4))) 0)  ;; 9.09
+(gsl-vector-get (estimate-MSE 100 (lambda () (simulate-gauss-am 3 4))) 0) ;; 8.61
+
+(gsl-vector-get (estimate-MSE 100 (lambda () (simulate-raptor 3 1))) 0)  ;; 8.969
+(gsl-vector-get (estimate-MSE 100 (lambda () (simulate-gauss-am 3 1))) 0) ;; 9.026
