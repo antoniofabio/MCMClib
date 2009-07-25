@@ -9,6 +9,7 @@
  */
 #include <assert.h>
 #include <gsl/gsl_math.h>
+#include "vector_stats.h"
 #include "mh.h"
 
 mcmclib_mh* mcmclib_mh_alloc(gsl_rng* r,
