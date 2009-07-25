@@ -106,3 +106,10 @@ void mcmclib_pooled_variance(double beta,
 
   gsl_matrix_free(tmp);
 }
+
+int mcmclib_vector_finite(gsl_vector* x) {
+  for(int i=0; i<x->size; i++)
+    if(!gsl_finite(gsl_vector_get(x, i)))
+      return 0;
+  return 1;
+}
