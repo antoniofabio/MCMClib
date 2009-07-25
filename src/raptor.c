@@ -104,6 +104,21 @@ void mcmclib_raptor_free(mcmclib_amh* p) {
   mcmclib_amh_free(p);
 }
 
+void mcmclib_raptor_set_sf(mcmclib_amh* p, double sf) {
+  mcmclib_raptor_set_sf_global(p, sf);
+  mcmclib_raptor_set_sf_local(p, sf);
+}
+
+void mcmclib_raptor_set_sf_global(mcmclib_amh* p, double sf) {
+  mcmclib_raptor_suff* s = (mcmclib_raptor_suff*) p->suff;
+  s->scaling_factor_global = sf;
+}
+
+void mcmclib_raptor_set_sf_local(mcmclib_amh* p, double sf) {
+  mcmclib_raptor_suff* s = (mcmclib_raptor_suff*) p->suff;
+  s->scaling_factor_local = sf;
+}
+
 void mcmclib_raptor_update(void* in_p) {
   mcmclib_amh* p = (mcmclib_amh*) in_p;
   mcmclib_raptor_suff* s = (mcmclib_raptor_suff*) p->suff;
@@ -115,4 +130,9 @@ void mcmclib_raptor_update(void* in_p) {
 					 s->Sigma_eps,
 					 s->scaling_factor_local,
 					 s->scaling_factor_global);
+}
+
+void mcmclib_raptor_set_alpha(mcmclib_amh* p, double alpha) {
+  mcmclib_rapt_gamma *qg = (mcmclib_rapt_gamma *) p->mh->q->gamma;
+  mcmclib_rapt_gamma_set_alpha(qg, alpha);
 }

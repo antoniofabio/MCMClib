@@ -72,6 +72,15 @@ mcmclib_amh* mcmclib_raptor_alloc(gsl_rng* r,
 /**\brief free a previously allocated RAPTOR sampler*/
 void mcmclib_raptor_free(mcmclib_amh* p);
 
+/**\brief set scaling factor */
+void mcmclib_raptor_set_sf(mcmclib_amh* p, double sf);
+/**\brief set global scaling factor */
+void mcmclib_raptor_set_sf_global(mcmclib_amh* p, double sf);
+/**\brief set local scaling factor */
+void mcmclib_raptor_set_sf_local(mcmclib_amh* p, double sf);
+/** customly set global proposal weight (same for all regions)*/
+void mcmclib_raptor_set_alpha(mcmclib_amh* p, double alpha);
+
 /** update local and global RAPT proposals covariance matrices
 
 basing on current mixture parameters estimates*/

@@ -1,5 +1,7 @@
 Version 0.18 A. F. Di Narzo <antonio.fabio@gmail.com>
-	*
+	* added 'set_alpha' setter to raptor public API
+	* added a new poisson-mcar-raptor example
+	* added 'set_sf' setters to gauss_am and raptor public APIs
 
 Version 0.17 1-06-2009 A. F. Di Narzo <antonio.fabio@gmail.com>
 	* added missing utility prototype to gauss_am header

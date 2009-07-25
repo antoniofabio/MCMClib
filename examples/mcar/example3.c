@@ -1,4 +1,4 @@
-/**Adaptive Gaussian Random Walk and RAPTOR on a Poisson model
+/**Adaptive Gaussian Random Walk on a Poisson model
    with MCAR effects example. Real data. */
 #include <stdio.h>
 #include <assert.h>
@@ -12,7 +12,6 @@
 #include <mcar_model.h>
 #include <pois_model.h>
 #include <gauss_am.h>
-#include <raptor.h>
 
 /* P=3, DIM=95: 0.22500 secs per iteration */
 #define N 50000
