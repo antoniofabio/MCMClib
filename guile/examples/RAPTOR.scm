@@ -23,9 +23,9 @@
     (do-ec (: i n)
            (gsl-vector-set gv i (vector-ref v i)))
     gv))
-(define mu1 (v2gv #(0.2 0.2)))
+(define mu1 (v2gv #(-5 -5)))
 (vectorArray-setitem *mu-hat* 0 mu1)
-(define mu2 (v2gv #(0.8 0.8)))
+(define mu2 (v2gv #(5 5)))
 (vectorArray-setitem *mu-hat* 1 mu2)
 
 (define (ll2M ll)
@@ -35,7 +35,7 @@
     (do-ec (: i n) (: j p)
            (gsl-matrix-set M i j (list-ref (list-ref ll i) j)))
     M))
-(define *Sigma-zero* (ll2M '((0.01 0) (0 0.01))))
+(define *Sigma-zero* (ll2M '((1 0) (0 1))))
 (matrixArray-setitem *Sigma-hat* 0 *Sigma-zero*)
 (matrixArray-setitem *Sigma-hat* 1 *Sigma-zero*)
 
@@ -96,4 +96,4 @@
                (begin
                  (mcmclib-amh-update *sampler*)
                  (mcmclib-monitor-update mon)))))
-(mcmclib-monitor-fprintf-means mon (stdout))
+(mcmclib-monitor-fprintf-all mon (stdout)) ;;prints means, vars, ARs, MSJDs
