@@ -1,5 +1,7 @@
 %module mcmclib
 
+%include "carrays.i"
+
 %scheme %{(load-extension "libguilemcmclib.so" "scm_init_swig_mcmclib_module")%}
 
 %{
