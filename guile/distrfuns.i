@@ -1,5 +1,6 @@
 %{
 #include <mvnorm.h>
+#include <mixnorm.h>
 #include <mcar_tilde.h>
 #include <mcar_model.h>
 #include <pois_model.h>
@@ -39,6 +40,22 @@ double mcmclib_mvnorm_lpdf_compute_noinv(mcmclib_mvnorm_lpdf* p, gsl_vector* x);
 double mcmclib_mvnorm_lpdf_noinv(gsl_vector* mu, gsl_matrix* iSigma, gsl_vector* x,
 				 double ldet, gsl_vector* work1, gsl_vector* work2);
 double mcmclib_mvnormzp_lpdf(const gsl_matrix* Psi, const gsl_vector* y);
+
+%array_functions(mcmclib_mvnorm_lpdf*, mvnormArray);
+
+typedef struct {
+} mcmclib_mixnorm_lpdf;
+%extend mcmclib_mixnorm_lpdf {
+  mcmclib_mixnorm_lpdf(gsl_vector* w, mcmclib_mvnorm_lpdf** pis) {
+    return mcmclib_mixnorm_lpdf_alloc(w, pis);
+  }
+  ~mcmclib_mixnorm_lpdf() {
+    mcmclib_mixnorm_lpdf_free($self);
+  }
+}
+%callback("%s_cb");
+double mcmclib_mixnorm_lpdf_compute(void* p, gsl_vector* x);
+%nocallback;
 
 /*MCAR distribution*/
 typedef struct {
