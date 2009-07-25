@@ -61,7 +61,7 @@ void mcmclib_mixem_online_free(mcmclib_mixem_online* p) {
 }
 
 /*update sufficient statistic*/
-static void mixem_compute_si(mcmclib_mixem_online* p, gsl_vector* y) {
+static int mixem_compute_si(mcmclib_mixem_online* p, gsl_vector* y) {
   int K = p->si->delta->size;
   double delta_sum = 0.0;
   for(int k=0; k < K; k++) {
@@ -72,6 +72,9 @@ static void mixem_compute_si(mcmclib_mixem_online* p, gsl_vector* y) {
     delta_sum += delta_k;
   }
   gsl_vector_scale(p->si->delta, 1.0 / delta_sum);
+  if(!mcmclib_vector_finite(p->si->delta)) {
+    GSL_ERROR("non-finite mixture component weight", GSL_EDOM);
+  }
 
   for(int k=0; k< K; k++) {
     double delta_k = gsl_vector_get(p->si->delta, k);
@@ -84,6 +87,8 @@ static void mixem_compute_si(mcmclib_mixem_online* p, gsl_vector* y) {
 		   0.0, p->si->delta_xx[k]);
     gsl_matrix_scale(p->si->delta_xx[k], delta_k);
   }
+
+  return 0;
 }
 void mcmclib_mixem_online_update_s(mcmclib_mixem_online* p, gsl_vector* y) {
   mixem_compute_si(p, y);
