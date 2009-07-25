@@ -1219,6 +1219,7 @@ SWIG_Guile_GetArgs (SCM *dest, SCM rest,
 
 static swig_guile_clientdata _swig_guile_clientdatamcmclib_monitor = { NULL, SCM_EOL };
 static swig_guile_clientdata _swig_guile_clientdatamcmclib_mvnorm_lpdf = { NULL, SCM_EOL };
+static swig_guile_clientdata _swig_guile_clientdatamcmclib_mixnorm_lpdf = { NULL, SCM_EOL };
 static swig_guile_clientdata _swig_guile_clientdatamcmclib_mcar_tilde_lpdf = { NULL, SCM_EOL };
 static swig_guile_clientdata _swig_guile_clientdatamcmclib_mcar_model = { NULL, SCM_EOL };
 static swig_guile_clientdata _swig_guile_clientdatamcmclib_pmodel_sampler = { NULL, SCM_EOL };
@@ -1238,16 +1239,18 @@ static swig_guile_clientdata _swig_guile_clientdatamcmclib_amh = { NULL, SCM_EOL
 #define SWIGTYPE_p_mcmclib_mcar_model swig_types[9]
 #define SWIGTYPE_p_mcmclib_mcar_tilde_lpdf swig_types[10]
 #define SWIGTYPE_p_mcmclib_mh swig_types[11]
-#define SWIGTYPE_p_mcmclib_monitor swig_types[12]
-#define SWIGTYPE_p_mcmclib_mvnorm_lpdf swig_types[13]
-#define SWIGTYPE_p_mcmclib_pmodel_sampler swig_types[14]
-#define SWIGTYPE_p_mcmclib_pois_model swig_types[15]
-#define SWIGTYPE_p_p_gsl_matrix swig_types[16]
-#define SWIGTYPE_p_p_gsl_vector swig_types[17]
-#define SWIGTYPE_p_unsigned_long swig_types[18]
-#define SWIGTYPE_p_void swig_types[19]
-static swig_type_info *swig_types[21];
-static swig_module_info swig_module = {swig_types, 20, 0, 0, 0, 0};
+#define SWIGTYPE_p_mcmclib_mixnorm_lpdf swig_types[12]
+#define SWIGTYPE_p_mcmclib_monitor swig_types[13]
+#define SWIGTYPE_p_mcmclib_mvnorm_lpdf swig_types[14]
+#define SWIGTYPE_p_mcmclib_pmodel_sampler swig_types[15]
+#define SWIGTYPE_p_mcmclib_pois_model swig_types[16]
+#define SWIGTYPE_p_p_gsl_matrix swig_types[17]
+#define SWIGTYPE_p_p_gsl_vector swig_types[18]
+#define SWIGTYPE_p_p_mcmclib_mvnorm_lpdf swig_types[19]
+#define SWIGTYPE_p_unsigned_long swig_types[20]
+#define SWIGTYPE_p_void swig_types[21]
+static swig_type_info *swig_types[23];
+static swig_module_info swig_module = {swig_types, 22, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -1298,6 +1301,7 @@ SWIGINTERN void delete_mcmclib_monitor(mcmclib_monitor *self){
   }
 
 #include <mvnorm.h>
+#include <mixnorm.h>
 #include <mcar_tilde.h>
 #include <mcar_model.h>
 #include <pois_model.h>
@@ -1308,6 +1312,29 @@ SWIGINTERN mcmclib_mvnorm_lpdf *new_mcmclib_mvnorm_lpdf(gsl_vector *mean,double 
 SWIGINTERN void delete_mcmclib_mvnorm_lpdf(mcmclib_mvnorm_lpdf *self){
     mcmclib_mvnorm_lpdf_free(self);
   }
+
+static mcmclib_mvnorm_lpdf* *new_mvnormArray(int nelements) { 
+  return (mcmclib_mvnorm_lpdf* *) calloc(nelements,sizeof(mcmclib_mvnorm_lpdf*)); 
+}
+
+static void delete_mvnormArray(mcmclib_mvnorm_lpdf* *ary) { 
+  free(ary); 
+}
+
+static mcmclib_mvnorm_lpdf* mvnormArray_getitem(mcmclib_mvnorm_lpdf* *ary, int index) {
+    return ary[index];
+}
+static void mvnormArray_setitem(mcmclib_mvnorm_lpdf* *ary, int index, mcmclib_mvnorm_lpdf* value) {
+    ary[index] = value;
+}
+
+SWIGINTERN mcmclib_mixnorm_lpdf *new_mcmclib_mixnorm_lpdf(gsl_vector *w,mcmclib_mvnorm_lpdf **pis){
+    return mcmclib_mixnorm_lpdf_alloc(w, pis);
+  }
+SWIGINTERN void delete_mcmclib_mixnorm_lpdf(mcmclib_mixnorm_lpdf *self){
+    mcmclib_mixnorm_lpdf_free(self);
+  }
+static double (*gswig_const_mcmclib_mixnorm_lpdf_compute_cb)(void *,gsl_vector *) = (double (*)(void *p,gsl_vector *x))(mcmclib_mixnorm_lpdf_compute);
 SWIGINTERN mcmclib_mcar_tilde_lpdf *new_mcmclib_mcar_tilde_lpdf(int p,gsl_matrix *M){
     return mcmclib_mcar_tilde_lpdf_alloc(p, M);
   }
@@ -2933,6 +2960,196 @@ _wrap_mcmclib_mvnormzp_lpdf (SCM s_0, SCM s_1)
 
 
 static SCM
+_wrap_new_mvnormArray (SCM s_0)
+{
+#define FUNC_NAME "new-mvnormArray"
+  int arg1 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  mcmclib_mvnorm_lpdf **result = 0 ;
+  
+  {
+    arg1 = (int) scm_num2int(s_0, SCM_ARG1, FUNC_NAME);
+  }
+  result = (mcmclib_mvnorm_lpdf **)new_mvnormArray(arg1);
+  {
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_p_mcmclib_mvnorm_lpdf, 0);
+  }
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_delete_mvnormArray (SCM s_0)
+{
+#define FUNC_NAME "delete-mvnormArray"
+  mcmclib_mvnorm_lpdf **arg1 = (mcmclib_mvnorm_lpdf **) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  
+  {
+    arg1 = (mcmclib_mvnorm_lpdf **)SWIG_MustGetPtr(s_0, SWIGTYPE_p_p_mcmclib_mvnorm_lpdf, 1, 0);
+  }
+  delete_mvnormArray(arg1);
+  gswig_result = SCM_UNSPECIFIED;
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mvnormArray_getitem (SCM s_0, SCM s_1)
+{
+#define FUNC_NAME "mvnormArray-getitem"
+  mcmclib_mvnorm_lpdf **arg1 = (mcmclib_mvnorm_lpdf **) 0 ;
+  int arg2 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  mcmclib_mvnorm_lpdf *result = 0 ;
+  
+  {
+    arg1 = (mcmclib_mvnorm_lpdf **)SWIG_MustGetPtr(s_0, SWIGTYPE_p_p_mcmclib_mvnorm_lpdf, 1, 0);
+  }
+  {
+    arg2 = (int) scm_num2int(s_1, SCM_ARG1, FUNC_NAME);
+  }
+  result = (mcmclib_mvnorm_lpdf *)mvnormArray_getitem(arg1,arg2);
+  {
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_mcmclib_mvnorm_lpdf, 0);
+  }
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mvnormArray_setitem (SCM s_0, SCM s_1, SCM s_2)
+{
+#define FUNC_NAME "mvnormArray-setitem"
+  mcmclib_mvnorm_lpdf **arg1 = (mcmclib_mvnorm_lpdf **) 0 ;
+  int arg2 ;
+  mcmclib_mvnorm_lpdf *arg3 = (mcmclib_mvnorm_lpdf *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  
+  {
+    arg1 = (mcmclib_mvnorm_lpdf **)SWIG_MustGetPtr(s_0, SWIGTYPE_p_p_mcmclib_mvnorm_lpdf, 1, 0);
+  }
+  {
+    arg2 = (int) scm_num2int(s_1, SCM_ARG1, FUNC_NAME);
+  }
+  {
+    arg3 = (mcmclib_mvnorm_lpdf *)SWIG_MustGetPtr(s_2, SWIGTYPE_p_mcmclib_mvnorm_lpdf, 3, 0);
+  }
+  mvnormArray_setitem(arg1,arg2,arg3);
+  gswig_result = SCM_UNSPECIFIED;
+  
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_new_mcmclib_mixnorm_lpdf (SCM s_0, SCM s_1)
+{
+#define FUNC_NAME "new-mcmclib-mixnorm-lpdf"
+  gsl_vector *arg1 = (gsl_vector *) 0 ;
+  mcmclib_mvnorm_lpdf **arg2 = (mcmclib_mvnorm_lpdf **) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  mcmclib_mixnorm_lpdf *result = 0 ;
+  
+  {
+    arg1 = (gsl_vector *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_gsl_vector, 1, 0);
+  }
+  {
+    arg2 = (mcmclib_mvnorm_lpdf **)SWIG_MustGetPtr(s_1, SWIGTYPE_p_p_mcmclib_mvnorm_lpdf, 2, 0);
+  }
+  result = (mcmclib_mixnorm_lpdf *)new_mcmclib_mixnorm_lpdf(arg1,arg2);
+  {
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_mcmclib_mixnorm_lpdf, 1);
+  }
+  
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_delete_mcmclib_mixnorm_lpdf (SCM s_0)
+{
+#define FUNC_NAME "delete-mcmclib-mixnorm-lpdf"
+  mcmclib_mixnorm_lpdf *arg1 = (mcmclib_mixnorm_lpdf *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  
+  {
+    arg1 = (mcmclib_mixnorm_lpdf *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_mixnorm_lpdf, 1, 0);
+  }
+  delete_mcmclib_mixnorm_lpdf(arg1);
+  gswig_result = SCM_UNSPECIFIED;
+  
+  SWIG_Guile_MarkPointerDestroyed(s_0);
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_mixnorm_lpdf_compute_cb(SCM s_0)
+{
+#define FUNC_NAME "mcmclib-mixnorm-lpdf-compute-cb"
+  SCM gswig_result;
+  
+  {
+    gswig_result = SWIG_NewPointerObj (gswig_const_mcmclib_mixnorm_lpdf_compute_cb, SWIGTYPE_p_f_p_void_p_gsl_vector__double, 0);
+  }
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_mixnorm_lpdf_compute (SCM s_0, SCM s_1)
+{
+#define FUNC_NAME "mcmclib-mixnorm-lpdf-compute"
+  void *arg1 = (void *) 0 ;
+  gsl_vector *arg2 = (gsl_vector *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  double result;
+  
+  {
+    arg1 = (void *)SWIG_MustGetPtr(s_0, NULL, 1, 0);
+  }
+  {
+    arg2 = (gsl_vector *)SWIG_MustGetPtr(s_1, SWIGTYPE_p_gsl_vector, 2, 0);
+  }
+  result = (double)mcmclib_mixnorm_lpdf_compute(arg1,arg2);
+  {
+    gswig_result = scm_make_real(result);
+  }
+  
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
 _wrap_mcmclib_mcar_tilde_lpdf_p_set (SCM s_0, SCM s_1)
 {
 #define FUNC_NAME "mcmclib-mcar-tilde-lpdf-p-set"
@@ -4490,12 +4707,14 @@ static swig_type_info _swigt__p_mcmclib_iwishart_lpdf = {"_p_mcmclib_iwishart_lp
 static swig_type_info _swigt__p_mcmclib_mcar_model = {"_p_mcmclib_mcar_model", "mcmclib_mcar_model *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_mcmclib_mcar_tilde_lpdf = {"_p_mcmclib_mcar_tilde_lpdf", "mcmclib_mcar_tilde_lpdf *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_mcmclib_mh = {"_p_mcmclib_mh", "mcmclib_mh *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_mcmclib_mixnorm_lpdf = {"_p_mcmclib_mixnorm_lpdf", "mcmclib_mixnorm_lpdf *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_mcmclib_monitor = {"_p_mcmclib_monitor", "mcmclib_monitor *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_mcmclib_mvnorm_lpdf = {"_p_mcmclib_mvnorm_lpdf", "mcmclib_mvnorm_lpdf *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_mcmclib_pmodel_sampler = {"_p_mcmclib_pmodel_sampler", "mcmclib_pmodel_sampler *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_mcmclib_pois_model = {"_p_mcmclib_pois_model", "mcmclib_pois_model *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_gsl_matrix = {"_p_p_gsl_matrix", "gsl_matrix **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_gsl_vector = {"_p_p_gsl_vector", "gsl_vector **", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_p_mcmclib_mvnorm_lpdf = {"_p_p_mcmclib_mvnorm_lpdf", "mcmclib_mvnorm_lpdf **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_long = {"_p_unsigned_long", "SCM *|unsigned long *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_void = {"_p_void", "void *", 0, 0, (void*)0, 0};
 
@@ -4512,12 +4731,14 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_mcmclib_mcar_model,
   &_swigt__p_mcmclib_mcar_tilde_lpdf,
   &_swigt__p_mcmclib_mh,
+  &_swigt__p_mcmclib_mixnorm_lpdf,
   &_swigt__p_mcmclib_monitor,
   &_swigt__p_mcmclib_mvnorm_lpdf,
   &_swigt__p_mcmclib_pmodel_sampler,
   &_swigt__p_mcmclib_pois_model,
   &_swigt__p_p_gsl_matrix,
   &_swigt__p_p_gsl_vector,
+  &_swigt__p_p_mcmclib_mvnorm_lpdf,
   &_swigt__p_unsigned_long,
   &_swigt__p_void,
 };
@@ -4534,12 +4755,14 @@ static swig_cast_info _swigc__p_mcmclib_iwishart_lpdf[] = {  {&_swigt__p_mcmclib
 static swig_cast_info _swigc__p_mcmclib_mcar_model[] = {  {&_swigt__p_mcmclib_mcar_model, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_mcmclib_mcar_tilde_lpdf[] = {  {&_swigt__p_mcmclib_mcar_tilde_lpdf, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_mcmclib_mh[] = {  {&_swigt__p_mcmclib_mh, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_mcmclib_mixnorm_lpdf[] = {  {&_swigt__p_mcmclib_mixnorm_lpdf, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_mcmclib_monitor[] = {  {&_swigt__p_mcmclib_monitor, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_mcmclib_mvnorm_lpdf[] = {  {&_swigt__p_mcmclib_mvnorm_lpdf, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_mcmclib_pmodel_sampler[] = {  {&_swigt__p_mcmclib_pmodel_sampler, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_mcmclib_pois_model[] = {  {&_swigt__p_mcmclib_pois_model, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_gsl_matrix[] = {  {&_swigt__p_p_gsl_matrix, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_gsl_vector[] = {  {&_swigt__p_p_gsl_vector, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_p_mcmclib_mvnorm_lpdf[] = {  {&_swigt__p_p_mcmclib_mvnorm_lpdf, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_unsigned_long[] = {  {&_swigt__p_unsigned_long, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_void[] = {  {&_swigt__p_void, 0, 0, 0},{0, 0, 0, 0}};
 
@@ -4556,12 +4779,14 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_mcmclib_mcar_model,
   _swigc__p_mcmclib_mcar_tilde_lpdf,
   _swigc__p_mcmclib_mh,
+  _swigc__p_mcmclib_mixnorm_lpdf,
   _swigc__p_mcmclib_monitor,
   _swigc__p_mcmclib_mvnorm_lpdf,
   _swigc__p_mcmclib_pmodel_sampler,
   _swigc__p_mcmclib_pois_model,
   _swigc__p_p_gsl_matrix,
   _swigc__p_p_gsl_vector,
+  _swigc__p_p_mcmclib_mvnorm_lpdf,
   _swigc__p_unsigned_long,
   _swigc__p_void,
 };
@@ -4881,6 +5106,16 @@ SWIG_init(void)
   scm_c_define_gsubr("mcmclib-mvnorm-lpdf-compute-noinv", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_mvnorm_lpdf_compute_noinv);
   scm_c_define_gsubr("mcmclib-mvnorm-lpdf-noinv", 6, 0, 0, (swig_guile_proc) _wrap_mcmclib_mvnorm_lpdf_noinv);
   scm_c_define_gsubr("mcmclib-mvnormzp-lpdf", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_mvnormzp_lpdf);
+  scm_c_define_gsubr("new-mvnormArray", 1, 0, 0, (swig_guile_proc) _wrap_new_mvnormArray);
+  scm_c_define_gsubr("delete-mvnormArray", 1, 0, 0, (swig_guile_proc) _wrap_delete_mvnormArray);
+  scm_c_define_gsubr("mvnormArray-getitem", 2, 0, 0, (swig_guile_proc) _wrap_mvnormArray_getitem);
+  scm_c_define_gsubr("mvnormArray-setitem", 3, 0, 0, (swig_guile_proc) _wrap_mvnormArray_setitem);
+  SWIG_TypeClientData(SWIGTYPE_p_mcmclib_mixnorm_lpdf, (void *) &_swig_guile_clientdatamcmclib_mixnorm_lpdf);
+  scm_c_define_gsubr("new-mcmclib-mixnorm-lpdf", 2, 0, 0, (swig_guile_proc) _wrap_new_mcmclib_mixnorm_lpdf);
+  ((swig_guile_clientdata *)(SWIGTYPE_p_mcmclib_mixnorm_lpdf->clientdata))->destroy = (guile_destructor) _wrap_delete_mcmclib_mixnorm_lpdf;
+  scm_c_define_gsubr("delete-mcmclib-mixnorm-lpdf", 1, 0, 0, (swig_guile_proc) _wrap_delete_mcmclib_mixnorm_lpdf);
+  scm_c_define_gsubr("mcmclib-mixnorm-lpdf-compute-cb", 0, 0, 0, (swig_guile_proc) _wrap_mcmclib_mixnorm_lpdf_compute_cb);
+  scm_c_define_gsubr("mcmclib-mixnorm-lpdf-compute", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_mixnorm_lpdf_compute);
   SWIG_TypeClientData(SWIGTYPE_p_mcmclib_mcar_tilde_lpdf, (void *) &_swig_guile_clientdatamcmclib_mcar_tilde_lpdf);
   scm_c_define_gsubr("mcmclib-mcar-tilde-lpdf-p-set", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_mcar_tilde_lpdf_p_set);
   scm_c_define_gsubr("mcmclib-mcar-tilde-lpdf-p-get", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_mcar_tilde_lpdf_p_get);
