@@ -47,45 +47,61 @@
     (lambda (x)
       (mcmclib-mixnorm-lpdf-compute pi-mix x))))
 
-(define (simulate-raptor d S)
+(define (simulate-amh d S sampler-builder)
   (let
-      (
-       (rng (new-gsl-rng (gsl-rng-default))) ;;random number generator
+      ((rng (new-gsl-rng (gsl-rng-default))) ;;random number generator
        (x (new-gsl-vector *n*)) ;;current chain state
-       (mu-hat (new-vectorArray *K*))
-       (mu-vec (vector (new-gsl-vector *n*) (new-gsl-vector *n*)))
        (target (make-target d S))
        (sampler '())
-       (monitor '())
-       )
+       (monitor '()))
     (gsl-vector-set-all x 0.0)
     (set! monitor (new-mcmclib-monitor x))
-    (gsl-vector-set-all (vector-ref mu-vec 0) (+ (* d -2) -1))
-    (gsl-vector-set-all (vector-ref mu-vec 1) (+ (* d 2) 1))
-    (do-ec (: i *K*)
-           (vectorArray-setitem mu-hat i (vector-ref mu-vec i)))
-    (set! sampler (mcmclib-raptor-alloc rng
-                                        (mcmclib-guile-lpdf-cb) (guile-to-voidptr target)
-                                        x *T0*
-                                        *Sigma-zero*
-                                        *beta-hat*
-                                        mu-hat
-                                        *Sigma-hat*))
+    (set! sampler (sampler-builder rng
+                                   (mcmclib-guile-lpdf-cb) (guile-to-voidptr target)
+                                   x))
     (do-ec (: i *T0*)
            (mcmclib-amh-update sampler))
     (do-ec (: i *N*)
            (begin
              (mcmclib-amh-update sampler)
              (mcmclib-monitor-update monitor)))
-    monitor
-  ))
+    monitor))
 
-(define (time fun)
+(define (simulate-raptor d S)
   (let*
-      ((start (current-time))
-       (thrash (fun))
-       (end (current-time)))
-    (- end start)))
+      ((mu-hat (new-vectorArray *K*))
+       (mu-vec (vector (new-gsl-vector *n*) (new-gsl-vector *n*)))
+       (raptor-builder (lambda (rng fun fun-data x)
+                         (mcmclib-raptor-alloc
+                          rng
+                          fun fun-data
+                          x *T0*
+                          *Sigma-zero*
+                          *beta-hat*
+                          mu-hat
+                          *Sigma-hat*))))
+    (gsl-vector-set-all (vector-ref mu-vec 0) (+ (* d -2) -1))
+    (gsl-vector-set-all (vector-ref mu-vec 1) (+ (* d 2) 1))
+    (do-ec (: i *K*)
+           (vectorArray-setitem mu-hat i (vector-ref mu-vec i)))
+    (simulate-amh d S raptor-builder)))
 
-(define *monitor* (simulate-raptor 0 4))
-(mcmclib-monitor-fprintf-all *monitor* (stdout)) ;;prints means, vars, ARs, MSJDs
+(define (simulate-gauss-am d S)
+  (let*
+      ((gauss-am-builder (lambda (rng fun fun-data x)
+                        (mcmclib-gauss-am-alloc
+                         rng
+                         fun fun-data
+                         x *Sigma-zero* *T0*))))
+  (simulate-amh d S gauss-am-builder)))
+
+(define (print-diags d S)
+  "prints means, vars, ARs, MSJDs for RAPTOR and AM"
+  (display "Gaussian AM") (newline)
+  (mcmclib-monitor-fprintf-all (simulate-gauss-am d S) (stdout))
+  (display "RAPTOR") (newline)
+  (mcmclib-monitor-fprintf-all (simulate-raptor d S) (stdout)))
+
+(print-diags 0 4)
+(print-diags 3 1)
+(print-diags 3 4)
