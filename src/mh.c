@@ -35,19 +35,12 @@ void mcmclib_mh_free(mcmclib_mh* p) {
   free(p);
 }
 
-static int vector_finite(gsl_vector* x) {
-  for(int i=0; i<x->size; i++)
-    if(!gsl_finite(gsl_vector_get(x, i)))
-      return 0;
-  return 1;
-}
-
 int mcmclib_mh_update(mcmclib_mh* p) {
   //assert(p->logdistr(p->logdistr_data, p->x) == p->logdistr_old);
   p->logdistr_old = p->logdistr(p->logdistr_data, p->x);
   gsl_vector_memcpy(p->x_old, p->x);
   mcmclib_mh_q_sample(p->q, p->x);
-  if(!vector_finite(p->x))
+  if(!mcmclib_vector_finite(p->x))
     GSL_ERROR("sampled a non-finite vector value", GSL_EDOM);
   p->last_accepted = mcmclib_mh_generic_step(p->r, p->x_old, p->x,
 					     p->logdistr, p->logdistr_data,

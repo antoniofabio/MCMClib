@@ -41,6 +41,9 @@ void mcmclib_covariance_update(gsl_matrix* cov, gsl_vector* mean, int* n, gsl_ve
 void mcmclib_pooled_variance(double beta, gsl_vector** means,
 			     gsl_matrix** variances, gsl_matrix* V);
 
+/**check if vector contains only finite values*/
+int mcmclib_vector_finite(gsl_vector* x);
+
 /**@}*/
 
 #endif
