@@ -42,7 +42,7 @@
 (define (dunif x)
   (let
       ((x0 (gsl-vector-get x 0))
-       (x1 (gsl-vector-get x 0)))
+       (x1 (gsl-vector-get x 1)))
     (if
      (and
       (and
@@ -70,5 +70,5 @@
     (- end start)))
 
 (time (lambda ()
-        (do-ec (: i 10000)
+        (do-ec (: i 100000)
                (mcmclib-amh-update *sampler*))))
