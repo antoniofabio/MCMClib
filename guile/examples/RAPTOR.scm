@@ -39,23 +39,41 @@
 (matrixArray-setitem *Sigma-hat* 0 *Sigma-zero*)
 (matrixArray-setitem *Sigma-hat* 1 *Sigma-zero*)
 
-(define (dunif x)
+;;Build a gaussian-mixture target distribution
+;;d: distance between means
+;;S: ratio between variances
+(define (make-target d S)
   (let
-      ((x0 (gsl-vector-get x 0))
-       (x1 (gsl-vector-get x 1)))
-    (if
-     (and
-      (and
-       (>= x0 0)
-       (<= x0 1))
-      (and
-       (>= x1 0)
-       (<= x1 1)))
-     0.0
-     (log 0.0))))
+      ((w (new-gsl-vector 2))
+       (Sigma1 (new-gsl-matrix *n* *n*))
+       (Sigma2 (new-gsl-matrix *n* *n*))
+       (mu1 (new-gsl-vector *n*))
+       (mu2 (new-gsl-vector *n*))
+       (pi1 '())
+       (pi2 '())
+       (pi-mix '())
+       (pi-array (new-mvnormArray 2)))
+    (gsl-vector-set-all w 0.5)
+    (gsl-matrix-set-identity Sigma1)
+    (gsl-matrix-memcpy Sigma2 Sigma1)
+    (gsl-matrix-scale Sigma2 S)
+    (gsl-vector-set-all mu1 (- d))
+    (gsl-vector-set-all mu2 d)
+    (set! pi1 (new-mcmclib-mvnorm-lpdf mu1 (gsl-matrix-data-get Sigma1)))
+    (set! pi2 (new-mcmclib-mvnorm-lpdf mu2 (gsl-matrix-data-get Sigma2)))
+    (mvnormArray-setitem pi-array 0 pi1)
+    (mvnormArray-setitem pi-array 1 pi2)
+    (set! pi-mix (new-mcmclib-mixnorm-lpdf w pi-array))
+    (lambda (x)
+      (mcmclib-mixnorm-lpdf-compute pi-mix x))))
 
+(define target (make-target 0 4))
+
+(gsl-vector-set-all *x* 0.5)
+
+;;Make a RAPTOR sampler for distance 'd', ratio 'S'
 (define *sampler* (mcmclib-raptor-alloc *rng*
-                                        (mcmclib-guile-lpdf-cb) (guile-to-voidptr dunif)
+                                        (mcmclib-guile-lpdf-cb) (guile-to-voidptr target)
                                         *x* *T0*
                                         *Sigma-zero*
                                         *beta-hat*
@@ -69,6 +87,13 @@
        (end (current-time)))
     (- end start)))
 
+(do-ec (: i *T0*)
+       (mcmclib-amh-update *sampler*))
+
+(define mon (new-mcmclib-monitor *x*))
 (time (lambda ()
         (do-ec (: i 100000)
-               (mcmclib-amh-update *sampler*))))
+               (begin
+                 (mcmclib-amh-update *sampler*)
+                 (mcmclib-monitor-update mon)))))
+(mcmclib-monitor-fprintf-means mon (stdout))
