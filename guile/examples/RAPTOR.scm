@@ -105,31 +105,37 @@
 (print-diags 3 1)
 (print-diags 3 4)
 
-;;MSE comparison
-(define (update-sum-sq curr-sum new-x)
-  (let
-      ((tmp-x (new-gsl-vector (gsl-vector-size-get new-x))))
-    (gsl-vector-memcpy tmp-x new-x)
-    (gsl-vector-mul tmp-x new-x)
-    (gsl-vector-add curr-sum tmp-x)))
+(define (gv2v gv)
+  "from gsl-vector to vector"
+  (vector-ec (: i (gsl-vector-size-get gv)) (gsl-vector-get gv i)))
 
+;;MSE comparison
 (define (estimate-MSE replicas simulator)
+  "estimate MSE of the sample mean estimator"
   (let
       ((mse (new-gsl-vector *n*))
-       (mean-i (new-gsl-vector *n*)))
+       (mean-i (new-gsl-vector *n*))
+       (update-sum-sq (lambda (curr-sum new-x)
+                        (let
+                            ((tmp-x (new-gsl-vector (gsl-vector-size-get new-x))))
+                          (gsl-vector-memcpy tmp-x new-x)
+                          (gsl-vector-mul tmp-x new-x)
+                          (gsl-vector-add curr-sum tmp-x)))))
     (gsl-vector-set-all mse 0.0)
     (do-ec (: i replicas)
            (begin
              (mcmclib-monitor-get-means (simulator) mean-i)
              (update-sum-sq mse mean-i)))
     (gsl-vector-scale mse (/ replicas))
-    mse))
+    (gv2v mse)))
 
-(gsl-vector-get (estimate-MSE 100 (lambda () (simulate-raptor 0 4))) 0)  ;; 0.055
-(gsl-vector-get (estimate-MSE 100 (lambda () (simulate-gauss-am 0 4))) 0) ;; 0.044
+(estimate-MSE 100 (lambda () (simulate-raptor 0 4)))
+;;#(0.0468550464263089 0.051909728421788 0.0492880597329444 0.0376887694923336 0.0510109076993617)
+(estimate-MSE 100 (lambda () (simulate-gauss-am 0 4)))
+;;#(0.0417742622344229 0.0403734540469312 0.0437711141991529 0.0397311348579993 0.0435686305425603)
 
-(gsl-vector-get (estimate-MSE 100 (lambda () (simulate-raptor 3 4))) 0)  ;; 9.09
-(gsl-vector-get (estimate-MSE 100 (lambda () (simulate-gauss-am 3 4))) 0) ;; 8.61
+(estimate-MSE 100 (lambda () (simulate-raptor 3 4)))
+(estimate-MSE 100 (lambda () (simulate-gauss-am 3 4)))
 
-(gsl-vector-get (estimate-MSE 100 (lambda () (simulate-raptor 3 1))) 0)  ;; 8.969
-(gsl-vector-get (estimate-MSE 100 (lambda () (simulate-gauss-am 3 1))) 0) ;; 9.026
+(estimate-MSE 100 (lambda () (simulate-raptor 3 1)))
+(estimate-MSE 100 (lambda () (simulate-gauss-am 3 1)))

@@ -21,7 +21,7 @@
            (gsl-vector-set gv i (vector-ref v i)))
     gv))
 (define (gv2v gv)
-  (vector-eg (: i (gsl-vector-size-get gv)) (gsl-vector-get gv i)))
+  (vector-ec (: i (gsl-vector-size-get gv)) (gsl-vector-get gv i)))
 
 ;;g-matrix -> g-vector
 (define (M2v M)
