@@ -57,10 +57,14 @@
 (define set (vector (v2gv #(0 0 0)) (v2gv #(0 1 1)) (v2gv #(0.2 1 1))
                     (v2gv #(0.8 1 1)) (v2gv #(1 1 1))))
 
-(define ecdf (ecdf-init set))
-(do-ec (: i 1000)
-       (begin
-         (set! ecdf (ecdf-update ecdf (sample-a-point)))))
-(set! ecdf (ecdf-compute ecdf))
+(define (empirical-CDF X0 N sampler)
+  (let
+      ((ecdf (ecdf-init X0)))
+    (do-ec (: i N)
+           (set! ecdf (ecdf-update ecdf (sampler))))
+    (ecdf-compute ecdf)))
+
+(define ecdf  (empirical-CDF set 1000
+               (lambda () (v2gv (vector-ec (: i dim) (gsl-rng-uniform r))))))
 (define (pair i) (vector (vector-ref ecdf i) (gv2v (vector-ref set i))))
 (do-ec (: i (vector-length set)) (format #t "~a\n" (pair i)))
