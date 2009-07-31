@@ -48,12 +48,20 @@
     (lambda (x)
       (mcmclib-mixnorm-lpdf-compute pi-mix x))))
 
+(define *N-X0* 1000)
+(define *X0* (new-gsl-matrix *N-X0* *n*))
+(let
+    ((f (fopen "mixnorm_iid_sample.dat" "r")))
+  (gsl-matrix-fscanf f *X0*)
+  (fclose f))
+
 (define (simulate-amh d S sampler-builder)
   (let
       ((x (new-gsl-vector *n*)) ;;current chain state
        (target (make-target d S))
        (sampler '())
-       (monitor '()))
+       (monitor '())
+       (ecdf (new-mcmclib-monitor-ecdf *X0*)))
     (gsl-vector-set-all x 0.0)
     (set! monitor (new-mcmclib-monitor x))
     (set! sampler (sampler-builder (mcmclib-guile-lpdf-cb) (guile-to-voidptr target)
@@ -63,8 +71,9 @@
     (do-ec (: i *N*)
            (begin
              (mcmclib-amh-update sampler)
-             (mcmclib-monitor-update monitor)))
-    monitor))
+             (mcmclib-monitor-update monitor)
+             (mcmclib-monitor-ecdf-update ecdf x)))
+    (list monitor ecdf)))
 
 (define (simulate-raptor d S)
   (let*
@@ -97,9 +106,9 @@
 (define (print-diags d S)
   "prints means, vars, ARs, MSJDs for RAPTOR and AM"
   (display "Gaussian AM") (newline)
-  (mcmclib-monitor-fprintf-all (simulate-gauss-am d S) (stdout))
+  (mcmclib-monitor-fprintf-all (car (simulate-gauss-am d S)) (stdout))
   (display "RAPTOR") (newline)
-  (mcmclib-monitor-fprintf-all (simulate-raptor d S) (stdout)))
+  (mcmclib-monitor-fprintf-all (car (simulate-raptor d S)) (stdout)))
 
 (print-diags 0 4)
 (print-diags 3 1)
@@ -124,7 +133,7 @@
     (gsl-vector-set-all mse 0.0)
     (do-ec (: i replicas)
            (begin
-             (mcmclib-monitor-get-means (simulator) mean-i)
+             (mcmclib-monitor-get-means (car (simulator)) mean-i)
              (update-sum-sq mse mean-i)))
     (gsl-vector-scale mse (/ replicas))
     (gv2v mse)))
@@ -139,3 +148,59 @@
 
 (estimate-MSE 100 (lambda () (simulate-raptor 3 1)))
 (estimate-MSE 100 (lambda () (simulate-gauss-am 3 1)))
+
+;;Distance from target distribution comparison
+(define (v2gv v)
+  (let*
+      ((n (vector-length v))
+       (gv (new-gsl-vector n)))
+    (do-ec (: i n)
+           (gsl-vector-set gv i (vector-ref v i)))
+    gv))
+
+;;compute target CDF
+(define *monitor* (new-mcmclib-monitor-ecdf *X0*))
+(do-ec (: i *N-X0*)
+       (let*
+           ((xi (v2gv (vector-ec (: j *n*) (gsl-matrix-get *X0* i j)))))
+         (mcmclib-monitor-ecdf-update *monitor* xi)))
+(define *Fn-tgt* (mcmclib-monitor-ecdf-Fn-get *monitor*))
+
+(define (norm x)
+  "vector L1 norm"
+  (let
+      ((ans 0.0))
+    (do-ec (: i (vector-length x))
+           (set! ans (+ ans (abs (vector-ref x i)))))
+    ans))
+
+(define (simul-distance simul-fun)
+  (let
+      ((Fn-raptor (mcmclib-monitor-ecdf-Fn-get (cadr (simul-fun)))))
+    (gsl-vector-sub Fn-raptor *Fn-tgt*)
+    (norm (gv2v Fn-raptor))))
+
+(simul-distance (lambda () (simulate-raptor 1 1)))
+
+(define (sum x)
+  (let
+      ((ans 0.0))
+    (do-ec (: i (vector-length x))
+           (set! ans (+ ans (vector-ref x i))))
+    ans))
+(define (average x)
+  (/ (sum x) (vector-length x)))
+
+(define (replicate n fun)
+  (vector-ec (: i n) (fun)))
+
+(define raptor-dist
+  (average
+   (replicate 1000
+              (lambda ()
+                (simul-distance (lambda () (simulate-raptor 1 1)))))))
+(define gauss-am-dist
+  (average
+   (replicate 1000
+              (lambda ()
+                (simul-distance (lambda () (simulate-gauss-am 1 1)))))))
