@@ -90,10 +90,7 @@ int mcmclib_mvnorm_lpdf_chol(mcmclib_mvnorm_lpdf* p) {
   gsl_matrix_view mv = gsl_matrix_view_array(p->vcov, d, d);
   gsl_matrix* vcov = &(mv.matrix);
   gsl_matrix_memcpy(p->rooti, vcov);
-  gsl_error_handler_t *hnd = gsl_set_error_handler_off();
-  int ans = gsl_linalg_cholesky_decomp(p->rooti);
-  gsl_set_error_handler(hnd);
-  return ans;
+  return mcmclib_cholesky_decomp(p->rooti);
 }
 
 double mcmclib_mvnorm_lpdf_compute_nochol(mcmclib_mvnorm_lpdf* p, gsl_vector* x) {
