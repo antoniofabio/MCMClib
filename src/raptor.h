@@ -33,7 +33,7 @@ typedef struct {
   mcmclib_mixnorm_lpdf* pi_hat; /**< mixture density*/
 } mcmclib_raptor_gamma;
 
-typedef double (*mcmclib_raptor_alpha_fun_t) (mcmclib_raptor_gamma*) ;
+typedef double (*mcmclib_raptor_alpha_fun_t) (void* data, mcmclib_raptor_gamma*);
 
 /** \brief RAPTOR sufficient data */
 typedef struct {
@@ -44,13 +44,15 @@ typedef struct {
   double scaling_factor_global;
 
   mcmclib_raptor_alpha_fun_t alpha_fun;
+  void* alpha_fun_data;
 } mcmclib_raptor_suff;
 
 /** alloc a new RAPTOR sampler suff. stats. object
 @param t0 burn-in length before starting adaptation
 @returns a new raptor_suff object
 */
-mcmclib_raptor_suff* mcmclib_raptor_suff_alloc(mcmclib_raptor_gamma* g, int t0);
+mcmclib_raptor_suff* mcmclib_raptor_suff_alloc(mcmclib_raptor_gamma* g, int t0,
+					       mcmclib_rapt_gamma* rg);
 /** free raptor_suff data*/
 void mcmclib_raptor_suff_free(mcmclib_raptor_suff* p);
 /** Update suff. stats. of a RAPTOR chain*/

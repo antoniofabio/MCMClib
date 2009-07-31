@@ -51,7 +51,13 @@ void mcmclib_raptor_gamma_free(mcmclib_raptor_gamma* p) {
   free(p);
 }
 
-mcmclib_raptor_suff* mcmclib_raptor_suff_alloc(mcmclib_raptor_gamma* g, int t0) {
+static double default_alpha_fun(void* data, mcmclib_raptor_gamma* p) {
+  mcmclib_rapt_gamma* g = (mcmclib_rapt_gamma*) data;
+  return gsl_matrix_get(g->lambda, 0, g->lambda->size2 - 1);
+}
+
+mcmclib_raptor_suff* mcmclib_raptor_suff_alloc(mcmclib_raptor_gamma* g, int t0,
+					       mcmclib_rapt_gamma* rg) {
   mcmclib_raptor_suff* a = (mcmclib_raptor_suff*) malloc(sizeof(mcmclib_raptor_suff));
   a->em = mcmclib_mixem_online_alloc(g->mu_hat, g->Sigma_hat, g->beta_hat, 0.5, t0);
   int d = g->mu_hat[0]->size;
@@ -59,6 +65,8 @@ mcmclib_raptor_suff* mcmclib_raptor_suff_alloc(mcmclib_raptor_gamma* g, int t0) 
   gsl_matrix_set_identity(a->Sigma_eps);
   gsl_matrix_scale(a->Sigma_eps, 0.001);
   a->scaling_factor_global = a->scaling_factor_local = 2.38 * 2.38 / (double) d;
+  a->alpha_fun = default_alpha_fun;
+  a->alpha_fun_data = rg;
   return a;
 }
 
@@ -90,7 +98,7 @@ mcmclib_amh* mcmclib_raptor_alloc(gsl_rng* r,
 					 Sigma_zero, K, Sigma_hat,
 					 raptor_which_region_fun, gamma);
   mcmclib_mh* mh = mcmclib_mh_alloc(r, logdistr, logdistr_data, q, x);
-  mcmclib_raptor_suff* suff = mcmclib_raptor_suff_alloc(gamma, t0);
+  mcmclib_raptor_suff* suff = mcmclib_raptor_suff_alloc(gamma, t0, q->gamma);
 
   return mcmclib_amh_alloc(mh, suff, mcmclib_raptor_update);
 }
@@ -126,6 +134,7 @@ void mcmclib_raptor_update(void* in_p) {
   mcmclib_mixem_online_update(em, p->mh->x);
   if((p->n) <= em->n0)
     return;
+  mcmclib_raptor_set_alpha(p, s->alpha_fun(s->alpha_fun_data, (mcmclib_raptor_gamma*) p->mh->q->gamma));
   mcmclib_rapt_q_update_proposals_custom(p->mh->q->gamma, em->Sigma, em->Sigma_global,
 					 s->Sigma_eps,
 					 s->scaling_factor_local,
