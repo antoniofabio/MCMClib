@@ -1218,6 +1218,7 @@ SWIG_Guile_GetArgs (SCM *dest, SCM rest,
 
 
 static swig_guile_clientdata _swig_guile_clientdatamcmclib_monitor = { NULL, SCM_EOL };
+static swig_guile_clientdata _swig_guile_clientdatamcmclib_monitor_ecdf = { NULL, SCM_EOL };
 static swig_guile_clientdata _swig_guile_clientdatamcmclib_mvnorm_lpdf = { NULL, SCM_EOL };
 static swig_guile_clientdata _swig_guile_clientdatamcmclib_mixnorm_lpdf = { NULL, SCM_EOL };
 static swig_guile_clientdata _swig_guile_clientdatamcmclib_mcar_tilde_lpdf = { NULL, SCM_EOL };
@@ -1241,16 +1242,17 @@ static swig_guile_clientdata _swig_guile_clientdatamcmclib_amh = { NULL, SCM_EOL
 #define SWIGTYPE_p_mcmclib_mh swig_types[11]
 #define SWIGTYPE_p_mcmclib_mixnorm_lpdf swig_types[12]
 #define SWIGTYPE_p_mcmclib_monitor swig_types[13]
-#define SWIGTYPE_p_mcmclib_mvnorm_lpdf swig_types[14]
-#define SWIGTYPE_p_mcmclib_pmodel_sampler swig_types[15]
-#define SWIGTYPE_p_mcmclib_pois_model swig_types[16]
-#define SWIGTYPE_p_p_gsl_matrix swig_types[17]
-#define SWIGTYPE_p_p_gsl_vector swig_types[18]
-#define SWIGTYPE_p_p_mcmclib_mvnorm_lpdf swig_types[19]
-#define SWIGTYPE_p_unsigned_long swig_types[20]
-#define SWIGTYPE_p_void swig_types[21]
-static swig_type_info *swig_types[23];
-static swig_module_info swig_module = {swig_types, 22, 0, 0, 0, 0};
+#define SWIGTYPE_p_mcmclib_monitor_ecdf swig_types[14]
+#define SWIGTYPE_p_mcmclib_mvnorm_lpdf swig_types[15]
+#define SWIGTYPE_p_mcmclib_pmodel_sampler swig_types[16]
+#define SWIGTYPE_p_mcmclib_pois_model swig_types[17]
+#define SWIGTYPE_p_p_gsl_matrix swig_types[18]
+#define SWIGTYPE_p_p_gsl_vector swig_types[19]
+#define SWIGTYPE_p_p_mcmclib_mvnorm_lpdf swig_types[20]
+#define SWIGTYPE_p_unsigned_long swig_types[21]
+#define SWIGTYPE_p_void swig_types[22]
+static swig_type_info *swig_types[24];
+static swig_module_info swig_module = {swig_types, 23, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -1298,6 +1300,12 @@ SWIGINTERN mcmclib_monitor *new_mcmclib_monitor(gsl_vector const *x){
   }
 SWIGINTERN void delete_mcmclib_monitor(mcmclib_monitor *self){
     mcmclib_monitor_free(self);
+  }
+SWIGINTERN mcmclib_monitor_ecdf *new_mcmclib_monitor_ecdf(gsl_matrix const *X0){
+    return mcmclib_monitor_ecdf_alloc(X0);
+  }
+SWIGINTERN void delete_mcmclib_monitor_ecdf(mcmclib_monitor_ecdf *self){
+    mcmclib_monitor_ecdf_free(self);
   }
 
 #include <mvnorm.h>
@@ -2554,6 +2562,266 @@ _wrap_mcmclib_monitor_fprintf_all (SCM s_0, SCM s_1)
     arg2 = (FILE *)SWIG_MustGetPtr(s_1, SWIGTYPE_p_FILE, 2, 0);
   }
   mcmclib_monitor_fprintf_all(arg1,arg2);
+  gswig_result = SCM_UNSPECIFIED;
+  
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_monitor_ecdf_Fn_set (SCM s_0, SCM s_1)
+{
+#define FUNC_NAME "mcmclib-monitor-ecdf-Fn-set"
+  mcmclib_monitor_ecdf *arg1 = (mcmclib_monitor_ecdf *) 0 ;
+  gsl_vector *arg2 = (gsl_vector *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  
+  {
+    arg1 = (mcmclib_monitor_ecdf *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_monitor_ecdf, 1, 0);
+  }
+  {
+    arg2 = (gsl_vector *)SWIG_MustGetPtr(s_1, SWIGTYPE_p_gsl_vector, 2, 0);
+  }
+  if (arg1) (arg1)->Fn = arg2;
+  gswig_result = SCM_UNSPECIFIED;
+  
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_monitor_ecdf_Fn_get (SCM s_0)
+{
+#define FUNC_NAME "mcmclib-monitor-ecdf-Fn-get"
+  mcmclib_monitor_ecdf *arg1 = (mcmclib_monitor_ecdf *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  gsl_vector *result = 0 ;
+  
+  {
+    arg1 = (mcmclib_monitor_ecdf *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_monitor_ecdf, 1, 0);
+  }
+  result = (gsl_vector *) ((arg1)->Fn);
+  {
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_gsl_vector, 0);
+  }
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_monitor_ecdf_X0_set (SCM s_0, SCM s_1)
+{
+#define FUNC_NAME "mcmclib-monitor-ecdf-X0-set"
+  mcmclib_monitor_ecdf *arg1 = (mcmclib_monitor_ecdf *) 0 ;
+  gsl_matrix *arg2 = (gsl_matrix *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  
+  {
+    arg1 = (mcmclib_monitor_ecdf *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_monitor_ecdf, 1, 0);
+  }
+  {
+    arg2 = (gsl_matrix *)SWIG_MustGetPtr(s_1, SWIGTYPE_p_gsl_matrix, 2, 0);
+  }
+  if (arg1) (arg1)->X0 = arg2;
+  gswig_result = SCM_UNSPECIFIED;
+  
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_monitor_ecdf_X0_get (SCM s_0)
+{
+#define FUNC_NAME "mcmclib-monitor-ecdf-X0-get"
+  mcmclib_monitor_ecdf *arg1 = (mcmclib_monitor_ecdf *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  gsl_matrix *result = 0 ;
+  
+  {
+    arg1 = (mcmclib_monitor_ecdf *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_monitor_ecdf, 1, 0);
+  }
+  result = (gsl_matrix *) ((arg1)->X0);
+  {
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_gsl_matrix, 0);
+  }
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_monitor_ecdf_n_set (SCM s_0, SCM s_1)
+{
+#define FUNC_NAME "mcmclib-monitor-ecdf-n-set"
+  mcmclib_monitor_ecdf *arg1 = (mcmclib_monitor_ecdf *) 0 ;
+  double arg2 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  
+  {
+    arg1 = (mcmclib_monitor_ecdf *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_monitor_ecdf, 1, 0);
+  }
+  {
+    arg2 = (double) scm_num2dbl(s_1, FUNC_NAME);
+  }
+  if (arg1) (arg1)->n = arg2;
+  gswig_result = SCM_UNSPECIFIED;
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_monitor_ecdf_n_get (SCM s_0)
+{
+#define FUNC_NAME "mcmclib-monitor-ecdf-n-get"
+  mcmclib_monitor_ecdf *arg1 = (mcmclib_monitor_ecdf *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  double result;
+  
+  {
+    arg1 = (mcmclib_monitor_ecdf *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_monitor_ecdf, 1, 0);
+  }
+  result = (double) ((arg1)->n);
+  {
+    gswig_result = scm_make_real(result);
+  }
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_monitor_ecdf_workspace_set (SCM s_0, SCM s_1)
+{
+#define FUNC_NAME "mcmclib-monitor-ecdf-workspace-set"
+  mcmclib_monitor_ecdf *arg1 = (mcmclib_monitor_ecdf *) 0 ;
+  gsl_vector *arg2 = (gsl_vector *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  
+  {
+    arg1 = (mcmclib_monitor_ecdf *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_monitor_ecdf, 1, 0);
+  }
+  {
+    arg2 = (gsl_vector *)SWIG_MustGetPtr(s_1, SWIGTYPE_p_gsl_vector, 2, 0);
+  }
+  if (arg1) (arg1)->workspace = arg2;
+  gswig_result = SCM_UNSPECIFIED;
+  
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_monitor_ecdf_workspace_get (SCM s_0)
+{
+#define FUNC_NAME "mcmclib-monitor-ecdf-workspace-get"
+  mcmclib_monitor_ecdf *arg1 = (mcmclib_monitor_ecdf *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  gsl_vector *result = 0 ;
+  
+  {
+    arg1 = (mcmclib_monitor_ecdf *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_monitor_ecdf, 1, 0);
+  }
+  result = (gsl_vector *) ((arg1)->workspace);
+  {
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_gsl_vector, 0);
+  }
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_new_mcmclib_monitor_ecdf (SCM s_0)
+{
+#define FUNC_NAME "new-mcmclib-monitor-ecdf"
+  gsl_matrix *arg1 = (gsl_matrix *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  mcmclib_monitor_ecdf *result = 0 ;
+  
+  {
+    arg1 = (gsl_matrix *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_gsl_matrix, 1, 0);
+  }
+  result = (mcmclib_monitor_ecdf *)new_mcmclib_monitor_ecdf((gsl_matrix const *)arg1);
+  {
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_mcmclib_monitor_ecdf, 1);
+  }
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_delete_mcmclib_monitor_ecdf (SCM s_0)
+{
+#define FUNC_NAME "delete-mcmclib-monitor-ecdf"
+  mcmclib_monitor_ecdf *arg1 = (mcmclib_monitor_ecdf *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  
+  {
+    arg1 = (mcmclib_monitor_ecdf *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_monitor_ecdf, 1, 0);
+  }
+  delete_mcmclib_monitor_ecdf(arg1);
+  gswig_result = SCM_UNSPECIFIED;
+  
+  SWIG_Guile_MarkPointerDestroyed(s_0);
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_monitor_ecdf_update (SCM s_0, SCM s_1)
+{
+#define FUNC_NAME "mcmclib-monitor-ecdf-update"
+  mcmclib_monitor_ecdf *arg1 = (mcmclib_monitor_ecdf *) 0 ;
+  gsl_vector *arg2 = (gsl_vector *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  
+  {
+    arg1 = (mcmclib_monitor_ecdf *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_monitor_ecdf, 1, 0);
+  }
+  {
+    arg2 = (gsl_vector *)SWIG_MustGetPtr(s_1, SWIGTYPE_p_gsl_vector, 2, 0);
+  }
+  mcmclib_monitor_ecdf_update(arg1,(gsl_vector const *)arg2);
   gswig_result = SCM_UNSPECIFIED;
   
   
@@ -4709,6 +4977,7 @@ static swig_type_info _swigt__p_mcmclib_mcar_tilde_lpdf = {"_p_mcmclib_mcar_tild
 static swig_type_info _swigt__p_mcmclib_mh = {"_p_mcmclib_mh", "mcmclib_mh *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_mcmclib_mixnorm_lpdf = {"_p_mcmclib_mixnorm_lpdf", "mcmclib_mixnorm_lpdf *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_mcmclib_monitor = {"_p_mcmclib_monitor", "mcmclib_monitor *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_mcmclib_monitor_ecdf = {"_p_mcmclib_monitor_ecdf", "mcmclib_monitor_ecdf *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_mcmclib_mvnorm_lpdf = {"_p_mcmclib_mvnorm_lpdf", "mcmclib_mvnorm_lpdf *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_mcmclib_pmodel_sampler = {"_p_mcmclib_pmodel_sampler", "mcmclib_pmodel_sampler *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_mcmclib_pois_model = {"_p_mcmclib_pois_model", "mcmclib_pois_model *", 0, 0, (void*)0, 0};
@@ -4733,6 +5002,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_mcmclib_mh,
   &_swigt__p_mcmclib_mixnorm_lpdf,
   &_swigt__p_mcmclib_monitor,
+  &_swigt__p_mcmclib_monitor_ecdf,
   &_swigt__p_mcmclib_mvnorm_lpdf,
   &_swigt__p_mcmclib_pmodel_sampler,
   &_swigt__p_mcmclib_pois_model,
@@ -4757,6 +5027,7 @@ static swig_cast_info _swigc__p_mcmclib_mcar_tilde_lpdf[] = {  {&_swigt__p_mcmcl
 static swig_cast_info _swigc__p_mcmclib_mh[] = {  {&_swigt__p_mcmclib_mh, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_mcmclib_mixnorm_lpdf[] = {  {&_swigt__p_mcmclib_mixnorm_lpdf, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_mcmclib_monitor[] = {  {&_swigt__p_mcmclib_monitor, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_mcmclib_monitor_ecdf[] = {  {&_swigt__p_mcmclib_monitor_ecdf, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_mcmclib_mvnorm_lpdf[] = {  {&_swigt__p_mcmclib_mvnorm_lpdf, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_mcmclib_pmodel_sampler[] = {  {&_swigt__p_mcmclib_pmodel_sampler, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_mcmclib_pois_model[] = {  {&_swigt__p_mcmclib_pois_model, 0, 0, 0},{0, 0, 0, 0}};
@@ -4781,6 +5052,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_mcmclib_mh,
   _swigc__p_mcmclib_mixnorm_lpdf,
   _swigc__p_mcmclib_monitor,
+  _swigc__p_mcmclib_monitor_ecdf,
   _swigc__p_mcmclib_mvnorm_lpdf,
   _swigc__p_mcmclib_pmodel_sampler,
   _swigc__p_mcmclib_pois_model,
@@ -5090,6 +5362,19 @@ SWIG_init(void)
   scm_c_define_gsubr("mcmclib-monitor-fprintf-AR", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_monitor_fprintf_AR);
   scm_c_define_gsubr("mcmclib-monitor-fprintf-MSJD", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_monitor_fprintf_MSJD);
   scm_c_define_gsubr("mcmclib-monitor-fprintf-all", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_monitor_fprintf_all);
+  SWIG_TypeClientData(SWIGTYPE_p_mcmclib_monitor_ecdf, (void *) &_swig_guile_clientdatamcmclib_monitor_ecdf);
+  scm_c_define_gsubr("mcmclib-monitor-ecdf-Fn-set", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_monitor_ecdf_Fn_set);
+  scm_c_define_gsubr("mcmclib-monitor-ecdf-Fn-get", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_monitor_ecdf_Fn_get);
+  scm_c_define_gsubr("mcmclib-monitor-ecdf-X0-set", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_monitor_ecdf_X0_set);
+  scm_c_define_gsubr("mcmclib-monitor-ecdf-X0-get", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_monitor_ecdf_X0_get);
+  scm_c_define_gsubr("mcmclib-monitor-ecdf-n-set", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_monitor_ecdf_n_set);
+  scm_c_define_gsubr("mcmclib-monitor-ecdf-n-get", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_monitor_ecdf_n_get);
+  scm_c_define_gsubr("mcmclib-monitor-ecdf-workspace-set", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_monitor_ecdf_workspace_set);
+  scm_c_define_gsubr("mcmclib-monitor-ecdf-workspace-get", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_monitor_ecdf_workspace_get);
+  scm_c_define_gsubr("new-mcmclib-monitor-ecdf", 1, 0, 0, (swig_guile_proc) _wrap_new_mcmclib_monitor_ecdf);
+  ((swig_guile_clientdata *)(SWIGTYPE_p_mcmclib_monitor_ecdf->clientdata))->destroy = (guile_destructor) _wrap_delete_mcmclib_monitor_ecdf;
+  scm_c_define_gsubr("delete-mcmclib-monitor-ecdf", 1, 0, 0, (swig_guile_proc) _wrap_delete_mcmclib_monitor_ecdf);
+  scm_c_define_gsubr("mcmclib-monitor-ecdf-update", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_monitor_ecdf_update);
   scm_c_define_gsubr("mcmclib-mvnorm-iid", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_mvnorm_iid);
   scm_c_define_gsubr("mcmclib-mvnorm", 3, 0, 0, (swig_guile_proc) _wrap_mcmclib_mvnorm);
   scm_c_define_gsubr("mcmclib-mvnorm-chol", 3, 0, 0, (swig_guile_proc) _wrap_mcmclib_mvnorm_chol);

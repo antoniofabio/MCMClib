@@ -31,3 +31,22 @@ void mcmclib_monitor_fprintf_vars(mcmclib_monitor* p, FILE* f);
 void mcmclib_monitor_fprintf_AR(mcmclib_monitor* p, FILE* f);
 void mcmclib_monitor_fprintf_MSJD(mcmclib_monitor* p, FILE* f);
 void mcmclib_monitor_fprintf_all(mcmclib_monitor* p, FILE* f);
+
+/** Empirical CDF function live computation */
+typedef struct {
+  gsl_vector* Fn; /**< current CDF value */
+  gsl_matrix* X0; /**< vertical matrix of points on which the CDF is computed*/
+  double n; /**< current observed sample size*/
+  gsl_vector* workspace;
+} mcmclib_monitor_ecdf;
+
+%extend mcmclib_monitor_ecdf {
+  mcmclib_monitor_ecdf(const gsl_matrix* X0) {
+    return mcmclib_monitor_ecdf_alloc(X0);
+  }
+  ~mcmclib_monitor_ecdf() {
+    mcmclib_monitor_ecdf_free($self);
+  }
+}
+
+void mcmclib_monitor_ecdf_update(mcmclib_monitor_ecdf* p, const gsl_vector* y);
