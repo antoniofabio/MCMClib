@@ -145,3 +145,9 @@ void mcmclib_raptor_set_alpha(mcmclib_amh* p, double alpha) {
   mcmclib_rapt_gamma *qg = (mcmclib_rapt_gamma *) p->mh->q->gamma;
   mcmclib_rapt_gamma_set_alpha(qg, alpha);
 }
+
+void mcmclib_raptor_set_alpha_fun(mcmclib_amh* p, void* data, mcmclib_raptor_alpha_fun_t fun) {
+  mcmclib_raptor_suff* s = (mcmclib_rapt_suff*) p->suff;
+  s->alpha_fun = fun;
+  s->alpha_fun_data = data;
+}

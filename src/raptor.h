@@ -86,6 +86,8 @@ void mcmclib_raptor_set_sf_global(mcmclib_amh* p, double sf);
 void mcmclib_raptor_set_sf_local(mcmclib_amh* p, double sf);
 /** customly set global proposal weight (same for all regions)*/
 void mcmclib_raptor_set_alpha(mcmclib_amh* p, double alpha);
+/** customly set global proposal weight function*/
+void mcmclib_raptor_set_alpha_fun(mcmclib_amh* p, void* data, mcmclib_raptor_alpha_fun_t fun);
 
 /** update local and global RAPT proposals covariance matrices
 
