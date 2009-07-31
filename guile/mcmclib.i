@@ -86,3 +86,4 @@ double mcmclib_guile_lpdf(void* p, gsl_vector* x);
 %include "monitor.i"
 %include "distrfuns.i"
 %include "amh.i"
+%include "mixem.i"
