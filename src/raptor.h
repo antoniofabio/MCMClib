@@ -33,6 +33,8 @@ typedef struct {
   mcmclib_mixnorm_lpdf* pi_hat; /**< mixture density*/
 } mcmclib_raptor_gamma;
 
+typedef double (*mcmclib_raptor_alpha_fun_t) (mcmclib_raptor_gamma*) ;
+
 /** \brief RAPTOR sufficient data */
 typedef struct {
   mcmclib_mixem_online* em; /**< online-EM mixture fitter*/
@@ -40,6 +42,8 @@ typedef struct {
   gsl_matrix* Sigma_eps;
   double scaling_factor_local;
   double scaling_factor_global;
+
+  mcmclib_raptor_alpha_fun_t alpha_fun;
 } mcmclib_raptor_suff;
 
 /** alloc a new RAPTOR sampler suff. stats. object
