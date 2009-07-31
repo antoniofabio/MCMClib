@@ -7,6 +7,7 @@
  *  the Free Software Foundation; either version 2 of the License, or
  *  (at your option) any later version.
  */
+#include <gsl/gsl_math.h>
 #include "vector_stats.h"
 
 void mcmclib_matrix_colmeans(gsl_matrix* m, gsl_vector* out) {
