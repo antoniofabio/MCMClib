@@ -69,6 +69,10 @@ int main(int argc, char** argv) {
     mcmclib_amh_update(sampler);
   assert(check_alpha_ncalls == (N - T0));
 
+  mcmclib_raptor_set_alpha_fun_identity(sampler);
+  for(int n=0; n<N; n++)
+    mcmclib_amh_update(sampler);
+
   /*free memory*/
   gsl_matrix_free(sigma_whole);
   gsl_vector_free(x);
