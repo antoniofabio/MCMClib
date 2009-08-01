@@ -11,6 +11,8 @@
 #include "raptor.h"
 #include "region_mixnorm.h"
 #include "mvnorm.h"
+#include "matrix.h"
+#include "vector_stats.h"
 
 mcmclib_raptor_gamma* mcmclib_raptor_gamma_alloc(gsl_vector* beta_hat,
 						 gsl_vector** mu_hat,
@@ -155,7 +157,27 @@ void mcmclib_raptor_set_alpha_fun(mcmclib_amh* p, void* data, mcmclib_raptor_alp
 }
 
 static double alpha_star_fun(mcmclib_raptor_gamma* g) {
-  return 0.5;
+  int K = g->beta_hat->size;
+  int d = g->mu_hat[0]->size;
+  gsl_matrix* work = gsl_matrix_alloc(d, d);
+  double within = 0.0;
+  for(int k=0; k<K; k++) {
+    gsl_matrix_memcpy(work, g->Sigma_hat[k]);
+    if(mcmclib_cholesky_decomp(work) == GSL_SUCCESS)
+      within += exp(mcmclib_matrix_logtrace(work));
+  }
+  gsl_vector* mean = gsl_vector_alloc(d);
+  int n=0;
+  for(int k=0; k<K; k++)
+    mcmclib_covariance_update(work, mean, &n, g->mu_hat[k]);
+  double between = 0.0;
+  if(mcmclib_cholesky_decomp(work) == GSL_SUCCESS)
+    between = exp(mcmclib_matrix_logtrace(work));
+  if(between == within)
+    return 0.5;
+  gsl_matrix_free(work);
+  gsl_vector_free(mean);
+  return between / (between + within);
 }
 
 static double alpha_fun_identity(void* ignore, mcmclib_raptor_gamma* g) {
