@@ -146,8 +146,22 @@ void mcmclib_raptor_set_alpha(mcmclib_amh* p, double alpha) {
   mcmclib_rapt_gamma_set_alpha(qg, alpha);
 }
 
+#define RAPTOR_SUFF(p) ((mcmclib_raptor_suff*) (p)->suff)
+
 void mcmclib_raptor_set_alpha_fun(mcmclib_amh* p, void* data, mcmclib_raptor_alpha_fun_t fun) {
-  mcmclib_raptor_suff* s = (mcmclib_rapt_suff*) p->suff;
+  mcmclib_raptor_suff* s = RAPTOR_SUFF(p);
   s->alpha_fun = fun;
   s->alpha_fun_data = data;
+}
+
+static double alpha_star_fun(mcmclib_raptor_gamma* g) {
+  return 0.5;
+}
+
+static double alpha_fun_identity(void* ignore, mcmclib_raptor_gamma* g) {
+  return alpha_star_fun(g);
+}
+
+void mcmclib_raptor_set_alpha_fun_identity(mcmclib_amh* p) {
+  mcmclib_raptor_set_alpha_fun(p, NULL, alpha_fun_identity);
 }
