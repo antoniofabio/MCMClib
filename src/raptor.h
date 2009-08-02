@@ -91,6 +91,17 @@ void mcmclib_raptor_set_alpha_fun(mcmclib_amh* p, void* data, mcmclib_raptor_alp
 /** set global proposal weight function to the 'identity' link */
 void mcmclib_raptor_set_alpha_fun_identity(mcmclib_amh* p);
 
+/** default alpha function: costantly returns the currently set alpha value
+@param data ptr to a rapt_gamma object
+*/
+double mcmclib_raptor_alpha_default_fun(void* data, mcmclib_raptor_gamma* p);
+
+/** returns a scalar between 0 and 1 representing the ratio between 'between'
+and total variance, computed from mixture parameters stored in 'g'*/
+double mcmclib_raptor_alpha_star_fun(mcmclib_raptor_gamma* g);
+
+double mcmclib_raptor_alpha_identity_fun(void* ignore, mcmclib_raptor_gamma* g);
+
 /** update local and global RAPT proposals covariance matrices
 
 basing on current mixture parameters estimates*/

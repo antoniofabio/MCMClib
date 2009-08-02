@@ -21,14 +21,10 @@ static const double MU[] = {0.2, 0.8};
 #define x0 v0(x)
 #define m00(m) gsl_matrix_get(m, 0, 0)
 
-#define TOL 1e-6
-int check_dequal(double a, double b) {
-  return (fabs(a-b) < TOL);
-}
-
+static double volume = 1.0;
 static double dunif(void* ignore, gsl_vector* x) {
-  if((x0 >= 0.0) && (x0 <= 1.0))
-    return log(1.0);
+  if((x0 >= 0.0) && (x0 <= volume))
+    return 0.0;
   return log(0.0);
 }
 
@@ -36,6 +32,10 @@ static int check_alpha_ncalls = 0;
 static double test_alpha_fun(void* ignore, mcmclib_raptor_gamma* g) {
   check_alpha_ncalls++;
   return 0.1;
+}
+
+static double test_alpha_fun_2(void* ignore, mcmclib_raptor_gamma* g) {
+  return mcmclib_raptor_alpha_star_fun(g);
 }
 
 int main(int argc, char** argv) {
@@ -70,6 +70,10 @@ int main(int argc, char** argv) {
   assert(check_alpha_ncalls == (N - T0));
 
   mcmclib_raptor_set_alpha_fun_identity(sampler);
+  for(int n=0; n<N; n++)
+    mcmclib_amh_update(sampler);
+
+  mcmclib_raptor_set_alpha_fun(sampler, NULL, test_alpha_fun_2);
   for(int n=0; n<N; n++)
     mcmclib_amh_update(sampler);
 

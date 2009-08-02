@@ -11,8 +11,6 @@
 #include "raptor.h"
 #include "region_mixnorm.h"
 #include "mvnorm.h"
-#include "matrix.h"
-#include "vector_stats.h"
 
 #define RAPT_GAMMA(p) ((mcmclib_rapt_gamma*) (p)->mh->q->gamma)
 #define RAPTOR_GAMMA(p) ((mcmclib_raptor_gamma*) RAPT_GAMMA(p)->which_region_data)
@@ -57,11 +55,6 @@ void mcmclib_raptor_gamma_free(mcmclib_raptor_gamma* p) {
   free(p);
 }
 
-static double default_alpha_fun(void* data, mcmclib_raptor_gamma* p) {
-  mcmclib_rapt_gamma* g = (mcmclib_rapt_gamma*) data;
-  return gsl_matrix_get(g->lambda, 0, g->lambda->size2 - 1);
-}
-
 mcmclib_raptor_suff* mcmclib_raptor_suff_alloc(mcmclib_raptor_gamma* g, int t0,
 					       mcmclib_rapt_gamma* rg) {
   mcmclib_raptor_suff* a = (mcmclib_raptor_suff*) malloc(sizeof(mcmclib_raptor_suff));
@@ -71,7 +64,7 @@ mcmclib_raptor_suff* mcmclib_raptor_suff_alloc(mcmclib_raptor_gamma* g, int t0,
   gsl_matrix_set_identity(a->Sigma_eps);
   gsl_matrix_scale(a->Sigma_eps, 0.001);
   a->scaling_factor_global = a->scaling_factor_local = 2.38 * 2.38 / (double) d;
-  a->alpha_fun = default_alpha_fun;
+  a->alpha_fun = mcmclib_raptor_alpha_default_fun;
   a->alpha_fun_data = rg;
   return a;
 }
@@ -155,36 +148,4 @@ void mcmclib_raptor_set_alpha_fun(mcmclib_amh* p, void* data, mcmclib_raptor_alp
   mcmclib_raptor_suff* s = RAPTOR_SUFF(p);
   s->alpha_fun = fun;
   s->alpha_fun_data = data;
-}
-
-static double alpha_star_fun(mcmclib_raptor_gamma* g) {
-  int K = g->beta_hat->size;
-  int d = g->mu_hat[0]->size;
-  gsl_matrix* work = gsl_matrix_alloc(d, d);
-  double within = 0.0;
-  for(int k=0; k<K; k++) {
-    gsl_matrix_memcpy(work, g->Sigma_hat[k]);
-    if(mcmclib_cholesky_decomp(work) == GSL_SUCCESS)
-      within += exp(mcmclib_matrix_logtrace(work));
-  }
-  gsl_vector* mean = gsl_vector_alloc(d);
-  int n=0;
-  for(int k=0; k<K; k++)
-    mcmclib_covariance_update(work, mean, &n, g->mu_hat[k]);
-  double between = 0.0;
-  if(mcmclib_cholesky_decomp(work) == GSL_SUCCESS)
-    between = exp(mcmclib_matrix_logtrace(work));
-  if(between == within)
-    return 0.5;
-  gsl_matrix_free(work);
-  gsl_vector_free(mean);
-  return between / (between + within);
-}
-
-static double alpha_fun_identity(void* ignore, mcmclib_raptor_gamma* g) {
-  return alpha_star_fun(g);
-}
-
-void mcmclib_raptor_set_alpha_fun_identity(mcmclib_amh* p) {
-  mcmclib_raptor_set_alpha_fun(p, NULL, alpha_fun_identity);
 }
