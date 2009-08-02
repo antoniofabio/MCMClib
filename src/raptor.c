@@ -14,6 +14,10 @@
 #include "matrix.h"
 #include "vector_stats.h"
 
+#define RAPT_GAMMA(p) ((mcmclib_rapt_gamma*) (p)->mh->q->gamma)
+#define RAPTOR_GAMMA(p) ((mcmclib_raptor_gamma*) RAPT_GAMMA(p)->which_region_data)
+#define RAPTOR_SUFF(p) ((mcmclib_raptor_suff*) (p)->suff)
+
 mcmclib_raptor_gamma* mcmclib_raptor_gamma_alloc(gsl_vector* beta_hat,
 						 gsl_vector** mu_hat,
 						 gsl_matrix** Sigma_hat) {
@@ -106,9 +110,8 @@ mcmclib_amh* mcmclib_raptor_alloc(gsl_rng* r,
 }
 
 void mcmclib_raptor_free(mcmclib_amh* p) {
-  mcmclib_raptor_suff_free((mcmclib_raptor_suff*) p->suff);
-  mcmclib_rapt_gamma* g = (mcmclib_rapt_gamma*) p->mh->q->gamma;
-  mcmclib_raptor_gamma_free((mcmclib_raptor_gamma*) g->which_region_data);
+  mcmclib_raptor_suff_free(RAPTOR_SUFF(p));
+  mcmclib_raptor_gamma_free(RAPTOR_GAMMA(p));
   mcmclib_rapt_q_free(p->mh->q);
   mcmclib_mh_free(p->mh);
   mcmclib_amh_free(p);
@@ -147,8 +150,6 @@ void mcmclib_raptor_set_alpha(mcmclib_amh* p, double alpha) {
   mcmclib_rapt_gamma *qg = (mcmclib_rapt_gamma *) p->mh->q->gamma;
   mcmclib_rapt_gamma_set_alpha(qg, alpha);
 }
-
-#define RAPTOR_SUFF(p) ((mcmclib_raptor_suff*) (p)->suff)
 
 void mcmclib_raptor_set_alpha_fun(mcmclib_amh* p, void* data, mcmclib_raptor_alpha_fun_t fun) {
   mcmclib_raptor_suff* s = RAPTOR_SUFF(p);
