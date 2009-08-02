@@ -139,7 +139,7 @@ void mcmclib_raptor_update(void* in_p) {
   mcmclib_mixem_online_update(em, p->mh->x);
   if((p->n) <= em->n0)
     return;
-  mcmclib_raptor_set_alpha(p, s->alpha_fun(s->alpha_fun_data, (mcmclib_raptor_gamma*) p->mh->q->gamma));
+  mcmclib_raptor_set_alpha(p, s->alpha_fun(s->alpha_fun_data, RAPTOR_GAMMA(p)));
   mcmclib_rapt_q_update_proposals_custom(p->mh->q->gamma, em->Sigma, em->Sigma_global,
 					 s->Sigma_eps,
 					 s->scaling_factor_local,
