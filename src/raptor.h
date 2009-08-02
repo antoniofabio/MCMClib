@@ -33,6 +33,8 @@ typedef struct {
   mcmclib_mixnorm_lpdf* pi_hat; /**< mixture density*/
 } mcmclib_raptor_gamma;
 
+typedef double (*mcmclib_raptor_alpha_fun_t) (void* data, mcmclib_raptor_gamma*);
+
 /** \brief RAPTOR sufficient data */
 typedef struct {
   mcmclib_mixem_online* em; /**< online-EM mixture fitter*/
@@ -40,13 +42,17 @@ typedef struct {
   gsl_matrix* Sigma_eps;
   double scaling_factor_local;
   double scaling_factor_global;
+
+  mcmclib_raptor_alpha_fun_t alpha_fun;
+  void* alpha_fun_data;
 } mcmclib_raptor_suff;
 
 /** alloc a new RAPTOR sampler suff. stats. object
 @param t0 burn-in length before starting adaptation
 @returns a new raptor_suff object
 */
-mcmclib_raptor_suff* mcmclib_raptor_suff_alloc(mcmclib_raptor_gamma* g, int t0);
+mcmclib_raptor_suff* mcmclib_raptor_suff_alloc(mcmclib_raptor_gamma* g, int t0,
+					       mcmclib_rapt_gamma* rg);
 /** free raptor_suff data*/
 void mcmclib_raptor_suff_free(mcmclib_raptor_suff* p);
 /** Update suff. stats. of a RAPTOR chain*/
@@ -80,6 +86,21 @@ void mcmclib_raptor_set_sf_global(mcmclib_amh* p, double sf);
 void mcmclib_raptor_set_sf_local(mcmclib_amh* p, double sf);
 /** customly set global proposal weight (same for all regions)*/
 void mcmclib_raptor_set_alpha(mcmclib_amh* p, double alpha);
+/** customly set global proposal weight function*/
+void mcmclib_raptor_set_alpha_fun(mcmclib_amh* p, void* data, mcmclib_raptor_alpha_fun_t fun);
+/** set global proposal weight function to the 'identity' link */
+void mcmclib_raptor_set_alpha_fun_identity(mcmclib_amh* p);
+
+/** default alpha function: costantly returns the currently set alpha value
+@param data ptr to a rapt_gamma object
+*/
+double mcmclib_raptor_alpha_default_fun(void* data, mcmclib_raptor_gamma* p);
+
+/** returns a scalar between 0 and 1 representing the ratio between 'between'
+and total variance, computed from mixture parameters stored in 'g'*/
+double mcmclib_raptor_alpha_star_fun(mcmclib_raptor_gamma* g);
+
+double mcmclib_raptor_alpha_identity_fun(void* ignore, mcmclib_raptor_gamma* g);
 
 /** update local and global RAPT proposals covariance matrices
 
