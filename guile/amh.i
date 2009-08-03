@@ -56,6 +56,16 @@ typedef struct {
   mcmclib_mvnorm_lpdf** pik_hat; /**< single mixture components densities*/
   mcmclib_mixnorm_lpdf* pi_hat; /**< mixture density*/
 } mcmclib_raptor_gamma;
+%extend mcmclib_raptor_gamma {
+  mcmclib_raptor_gamma(gsl_vector* beta_hat,
+		       gsl_vector** mu_hat,
+		       gsl_matrix** Sigma_hat) {
+    return mcmclib_raptor_gamma_alloc(beta_hat, mu_hat, Sigma_hat);
+  }
+  ~mcmclib_raptor_gamma() {
+    mcmclib_raptor_gamma_free($self);
+  }
+}
 void mcmclib_raptor_set_sf(mcmclib_amh* p, double sf);
 void mcmclib_raptor_set_sf_global(mcmclib_amh* p, double sf);
 void mcmclib_raptor_set_sf_local(mcmclib_amh* p, double sf);

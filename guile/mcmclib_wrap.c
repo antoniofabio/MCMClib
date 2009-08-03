@@ -1397,6 +1397,12 @@ SWIGINTERN mcmclib_amh *new_mcmclib_amh(mcmclib_mh *mh,void *suff,mcmclib_amh_up
 SWIGINTERN void delete_mcmclib_amh(mcmclib_amh *self){
     mcmclib_amh_free(self);
   }
+SWIGINTERN mcmclib_raptor_gamma *new_mcmclib_raptor_gamma(gsl_vector *beta_hat,gsl_vector **mu_hat,gsl_matrix **Sigma_hat){
+    return mcmclib_raptor_gamma_alloc(beta_hat, mu_hat, Sigma_hat);
+  }
+SWIGINTERN void delete_mcmclib_raptor_gamma(mcmclib_raptor_gamma *self){
+    mcmclib_raptor_gamma_free(self);
+  }
 
 #include <mixem_online.h>
 
@@ -5224,6 +5230,39 @@ _wrap_mcmclib_raptor_gamma_pi_hat_get (SCM s_0)
 
 
 static SCM
+_wrap_new_mcmclib_raptor_gamma (SCM s_0, SCM s_1, SCM s_2)
+{
+#define FUNC_NAME "new-mcmclib-raptor-gamma"
+  gsl_vector *arg1 = (gsl_vector *) 0 ;
+  gsl_vector **arg2 = (gsl_vector **) 0 ;
+  gsl_matrix **arg3 = (gsl_matrix **) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  mcmclib_raptor_gamma *result = 0 ;
+  
+  {
+    arg1 = (gsl_vector *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_gsl_vector, 1, 0);
+  }
+  {
+    arg2 = (gsl_vector **)SWIG_MustGetPtr(s_1, SWIGTYPE_p_p_gsl_vector, 2, 0);
+  }
+  {
+    arg3 = (gsl_matrix **)SWIG_MustGetPtr(s_2, SWIGTYPE_p_p_gsl_matrix, 3, 0);
+  }
+  result = (mcmclib_raptor_gamma *)new_mcmclib_raptor_gamma(arg1,arg2,arg3);
+  {
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_mcmclib_raptor_gamma, 1);
+  }
+  
+  
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
 _wrap_delete_mcmclib_raptor_gamma (SCM s_0)
 {
 #define FUNC_NAME "delete-mcmclib-raptor-gamma"
@@ -5234,7 +5273,7 @@ _wrap_delete_mcmclib_raptor_gamma (SCM s_0)
   {
     arg1 = (mcmclib_raptor_gamma *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_raptor_gamma, 1, 0);
   }
-  free((char *) arg1);
+  delete_mcmclib_raptor_gamma(arg1);
   gswig_result = SCM_UNSPECIFIED;
   
   SWIG_Guile_MarkPointerDestroyed(s_0);
@@ -6092,6 +6131,7 @@ SWIG_init(void)
   scm_c_define_gsubr("mcmclib-raptor-gamma-pik-hat-get", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_raptor_gamma_pik_hat_get);
   scm_c_define_gsubr("mcmclib-raptor-gamma-pi-hat-set", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_raptor_gamma_pi_hat_set);
   scm_c_define_gsubr("mcmclib-raptor-gamma-pi-hat-get", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_raptor_gamma_pi_hat_get);
+  scm_c_define_gsubr("new-mcmclib-raptor-gamma", 3, 0, 0, (swig_guile_proc) _wrap_new_mcmclib_raptor_gamma);
   ((swig_guile_clientdata *)(SWIGTYPE_p_mcmclib_raptor_gamma->clientdata))->destroy = (guile_destructor) _wrap_delete_mcmclib_raptor_gamma;
   scm_c_define_gsubr("delete-mcmclib-raptor-gamma", 1, 0, 0, (swig_guile_proc) _wrap_delete_mcmclib_raptor_gamma);
   scm_c_define_gsubr("mcmclib-raptor-set-sf", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_raptor_set_sf);
