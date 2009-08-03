@@ -46,3 +46,20 @@ mcmclib_amh* mcmclib_raptor_alloc(gsl_rng* r,
 				  gsl_vector** mu_hat,
 				  gsl_matrix** Sigma_hat);
 void mcmclib_raptor_free(mcmclib_amh* p);
+typedef double (*mcmclib_raptor_alpha_fun_t) (void* data, mcmclib_raptor_gamma*);
+/** \brief RAPTOR sampler gamma values */
+typedef struct {
+  gsl_vector* beta_hat; /**< current mixture weights estimates*/
+  gsl_vector** mu_hat; /**< current mixture means estimates*/
+  gsl_matrix** Sigma_hat; /**< current mixture variances estimates*/
+
+  mcmclib_mvnorm_lpdf** pik_hat; /**< single mixture components densities*/
+  mcmclib_mixnorm_lpdf* pi_hat; /**< mixture density*/
+} mcmclib_raptor_gamma;
+void mcmclib_raptor_set_sf(mcmclib_amh* p, double sf);
+void mcmclib_raptor_set_sf_global(mcmclib_amh* p, double sf);
+void mcmclib_raptor_set_sf_local(mcmclib_amh* p, double sf);
+void mcmclib_raptor_set_alpha(mcmclib_amh* p, double alpha);
+void mcmclib_raptor_set_alpha_fun(mcmclib_amh* p, void* data, mcmclib_raptor_alpha_fun_t fun);
+void mcmclib_raptor_set_alpha_fun_identity(mcmclib_amh* p);
+double mcmclib_raptor_alpha_star_fun(mcmclib_raptor_gamma* g);
