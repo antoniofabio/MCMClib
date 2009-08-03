@@ -33,6 +33,12 @@ typedef struct {
   mcmclib_mixnorm_lpdf* pi_hat; /**< mixture density*/
 } mcmclib_raptor_gamma;
 
+/** alloc a new raptor_gamma object. Input arguments are copied @internal
+*/
+mcmclib_raptor_gamma* mcmclib_raptor_gamma_alloc(gsl_vector* beta_hat,
+						 gsl_vector** mu_hat,
+						 gsl_matrix** Sigma_hat);
+
 typedef double (*mcmclib_raptor_alpha_fun_t) (void* data, mcmclib_raptor_gamma*);
 
 /** \brief RAPTOR sufficient data */
@@ -47,7 +53,7 @@ typedef struct {
   void* alpha_fun_data;
 } mcmclib_raptor_suff;
 
-/** alloc a new RAPTOR sampler suff. stats. object
+/** alloc a new RAPTOR sampler suff stats object
 @param t0 burn-in length before starting adaptation
 @returns a new raptor_suff object
 */
@@ -55,7 +61,7 @@ mcmclib_raptor_suff* mcmclib_raptor_suff_alloc(mcmclib_raptor_gamma* g, int t0,
 					       mcmclib_rapt_gamma* rg);
 /** free raptor_suff data*/
 void mcmclib_raptor_suff_free(mcmclib_raptor_suff* p);
-/** Update suff. stats. of a RAPTOR chain*/
+/** Update suff stats of a RAPTOR chain*/
 int mcmclib_raptor_suff_update(mcmclib_raptor_suff* p);
 
 /** \brief alloc a new RAPTOR sampler
@@ -104,7 +110,8 @@ double mcmclib_raptor_alpha_identity_fun(void* ignore, mcmclib_raptor_gamma* g);
 
 /** update local and global RAPT proposals covariance matrices
 
-basing on current mixture parameters estimates*/
+basing on current mixture parameters estimates
+@internal*/
 void mcmclib_raptor_update_proposals(mcmclib_raptor_suff* p);
 
 /**@}*/
