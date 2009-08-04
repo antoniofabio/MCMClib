@@ -34,10 +34,10 @@ double mcmclib_raptor_alpha_star_fun(mcmclib_raptor_gamma* g) {
   double between = 0.0;
   if(mcmclib_cholesky_decomp(work) == GSL_SUCCESS)
     between = exp(mcmclib_matrix_logtrace(work));
-  if(between == within)
-    return 0.5;
   gsl_matrix_free(work);
   gsl_vector_free(mean);
+  if(between == within)
+    return 0.5;
   return between / (between + within);
 }
 
