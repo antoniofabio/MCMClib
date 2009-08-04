@@ -1270,6 +1270,7 @@ static swig_module_info swig_module = {swig_types, 28, 0, 0, 0, 0};
 #include <lpdf_iwishart.h>
 #include <mh.h>
 #include <monitor.h>
+#include <gauss_rw.h>
 #include <gauss_mrw.h>
 
 static void guile_mcmclib_err_handler(const char * reason,
@@ -1833,6 +1834,68 @@ _wrap_mcmclib_mh_update (SCM s_0)
   {
     gswig_result = scm_long2num(result);
   }
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_gauss_rw_alloc (SCM s_0, SCM s_1, SCM s_2, SCM s_3, SCM s_4)
+{
+#define FUNC_NAME "mcmclib-gauss-rw-alloc"
+  gsl_rng *arg1 = (gsl_rng *) 0 ;
+  distrfun_p arg2 = (distrfun_p) 0 ;
+  void *arg3 = (void *) 0 ;
+  gsl_vector *arg4 = (gsl_vector *) 0 ;
+  double arg5 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  mcmclib_mh *result = 0 ;
+  
+  {
+    arg1 = (gsl_rng *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_gsl_rng, 1, 0);
+  }
+  {
+    arg2 = (distrfun_p)SWIG_MustGetPtr(s_1, SWIGTYPE_p_f_p_void_p_gsl_vector__double, 2, 0);
+  }
+  {
+    arg3 = (void *)SWIG_MustGetPtr(s_2, NULL, 3, 0);
+  }
+  {
+    arg4 = (gsl_vector *)SWIG_MustGetPtr(s_3, SWIGTYPE_p_gsl_vector, 4, 0);
+  }
+  {
+    arg5 = (double) scm_num2dbl(s_4, FUNC_NAME);
+  }
+  result = (mcmclib_mh *)mcmclib_gauss_rw_alloc(arg1,arg2,arg3,arg4,arg5);
+  {
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_mcmclib_mh, 0);
+  }
+  
+  
+  
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_gauss_rw_free (SCM s_0)
+{
+#define FUNC_NAME "mcmclib-gauss-rw-free"
+  mcmclib_mh *arg1 = (mcmclib_mh *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  
+  {
+    arg1 = (mcmclib_mh *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_mh, 1, 0);
+  }
+  mcmclib_gauss_rw_free(arg1);
+  gswig_result = SCM_UNSPECIFIED;
   
   
   return gswig_result;
@@ -6388,6 +6451,8 @@ SWIG_init(void)
   ((swig_guile_clientdata *)(SWIGTYPE_p_mcmclib_mh->clientdata))->destroy = (guile_destructor) _wrap_delete_mcmclib_mh;
   scm_c_define_gsubr("delete-mcmclib-mh", 1, 0, 0, (swig_guile_proc) _wrap_delete_mcmclib_mh);
   scm_c_define_gsubr("mcmclib-mh-update", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_mh_update);
+  scm_c_define_gsubr("mcmclib-gauss-rw-alloc", 5, 0, 0, (swig_guile_proc) _wrap_mcmclib_gauss_rw_alloc);
+  scm_c_define_gsubr("mcmclib-gauss-rw-free", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_gauss_rw_free);
   scm_c_define_gsubr("mcmclib-gauss-mrw-alloc", 5, 0, 0, (swig_guile_proc) _wrap_mcmclib_gauss_mrw_alloc);
   scm_c_define_gsubr("mcmclib-gauss-mrw-free", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_gauss_mrw_free);
   scm_c_define_gsubr("mcmclib-iwishart-lpdf-alloc", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_iwishart_lpdf_alloc);
