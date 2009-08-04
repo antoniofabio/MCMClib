@@ -56,18 +56,39 @@
     #:fun-ptr (mcmclib-guile-lpdf-cb)
     #:fun-data-ptr (guile-to-voidptr fun)
     #:keep fun))
-(define-class <amh> (<swig-obj>)
+(define-class <mh> (<swig-obj>)
   (rng #:init-keyword #:rng)
   (distrfun #:init-keyword #:distrfun)
   (x #:init-keyword #:x))
+(define-method (update (obj <mh>)) (mcmclib-mh-update (get-c-ref obj)))
+(define-class <amh> (<mh>))
 (define-method (update (obj <amh>)) (mcmclib-amh-update (get-c-ref obj)))
-(export <swig-obj> <distrfun> <amh> make-guile-distrfun update)
+(export <swig-obj> <distrfun> <mh> <amh> make-guile-distrfun update)
 
 (use-syntax (ice-9 syncase))
 
 (define (symbol-concatenate lst)
   (string->symbol (string-concatenate (map symbol->string lst))))
 (export symbol-concatenate)
+
+(define-syntax make-mh
+  (syntax-rules ()
+    ((make-mh sub-type rng-in distrfun-obj-in x-in rest ...)
+     (let
+         ((constructor-name (symbol-concatenate (list 'mcmclib- sub-type '-alloc)))
+          (rng rng-in)
+          (x x-in)
+          (distrfun-obj distrfun-obj-in))
+     (make <mh>
+       #:c-ref ((eval constructor-name (interaction-environment))
+                rng
+                (slot-ref distrfun-obj 'fun-ptr)
+                (slot-ref distrfun-obj 'fun-data-ptr)
+                x rest ...)
+       #:rng rng
+       #:distrfun distrfun-obj
+       #:x x)))))
+(export-syntax make-mh)
 
 (define-syntax make-amh
   (syntax-rules ()
