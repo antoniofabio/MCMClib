@@ -29,8 +29,6 @@ void mcmclib_amh_reset(mcmclib_amh* p);
 /*Concrete AMH samplers implementations*/
 
 /*Gaussian AM*/
-%newobject mcmclib_gauss_am_alloc;
-%delobject mcmclib_gauss_am_free;
 mcmclib_amh* mcmclib_gauss_am_alloc(gsl_rng* r,
 				    distrfun_p logdistr, void* logdistr_data,
 				    gsl_vector* start_x,
