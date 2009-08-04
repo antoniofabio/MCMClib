@@ -3,7 +3,8 @@
 (use-modules (srfi srfi-1)
 	     (srfi srfi-42)
              (swig gsl)
-             (swig mcmclib))
+             (swig mcmclib)
+             (oop goops))
 
 (export v2gv gv2v gM2M va2ca ma2ca)
 
@@ -41,3 +42,34 @@
     (do-ec (: i n)
            (matrixArray-setitem ca i (vector-ref ma i)))
     ca))
+
+;;
+;;keep references of referenced objects to avoid premature garbage collection
+;;
+(define-class <swig-obj> () (c-ref #:init-keyword #:c-ref #:getter get-c-ref))
+(define-class <amh> (<swig-obj>) (rng #:init-keyword #:rng) (x #:init-keyword #:x))
+(define-method (update (obj <amh>)) (mcmclib-amh-update (get-c-ref obj)))
+(export <swig-obj> <amh> update)
+
+(use-syntax (ice-9 syncase))
+
+(define (symbol-concatenate lst)
+  (string->symbol (string-concatenate (map symbol->string lst))))
+(export symbol-concatenate)
+
+(define-syntax make-amh
+  (syntax-rules ()
+    ((make-amh sub-type rng distrfun distrfun-data x ...)
+     (let
+         ((constructor-name (symbol-concatenate (list 'mcmclib- sub-type '-alloc))))
+     (make <amh>
+       #:c-obj ((eval constructor-name (interaction-environment))
+                rng distrfun distrfun-data x ...)
+       #:rng rng
+       #:x (car (list x ...)))))))
+;;use as follows:
+;;
+;;(make-amh 'raptor rng distrfun distrfun-data x
+;;          t0 Sigma_zero beta_hat mu_hat Sigma_hat)
+;;(make-amh 'gauss-am rng distrfun distrfun-data x sigma_zero t0)
+(export-syntax make-amh)
