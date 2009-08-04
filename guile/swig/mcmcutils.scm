@@ -71,18 +71,21 @@
 
 (define-syntax make-amh
   (syntax-rules ()
-    ((make-amh sub-type rng distrfun-obj x ...)
+    ((make-amh sub-type rng-in distrfun-obj-in x-in rest ...)
      (let
-         ((constructor-name (symbol-concatenate (list 'mcmclib- sub-type '-alloc))))
+         ((constructor-name (symbol-concatenate (list 'mcmclib- sub-type '-alloc)))
+          (rng rng-in)
+          (x x-in)
+          (distrfun-obj distrfun-obj-in))
      (make <amh>
        #:c-ref ((eval constructor-name (interaction-environment))
                 rng
                 (slot-ref distrfun-obj 'fun-ptr)
                 (slot-ref distrfun-obj 'fun-data-ptr)
-                x ...)
+                x rest ...)
        #:rng rng
        #:distrfun distrfun-obj
-       #:x (car (list x ...)))))))
+       #:x x)))))
 ;;use as follows:
 ;;
 ;;(make-amh 'raptor rng (make-guile-distrfun (lambda (x) 0.0) x
