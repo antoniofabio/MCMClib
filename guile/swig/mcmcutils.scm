@@ -113,3 +113,14 @@
 ;;          t0 Sigma_zero beta_hat mu_hat Sigma_hat)
 ;;(make-amh 'gauss-am rng distrfun distrfun-data x sigma_zero t0)
 (export-syntax make-amh)
+
+;;
+;;wrap monitor objects
+;;
+(define-class <monitor> (<swig-obj>) (x #:init-keyword #:x))
+(define-method (update (obj <monitor>))
+  (mcmclib-monitor-update (get-c-ref obj)))
+(define-class <monitor-ecdf> (<swig-obj>) (x #:init-keyword #:x))
+(define-method (update (obj <monitor-ecdf>))
+  (mcmclib-monitor-ecdf-update (get-c-ref obj) (slot-ref obj 'x)))
+(export <monitor> <monitor-ecdf>)
