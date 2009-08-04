@@ -1870,7 +1870,7 @@ _wrap_mcmclib_gauss_mrw_alloc (SCM s_0, SCM s_1, SCM s_2, SCM s_3, SCM s_4)
   }
   result = (mcmclib_mh *)mcmclib_gauss_mrw_alloc(arg1,arg2,arg3,arg4,(gsl_matrix const *)arg5);
   {
-    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_mcmclib_mh, 1);
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_mcmclib_mh, 0);
   }
   
   
@@ -5255,7 +5255,7 @@ _wrap_mcmclib_gauss_am_alloc (SCM s_0, SCM s_1, SCM s_2, SCM s_3, SCM s_4, SCM s
   }
   result = (mcmclib_amh *)mcmclib_gauss_am_alloc(arg1,arg2,arg3,arg4,(gsl_matrix const *)arg5,arg6);
   {
-    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_mcmclib_amh, 1);
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_mcmclib_amh, 0);
   }
   
   

@@ -40,13 +40,11 @@ int mcmclib_mh_update(mcmclib_mh* p);
 
 typedef double (*distrfun_p)(void*, gsl_vector*);
 
-%newobject mcmclib_gauss_mrw_alloc;
 mcmclib_mh* mcmclib_gauss_mrw_alloc(gsl_rng* r,
 				    distrfun_p distrfun,
 				    void* logdistr_data,
 				    gsl_vector* x,
 				    const gsl_matrix* sigma_zero);
-%delobject mcmclib_gauss_mrw_free;
 void mcmclib_gauss_mrw_free(mcmclib_mh*);
 
 mcmclib_iwishart_lpdf* mcmclib_iwishart_lpdf_alloc(gsl_matrix* Psi, int m);
