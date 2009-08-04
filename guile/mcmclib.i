@@ -10,10 +10,10 @@
 #include <monitor.h>
 #include <gauss_mrw.h>
 
-static void guile_gsl_err_handler(const char * reason,
-				  const char * file,
-				  int line,
-				  int gsl_errno) {
+static void guile_mcmclib_err_handler(const char * reason,
+				      const char * file,
+				      int line,
+				      int gsl_errno) {
   static char msg[2048];
   sprintf(msg, "%s:%d", file, line);
   scm_error_scm(scm_misc_error_key,
@@ -23,9 +23,19 @@ static void guile_gsl_err_handler(const char * reason,
 %}
 
 %init %{
-  gsl_set_error_handler(guile_gsl_err_handler);
+  gsl_set_error_handler(guile_mcmclib_err_handler);
 %}
 
+typedef struct {
+  gsl_rng* r; /**< rng*/
+  distrfun_p logdistr; /**< target log-density fun*/
+  void* logdistr_data; /**< target log-density data*/
+  mcmclib_mh_q* q; /**< proposal kernel object*/
+  gsl_vector* x; /**< current chain value*/
+  gsl_vector* x_old; /**< old chain value*/
+  double logdistr_old; /**< log-distrib. of old chain value */
+  int last_accepted; /**< flag: last move has been accepted?*/
+} mcmclib_mh;
 int mcmclib_mh_update(mcmclib_mh* p);
 
 typedef double (*distrfun_p)(void*, gsl_vector*);
