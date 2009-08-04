@@ -25,6 +25,18 @@
   (vector-ec (: i (gsl-matrix-size1-get gM))
              (vector-ec (: j (gsl-matrix-size2-get gM))
                         (gsl-matrix-get gM i j))))
+(define (M2gM M)
+  "convert a scheme matrix into a gsl matrix"
+  (let*
+      ((nrows (vector-length M))
+       (ncols (vector-length (vector-ref M 0)))
+       (gM (new-gsl-matrix nrows ncols)))
+    (do-ec (: i nrows)
+           (let
+               ((row (vector-ref M i)))
+             (do-ec (: j ncols)
+                    (gsl-matrix-set gM i j (vector-ref row j)))))
+    gM))
 
 (define (va2ca va)
   "convert a vector of g-vectors into a C array of g-vectors"
