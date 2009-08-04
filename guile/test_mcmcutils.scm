@@ -10,6 +10,12 @@
  (swig mcmclib)
  (swig mcmcutils))
 
+;;check gsl support functions
+(gv2v (v2gv #(1 2 3)))
+;#(1.0 2.0 3.0)
+(gM2M (M2gM #(#(1 2 3) #(4 5 6))))
+;#(#(1.0 2.0 3.0) #(4.0 5.0 6.0))
+
 (define s (make-amh 'gauss-am
                     (new-gsl-rng (gsl-rng-default))
                     (make-guile-distrfun (lambda (x) 0.0))

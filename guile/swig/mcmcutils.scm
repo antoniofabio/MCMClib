@@ -6,7 +6,7 @@
              (swig mcmclib)
              (oop goops))
 
-(export v2gv gv2v gM2M va2ca ma2ca)
+(export v2gv gv2v gM2M M2gM va2ca ma2ca)
 
 (define (v2gv v)
   "convert the scheme vector 'v' into a gsl vector"
