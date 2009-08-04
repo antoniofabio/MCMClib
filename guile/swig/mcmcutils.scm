@@ -47,9 +47,21 @@
 ;;keep references of referenced objects to avoid premature garbage collection
 ;;
 (define-class <swig-obj> () (c-ref #:init-keyword #:c-ref #:getter get-c-ref))
-(define-class <amh> (<swig-obj>) (rng #:init-keyword #:rng) (x #:init-keyword #:x))
+(define-class <distrfun> ()
+  (fun-ptr #:init-keyword #:fun-ptr)
+  (fun-data-ptr #:init-keyword #:fun-data-ptr)
+  (keep #:init-keyword #:keep))
+(define (make-guile-distrfun fun)
+  (make <distrfun>
+    #:fun-ptr (mcmclib-guile-lpdf-cb)
+    #:fun-data-ptr (guile-to-voidptr fun)
+    #:keep fun))
+(define-class <amh> (<swig-obj>)
+  (rng #:init-keyword #:rng)
+  (distrfun #:init-keyword #:distrfun)
+  (x #:init-keyword #:x))
 (define-method (update (obj <amh>)) (mcmclib-amh-update (get-c-ref obj)))
-(export <swig-obj> <amh> update)
+(export <swig-obj> <distrfun> <amh> make-guile-distrfun update)
 
 (use-syntax (ice-9 syncase))
 
@@ -59,17 +71,21 @@
 
 (define-syntax make-amh
   (syntax-rules ()
-    ((make-amh sub-type rng distrfun distrfun-data x ...)
+    ((make-amh sub-type rng distrfun-obj x ...)
      (let
          ((constructor-name (symbol-concatenate (list 'mcmclib- sub-type '-alloc))))
      (make <amh>
-       #:c-obj ((eval constructor-name (interaction-environment))
-                rng distrfun distrfun-data x ...)
+       #:c-ref ((eval constructor-name (interaction-environment))
+                rng
+                (slot-ref distrfun-obj 'fun-ptr)
+                (slot-ref distrfun-obj 'fun-data-ptr)
+                x ...)
        #:rng rng
+       #:distrfun distrfun-obj
        #:x (car (list x ...)))))))
 ;;use as follows:
 ;;
-;;(make-amh 'raptor rng distrfun distrfun-data x
+;;(make-amh 'raptor rng (make-guile-distrfun (lambda (x) 0.0) x
 ;;          t0 Sigma_zero beta_hat mu_hat Sigma_hat)
 ;;(make-amh 'gauss-am rng distrfun distrfun-data x sigma_zero t0)
 (export-syntax make-amh)
