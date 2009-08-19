@@ -33,11 +33,12 @@ typedef struct {
   mcmclib_mixnorm_lpdf* pi_hat; /**< mixture density*/
 } mcmclib_raptor_gamma;
 
-/** alloc a new raptor_gamma object. Input arguments are copied @internal
-*/
+/** alloc a new raptor_gamma object. Input arguments are copied @internal */
 mcmclib_raptor_gamma* mcmclib_raptor_gamma_alloc(gsl_vector* beta_hat,
 						 gsl_vector** mu_hat,
 						 gsl_matrix** Sigma_hat);
+/** frees a raptor_gamma object @internal*/
+void mcmclib_raptor_gamma_free(mcmclib_raptor_gamma* p);
 
 typedef double (*mcmclib_raptor_alpha_fun_t) (void* data, mcmclib_raptor_gamma*);
 
