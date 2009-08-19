@@ -8,6 +8,7 @@
 #include <lpdf_iwishart.h>
 #include <mh.h>
 #include <monitor.h>
+#include <gauss_rw.h>
 #include <gauss_mrw.h>
 
 static void guile_mcmclib_err_handler(const char * reason,
@@ -40,6 +41,10 @@ int mcmclib_mh_update(mcmclib_mh* p);
 
 typedef double (*distrfun_p)(void*, gsl_vector*);
 
+mcmclib_mh* mcmclib_gauss_rw_alloc(gsl_rng* r,
+				   distrfun_p logdistr, void* data,
+				   gsl_vector* start_x, double step_size);
+void mcmclib_gauss_rw_free(mcmclib_mh*);
 mcmclib_mh* mcmclib_gauss_mrw_alloc(gsl_rng* r,
 				    distrfun_p distrfun,
 				    void* logdistr_data,

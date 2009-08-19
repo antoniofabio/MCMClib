@@ -1,5 +1,5 @@
 Version 0.18 A. F. Di Narzo <antonio.fabio@gmail.com>
-	* added 'alpha_fun' option to raptor sampler
+	* added self-adjusting alpha option to raptor algorithm
 	* removed scam module from master branch
 	* added utility monitor_ecdf module
 	* added 'set_alpha' setter to raptor public API
