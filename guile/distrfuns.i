@@ -32,7 +32,9 @@ typedef struct {
   }
 }
 
+%callback("%s_cb");
 double mcmclib_mvnorm_lpdf_compute(void* in_p, gsl_vector* x);
+%nocallback;
 int mcmclib_mvnorm_lpdf_chol(mcmclib_mvnorm_lpdf* p);
 double mcmclib_mvnorm_lpdf_compute_nochol(mcmclib_mvnorm_lpdf* p, gsl_vector* x);
 void mcmclib_mvnorm_lpdf_inverse(mcmclib_mvnorm_lpdf* p);
