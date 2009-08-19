@@ -1,4 +1,4 @@
-/**Test RAPTOR algorithm on dumb target: check custom alpha fun. setting*/
+/**Test RAPTOR: check custom alpha fun. setting*/
 #include <stdio.h>
 #include <assert.h>
 #include <gsl/gsl_rng.h>
