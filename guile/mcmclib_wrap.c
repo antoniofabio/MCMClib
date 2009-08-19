@@ -1340,6 +1340,7 @@ SWIGINTERN mcmclib_mvnorm_lpdf *new_mcmclib_mvnorm_lpdf(gsl_vector *mean,double 
 SWIGINTERN void delete_mcmclib_mvnorm_lpdf(mcmclib_mvnorm_lpdf *self){
     mcmclib_mvnorm_lpdf_free(self);
   }
+static double (*gswig_const_mcmclib_mvnorm_lpdf_compute_cb)(void *,gsl_vector *) = (double (*)(void *in_p,gsl_vector *x))(mcmclib_mvnorm_lpdf_compute);
 
 static mcmclib_mvnorm_lpdf* *new_mvnormArray(int nelements) { 
   return (mcmclib_mvnorm_lpdf* *) calloc(nelements,sizeof(mcmclib_mvnorm_lpdf*)); 
@@ -3519,6 +3520,21 @@ _wrap_delete_mcmclib_mvnorm_lpdf (SCM s_0)
   gswig_result = SCM_UNSPECIFIED;
   
   SWIG_Guile_MarkPointerDestroyed(s_0);
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_mvnorm_lpdf_compute_cb(SCM s_0)
+{
+#define FUNC_NAME "mcmclib-mvnorm-lpdf-compute-cb"
+  SCM gswig_result;
+  
+  {
+    gswig_result = SWIG_NewPointerObj (gswig_const_mcmclib_mvnorm_lpdf_compute_cb, SWIGTYPE_p_f_p_void_p_gsl_vector__double, 0);
+  }
   
   return gswig_result;
 #undef FUNC_NAME
@@ -6526,6 +6542,7 @@ SWIG_init(void)
   scm_c_define_gsubr("new-mcmclib-mvnorm-lpdf", 2, 0, 0, (swig_guile_proc) _wrap_new_mcmclib_mvnorm_lpdf);
   ((swig_guile_clientdata *)(SWIGTYPE_p_mcmclib_mvnorm_lpdf->clientdata))->destroy = (guile_destructor) _wrap_delete_mcmclib_mvnorm_lpdf;
   scm_c_define_gsubr("delete-mcmclib-mvnorm-lpdf", 1, 0, 0, (swig_guile_proc) _wrap_delete_mcmclib_mvnorm_lpdf);
+  scm_c_define_gsubr("mcmclib-mvnorm-lpdf-compute-cb", 0, 0, 0, (swig_guile_proc) _wrap_mcmclib_mvnorm_lpdf_compute_cb);
   scm_c_define_gsubr("mcmclib-mvnorm-lpdf-compute", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_mvnorm_lpdf_compute);
   scm_c_define_gsubr("mcmclib-mvnorm-lpdf-chol", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_mvnorm_lpdf_chol);
   scm_c_define_gsubr("mcmclib-mvnorm-lpdf-compute-nochol", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_mvnorm_lpdf_compute_nochol);
