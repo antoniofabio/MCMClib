@@ -75,7 +75,7 @@
 (define-method (update (obj <mh>)) (mcmclib-mh-update (get-c-ref obj)))
 (define-class <amh> (<mh>))
 (define-method (update (obj <amh>)) (mcmclib-amh-update (get-c-ref obj)))
-(export <swig-obj> <distrfun> <mh> <amh> make-guile-distrfun update)
+(export <swig-obj> <distrfun> <mh> <amh> make-guile-distrfun update get-c-ref)
 
 (use-syntax (ice-9 syncase))
 
