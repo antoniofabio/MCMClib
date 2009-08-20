@@ -36,5 +36,5 @@ double mcmclib_mh_q_logd(mcmclib_mh_q* p, gsl_vector* x, gsl_vector* y) {
 }
 
 double mcmclib_mh_q_ratio_offset(mcmclib_mh_q* p, gsl_vector* x, gsl_vector* y) {
-  return mcmclib_mh_q_logd(p, x, y) - mcmclib_mh_q_logd(p, y, x);
+  return mcmclib_mh_q_logd(p, y, x) - mcmclib_mh_q_logd(p, x, y);
 }

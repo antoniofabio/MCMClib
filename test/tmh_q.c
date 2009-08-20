@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
   mcmclib_mh_q* q = mcmclib_mh_q_alloc(r, sampler, &inc, qd, &inc, &inc);
 
   assert(mcmclib_mh_q_logd(q, x, y) == qd(&inc, x, y));
-  assert(mcmclib_mh_q_ratio_offset(q, x, y) == qd(&inc, x, y) - qd(&inc, y, x));
+  assert(mcmclib_mh_q_ratio_offset(q, x, y) == qd(&inc, y, x) - qd(&inc, x, y));
   mcmclib_mh_q_sample(q, x);
   assert(x0 == 3.0);
 
