@@ -1408,6 +1408,16 @@ SWIGINTERN void delete_mcmclib_raptor_gamma(mcmclib_raptor_gamma *self){
     mcmclib_raptor_gamma_free(self);
   }
 
+#define RAPT_GAMMA(p) ((mcmclib_rapt_gamma*) (p)->mh->q->gamma)
+#define RAPTOR_GAMMA(p) ((mcmclib_raptor_gamma*) RAPT_GAMMA(p)->which_region_data)
+#define RAPTOR_SUFF(p) ((mcmclib_raptor_suff*) (p)->suff)
+
+
+  mcmclib_raptor_gamma* mcmclib_raptor_gamma_get(mcmclib_amh* p) {
+    return RAPTOR_GAMMA(p);
+  }
+
+
 #include <mixem_online.h>
 
 SWIGINTERN mcmclib_mixem_online *new_mcmclib_mixem_online(gsl_vector **mu,gsl_matrix **Sigma,gsl_vector *beta,double eta_eps,int n0){
@@ -5937,6 +5947,29 @@ _wrap_mcmclib_raptor_alpha_star_fun (SCM s_0)
 
 
 static SCM
+_wrap_mcmclib_raptor_gamma_get (SCM s_0)
+{
+#define FUNC_NAME "mcmclib-raptor-gamma-get"
+  mcmclib_amh *arg1 = (mcmclib_amh *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  mcmclib_raptor_gamma *result = 0 ;
+  
+  {
+    arg1 = (mcmclib_amh *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_amh, 1, 0);
+  }
+  result = (mcmclib_raptor_gamma *)mcmclib_raptor_gamma_get(arg1);
+  {
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_mcmclib_raptor_gamma, 0);
+  }
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
 _wrap_mcmclib_mixem_online_gamma_set (SCM s_0, SCM s_1)
 {
 #define FUNC_NAME "mcmclib-mixem-online-gamma-set"
@@ -6651,6 +6684,7 @@ SWIG_init(void)
   scm_c_define_gsubr("mcmclib-raptor-set-alpha-fun", 3, 0, 0, (swig_guile_proc) _wrap_mcmclib_raptor_set_alpha_fun);
   scm_c_define_gsubr("mcmclib-raptor-set-alpha-fun-identity", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_raptor_set_alpha_fun_identity);
   scm_c_define_gsubr("mcmclib-raptor-alpha-star-fun", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_raptor_alpha_star_fun);
+  scm_c_define_gsubr("mcmclib-raptor-gamma-get", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_raptor_gamma_get);
   SWIG_TypeClientData(SWIGTYPE_p_mcmclib_mixem_online, (void *) &_swig_guile_clientdatamcmclib_mixem_online);
   scm_c_define_gsubr("mcmclib-mixem-online-gamma-set", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_mixem_online_gamma_set);
   scm_c_define_gsubr("mcmclib-mixem-online-gamma-get", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_mixem_online_gamma_get);
