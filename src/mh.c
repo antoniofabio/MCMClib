@@ -78,7 +78,7 @@ int mcmclib_mh_generic_step(const gsl_rng* r, gsl_vector* old, gsl_vector* x,
     return 0;
   }
 
-  mh_ratio = logdistr_new - logdistr_old +  mh_offset;
+  mh_ratio = logdistr_new - logdistr_old + mh_offset;
   if((mh_ratio > 0) || (gsl_rng_uniform(r) <= exp(mh_ratio))) {
     plogdistr_old[0] = logdistr_new;
     return 1;
