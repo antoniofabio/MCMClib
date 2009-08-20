@@ -63,7 +63,6 @@ mcmclib_raptor_suff* mcmclib_raptor_suff_alloc(mcmclib_raptor_gamma* g, int t0,
   a->Sigma_eps = gsl_matrix_alloc(d, d);
   gsl_matrix_set_identity(a->Sigma_eps);
   gsl_matrix_scale(a->Sigma_eps, 0.001);
-  a->scaling_factor_global = a->scaling_factor_local = 2.38 * 2.38 / (double) d;
   a->alpha_fun = mcmclib_raptor_alpha_default_fun;
   a->alpha_fun_data = rg;
   return a;
@@ -98,8 +97,10 @@ mcmclib_amh* mcmclib_raptor_alloc(gsl_rng* r,
 					 raptor_which_region_fun, gamma);
   mcmclib_mh* mh = mcmclib_mh_alloc(r, logdistr, logdistr_data, q, x);
   mcmclib_raptor_suff* suff = mcmclib_raptor_suff_alloc(gamma, t0, q->gamma);
+  mcmclib_amh* ans = mcmclib_amh_alloc(mh, suff, mcmclib_raptor_update);
 
-  return mcmclib_amh_alloc(mh, suff, mcmclib_raptor_update);
+  mcmclib_raptor_set_sf(ans, 2.38*2.38 / (double) x->size);
+  return ans;
 }
 
 void mcmclib_raptor_free(mcmclib_amh* p) {
