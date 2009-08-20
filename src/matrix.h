@@ -26,6 +26,9 @@ int mcmclib_cholesky_inverse(gsl_matrix* A);
 /** Trace of the logarithm of matrix 'A' */
 double mcmclib_matrix_logtrace(const gsl_matrix* A);
 
+/** Compute eigenvalues of a real, symmetric matrix*/
+void mcmclib_matrix_symm_eigenvalues(const gsl_matrix* A, gsl_vector* out);
+
 /** Compute matrix inverse in-place, by LU factorization */
 void mcmclib_matrix_inverse(gsl_matrix* A);
 
