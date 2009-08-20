@@ -5,6 +5,7 @@
              (swig gsl)
              (swig mcmclib)
              (oop goops))
+(use-syntax (ice-9 syncase))
 
 (export v2gv gv2v gM2M M2gM va2ca ma2ca)
 
@@ -77,6 +78,8 @@
       ((m (apply min x)))
     (list-index (lambda (y) (= y m)) x)))
 
+(export xor square dist get-dists which-min)
+
 ;;
 ;;keep references of referenced objects to avoid premature garbage collection
 ;;
@@ -98,8 +101,6 @@
 (define-class <amh> (<mh>))
 (define-method (update (obj <amh>)) (mcmclib-amh-update (get-c-ref obj)))
 (export <swig-obj> <distrfun> <mh> <amh> make-guile-distrfun update get-c-ref)
-
-(use-syntax (ice-9 syncase))
 
 (define (symbol-concatenate lst)
   (string->symbol (string-concatenate (map symbol->string lst))))
@@ -177,3 +178,4 @@
     (array-set! (slot-ref obj 'counts) (+ old-count 1) old-state new-state)
     (slot-set! obj 'state new-state)
     obj))
+(export <transition-matrix> make-transition-matrix)
