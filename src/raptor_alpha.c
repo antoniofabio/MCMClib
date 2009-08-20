@@ -17,6 +17,14 @@ double mcmclib_raptor_alpha_default_fun(void* data, mcmclib_raptor_gamma* p) {
   return gsl_matrix_get(g->lambda, 0, g->lambda->size2 - 1);
 }
 
+static double matrix_max_eigenvalue(const gsl_matrix* A) {
+  gsl_vector* out = gsl_vector_alloc(A->size1);
+  mcmclib_matrix_symm_eigenvalues(A, out);
+  double ans = gsl_vector_min(out);
+  gsl_vector_free(out);
+  return ans;
+}
+
 double mcmclib_raptor_alpha_star_fun(mcmclib_raptor_gamma* g) {
   int K = g->beta_hat->size;
   int d = g->mu_hat[0]->size;
@@ -28,14 +36,8 @@ double mcmclib_raptor_alpha_star_fun(mcmclib_raptor_gamma* g) {
     gsl_matrix_scale(work, gsl_vector_get(g->beta_hat, k));
     gsl_matrix_add(W, work);
   }
-  double lwithin = log(0.0);
   gsl_matrix_free(work);
-  if(mcmclib_cholesky_decomp(W) == GSL_SUCCESS) {
-    lwithin = mcmclib_matrix_logtrace(W);
-  } else {
-    gsl_matrix_free(W);
-    return 1.0;
-  }
+  double lwithin = log(matrix_max_eigenvalue(W));
   gsl_matrix_free(W);
   gsl_matrix* B = gsl_matrix_alloc(d, d);
   gsl_matrix_set_zero(B);
@@ -47,8 +49,7 @@ double mcmclib_raptor_alpha_star_fun(mcmclib_raptor_gamma* g) {
 		    Mk, Mk, 1.0, B);
   }
   double lbetween = 0.0;
-  if(mcmclib_cholesky_decomp(B) == GSL_SUCCESS)
-    lbetween = mcmclib_matrix_logtrace(B);
+  lbetween = log(matrix_max_eigenvalue(B));
   gsl_matrix_free(B);
   if(lbetween == lwithin)
     return 0.5;

@@ -1,5 +1,6 @@
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_linalg.h>
+#include <gsl/gsl_eigen.h>
 #include "matrix.h"
 
 int mcmclib_cholesky_decomp(gsl_matrix* A) {
@@ -70,4 +71,12 @@ void mcmclib_matrix_printf(gsl_matrix* A) {
     gsl_vector_view row = gsl_matrix_row(A, i);
     mcmclib_vector_printf(&row.vector);
   }
+}
+
+void mcmclib_matrix_symm_eigenvalues(const gsl_matrix* A, gsl_vector* out) {
+  gsl_matrix* A1 = gsl_matrix_alloc(A->size1, A->size2);
+  gsl_matrix_memcpy(A1, A);
+  gsl_eigen_symm_workspace* w = gsl_eigen_symm_alloc (A1->size1);
+  gsl_eigen_symm(A1, out, w);
+  gsl_eigen_symm_free (w);
 }
