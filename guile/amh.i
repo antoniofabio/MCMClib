@@ -71,3 +71,14 @@ void mcmclib_raptor_set_alpha(mcmclib_amh* p, double alpha);
 void mcmclib_raptor_set_alpha_fun(mcmclib_amh* p, void* data, mcmclib_raptor_alpha_fun_t fun);
 void mcmclib_raptor_set_alpha_fun_identity(mcmclib_amh* p);
 double mcmclib_raptor_alpha_star_fun(mcmclib_raptor_gamma* g);
+
+%{
+#define RAPT_GAMMA(p) ((mcmclib_rapt_gamma*) (p)->mh->q->gamma)
+#define RAPTOR_GAMMA(p) ((mcmclib_raptor_gamma*) RAPT_GAMMA(p)->which_region_data)
+#define RAPTOR_SUFF(p) ((mcmclib_raptor_suff*) (p)->suff)
+%}
+%inline{
+  mcmclib_raptor_gamma* mcmclib_raptor_gamma_get(mcmclib_amh* p) {
+    return RAPTOR_GAMMA(p);
+  }
+}
