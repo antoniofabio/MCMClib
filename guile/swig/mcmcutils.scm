@@ -4,7 +4,8 @@
 	     (srfi srfi-42)
              (swig gsl)
              (swig mcmclib)
-             (oop goops))
+             (oop goops)
+             (ice-9 pretty-print))
 (use-syntax (ice-9 syncase))
 
 (export v2gv gv2v gM2M M2gM va2ca ma2ca)
@@ -167,12 +168,39 @@
 ;;wrap monitor objects
 ;;
 (define-class <monitor> (<swig-obj>) (x #:init-keyword #:x))
+(define (make-monitor x)
+  (make <monitor> #:x x #:c-ref (new-mcmclib-monitor x)))
 (define-method (update (obj <monitor>))
   (mcmclib-monitor-update (get-c-ref obj)))
+(define-method (get-monitor-value (obj <monitor>) what)
+  "get values 'what' (a symbol) from monitor object 'obj' as a scheme vector"
+  (let*
+      ((cobj (get-c-ref obj))
+       (d (gsl-vector-size-get (mcmclib-monitor-x-get cobj)))
+       (v (new-gsl-vector d))
+       (fun-name (symbol-concatenate (list 'mcmclib-monitor-get- what))))
+    ((eval fun-name (interaction-environment)) cobj v)
+    (gv2v v)))
+(define-method (write (obj <monitor>) port)
+  (let*
+      ((cobj (get-c-ref obj))
+       (d (gsl-vector-size-get (mcmclib-monitor-x-get cobj)))
+       (v (new-gsl-vector d)))
+    (format #t "<monitor>\n")
+    (format #t "monitoring: ~a\n" (slot-ref obj 'x))
+    (format #t "means:\n")
+    (pretty-print (get-monitor-value obj 'means))
+    (format #t "variances:\n")
+    (pretty-print (get-monitor-value obj 'vars))
+    (format #t "acceptance rates:\n")
+    (pretty-print (get-monitor-value obj 'ar))
+    (format #t "mean squared jumping distances:\n")
+    (pretty-print (get-monitor-value obj 'msjd))))
+
 (define-class <monitor-ecdf> (<swig-obj>) (x #:init-keyword #:x))
 (define-method (update (obj <monitor-ecdf>))
   (mcmclib-monitor-ecdf-update (get-c-ref obj) (slot-ref obj 'x)))
-(export <monitor> <monitor-ecdf>)
+(export <monitor> get-monitor-value <monitor-ecdf>)
 
 ;;
 ;;transition frequencies of a finite state machine
