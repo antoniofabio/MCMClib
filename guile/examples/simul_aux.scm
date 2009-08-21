@@ -1,18 +1,3 @@
-(define (diag value size)
-  "diagonal matrix 'size x size'"
-  (let
-      ((ans (new-gsl-matrix size size)))
-    (gsl-matrix-set-identity ans)
-    (gsl-matrix-scale ans value)
-    ans))
-
-(define (make-filled-vector value dim)
-  "make vector of dimension 'dim' filled with 'value'"
-  (let
-      ((ans (new-gsl-vector dim)))
-    (gsl-vector-set-all ans value)
-    ans))
-
 (define (make-mvnorm mu Sigma)
   "build a multivariate normal distrib. fun."
   (let

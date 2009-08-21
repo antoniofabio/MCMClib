@@ -59,26 +59,40 @@
 (define (xor a b)
   (or (and a (not b))
       (and (not a) b)))
+
 (define (square x) (* x x))
+
 (define (dist x y)
   "euclidean distance between two gsl vectors"
-  (let*
-      ((n (gsl-vector-size-get x))
-       (z (new-gsl-vector n)))
-    (gsl-vector-memcpy z x)
-    (gsl-vector-sub z y)
-    (do-ec (: i n) (gsl-vector-set z i (square (gsl-vector-get z i))))
-    (sum-ec (: i n) (gsl-vector-get z i))))
+  (sum-ec (: i (gsl-vector-size-get x))
+          (square (- (gsl-vector-get x i) (gsl-vector-get y i)))))
+
 (define (get-dists x pts)
   "compute distances between point x and list of points 'pts'. gsl vectors"
   (map (lambda (y) (dist x y)) pts))
+
 (define (which-min x)
   "0-based index of the minimum value in list 'x'"
   (let
       ((m (apply min x)))
     (list-index (lambda (y) (= y m)) x)))
 
-(export xor square dist get-dists which-min)
+(define (diag value size)
+  "gsl diagonal matrix 'size x size'"
+  (let
+      ((ans (new-gsl-matrix size size)))
+    (gsl-matrix-set-identity ans)
+    (gsl-matrix-scale ans value)
+    ans))
+
+(define (make-filled-vector value dim)
+  "make gsl vector of dimension 'dim' filled with 'value'"
+  (let
+      ((ans (new-gsl-vector dim)))
+    (gsl-vector-set-all ans value)
+    ans))
+
+(export xor square dist get-dists which-min diag make-filled-vector)
 
 ;;
 ;;keep references of referenced objects to avoid premature garbage collection
