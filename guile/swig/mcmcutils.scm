@@ -200,7 +200,7 @@
 (define-class <monitor-ecdf> (<swig-obj>) (x #:init-keyword #:x))
 (define-method (update (obj <monitor-ecdf>))
   (mcmclib-monitor-ecdf-update (get-c-ref obj) (slot-ref obj 'x)))
-(export <monitor> get-monitor-value <monitor-ecdf>)
+(export <monitor> get-monitor-value <monitor-ecdf> make-monitor)
 
 ;;
 ;;transition frequencies of a finite state machine
