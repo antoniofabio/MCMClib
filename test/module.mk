@@ -6,7 +6,7 @@ TEST_names:= t1 t2 trecursive_variance tmixem tmixem_rec tmixem_online \
 	tinca trapt_inca tam_inca tinca_raptor \
 	tmcar_tilde twishart tmcar_model tiwishart \
 	tgivens tmonitor thier tpois_model tmonitor2 tmixem_online2 \
-	traptor2
+	traptor2 tmh3
 
 TEST_targets:=$(TEST_names:%=test_%)
 TEST_BIN:= $(TEST_names:%=test/%)
