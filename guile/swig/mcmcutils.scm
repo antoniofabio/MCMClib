@@ -24,20 +24,27 @@
 
 (define (gM2M gM)
   "convert a gsl matrix into a scheme matrix"
-  (vector-ec (: i (gsl-matrix-size1-get gM))
-             (vector-ec (: j (gsl-matrix-size2-get gM))
-                        (gsl-matrix-get gM i j))))
+  (let*
+      ((nr (gsl-matrix-size1-get gM))
+       (nc (gsl-matrix-size2-get gM))
+       (ans (make-array 0.0 nr nc)))
+    (do-ec (: i nr) (: j nc)
+           (array-set! ans (gsl-matrix-get gM i j) i j))
+    ans))
+(define-public (matrix-numrows M)
+  "get the number of rows of matrix M"
+  (car (array-dimensions M)))
+(define-public (matrix-numcolumns M)
+  "get the number of columns of matrix M"
+  (cadr (array-dimensions M)))
 (define (M2gM M)
   "convert a scheme matrix into a gsl matrix"
   (let*
-      ((nrows (vector-length M))
-       (ncols (vector-length (vector-ref M 0)))
-       (gM (new-gsl-matrix nrows ncols)))
-    (do-ec (: i nrows)
-           (let
-               ((row (vector-ref M i)))
-             (do-ec (: j ncols)
-                    (gsl-matrix-set gM i j (vector-ref row j)))))
+      ((nr (matrix-numrows M))
+       (nc (matrix-numcolumns M))
+       (gM (new-gsl-matrix nr nc)))
+    (do-ec (: i nr) (: j nc)
+           (gsl-matrix-set gM i j (array-ref M i j)))
     gM))
 
 (define (va2ca va)
