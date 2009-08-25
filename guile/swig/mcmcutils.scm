@@ -47,6 +47,17 @@
            (gsl-matrix-set gM i j (array-ref M i j)))
     gM))
 
+(define-public (matrix-add a b)
+  (let
+      ((ans (M2gM a)))
+    (gsl-matrix-add a (M2gM b))
+    (gM2M ans)))
+(define-public (matrix-scale a b)
+  (let
+      ((ans (M2gM a)))
+    (gsl-matrix-scale a b)
+    (gM2M ans)))
+
 (define (va2ca va)
   "convert a vector of g-vectors into a C array of g-vectors"
   (let*
