@@ -41,4 +41,4 @@
 ;;Update mean of a list of objects on which and '(add x y)'
 ;;  and a '(scale x s)' method is defined.
 (define (update-means old-values new-values old-n)
-  (map (lambda (x y) (update-mean x y old-n) old-values new-values)))
+  (map (lambda (x y) (update-mean x y old-n)) old-values new-values))
