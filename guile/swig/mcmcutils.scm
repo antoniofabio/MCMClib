@@ -50,13 +50,28 @@
 (define-public (matrix-add a b)
   (let
       ((ans (M2gM a)))
-    (gsl-matrix-add a (M2gM b))
+    (gsl-matrix-add ans (M2gM b))
     (gM2M ans)))
 (define-public (matrix-scale a b)
   (let
       ((ans (M2gM a)))
-    (gsl-matrix-scale a b)
+    (gsl-matrix-scale ans b)
     (gM2M ans)))
+
+(define-method (add (x <vector>) (y <vector>))
+  (vector-ec (: i (vector-length x)) (+ (vector-ref x i) (vector-ref y i))))
+(define-method (scale (x <vector>) s)
+  (vector-ec (: i (vector-length x)) (* (vector-ref x i) s)))
+(define-method (add (x <array>) (y <array>))
+  (matrix-add x y))
+(define-method (scale (x <array>) s)
+  (matrix-scale x s))
+(export add scale)
+
+(define-public (update-mean old-value new-data old-n)
+  "update mean value 'old-value' based on sample size 'old-n'
+   using the new data point 'new-data'"
+  (scale (add (scale old-value old-n) new-data) (/ (+ 1.0 old-n))))
 
 (define (va2ca va)
   "convert a vector of g-vectors into a C array of g-vectors"
