@@ -1,3 +1,14 @@
+(use-modules
+ (oop goops)
+ (oop goops describe)
+ (ice-9 pretty-print)
+ (ice-9 time)
+ (srfi srfi-1)
+ (srfi srfi-42)
+ (swig gsl)
+ (swig mcmclib)
+ (swig mcmcutils))
+
 (define (make-mvnorm mu Sigma)
   "build a multivariate normal distrib. fun."
   (let
