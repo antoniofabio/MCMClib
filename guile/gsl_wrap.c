@@ -6439,11 +6439,13 @@ _wrap_gsl_qrng_niederreiter_2(SCM s_0)
 #define FUNC_NAME "gsl-qrng-niederreiter-2"
   SCM gswig_result;
   
+  if (s_0 != SCM_UNDEFINED) {
+    {
+      gsl_qrng_niederreiter_2 = (gsl_qrng_type *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_gsl_qrng_type, 1, 0);
+    }
+  }
   {
-    gsl_qrng_type * resultptr;
-    resultptr = (gsl_qrng_type *) malloc(sizeof(gsl_qrng_type const));
-    memmove(resultptr, &gsl_qrng_niederreiter_2, sizeof(gsl_qrng_type const));
-    gswig_result = SWIG_NewPointerObj(resultptr, SWIGTYPE_p_gsl_qrng_type, 0);
+    gswig_result = SWIG_NewPointerObj (gsl_qrng_niederreiter_2, SWIGTYPE_p_gsl_qrng_type, 0);
   }
   
   return gswig_result;
@@ -6457,11 +6459,13 @@ _wrap_gsl_qrng_sobol(SCM s_0)
 #define FUNC_NAME "gsl-qrng-sobol"
   SCM gswig_result;
   
+  if (s_0 != SCM_UNDEFINED) {
+    {
+      gsl_qrng_sobol = (gsl_qrng_type *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_gsl_qrng_type, 1, 0);
+    }
+  }
   {
-    gsl_qrng_type * resultptr;
-    resultptr = (gsl_qrng_type *) malloc(sizeof(gsl_qrng_type const));
-    memmove(resultptr, &gsl_qrng_sobol, sizeof(gsl_qrng_type const));
-    gswig_result = SWIG_NewPointerObj(resultptr, SWIGTYPE_p_gsl_qrng_type, 0);
+    gswig_result = SWIG_NewPointerObj (gsl_qrng_sobol, SWIGTYPE_p_gsl_qrng_type, 0);
   }
   
   return gswig_result;
@@ -6475,11 +6479,13 @@ _wrap_gsl_qrng_halton(SCM s_0)
 #define FUNC_NAME "gsl-qrng-halton"
   SCM gswig_result;
   
+  if (s_0 != SCM_UNDEFINED) {
+    {
+      gsl_qrng_halton = (gsl_qrng_type *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_gsl_qrng_type, 1, 0);
+    }
+  }
   {
-    gsl_qrng_type * resultptr;
-    resultptr = (gsl_qrng_type *) malloc(sizeof(gsl_qrng_type const));
-    memmove(resultptr, &gsl_qrng_halton, sizeof(gsl_qrng_type const));
-    gswig_result = SWIG_NewPointerObj(resultptr, SWIGTYPE_p_gsl_qrng_type, 0);
+    gswig_result = SWIG_NewPointerObj (gsl_qrng_halton, SWIGTYPE_p_gsl_qrng_type, 0);
   }
   
   return gswig_result;
@@ -6493,11 +6499,13 @@ _wrap_gsl_qrng_reversehalton(SCM s_0)
 #define FUNC_NAME "gsl-qrng-reversehalton"
   SCM gswig_result;
   
+  if (s_0 != SCM_UNDEFINED) {
+    {
+      gsl_qrng_reversehalton = (gsl_qrng_type *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_gsl_qrng_type, 1, 0);
+    }
+  }
   {
-    gsl_qrng_type * resultptr;
-    resultptr = (gsl_qrng_type *) malloc(sizeof(gsl_qrng_type const));
-    memmove(resultptr, &gsl_qrng_reversehalton, sizeof(gsl_qrng_type const));
-    gswig_result = SWIG_NewPointerObj(resultptr, SWIGTYPE_p_gsl_qrng_type, 0);
+    gswig_result = SWIG_NewPointerObj (gsl_qrng_reversehalton, SWIGTYPE_p_gsl_qrng_type, 0);
   }
   
   return gswig_result;
@@ -7057,10 +7065,10 @@ SWIG_init(void)
   scm_c_define_gsubr("gsl-qrng-state", 1, 0, 0, (swig_guile_proc) _wrap_gsl_qrng_state);
   scm_c_define_gsubr("gsl-qrng-memcpy", 2, 0, 0, (swig_guile_proc) _wrap_gsl_qrng_memcpy);
   scm_c_define_gsubr("gsl-qrng-clone", 1, 0, 0, (swig_guile_proc) _wrap_gsl_qrng_clone);
-  scm_c_define_gsubr("gsl-qrng-niederreiter-2", 0, 0, 0, (swig_guile_proc) _wrap_gsl_qrng_niederreiter_2);
-  scm_c_define_gsubr("gsl-qrng-sobol", 0, 0, 0, (swig_guile_proc) _wrap_gsl_qrng_sobol);
-  scm_c_define_gsubr("gsl-qrng-halton", 0, 0, 0, (swig_guile_proc) _wrap_gsl_qrng_halton);
-  scm_c_define_gsubr("gsl-qrng-reversehalton", 0, 0, 0, (swig_guile_proc) _wrap_gsl_qrng_reversehalton);
+  scm_c_define_gsubr("gsl-qrng-niederreiter-2", 0, 1, 0, (swig_guile_proc) _wrap_gsl_qrng_niederreiter_2);
+  scm_c_define_gsubr("gsl-qrng-sobol", 0, 1, 0, (swig_guile_proc) _wrap_gsl_qrng_sobol);
+  scm_c_define_gsubr("gsl-qrng-halton", 0, 1, 0, (swig_guile_proc) _wrap_gsl_qrng_halton);
+  scm_c_define_gsubr("gsl-qrng-reversehalton", 0, 1, 0, (swig_guile_proc) _wrap_gsl_qrng_reversehalton);
 }
 
 #ifdef __cplusplus
