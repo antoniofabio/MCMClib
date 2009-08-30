@@ -9,6 +9,13 @@
  (swig mcmclib)
  (swig mcmcutils))
 
+(define (invLogit s)
+  (let ((S (exp s))) (/ S (+ 1.0 S))))
+(define (logit s)
+  (log (/ s (- 1.0 s))))
+(define (rescale s min max)
+  (+ min (* s (- max min))))
+
 (define (make-mvnorm mu Sigma)
   "build a multivariate normal distrib. fun."
   (let
