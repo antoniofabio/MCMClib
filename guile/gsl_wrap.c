@@ -1220,6 +1220,7 @@ SWIG_Guile_GetArgs (SCM *dest, SCM rest,
 static swig_guile_clientdata _swig_guile_clientdatagsl_vector = { NULL, SCM_EOL };
 static swig_guile_clientdata _swig_guile_clientdatagsl_matrix = { NULL, SCM_EOL };
 static swig_guile_clientdata _swig_guile_clientdatagsl_rng = { NULL, SCM_EOL };
+static swig_guile_clientdata _swig_guile_clientdatagsl_qrng = { NULL, SCM_EOL };
 
 /* -------- TYPES TABLE (BEGIN) -------- */
 
@@ -1231,16 +1232,19 @@ static swig_guile_clientdata _swig_guile_clientdatagsl_rng = { NULL, SCM_EOL };
 #define SWIGTYPE_p_double swig_types[5]
 #define SWIGTYPE_p_gsl_block swig_types[6]
 #define SWIGTYPE_p_gsl_matrix swig_types[7]
-#define SWIGTYPE_p_gsl_rng swig_types[8]
-#define SWIGTYPE_p_gsl_rng_type swig_types[9]
-#define SWIGTYPE_p_gsl_vector swig_types[10]
-#define SWIGTYPE_p_p_gsl_matrix swig_types[11]
-#define SWIGTYPE_p_p_gsl_rng_type swig_types[12]
-#define SWIGTYPE_p_p_gsl_vector swig_types[13]
-#define SWIGTYPE_p_size_t swig_types[14]
-#define SWIGTYPE_p_unsigned_long swig_types[15]
-static swig_type_info *swig_types[17];
-static swig_module_info swig_module = {swig_types, 16, 0, 0, 0, 0};
+#define SWIGTYPE_p_gsl_qrng swig_types[8]
+#define SWIGTYPE_p_gsl_qrng_type swig_types[9]
+#define SWIGTYPE_p_gsl_rng swig_types[10]
+#define SWIGTYPE_p_gsl_rng_type swig_types[11]
+#define SWIGTYPE_p_gsl_vector swig_types[12]
+#define SWIGTYPE_p_p_gsl_matrix swig_types[13]
+#define SWIGTYPE_p_p_gsl_rng_type swig_types[14]
+#define SWIGTYPE_p_p_gsl_vector swig_types[15]
+#define SWIGTYPE_p_size_t swig_types[16]
+#define SWIGTYPE_p_unsigned_long swig_types[17]
+#define SWIGTYPE_p_void swig_types[18]
+static swig_type_info *swig_types[20];
+static swig_module_info swig_module = {swig_types, 19, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -1253,6 +1257,7 @@ static swig_module_info swig_module = {swig_types, 16, 0, 0, 0, 0};
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_rng.h>
+#include <gsl/gsl_qrng.h>
 
 static void guile_gsl_err_handler(const char * reason,
 				  const char * file,
@@ -1314,6 +1319,15 @@ SWIGINTERN gsl_rng *new_gsl_rng(gsl_rng_type *type){
   }
 SWIGINTERN void delete_gsl_rng(gsl_rng *self){
     gsl_rng_free(self);
+  }
+SWIGINTERN gsl_qrng *new_gsl_qrng(gsl_qrng_type *T,unsigned int d){
+    return gsl_qrng_alloc(T, d);
+  }
+SWIGINTERN void delete_gsl_qrng(gsl_qrng *self){
+    gsl_qrng_free(self);
+  }
+SWIGINTERN int gsl_qrng_get_value(gsl_qrng *self,gsl_vector *x){
+    return gsl_qrng_get(self, x->data);
   }
 static SCM
 _wrap_fopen (SCM s_0, SCM s_1)
@@ -6203,6 +6217,294 @@ _wrap_gsl_rng_uniform_int (SCM s_0, SCM s_1)
 }
 
 
+static SCM
+_wrap_new_gsl_qrng (SCM s_0, SCM s_1)
+{
+#define FUNC_NAME "new-gsl-qrng"
+  gsl_qrng_type *arg1 = (gsl_qrng_type *) 0 ;
+  unsigned int arg2 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  gsl_qrng *result = 0 ;
+  
+  {
+    arg1 = (gsl_qrng_type *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_gsl_qrng_type, 1, 0);
+  }
+  {
+    arg2 = (unsigned int) scm_num2uint(s_1, SCM_ARG1, FUNC_NAME);
+  }
+  result = (gsl_qrng *)new_gsl_qrng(arg1,arg2);
+  {
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_gsl_qrng, 1);
+  }
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_delete_gsl_qrng (SCM s_0)
+{
+#define FUNC_NAME "delete-gsl-qrng"
+  gsl_qrng *arg1 = (gsl_qrng *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  
+  {
+    arg1 = (gsl_qrng *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_gsl_qrng, 1, 0);
+  }
+  delete_gsl_qrng(arg1);
+  gswig_result = SCM_UNSPECIFIED;
+  
+  SWIG_Guile_MarkPointerDestroyed(s_0);
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_gsl_qrng_get_value (SCM s_0, SCM s_1)
+{
+#define FUNC_NAME "gsl-qrng-get-value"
+  gsl_qrng *arg1 = (gsl_qrng *) 0 ;
+  gsl_vector *arg2 = (gsl_vector *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  int result;
+  
+  {
+    arg1 = (gsl_qrng *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_gsl_qrng, 1, 0);
+  }
+  {
+    arg2 = (gsl_vector *)SWIG_MustGetPtr(s_1, SWIGTYPE_p_gsl_vector, 2, 0);
+  }
+  result = (int)gsl_qrng_get_value(arg1,arg2);
+  {
+    gswig_result = scm_long2num(result);
+  }
+  
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_gsl_qrng_init (SCM s_0)
+{
+#define FUNC_NAME "gsl-qrng-init"
+  gsl_qrng *arg1 = (gsl_qrng *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  
+  {
+    arg1 = (gsl_qrng *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_gsl_qrng, 1, 0);
+  }
+  gsl_qrng_init(arg1);
+  gswig_result = SCM_UNSPECIFIED;
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_gsl_qrng_name (SCM s_0)
+{
+#define FUNC_NAME "gsl-qrng-name"
+  gsl_qrng *arg1 = (gsl_qrng *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  char *result = 0 ;
+  
+  {
+    arg1 = (gsl_qrng *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_gsl_qrng, 1, 0);
+  }
+  result = (char *)gsl_qrng_name((gsl_qrng const *)arg1);
+  {
+    gswig_result = scm_makfrom0str((const char *)result);
+  }
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_gsl_qrng_size (SCM s_0)
+{
+#define FUNC_NAME "gsl-qrng-size"
+  gsl_qrng *arg1 = (gsl_qrng *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  size_t result;
+  
+  {
+    arg1 = (gsl_qrng *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_gsl_qrng, 1, 0);
+  }
+  result = gsl_qrng_size((gsl_qrng const *)arg1);
+  {
+    gswig_result = scm_ulong2num(result);
+  }
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_gsl_qrng_state (SCM s_0)
+{
+#define FUNC_NAME "gsl-qrng-state"
+  gsl_qrng *arg1 = (gsl_qrng *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  void *result = 0 ;
+  
+  {
+    arg1 = (gsl_qrng *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_gsl_qrng, 1, 0);
+  }
+  result = (void *)gsl_qrng_state((gsl_qrng const *)arg1);
+  {
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_void, 0);
+  }
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_gsl_qrng_memcpy (SCM s_0, SCM s_1)
+{
+#define FUNC_NAME "gsl-qrng-memcpy"
+  gsl_qrng *arg1 = (gsl_qrng *) 0 ;
+  gsl_qrng *arg2 = (gsl_qrng *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  int result;
+  
+  {
+    arg1 = (gsl_qrng *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_gsl_qrng, 1, 0);
+  }
+  {
+    arg2 = (gsl_qrng *)SWIG_MustGetPtr(s_1, SWIGTYPE_p_gsl_qrng, 2, 0);
+  }
+  result = (int)gsl_qrng_memcpy(arg1,(gsl_qrng const *)arg2);
+  {
+    gswig_result = scm_long2num(result);
+  }
+  
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_gsl_qrng_clone (SCM s_0)
+{
+#define FUNC_NAME "gsl-qrng-clone"
+  gsl_qrng *arg1 = (gsl_qrng *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  gsl_qrng *result = 0 ;
+  
+  {
+    arg1 = (gsl_qrng *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_gsl_qrng, 1, 0);
+  }
+  result = (gsl_qrng *)gsl_qrng_clone((gsl_qrng const *)arg1);
+  {
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_gsl_qrng, 1);
+  }
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_gsl_qrng_niederreiter_2(SCM s_0)
+{
+#define FUNC_NAME "gsl-qrng-niederreiter-2"
+  SCM gswig_result;
+  
+  {
+    gsl_qrng_type * resultptr;
+    resultptr = (gsl_qrng_type *) malloc(sizeof(gsl_qrng_type const));
+    memmove(resultptr, &gsl_qrng_niederreiter_2, sizeof(gsl_qrng_type const));
+    gswig_result = SWIG_NewPointerObj(resultptr, SWIGTYPE_p_gsl_qrng_type, 0);
+  }
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_gsl_qrng_sobol(SCM s_0)
+{
+#define FUNC_NAME "gsl-qrng-sobol"
+  SCM gswig_result;
+  
+  {
+    gsl_qrng_type * resultptr;
+    resultptr = (gsl_qrng_type *) malloc(sizeof(gsl_qrng_type const));
+    memmove(resultptr, &gsl_qrng_sobol, sizeof(gsl_qrng_type const));
+    gswig_result = SWIG_NewPointerObj(resultptr, SWIGTYPE_p_gsl_qrng_type, 0);
+  }
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_gsl_qrng_halton(SCM s_0)
+{
+#define FUNC_NAME "gsl-qrng-halton"
+  SCM gswig_result;
+  
+  {
+    gsl_qrng_type * resultptr;
+    resultptr = (gsl_qrng_type *) malloc(sizeof(gsl_qrng_type const));
+    memmove(resultptr, &gsl_qrng_halton, sizeof(gsl_qrng_type const));
+    gswig_result = SWIG_NewPointerObj(resultptr, SWIGTYPE_p_gsl_qrng_type, 0);
+  }
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_gsl_qrng_reversehalton(SCM s_0)
+{
+#define FUNC_NAME "gsl-qrng-reversehalton"
+  SCM gswig_result;
+  
+  {
+    gsl_qrng_type * resultptr;
+    resultptr = (gsl_qrng_type *) malloc(sizeof(gsl_qrng_type const));
+    memmove(resultptr, &gsl_qrng_reversehalton, sizeof(gsl_qrng_type const));
+    gswig_result = SWIG_NewPointerObj(resultptr, SWIGTYPE_p_gsl_qrng_type, 0);
+  }
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -6217,6 +6519,8 @@ static swig_type_info _swigt__p__gsl_vector_view = {"_p__gsl_vector_view", "_gsl
 static swig_type_info _swigt__p_double = {"_p_double", "double *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_gsl_block = {"_p_gsl_block", "gsl_block *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_gsl_matrix = {"_p_gsl_matrix", "gsl_matrix *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_gsl_qrng = {"_p_gsl_qrng", "gsl_qrng *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_gsl_qrng_type = {"_p_gsl_qrng_type", "gsl_qrng_type *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_gsl_rng = {"_p_gsl_rng", "gsl_rng *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_gsl_rng_type = {"_p_gsl_rng_type", "gsl_rng_type *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_gsl_vector = {"_p_gsl_vector", "gsl_vector *", 0, 0, (void*)0, 0};
@@ -6225,6 +6529,7 @@ static swig_type_info _swigt__p_p_gsl_rng_type = {"_p_p_gsl_rng_type", "gsl_rng_
 static swig_type_info _swigt__p_p_gsl_vector = {"_p_p_gsl_vector", "gsl_vector **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_size_t = {"_p_size_t", "size_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_long = {"_p_unsigned_long", "SCM *|unsigned long *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_void = {"_p_void", "void *", 0, 0, (void*)0, 0};
 
 static swig_type_info *swig_type_initial[] = {
   &_swigt__p_FILE,
@@ -6235,6 +6540,8 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_double,
   &_swigt__p_gsl_block,
   &_swigt__p_gsl_matrix,
+  &_swigt__p_gsl_qrng,
+  &_swigt__p_gsl_qrng_type,
   &_swigt__p_gsl_rng,
   &_swigt__p_gsl_rng_type,
   &_swigt__p_gsl_vector,
@@ -6243,6 +6550,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_p_gsl_vector,
   &_swigt__p_size_t,
   &_swigt__p_unsigned_long,
+  &_swigt__p_void,
 };
 
 static swig_cast_info _swigc__p_FILE[] = {  {&_swigt__p_FILE, 0, 0, 0},{0, 0, 0, 0}};
@@ -6253,6 +6561,8 @@ static swig_cast_info _swigc__p__gsl_vector_view[] = {  {&_swigt__p__gsl_vector_
 static swig_cast_info _swigc__p_double[] = {  {&_swigt__p_double, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_gsl_block[] = {  {&_swigt__p_gsl_block, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_gsl_matrix[] = {  {&_swigt__p_gsl_matrix, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_gsl_qrng[] = {  {&_swigt__p_gsl_qrng, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_gsl_qrng_type[] = {  {&_swigt__p_gsl_qrng_type, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_gsl_rng[] = {  {&_swigt__p_gsl_rng, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_gsl_rng_type[] = {  {&_swigt__p_gsl_rng_type, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_gsl_vector[] = {  {&_swigt__p_gsl_vector, 0, 0, 0},{0, 0, 0, 0}};
@@ -6261,6 +6571,7 @@ static swig_cast_info _swigc__p_p_gsl_rng_type[] = {  {&_swigt__p_p_gsl_rng_type
 static swig_cast_info _swigc__p_p_gsl_vector[] = {  {&_swigt__p_p_gsl_vector, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_size_t[] = {  {&_swigt__p_size_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_unsigned_long[] = {  {&_swigt__p_unsigned_long, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_void[] = {  {&_swigt__p_void, 0, 0, 0},{0, 0, 0, 0}};
 
 static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_FILE,
@@ -6271,6 +6582,8 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_double,
   _swigc__p_gsl_block,
   _swigc__p_gsl_matrix,
+  _swigc__p_gsl_qrng,
+  _swigc__p_gsl_qrng_type,
   _swigc__p_gsl_rng,
   _swigc__p_gsl_rng_type,
   _swigc__p_gsl_vector,
@@ -6279,6 +6592,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_p_gsl_vector,
   _swigc__p_size_t,
   _swigc__p_unsigned_long,
+  _swigc__p_void,
 };
 
 
@@ -6732,6 +7046,21 @@ SWIG_init(void)
   scm_c_define_gsubr("gsl-rng-uniform", 1, 0, 0, (swig_guile_proc) _wrap_gsl_rng_uniform);
   scm_c_define_gsubr("gsl-rng-uniform-pos", 1, 0, 0, (swig_guile_proc) _wrap_gsl_rng_uniform_pos);
   scm_c_define_gsubr("gsl-rng-uniform-int", 2, 0, 0, (swig_guile_proc) _wrap_gsl_rng_uniform_int);
+  SWIG_TypeClientData(SWIGTYPE_p_gsl_qrng, (void *) &_swig_guile_clientdatagsl_qrng);
+  scm_c_define_gsubr("new-gsl-qrng", 2, 0, 0, (swig_guile_proc) _wrap_new_gsl_qrng);
+  ((swig_guile_clientdata *)(SWIGTYPE_p_gsl_qrng->clientdata))->destroy = (guile_destructor) _wrap_delete_gsl_qrng;
+  scm_c_define_gsubr("delete-gsl-qrng", 1, 0, 0, (swig_guile_proc) _wrap_delete_gsl_qrng);
+  scm_c_define_gsubr("gsl-qrng-get-value", 2, 0, 0, (swig_guile_proc) _wrap_gsl_qrng_get_value);
+  scm_c_define_gsubr("gsl-qrng-init", 1, 0, 0, (swig_guile_proc) _wrap_gsl_qrng_init);
+  scm_c_define_gsubr("gsl-qrng-name", 1, 0, 0, (swig_guile_proc) _wrap_gsl_qrng_name);
+  scm_c_define_gsubr("gsl-qrng-size", 1, 0, 0, (swig_guile_proc) _wrap_gsl_qrng_size);
+  scm_c_define_gsubr("gsl-qrng-state", 1, 0, 0, (swig_guile_proc) _wrap_gsl_qrng_state);
+  scm_c_define_gsubr("gsl-qrng-memcpy", 2, 0, 0, (swig_guile_proc) _wrap_gsl_qrng_memcpy);
+  scm_c_define_gsubr("gsl-qrng-clone", 1, 0, 0, (swig_guile_proc) _wrap_gsl_qrng_clone);
+  scm_c_define_gsubr("gsl-qrng-niederreiter-2", 0, 0, 0, (swig_guile_proc) _wrap_gsl_qrng_niederreiter_2);
+  scm_c_define_gsubr("gsl-qrng-sobol", 0, 0, 0, (swig_guile_proc) _wrap_gsl_qrng_sobol);
+  scm_c_define_gsubr("gsl-qrng-halton", 0, 0, 0, (swig_guile_proc) _wrap_gsl_qrng_halton);
+  scm_c_define_gsubr("gsl-qrng-reversehalton", 0, 0, 0, (swig_guile_proc) _wrap_gsl_qrng_reversehalton);
 }
 
 #ifdef __cplusplus
