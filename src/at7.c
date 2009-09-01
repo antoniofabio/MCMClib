@@ -88,38 +88,32 @@ static mcmclib_mh_q* at7_q_alloc(gsl_rng* r, distrfun_p logdistr, void* logdistr
 			    gamma);
 }
 
-mcmclib_at7_suff* mcmclib_at7_suff_alloc(mcmclib_at7_gamma* g,
-					 const gsl_vector* beta_hat,
-					 gsl_vector** mu_hat,
-					 gsl_matrix** Sigma_hat,
-					 int t0) {
+mcmclib_at7_suff* mcmclib_at7_suff_alloc(mcmclib_at7_gamma* g, int t0) {
   mcmclib_at7_suff* a = (mcmclib_at7_suff*) malloc(sizeof(mcmclib_at7_suff));
-  int K = g->beta->size;
-  int dim = g->mu[0]->size;
-  a->beta_hat = gsl_vector_alloc(K);
-  gsl_vector_memcpy(a->beta_hat, beta_hat);
-  a->mu_hat = malloc(K * sizeof(gsl_vector*));
-  a->Sigma_hat = malloc(K * sizeof(gsl_matrix*));
-  for(int k=0; k<K; k++) {
-    a->mu_hat[k] = gsl_vector_alloc(dim);
-    gsl_vector_memcpy(a->mu_hat[k], mu_hat[k]);
-    a->Sigma_hat[k] = gsl_matrix_alloc(dim, dim);
-    gsl_matrix_memcpy(a->Sigma_hat[k], Sigma_hat[k]);
-  }
-  a->em = mcmclib_mixem_online_alloc(a->mu_hat, a->Sigma_hat, a->beta_hat, 0.5, t0);
+  a->em = mcmclib_mixem_online_alloc(g->mu, g->Sigma, g->beta, 0.5, t0);
   return a;
 }
 
 void mcmclib_at7_suff_free(mcmclib_at7_suff* p) {
   mcmclib_mixem_online_free(p->em);
-  for(int k=0; k < p->beta_hat->size; k++) {
-    gsl_vector_free(p->mu_hat[k]);
-    gsl_matrix_free(p->Sigma_hat[k]);
-  }
-  free(p->Sigma_hat);
-  free(p->mu_hat);
-  gsl_vector_free(p->beta_hat);
   free(p);
+}
+
+/*dest = alpha * (A + B) */
+static void matrix_addscale(gsl_matrix* dest,
+			    const gsl_matrix* A, const gsl_matrix* B, double alpha) {
+  gsl_matrix_memcpy(dest, A);
+  gsl_matrix_add(dest, B);
+  gsl_matrix_scale(dest, alpha);
+}
+
+void at7_gamma_update_Sigma(mcmclib_at7_gamma* p) {
+  int K = p->beta->size;
+  for(int k=0; k < K; k++) {
+    matrix_addscale(p->localVariances[k],
+		    p->Sigma_eps, p->Sigma[k],
+		    gsl_vector_get(p->scaling_factors, k));
+  }
 }
 
 mcmclib_amh* mcmclib_at7_alloc(gsl_rng* r,
@@ -134,11 +128,7 @@ mcmclib_amh* mcmclib_at7_alloc(gsl_rng* r,
   mcmclib_mh_q* q = at7_q_alloc(r, logdistr, logdistr_data,
 				Sigma_zero, gamma);
   mcmclib_mh* mh = mcmclib_mh_alloc(r, logdistr, logdistr_data, q, x);
-  mcmclib_at7_suff* suff = mcmclib_at7_suff_alloc(gamma,
-						  beta_hat,
-						  mu_hat,
-						  Sigma_hat,
-						  t0);
+  mcmclib_at7_suff* suff = mcmclib_at7_suff_alloc(gamma, t0);
   mcmclib_amh* ans = mcmclib_amh_alloc(mh, suff, mcmclib_at7_update);
 
   mcmclib_at7_set_sf_all(ans, 2.38*2.38 / (double) x->size);
@@ -154,11 +144,11 @@ void mcmclib_at7_free(mcmclib_amh* p) {
 }
 
 void mcmclib_at7_set_sf_all(mcmclib_amh* p, double sf) {
-  gsl_vector_set_all(AT7_SUFF(p)->scaling_factors, sf);
+  gsl_vector_set_all(AT7_GAMMA(p)->scaling_factors, sf);
 }
 
 void mcmclib_at7_set_sf(mcmclib_amh* p, const gsl_vector* sf) {
-  gsl_vector_memcpy(AT7_SUFF(p)->scaling_factors, sf);
+  gsl_vector_memcpy(AT7_GAMMA(p)->scaling_factors, sf);
 }
 
 void mcmclib_at7_update(void* in_p) {
@@ -166,7 +156,6 @@ void mcmclib_at7_update(void* in_p) {
   mcmclib_at7_suff* s = AT7_SUFF(p);
   mcmclib_mixem_online* em = s->em;
   mcmclib_mixem_online_update(em, p->mh->x);
-  if((p->n) <= em->n0)
-    return;
-  //TODO
+  if((p->n) > em->n0)
+    at7_gamma_update_Sigma(AT7_GAMMA(p));
 }
