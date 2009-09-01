@@ -37,14 +37,18 @@ mcmclib_at7_gamma* mcmclib_at7_gamma_alloc(const gsl_vector* beta,
   mcmclib_at7_gamma* ans = (mcmclib_at7_gamma*) malloc(sizeof(mcmclib_at7_gamma));
   int K = beta->size;
   int dim = mu[0]->size;
+  ans->beta = gsl_vector_alloc(K);
   gsl_vector_memcpy(ans->beta, beta);
   ans->mu = (gsl_vector**) malloc(K * sizeof(gsl_vector*));
   ans->Sigma = (gsl_matrix**) malloc(K * sizeof(gsl_matrix*));
-  ans->qVariances = (gsl_matrix**) malloc(K * sizeof(gsl_matrix*));
+  ans->pik = (mcmclib_mvnorm_lpdf**) malloc(K * sizeof(mcmclib_mvnorm_lpdf*));
   ans->tmpMean = gsl_vector_alloc(dim);
+  ans->qVariances = (gsl_matrix**) malloc(K * sizeof(gsl_matrix*));
   ans->qdk = (mcmclib_mvnorm_lpdf**) malloc(K * sizeof(mcmclib_mvnorm_lpdf*));
   for(int k=0; k < beta->size; k++) {
+    ans->mu[k] = gsl_vector_alloc(dim);
     gsl_vector_memcpy(ans->mu[k], mu[k]);
+    ans->Sigma[k] = gsl_matrix_alloc(dim, dim);
     gsl_matrix_memcpy(ans->Sigma[k], Sigma[k]);
     ans->pik[k] = mcmclib_mvnorm_lpdf_alloc(ans->mu[k], ans->Sigma[k]->data);
     ans->qVariances[k] = gsl_matrix_alloc(dim, dim);
@@ -52,7 +56,14 @@ mcmclib_at7_gamma* mcmclib_at7_gamma_alloc(const gsl_vector* beta,
   }
   gsl_vector_memcpy(ans->beta, beta);
   ans->pi = mcmclib_mixnorm_lpdf_alloc(ans->beta, ans->pik);
+  ans->Sigma_eps = gsl_matrix_alloc(dim, dim);
+  gsl_matrix_set_identity(ans->Sigma_eps);
+  gsl_matrix_scale(ans->Sigma_eps, 0.001);
+  ans->scaling_factors = gsl_vector_alloc(K);
+  gsl_vector_set_all(ans->scaling_factors, 2.38*2.38 / (double) dim);
   at7_gamma_update_Sigma(ans);
+  ans->weights = gsl_vector_alloc(K);
+  gsl_vector_set_all(ans->weights, 0.0);
   return ans;
 }
 
@@ -67,6 +78,8 @@ void mcmclib_at7_gamma_free(mcmclib_at7_gamma* p) {
     mcmclib_mvnorm_lpdf_free(p->qdk[k]);
     gsl_matrix_free(p->qVariances[k]);
   }
+  gsl_vector_free(p->weights);
+  gsl_vector_free(p->scaling_factors);
   free(p->mu);
   free(p->Sigma);
   free(p->qVariances);
@@ -150,8 +163,6 @@ mcmclib_amh* mcmclib_at7_alloc(gsl_rng* r,
   mcmclib_mh* mh = mcmclib_mh_alloc(r, logdistr, logdistr_data, q, x);
   mcmclib_at7_suff* suff = mcmclib_at7_suff_alloc(gamma, t0);
   mcmclib_amh* ans = mcmclib_amh_alloc(mh, suff, mcmclib_at7_update);
-
-  mcmclib_at7_set_sf_all(ans, 2.38*2.38 / (double) x->size);
   return ans;
 }
 
