@@ -89,12 +89,12 @@ void mcmclib_at7_gamma_free(mcmclib_at7_gamma* p) {
 static void at7_components_weights(mcmclib_at7_gamma* g, gsl_vector* x) {
   mcmclib_mvnorm_lpdf** pik = g->pik;
   double sum=0.0;
-  for(int k=0; k < x->size; k++) {
-    double nuk = exp(mcmclib_mvnorm_lpdf_compute(pik[k], x));
-    gsl_vector_set(x, k, nuk);
+  for(int k=0; k < g->weights->size; k++) {
+    double nuk = gsl_vector_get(g->beta, k) * exp(mcmclib_mvnorm_lpdf_compute(pik[k], x));
+    gsl_vector_set(g->weights, k, nuk);
     sum += nuk;
   }
-  gsl_vector_scale(x, 1.0 / sum);
+  gsl_vector_scale(g->weights, 1.0 / sum);
 }
 
 /*sample a discrete value from the discrete distribution with probs. 'probs'*/
@@ -111,7 +111,7 @@ static int sample(gsl_rng* r, gsl_vector* probs) {
 
 static void at7_q_sample(mcmclib_mh_q* q, gsl_vector* x) {
   mcmclib_at7_gamma* gamma = (mcmclib_at7_gamma*) q->gamma;
-  at7_components_weights(gamma, gamma->weights);
+  at7_components_weights(gamma, x);
   int k = sample(q->r, gamma->weights);
   gsl_vector* oldx = gsl_vector_alloc(x->size);
   gsl_vector_memcpy(oldx, x);
