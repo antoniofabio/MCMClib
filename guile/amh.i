@@ -82,3 +82,5 @@ double mcmclib_raptor_alpha_star_fun(mcmclib_raptor_gamma* g);
     return RAPTOR_GAMMA(p);
   }
 }
+
+%include "at7.i"
