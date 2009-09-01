@@ -32,20 +32,22 @@ typedef struct {
   mcmclib_mvnorm_lpdf** pik_hat; /**< single mixture components densities*/
   mcmclib_mixnorm_lpdf* pi_hat; /**< mixture density*/
 
-  gsl_matrix* Sigma_eps; /**< positive-definiteness correction factor*/
-  gsl_vector* scaling_factors; /**< region-specific scaling factors*/
+  gsl_vector* weights; /**< internal workspace memory*/
 } mcmclib_at7_gamma;
 
 /** alloc a new at7_gamma object. Input arguments are copied @internal */
-mcmclib_at7_gamma* mcmclib_at7_gamma_alloc(gsl_vector* beta_hat,
-					   gsl_vector** mu_hat,
-					   gsl_matrix** Sigma_hat);
+mcmclib_at7_gamma* mcmclib_at7_gamma_alloc(const gsl_vector* beta_hat,
+					   const gsl_vector** mu_hat,
+					   const gsl_matrix** Sigma_hat);
 /** frees an at7_gamma object @internal*/
 void mcmclib_at7_gamma_free(mcmclib_at7_gamma* p);
 
 /** \brief AT7 sufficient data */
 typedef struct {
   mcmclib_mixem_online* em; /**< online-EM mixture fitter*/
+
+  gsl_matrix* Sigma_eps; /**< positive-definiteness correction factor*/
+  gsl_vector* scaling_factors; /**< region-specific scaling factors*/
 } mcmclib_at7_suff;
 
 /** alloc a new AT7 sampler suff stats object
@@ -72,9 +74,9 @@ int mcmclib_at7_suff_update(mcmclib_raptor_suff* p);
 mcmclib_amh* mcmclib_at7_alloc(gsl_rng* r,
 			       distrfun_p logdistr, void* logdistr_data,
 			       gsl_vector* x, int t0, gsl_matrix* Sigma_zero,
-			       gsl_vector* beta_hat,
-			       gsl_vector** mu_hat,
-			       gsl_matrix** Sigma_hat);
+			       const gsl_vector* beta_hat,
+			       const gsl_vector** mu_hat,
+			       const gsl_matrix** Sigma_hat);
 /**\brief free a previously allocated AT7 sampler*/
 void mcmclib_at7_free(mcmclib_amh* p);
 /**@internal */
