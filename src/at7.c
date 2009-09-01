@@ -129,7 +129,7 @@ static double at7_q_d(void* in_gamma, gsl_vector* x, gsl_vector* y) {
   for(int k=0; k < K; k++)
     ans += exp(mcmclib_mvnorm_lpdf_compute(gamma->qdk[k], y)) *
       gsl_vector_get(gamma->weights, k);
-  return ans;
+  return log(ans);
 }
 
 static mcmclib_mh_q* at7_q_alloc(gsl_rng* r, distrfun_p logdistr, void* logdistr_data,
