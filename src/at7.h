@@ -29,9 +29,11 @@ typedef struct {
   gsl_vector** mu; /**< current mixture means*/
   gsl_matrix** Sigma; /**< current mixture variances*/
 
-  gsl_matrix** localVariances; /**< local proposal variances*/
   mcmclib_mvnorm_lpdf** pik; /**< single mixture components densities*/
-  mcmclib_mixnorm_lpdf* pi; /**< mixture density*/
+  mcmclib_mixnorm_lpdf* pi; /**< fitted mixture density*/
+
+  gsl_matrix** qVariances; /**< local proposal variances*/
+  mcmclib_mvnorm_lpdf** qdk; /**< proposal density components*/
 
   gsl_matrix* Sigma_eps; /**< positive-definiteness correction factor*/
   gsl_vector* scaling_factors; /**< region-specific scaling factors*/
