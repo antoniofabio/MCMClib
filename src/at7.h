@@ -37,8 +37,8 @@ typedef struct {
 
 /** alloc a new at7_gamma object. Input arguments are copied @internal */
 mcmclib_at7_gamma* mcmclib_at7_gamma_alloc(const gsl_vector* beta_hat,
-					   const gsl_vector** mu_hat,
-					   const gsl_matrix** Sigma_hat);
+					   gsl_vector** mu_hat,
+					   gsl_matrix** Sigma_hat);
 /** frees an at7_gamma object @internal*/
 void mcmclib_at7_gamma_free(mcmclib_at7_gamma* p);
 
@@ -75,8 +75,8 @@ mcmclib_amh* mcmclib_at7_alloc(gsl_rng* r,
 			       distrfun_p logdistr, void* logdistr_data,
 			       gsl_vector* x, int t0, gsl_matrix* Sigma_zero,
 			       const gsl_vector* beta_hat,
-			       const gsl_vector** mu_hat,
-			       const gsl_matrix** Sigma_hat);
+			       gsl_vector** mu_hat,
+			       gsl_matrix** Sigma_hat);
 /**\brief free a previously allocated AT7 sampler*/
 void mcmclib_at7_free(mcmclib_amh* p);
 /**@internal */

@@ -15,8 +15,8 @@
 #define AT7_SUFF(p) ((mcmclib_at7_suff*)((mcmclib_amh*) p)->suff)
 
 mcmclib_at7_gamma* mcmclib_at7_gamma_alloc(const gsl_vector* beta_hat,
-					   const gsl_vector** mu_hat,
-					   const gsl_matrix** Sigma_hat) {
+					   gsl_vector** mu_hat,
+					   gsl_matrix** Sigma_hat) {
   mcmclib_at7_gamma* ans = (mcmclib_at7_gamma*) malloc(sizeof(mcmclib_at7_gamma));
   gsl_vector_memcpy(ans->beta_hat, beta_hat);
   for(int k=0; k < beta_hat->size; k++) {
@@ -99,8 +99,8 @@ mcmclib_amh* mcmclib_at7_alloc(gsl_rng* r,
 			       distrfun_p logdistr, void* logdistr_data,
 			       gsl_vector* x, int t0, gsl_matrix* Sigma_zero,
 			       const gsl_vector* beta_hat,
-			       const gsl_vector** mu_hat,
-			       const gsl_matrix** Sigma_hat){
+			       gsl_vector** mu_hat,
+			       gsl_matrix** Sigma_hat){
   mcmclib_at7_gamma* gamma = mcmclib_at7_gamma_alloc(beta_hat,
 						     mu_hat,
 						     Sigma_hat);
