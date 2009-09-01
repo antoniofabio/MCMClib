@@ -124,13 +124,14 @@ static void at7_q_sample(mcmclib_mh_q* q, gsl_vector* x) {
 
 static double at7_q_d(void* in_gamma, gsl_vector* x, gsl_vector* y) {
   mcmclib_at7_gamma* gamma = (mcmclib_at7_gamma*) in_gamma;
+  at7_components_weights(gamma, x);
   gsl_vector_memcpy(gamma->tmpMean, x);
-  at7_components_weights(gamma, y);
   int K = gamma->beta->size;
   double ans = 0.0;
-  for(int k=0; k < K; k++)
-    ans += exp(mcmclib_mvnorm_lpdf_compute(gamma->qdk[k], y)) *
-      gsl_vector_get(gamma->weights, k);
+  for(int k=0; k < K; k++) {
+    double xy = exp(mcmclib_mvnorm_lpdf_compute(gamma->qdk[k], y));
+    ans +=  xy * gsl_vector_get(gamma->weights, k);
+  }
   return log(ans);
 }
 
