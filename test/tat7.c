@@ -58,9 +58,8 @@ int main(int argc, char** argv) {
 					   w_hat, mu_hat, Sigma_hat);
 
   /*Main MCMC loop*/
-  for(int n=0; n<N; n++) {
+  for(int n=0; n<N; n++)
     mcmclib_amh_update(sampler);
-  }
 
   /*check options setting*/
   mcmclib_at7_set_sf_all(sampler, 0.2);
@@ -75,7 +74,7 @@ int main(int argc, char** argv) {
   /*free memory*/
   gsl_matrix_free(sigma_whole);
   gsl_vector_free(x);
-  mcmclib_raptor_free(sampler);
+  mcmclib_at7_free(sampler);
 
   return 0;
 }

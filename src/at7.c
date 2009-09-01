@@ -68,9 +68,6 @@ mcmclib_at7_gamma* mcmclib_at7_gamma_alloc(const gsl_vector* beta,
 }
 
 void mcmclib_at7_gamma_free(mcmclib_at7_gamma* p) {
-  mcmclib_mixnorm_lpdf_free(p->pi);
-  gsl_vector_free(p->beta);
-  gsl_vector_free(p->tmpMean);
   for(int k=0; k < p->beta->size; k++) {
     mcmclib_mvnorm_lpdf_free(p->pik[k]);
     gsl_vector_free(p->mu[k]);
@@ -78,8 +75,13 @@ void mcmclib_at7_gamma_free(mcmclib_at7_gamma* p) {
     mcmclib_mvnorm_lpdf_free(p->qdk[k]);
     gsl_matrix_free(p->qVariances[k]);
   }
+  mcmclib_mixnorm_lpdf_free(p->pi);
+  gsl_vector_free(p->beta);
+  gsl_vector_free(p->tmpMean);
   gsl_vector_free(p->weights);
   gsl_vector_free(p->scaling_factors);
+  free(p->pik);
+  free(p->qdk);
   free(p->mu);
   free(p->Sigma);
   free(p->qVariances);
@@ -123,7 +125,7 @@ static void at7_q_sample(mcmclib_mh_q* q, gsl_vector* x) {
 static double at7_q_d(void* in_gamma, gsl_vector* x, gsl_vector* y) {
   mcmclib_at7_gamma* gamma = (mcmclib_at7_gamma*) in_gamma;
   gsl_vector_memcpy(gamma->tmpMean, x);
-  at7_components_weights(gamma, gamma->weights);
+  at7_components_weights(gamma, y);
   int K = gamma->beta->size;
   double ans = 0.0;
   for(int k=0; k < K; k++)
