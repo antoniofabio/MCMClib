@@ -154,7 +154,7 @@ void mcmclib_at7_suff_free(mcmclib_at7_suff* p) {
 
 mcmclib_amh* mcmclib_at7_alloc(gsl_rng* r,
 			       distrfun_p logdistr, void* logdistr_data,
-			       gsl_vector* x, int t0, gsl_matrix* Sigma_zero,
+			       gsl_vector* x, int t0,
 			       const gsl_vector* beta_hat,
 			       gsl_vector** mu_hat,
 			       gsl_matrix** Sigma_hat){
