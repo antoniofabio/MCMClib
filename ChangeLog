@@ -1,4 +1,5 @@
-Version 0.18 A. F. Di Narzo <antonio.fabio@gmail.com>
+Version 0.18 A. F. Di Narzo <antonio.fabio@gmail.com>,
+	* added 'AT7' module, implementing Andrieu&Thoms (2008) alg.7 adaptive sampler
 	* added symm. matrix eigenvalues computing function
 	* fixed a very serious bug in asymmetric MH-ratio formula
 	* added self-adjusting alpha option to raptor algorithm
