@@ -25,12 +25,12 @@
 
 /** \brief AT7 gamma values */
 typedef struct {
-  gsl_vector* beta_hat; /**< current mixture weights estimates*/
-  gsl_vector** mu_hat; /**< current mixture means estimates*/
-  gsl_matrix** Sigma_hat; /**< current mixture variances estimates*/
+  gsl_vector* beta; /**< current mixture weights*/
+  gsl_vector** mu; /**< current mixture means*/
+  gsl_matrix** Sigma; /**< current mixture variances*/
 
-  mcmclib_mvnorm_lpdf** pik_hat; /**< single mixture components densities*/
-  mcmclib_mixnorm_lpdf* pi_hat; /**< mixture density*/
+  mcmclib_mvnorm_lpdf** pik; /**< single mixture components densities*/
+  mcmclib_mixnorm_lpdf* pi; /**< mixture density*/
 
   gsl_vector* weights; /**< internal workspace memory*/
 } mcmclib_at7_gamma;
@@ -44,6 +44,10 @@ void mcmclib_at7_gamma_free(mcmclib_at7_gamma* p);
 
 /** \brief AT7 sufficient data */
 typedef struct {
+  gsl_vector* beta_hat;
+  gsl_vector** mu_hat;
+  gsl_matrix** Sigma_hat;
+
   mcmclib_mixem_online* em; /**< online-EM mixture fitter*/
 
   gsl_matrix* Sigma_eps; /**< positive-definiteness correction factor*/
@@ -54,7 +58,11 @@ typedef struct {
 @param t0 burn-in length before starting adaptation
 @returns a new AT7_suff object
 */
-mcmclib_at7_suff* mcmclib_at7_suff_alloc(mcmclib_at7_gamma* g, int t0);
+mcmclib_at7_suff* mcmclib_at7_suff_alloc(mcmclib_at7_gamma* g,
+					 const gsl_vector* beta_hat,
+					 gsl_vector** mu_hat,
+					 gsl_matrix** Sigma_hat,
+					 int t0);
 /** free raptor_suff data*/
 void mcmclib_at7_suff_free(mcmclib_at7_suff* p);
 /** Update suff stats of an AT7 chain*/
