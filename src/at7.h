@@ -52,8 +52,7 @@ typedef struct {
 @param t0 burn-in length before starting adaptation
 @returns a new AT7_suff object
 */
-mcmclib_at7_suff* mcmclib_at7_suff_alloc(mcmclib_at7_gamma* g, int t0,
-					 mcmclib_rapt_gamma* rg);
+mcmclib_at7_suff* mcmclib_at7_suff_alloc(mcmclib_at7_gamma* g, int t0);
 /** free raptor_suff data*/
 void mcmclib_at7_suff_free(mcmclib_at7_suff* p);
 /** Update suff stats of an AT7 chain*/
@@ -78,6 +77,8 @@ mcmclib_amh* mcmclib_at7_alloc(gsl_rng* r,
 			       gsl_matrix** Sigma_hat);
 /**\brief free a previously allocated AT7 sampler*/
 void mcmclib_at7_free(mcmclib_amh* p);
+/**@internal */
+void mcmclib_at7_update(void* p);
 
 /**\brief set scaling factors */
 void mcmclib_at7_set_sf(mcmclib_amh* p, const gsl_vector* sf);
