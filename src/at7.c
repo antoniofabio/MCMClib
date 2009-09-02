@@ -61,9 +61,9 @@ mcmclib_at7_gamma* mcmclib_at7_gamma_alloc(const gsl_vector* beta,
   gsl_matrix_scale(ans->Sigma_eps, 0.001);
   ans->scaling_factors = gsl_vector_alloc(K);
   gsl_vector_set_all(ans->scaling_factors, 2.38*2.38 / (double) dim);
-  at7_gamma_update_Sigma(ans);
   ans->weights = gsl_vector_alloc(K);
   gsl_vector_set_all(ans->weights, 0.0);
+  at7_gamma_update_Sigma(ans);
   return ans;
 }
 
@@ -76,6 +76,7 @@ void mcmclib_at7_gamma_free(mcmclib_at7_gamma* p) {
     gsl_matrix_free(p->qVariances[k]);
   }
   mcmclib_mixnorm_lpdf_free(p->pi);
+  gsl_matrix_free(p->Sigma_eps);
   gsl_vector_free(p->beta);
   gsl_vector_free(p->tmpMean);
   gsl_vector_free(p->weights);
@@ -172,7 +173,7 @@ mcmclib_amh* mcmclib_at7_alloc(gsl_rng* r,
 void mcmclib_at7_free(mcmclib_amh* p) {
   mcmclib_at7_suff_free(AT7_SUFF(p));
   mcmclib_at7_gamma_free(AT7_GAMMA(p));
-  //mcmclib_at7_q_free((mcmclib_at7_q*) p->mh->q); FIXME
+  mcmclib_mh_q_free(p->mh->q);
   mcmclib_mh_free(p->mh);
   mcmclib_amh_free(p);
 }

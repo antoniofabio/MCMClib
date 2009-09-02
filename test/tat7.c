@@ -36,15 +36,25 @@ static double dunif(void* ignore, gsl_vector* x) {
   return log(1.0);
 }
 
-#define RUN_CHAIN \
-  if(1) {					\
-    gsl_vector_set_all(x, 0.5);			\
-    m = mcmclib_monitor_alloc(x);		\
-    for(int n=0; n<N; n++) {			\
-      mcmclib_amh_update(sampler);		\
-      mcmclib_monitor_update(m);		\
-    }						\
-  }						\
+#define INIT_CHAIN							\
+  if(1) {								\
+  gsl_vector_set_all(x, 0.5);						\
+  m = mcmclib_monitor_alloc(x);						\
+  sampler = mcmclib_at7_alloc(rng,					\
+			      dunif, NULL,				\
+			      x, T0,					\
+			      w_hat, mu_hat, Sigma_hat);		\
+  }									\
+
+#define RUN_CHAIN							\
+  if(1) {								\
+    for(int n=0; n<N; n++) {						\
+      mcmclib_amh_update(sampler);					\
+      mcmclib_monitor_update(m);					\
+    }									\
+    mcmclib_at7_free(sampler);						\
+    mcmclib_monitor_free(m);						\
+  }									\
 
 #define TRY_DIM(dim)							\
   if(1) {								\
@@ -57,23 +67,26 @@ static double dunif(void* ignore, gsl_vector* x) {
     }									\
     gsl_vector_set_all(w_hat, 1.0 / (double) K);			\
     rng = gsl_rng_alloc(gsl_rng_default);				\
-    sampler = mcmclib_at7_alloc(rng,					\
-				dunif, NULL,				\
-				x, T0,					\
-				w_hat, mu_hat, Sigma_hat);		\
-  RUN_CHAIN;								\
+    INIT_CHAIN;								\
+    RUN_CHAIN;								\
 									\
-  mcmclib_at7_set_sf_all(sampler, 0.2);					\
-  RUN_CHAIN;								\
+    INIT_CHAIN;								\
+    mcmclib_at7_set_sf_all(sampler, 0.2);				\
+    RUN_CHAIN;								\
 									\
-  sf = gsl_vector_alloc(K);						\
-  gsl_vector_set_all(sf, 2.0);						\
-  mcmclib_at7_set_sf(sampler, sf);					\
-  gsl_vector_free(sf);							\
-  RUN_CHAIN;								\
+    INIT_CHAIN;								\
+    sf = gsl_vector_alloc(K);						\
+    gsl_vector_set_all(sf, 2.0);					\
+    mcmclib_at7_set_sf(sampler, sf);					\
+    gsl_vector_free(sf);						\
+    RUN_CHAIN;								\
   /*free memory*/							\
   gsl_vector_free(x);							\
-  mcmclib_at7_free(sampler);						\
+  gsl_rng_free(rng);							\
+  for(int k=0; k<K; k++) {						\
+    gsl_vector_free(mu_hat[k]);						\
+    gsl_matrix_free(Sigma_hat[k]);					\
+  }									\
   }									\
 
 int main(int argc, char** argv) {
@@ -91,5 +104,6 @@ int main(int argc, char** argv) {
   TRY_DIM(2);
   TRY_DIM(3);
 
+  gsl_vector_free(w_hat);
   return 0;
 }
