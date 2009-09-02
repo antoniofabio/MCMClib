@@ -101,8 +101,8 @@ int main(int argc, char** argv) {
   gsl_vector* w_hat = gsl_vector_alloc(K);
 
   TRY_DIM(1);
-  /*  TRY_DIM(2);
-      TRY_DIM(3);*/
+  TRY_DIM(2);
+  TRY_DIM(3);
 
   gsl_vector_free(w_hat);
   return 0;
