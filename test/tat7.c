@@ -37,14 +37,20 @@ static double dunif(void* ignore, gsl_vector* x) {
 }
 
 #define RUN_CHAIN \
-  if(1) {					\
-    gsl_vector_set_all(x, 0.5);			\
-    m = mcmclib_monitor_alloc(x);		\
-    for(int n=0; n<N; n++) {			\
-      mcmclib_amh_update(sampler);		\
-      mcmclib_monitor_update(m);		\
-    }						\
-  }						\
+  if(1) {								\
+    gsl_vector_set_all(x, 0.5);						\
+    m = mcmclib_monitor_alloc(x);					\
+    sampler = mcmclib_at7_alloc(rng,					\
+				dunif, NULL,				\
+				x, T0,					\
+				w_hat, mu_hat, Sigma_hat);		\
+    for(int n=0; n<N; n++) {						\
+      mcmclib_amh_update(sampler);					\
+      mcmclib_monitor_update(m);					\
+    }									\
+    mcmclib_at7_free(sampler);						\
+    mcmclib_monitor_free(m);						\
+  }									\
 
 #define TRY_DIM(dim)							\
   if(1) {								\
@@ -57,10 +63,6 @@ static double dunif(void* ignore, gsl_vector* x) {
     }									\
     gsl_vector_set_all(w_hat, 1.0 / (double) K);			\
     rng = gsl_rng_alloc(gsl_rng_default);				\
-    sampler = mcmclib_at7_alloc(rng,					\
-				dunif, NULL,				\
-				x, T0,					\
-				w_hat, mu_hat, Sigma_hat);		\
   RUN_CHAIN;								\
 									\
   mcmclib_at7_set_sf_all(sampler, 0.2);					\
@@ -73,7 +75,6 @@ static double dunif(void* ignore, gsl_vector* x) {
   RUN_CHAIN;								\
   /*free memory*/							\
   gsl_vector_free(x);							\
-  mcmclib_at7_free(sampler);						\
   }									\
 
 int main(int argc, char** argv) {

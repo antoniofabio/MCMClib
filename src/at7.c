@@ -170,9 +170,9 @@ mcmclib_amh* mcmclib_at7_alloc(gsl_rng* r,
 }
 
 void mcmclib_at7_free(mcmclib_amh* p) {
-  mcmclib_at7_suff_free(AT7_SUFF(p));
   mcmclib_at7_gamma_free(AT7_GAMMA(p));
-  //mcmclib_at7_q_free((mcmclib_at7_q*) p->mh->q); FIXME
+  mcmclib_at7_suff_free(AT7_SUFF(p));
+  mcmclib_mh_q_free(p->mh->q);
   mcmclib_mh_free(p->mh);
   mcmclib_amh_free(p);
 }
