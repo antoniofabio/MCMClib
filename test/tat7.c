@@ -75,6 +75,11 @@ static double dunif(void* ignore, gsl_vector* x) {
   RUN_CHAIN;								\
   /*free memory*/							\
   gsl_vector_free(x);							\
+  gsl_rng_free(rng);							\
+  for(int k=0; k<K; k++) {						\
+    gsl_vector_free(mu_hat[k]);						\
+    gsl_matrix_free(Sigma_hat[k]);					\
+  }									\
   }									\
 
 int main(int argc, char** argv) {
@@ -92,5 +97,6 @@ int main(int argc, char** argv) {
   TRY_DIM(2);
   TRY_DIM(3);
 
+  gsl_vector_free(w_hat);
   return 0;
 }

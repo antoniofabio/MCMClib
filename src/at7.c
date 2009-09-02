@@ -76,6 +76,7 @@ void mcmclib_at7_gamma_free(mcmclib_at7_gamma* p) {
     gsl_matrix_free(p->qVariances[k]);
   }
   mcmclib_mixnorm_lpdf_free(p->pi);
+  gsl_matrix_free(p->Sigma_eps);
   gsl_vector_free(p->beta);
   gsl_vector_free(p->tmpMean);
   gsl_vector_free(p->weights);
