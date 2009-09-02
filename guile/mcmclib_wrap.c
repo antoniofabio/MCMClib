@@ -1425,6 +1425,11 @@ SWIGINTERN void delete_mcmclib_raptor_gamma(mcmclib_raptor_gamma *self){
 #include <at7.h>
 
 
+  mcmclib_at7_gamma* mcmclib_at7_gamma_get(mcmclib_amh* p) {
+    return ((mcmclib_at7_gamma*)((mcmclib_amh*) p)->mh->q->gamma);
+  }
+
+
 #include <mixem_online.h>
 
 SWIGINTERN mcmclib_mixem_online *new_mcmclib_mixem_online(gsl_vector **mu,gsl_matrix **Sigma,gsl_vector *beta,double eta_eps,int n0){
@@ -6774,6 +6779,29 @@ _wrap_mcmclib_at7_set_sf_all (SCM s_0, SCM s_1)
 
 
 static SCM
+_wrap_mcmclib_at7_gamma_get (SCM s_0)
+{
+#define FUNC_NAME "mcmclib-at7-gamma-get"
+  mcmclib_amh *arg1 = (mcmclib_amh *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  mcmclib_at7_gamma *result = 0 ;
+  
+  {
+    arg1 = (mcmclib_amh *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_amh, 1, 0);
+  }
+  result = (mcmclib_at7_gamma *)mcmclib_at7_gamma_get(arg1);
+  {
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_mcmclib_at7_gamma, 0);
+  }
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
 _wrap_mcmclib_mixem_online_gamma_set (SCM s_0, SCM s_1)
 {
 #define FUNC_NAME "mcmclib-mixem-online-gamma-set"
@@ -7533,6 +7561,7 @@ SWIG_init(void)
   scm_c_define_gsubr("mcmclib-at7-free", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_at7_free);
   scm_c_define_gsubr("mcmclib-at7-set-sf", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_at7_set_sf);
   scm_c_define_gsubr("mcmclib-at7-set-sf-all", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_at7_set_sf_all);
+  scm_c_define_gsubr("mcmclib-at7-gamma-get", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_at7_gamma_get);
   SWIG_TypeClientData(SWIGTYPE_p_mcmclib_mixem_online, (void *) &_swig_guile_clientdatamcmclib_mixem_online);
   scm_c_define_gsubr("mcmclib-mixem-online-gamma-set", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_mixem_online_gamma_set);
   scm_c_define_gsubr("mcmclib-mixem-online-gamma-get", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_mixem_online_gamma_get);
