@@ -186,11 +186,21 @@ void mcmclib_at7_set_sf(mcmclib_amh* p, const gsl_vector* sf) {
   gsl_vector_memcpy(AT7_GAMMA(p)->scaling_factors, sf);
 }
 
+/*here just for debugging purposes*/
+#define PRINT_STATE(p)\
+  fprintf(stderr, "w[0]: %f; means: mu[0]=%f, mu[1]=%f; variances: S[0]=%f, S[1]=%f\n",\
+	  gsl_vector_get(AT7_GAMMA(p)->beta, 0),			\
+	  gsl_vector_get(AT7_GAMMA(p)->mu[0], 0),			\
+	  gsl_vector_get(AT7_GAMMA(p)->mu[1], 0),			\
+	  gsl_matrix_get(AT7_GAMMA(p)->Sigma[0], 0, 0),			\
+	  gsl_matrix_get(AT7_GAMMA(p)->Sigma[1], 0, 0))			\
+
 void mcmclib_at7_update(void* in_p) {
   mcmclib_amh* p = (mcmclib_amh*) in_p;
   mcmclib_at7_suff* s = AT7_SUFF(p);
   mcmclib_mixem_online* em = s->em;
   mcmclib_mixem_online_update(em, p->mh->x);
-  if((p->n) > em->n0)
+  if((p->n) > em->n0) {
     at7_gamma_update_Sigma(AT7_GAMMA(p));
+  }
 }
