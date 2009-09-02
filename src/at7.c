@@ -61,9 +61,9 @@ mcmclib_at7_gamma* mcmclib_at7_gamma_alloc(const gsl_vector* beta,
   gsl_matrix_scale(ans->Sigma_eps, 0.001);
   ans->scaling_factors = gsl_vector_alloc(K);
   gsl_vector_set_all(ans->scaling_factors, 2.38*2.38 / (double) dim);
-  at7_gamma_update_Sigma(ans);
   ans->weights = gsl_vector_alloc(K);
   gsl_vector_set_all(ans->weights, 0.0);
+  at7_gamma_update_Sigma(ans);
   return ans;
 }
 
