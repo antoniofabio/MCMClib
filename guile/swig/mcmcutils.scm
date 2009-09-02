@@ -81,6 +81,8 @@
     (do-ec (: i n)
            (vectorArray-setitem ca i (vector-ref va i)))
     ca))
+(define (ca2va ca size)
+  (vector-ec (: i size) (gv2v (vectorArray-getitem ca i))))
 (define (ma2ca ma)
   "convert a vector of g-matrices into a C array of g-matrices"
   (let*
@@ -89,6 +91,8 @@
     (do-ec (: i n)
            (matrixArray-setitem ca i (vector-ref ma i)))
     ca))
+(define (ca2ma ca size)
+  (vector-ec (: i size) (gM2M (matrixArray-getitem ca i))))
 
 (define (xor a b)
   (or (and a (not b))
