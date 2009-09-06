@@ -137,7 +137,12 @@
 ;;
 ;;keep references of referenced objects to avoid premature garbage collection
 ;;
-(define-class <swig-obj> () (c-ref #:init-keyword #:c-ref #:getter get-c-ref))
+(define-class <swig-obj> ()
+  (c-ref #:init-keyword #:c-ref #:getter get-c-ref)
+  (subtype #:init-keyword #:subtype #:getter get-subtype))
+(define-method (free (obj <swig-obj>))
+  (let ((destructor-name (symbol-concatenate (list (get-subtype obj) '-free))))
+    ((eval destructor-name (interaction-environment)))))
 (define-class <distrfun> ()
   (fun-ptr #:init-keyword #:fun-ptr)
   (fun-data-ptr #:init-keyword #:fun-data-ptr)
@@ -154,7 +159,8 @@
 (define-method (update (obj <mh>)) (mcmclib-mh-update (get-c-ref obj)))
 (define-class <amh> (<mh>))
 (define-method (update (obj <amh>)) (mcmclib-amh-update (get-c-ref obj)))
-(export <swig-obj> <distrfun> <mh> <amh> make-guile-distrfun update get-c-ref)
+(export <swig-obj> <distrfun> <mh> <amh> make-guile-distrfun update
+        get-c-ref get-subtype free)
 
 (define (symbol-concatenate lst)
   (string->symbol (string-concatenate (map symbol->string lst))))
@@ -174,6 +180,7 @@
                 (slot-ref distrfun-obj 'fun-ptr)
                 (slot-ref distrfun-obj 'fun-data-ptr)
                 x rest ...)
+       #:subtype (symbol-concatenate 'mcmclib- sub-type)
        #:rng rng
        #:distrfun distrfun-obj
        #:x x)))))
@@ -193,6 +200,7 @@
                 (slot-ref distrfun-obj 'fun-ptr)
                 (slot-ref distrfun-obj 'fun-data-ptr)
                 x rest ...)
+       #:subtype (symbol-concatenate 'mcmclib- sub-type)
        #:rng rng
        #:distrfun distrfun-obj
        #:x x)))))
