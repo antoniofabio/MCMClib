@@ -66,6 +66,10 @@
   (matrix-add x y))
 (define-method (scale (x <array>) s)
   (matrix-scale x s))
+(define-method (add (a <list>) (b <list>))
+  (map add a b))
+(define-method (scale (a <list>) s)
+  (map (lambda (x) (scale x s)) a))
 (export add scale)
 
 (define-public (update-mean old-value new-data old-n)
