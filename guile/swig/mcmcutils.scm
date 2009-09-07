@@ -142,7 +142,7 @@
   (subtype #:init-keyword #:subtype #:getter get-subtype))
 (define-method (free (obj <swig-obj>))
   (let ((destructor-name (symbol-concatenate (list (get-subtype obj) '-free))))
-    ((eval destructor-name (interaction-environment)))))
+    ((eval destructor-name (interaction-environment)) (get-c-ref obj))))
 (define-class <distrfun> ()
   (fun-ptr #:init-keyword #:fun-ptr)
   (fun-data-ptr #:init-keyword #:fun-data-ptr)
