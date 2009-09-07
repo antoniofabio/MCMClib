@@ -180,7 +180,7 @@
                 (slot-ref distrfun-obj 'fun-ptr)
                 (slot-ref distrfun-obj 'fun-data-ptr)
                 x rest ...)
-       #:subtype (symbol-concatenate 'mcmclib- sub-type)
+       #:subtype (symbol-concatenate (list 'mcmclib- sub-type))
        #:rng rng
        #:distrfun distrfun-obj
        #:x x)))))
@@ -200,7 +200,7 @@
                 (slot-ref distrfun-obj 'fun-ptr)
                 (slot-ref distrfun-obj 'fun-data-ptr)
                 x rest ...)
-       #:subtype (symbol-concatenate 'mcmclib- sub-type)
+       #:subtype (symbol-concatenate (list 'mcmclib- sub-type))
        #:rng rng
        #:distrfun distrfun-obj
        #:x x)))))
