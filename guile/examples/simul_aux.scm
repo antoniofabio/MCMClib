@@ -60,3 +60,10 @@
 ;;  and a '(scale x s)' method is defined.
 (define (update-means old-values new-values old-n)
   (map (lambda (x y) (update-mean x y old-n)) old-values new-values))
+
+(define (vector-map fun vec)
+  (list->vector (map fun (vector->list vec))))
+
+(define-method (sq (x <number>)) (* x x))
+(define-method (sq (x <vector>)) (vector-map sq x))
+(define-method (sq (x <list>)) (map sq x))
