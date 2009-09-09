@@ -98,6 +98,7 @@ int main(int argc, char** argv) {
     mcmclib_amh_update(sampler);
 
   /*free memory*/
+  mcmclib_mixem_online_free(olem);
   gsl_matrix_free(sigma_whole);
   gsl_vector_free(x);
   mcmclib_raptor_free(sampler);
@@ -109,7 +110,7 @@ int main(int argc, char** argv) {
     gsl_matrix_free(Sigma[k]);
   }
   gsl_vector_free(w_hat);
-  mcmclib_mixem_online_free(olem);
+  gsl_vector_free(beta);
 
   return 0;
 }
