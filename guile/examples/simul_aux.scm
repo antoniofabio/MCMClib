@@ -67,3 +67,13 @@
 (define-method (sq (x <number>)) (* x x))
 (define-method (sq (x <vector>)) (vector-map sq x))
 (define-method (sq (x <list>)) (map sq x))
+
+(define-method (update (obj <list>)) (map update obj))
+(define-method (get (obj <list>)) (map get obj))
+(define-method (zero (obj <list>)) (map zero obj))
+
+(define-method (get (obj <monitor>))
+  (map (lambda (what) (get-monitor-value obj what)) '(means vars ar msjd)))
+(define-method (zero (obj <monitor>))
+  (let ((dim (gsl-vector-size-get (slot-ref obj 'x))))
+    (list-ec (: i 4) (make-vector dim 0.0))))
