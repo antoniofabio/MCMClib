@@ -39,9 +39,11 @@ int main(int argc, char** argv) {
       assert(gsl_matrix_get(V, d1, d2) == gsl_matrix_get(Vt, d1, d2));
 
   /*free memory*/
-  for(int k=0; k<2; k++)
-    gsl_vector_free(x[k]);
+  for(int n=0; n<N; n++)
+    gsl_vector_free(x[n]);
   gsl_matrix_free(V);
+  gsl_matrix_free(Vt);
+  gsl_matrix_free(X);
   gsl_vector_free(m);
 
   return 0;

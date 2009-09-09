@@ -101,11 +101,14 @@ int main(int argc, char** argv) {
   }
 
   /*free memory*/
+  gsl_matrix_free(X);
   for(int k=0; k<K; k++)
     gsl_matrix_free(sigma_local[k]);
   gsl_matrix_free(sigma_whole);
   gsl_vector_free(x);
   mcmclib_rapt_free(s);
+  gsl_rng_free(rng);
+  gsl_vector_free(which_region_n);
 
   return 0;
 }

@@ -76,6 +76,7 @@ int main(int argc, char** argv) {
   gsl_matrix_free(sigma);
   gsl_vector_free(x);
   mcmclib_gauss_am_free(s);
+  gsl_rng_free(rng);
 
   return 0;
 }
