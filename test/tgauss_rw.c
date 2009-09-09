@@ -57,6 +57,7 @@ int main(int argc, char** argv) {
   /*free memory*/
   gsl_vector_free(x);
   mcmclib_gauss_rw_free(s);
+  gsl_rng_free(rng);
 
   return 0;
 }
