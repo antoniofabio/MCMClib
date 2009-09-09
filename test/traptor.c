@@ -109,6 +109,7 @@ int main(int argc, char** argv) {
     gsl_matrix_free(Sigma[k]);
   }
   gsl_vector_free(w_hat);
+  gsl_vector_free(beta);
   mcmclib_mixem_online_free(olem);
 
   return 0;

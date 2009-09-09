@@ -61,6 +61,7 @@ static void sRepresentationAsymm(double s) {
   assert(check_dequal(gsl_vector_get(values, 0), exp(s + 1.0)));
   assert(check_dequal(gsl_vector_get(values, 1), exp(s)));
   assert(check_dequal(gsl_vector_get(values, 2), exp(s - 1.0)));
+  gsl_vector_free(values);
 }
 
 int main(int argc, char** argv) {
