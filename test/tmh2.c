@@ -59,6 +59,7 @@ int main(int argc, char** argv) {
   gsl_vector_free(x);
   gsl_rng_free(r);
   mcmclib_mh_free(s);
+  mcmclib_mh_q_free(q);
 
   return 0;
 }

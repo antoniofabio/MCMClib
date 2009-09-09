@@ -46,6 +46,7 @@ void mcmclib_rapt_suff_free(mcmclib_rapt_suff* p) {
   }
   gsl_vector_free(p->global_mean);
   gsl_matrix_free(p->global_variance);
+  gsl_matrix_free(p->Sigma_eps);
   free(p->means);
   free(p->variances);
 

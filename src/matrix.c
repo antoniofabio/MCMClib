@@ -79,4 +79,5 @@ void mcmclib_matrix_symm_eigenvalues(const gsl_matrix* A, gsl_vector* out) {
   gsl_eigen_symm_workspace* w = gsl_eigen_symm_alloc (A1->size1);
   gsl_eigen_symm(A1, out, w);
   gsl_eigen_symm_free (w);
+  gsl_matrix_free(A1);
 }

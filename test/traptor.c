@@ -98,9 +98,19 @@ int main(int argc, char** argv) {
     mcmclib_amh_update(sampler);
 
   /*free memory*/
+  mcmclib_mixem_online_free(olem);
   gsl_matrix_free(sigma_whole);
   gsl_vector_free(x);
   mcmclib_raptor_free(sampler);
+  gsl_rng_free(rng);
+  for(int k=0; k<K; k++) {
+    gsl_vector_free(mu_hat[k]);
+    gsl_vector_free(mu[k]);
+    gsl_matrix_free(Sigma_hat[k]);
+    gsl_matrix_free(Sigma[k]);
+  }
+  gsl_vector_free(w_hat);
+  gsl_vector_free(beta);
 
   return 0;
 }

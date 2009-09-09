@@ -60,12 +60,15 @@ int main(int argc, char** argv) {
   }
 
   /*free memory*/
-  for(int k=0; k<K; k++)
+  for(int k=0; k<K; k++) {
+    gsl_vector_free(mu_hat[k]);
     gsl_matrix_free(Sigma_hat[k]);
+  }
   gsl_matrix_free(Sigma_zero);
   for(int m=0; m<M; m++)
     gsl_vector_free(x[m]);
   mcmclib_inca_raptor_free(s);
+  gsl_rng_free(rng);
 
   return 0;
 }
