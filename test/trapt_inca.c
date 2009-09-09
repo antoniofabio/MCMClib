@@ -118,6 +118,7 @@ int main(int argc, char** argv) {
   for(int m=0; m<M; m++)
     gsl_vector_free(x[m]);
   mcmclib_inca_rapt_free(s);
+  gsl_rng_free(rng);
 
   return 0;
 }

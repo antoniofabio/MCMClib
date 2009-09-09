@@ -106,6 +106,8 @@ int main(int argc, char** argv) {
   gsl_matrix_free(sigma_whole);
   gsl_vector_free(x);
   mcmclib_rapt_free(s);
+  gsl_rng_free(rng);
+  gsl_vector_free(which_region_n);
 
   return 0;
 }

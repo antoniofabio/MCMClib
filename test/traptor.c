@@ -101,6 +101,14 @@ int main(int argc, char** argv) {
   gsl_matrix_free(sigma_whole);
   gsl_vector_free(x);
   mcmclib_raptor_free(sampler);
+  gsl_rng_free(rng);
+  for(int k=0; k<K; k++) {
+    gsl_vector_free(mu_hat[k]);
+    gsl_vector_free(mu[k]);
+    gsl_matrix_free(Sigma_hat[k]);
+    gsl_matrix_free(Sigma[k]);
+  }
+  mcmclib_mixem_online_free(olem);
 
   return 0;
 }
