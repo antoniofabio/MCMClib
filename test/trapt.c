@@ -101,6 +101,7 @@ int main(int argc, char** argv) {
   }
 
   /*free memory*/
+  gsl_matrix_free(X);
   for(int k=0; k<K; k++)
     gsl_matrix_free(sigma_local[k]);
   gsl_matrix_free(sigma_whole);
