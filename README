@@ -1,0 +1,32 @@
+= Compiling instructions =
+
+~ Dependencies
+The GNU Scientific Library, version >= 1.12:
+http://www.gnu.org/software/gsl
+
+~ Build tools
+- GNU make
+- gcc compiler
+
+~ Compiling
+From the toplevel directory, type:
+
+$ make
+
+This will build the static library 'libmcmclib.a' and the shared library
+'libmcmclib.so' in the 'src' folder. If you need to tweak the compiler options,
+set the environmental variables CFLAGS (passed to the C compiler) and LDFLAGS
+(passed to the linker). To customize these variables even more, you can edit the
+toplevel `Makefile' direclty.
+
+~ Compiling the guile bindings
+In order to compile the guile bindings, you need the GNU guile library:
+http://www.gnu.org/software/guile/guile.html
+installed in your system, version 1.8.x or a compatible one.
+
+To compile the guile bindings, type:
+
+$ make guile
+
+at the shell prompt. If all goes right, in the 'guile' subfolder you will find
+all the relevant stuff, ready to be used.
