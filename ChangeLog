@@ -1,3 +1,6 @@
+Version 0.19 A. F. Di Narzo <antonio.fabio@gmail.com>
+	* added (undocumented) guile bindings
+
 Version 0.18 15-09-2009 A. F. Di Narzo <antonio.fabio@gmail.com>
 	* added 'AT7' module, implementing Andrieu&Thoms (2008) alg.7 adaptive sampler
 	* added symm. matrix eigenvalues computing function
