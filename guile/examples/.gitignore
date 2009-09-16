@@ -1,0 +1,9 @@
+*_wrap.c
+*.scm.err
+*.scm.out
+*.aux
+*.log
+_region_.*
+auto
+results.pdf
+
