@@ -1,4 +1,5 @@
 Version 0.19 A. F. Di Narzo <antonio.fabio@gmail.com>
+	* added a new RAPTOR consistency check
 	* added README file with compiling instructions
 	* added (undocumented) guile bindings
 
