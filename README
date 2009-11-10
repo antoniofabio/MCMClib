@@ -1,3 +1,13 @@
+= MCMClib: a C library for decent speed MCMC =
+
+MCMClib is an object-oriented C library for doing decent speed MCMC.  The API is
+object-oriented, and should allow for easy binding to higher-level language.
+
+Undocumented, temptative bindings to Guile-scheme are provided.
+
+This library is released under the terms of the GPL library, version 3 or
+greater.
+
 = Compiling instructions =
 
 ~ Dependencies
