@@ -1,0 +1,8 @@
+In order to use the gsl and MCMClib guile bindings, you have to copy the ".so"
+files from the "swig" to a folder in your LD_LIBRARY_PATH, or in any place where
+the 'ld' linker can see them.
+
+Next, you have to place the "swig" and "srfi" folders in your guile load path,
+or set it accordingly from within guile, as it's done at the beginning of the 'main.scm'
+script.
+
