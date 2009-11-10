@@ -1,9 +1,4 @@
-(set! %load-path (cons "." %load-path))
-
-(use-modules (srfi srfi-1)
-	     (srfi srfi-42)
-             (swig gsl)
-             (swig mcmclib))
+(load "main.scm")
 
 (define *n* 5) ;;target distribution dimension
 (define *K* 2) ;;number of mixture components
