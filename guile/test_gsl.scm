@@ -1,8 +1,4 @@
-(set! %load-path (cons "." %load-path))
-
-(use-modules (srfi srfi-1)
-	     (srfi srfi-42)
-             (swig gsl))
+(load "main.scm")
 
 (define v (new-gsl-vector 3))
 (do-ec (: i 3)
@@ -41,7 +37,6 @@
   (new-gsl-matrix 3 3)))
 
 (define rng (new-gsl-rng (gsl-rng-default)))
-(define lr )
 (define (mean l)
   (/
    (fold (lambda (x y) (+ x y)) 0 l)

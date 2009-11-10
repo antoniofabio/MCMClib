@@ -75,6 +75,11 @@
    using the new data point 'new-data'"
   (scale (add (scale old-value old-n) new-data) (/ (+ 1.0 old-n))))
 
+(define (gsl-copy-subvec dest src offset)
+  "copy a gvector into a subset of another gvector"
+  (do-ec (: i (gsl-vector-size-get src))
+         (gsl-vector-set dest (+ offset i) (gsl-vector-get src i))))
+
 (define (va2ca va)
   "convert a vector of g-vectors into a C array of g-vectors"
   (let*
