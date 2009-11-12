@@ -46,7 +46,7 @@ typedef int (*region_fun_t) (gsl_vector*, void*);
   }
 %}
 %callback("%s_cb");
-double mcmclib_guile_region_fun(gsl_vector* x, void* p);
+int mcmclib_guile_region_fun(gsl_vector* x, void* p);
 %nocallback;
 
 mcmclib_amh* mcmclib_rapt_alloc(gsl_rng* r,
