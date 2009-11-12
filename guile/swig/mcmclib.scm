@@ -168,6 +168,10 @@
         mcmclib-gauss-am-alloc
         mcmclib-gauss-am-free
         mcmclib-gauss-am-set-sf
+        mcmclib-guile-region-fun-cb
+        mcmclib-guile-region-fun
+        mcmclib-rapt-alloc
+        mcmclib-rapt-free
         mcmclib-raptor-alloc
         mcmclib-raptor-free
         mcmclib-raptor-gamma-beta-hat-set
