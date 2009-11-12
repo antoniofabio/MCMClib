@@ -226,9 +226,9 @@
   (fun-ptr #:init-keyword #:fun-ptr)
   (fun-data-ptr #:init-keyword #:fun-data-ptr)
   (keep #:init-keyword #:keep))
-(define (make-guile-regionfun fun)
+(define-public (make-guile-regionfun fun)
   (make <regionfun>
-    #:fun-ptr (mcmclib-guile-regionfun-cb)
+    #:fun-ptr (mcmclib-guile-region-fun-cb)
     #:fun-data-ptr (guile-to-voidptr fun)
     #:keep fun))
 
