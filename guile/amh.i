@@ -36,6 +36,30 @@ mcmclib_amh* mcmclib_gauss_am_alloc(gsl_rng* r,
 void mcmclib_gauss_am_free(mcmclib_amh* p);
 void mcmclib_gauss_am_set_sf(mcmclib_amh* p, double sf);
 
+/*RAPT*/
+typedef int (*region_fun_t) (gsl_vector*, void*);
+%{
+  static int mcmclib_guile_region_fun(gsl_vector* x, void* p) {
+    SCM sx = SWIG_NewPointerObj(x, SWIGTYPE_p_gsl_vector, 0);
+    SCM ans = scm_call_1((SCM) p, sx);
+    return scm_to_int(ans);
+  }
+%}
+%callback("%s_cb");
+int mcmclib_guile_region_fun(gsl_vector* x, void* p);
+%nocallback;
+
+mcmclib_amh* mcmclib_rapt_alloc(gsl_rng* r,
+				distrfun_p logdistr, void* logdistr_data,
+				gsl_vector* x,
+				int t0,
+				const gsl_matrix* sigma_whole,
+				int K,
+				gsl_matrix** sigma_local,
+				region_fun_t which_region,
+				void* which_region_data);
+void mcmclib_rapt_free(mcmclib_amh* p);
+
 /*RAPTOR*/
 mcmclib_amh* mcmclib_raptor_alloc(gsl_rng* r,
 				  distrfun_p logdistr, void* logdistr_data,

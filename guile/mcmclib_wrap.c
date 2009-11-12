@@ -1222,36 +1222,37 @@ static swig_guile_clientdata _swig_guile_clientdatamcmclib_mixem_online = { NULL
 
 #define SWIGTYPE_p_FILE swig_types[0]
 #define SWIGTYPE_p_double swig_types[1]
-#define SWIGTYPE_p_f_p_void__void swig_types[2]
-#define SWIGTYPE_p_f_p_void_p_gsl_vector__double swig_types[3]
-#define SWIGTYPE_p_f_p_void_p_mcmclib_raptor_gamma__double swig_types[4]
-#define SWIGTYPE_p_gsl_matrix swig_types[5]
-#define SWIGTYPE_p_gsl_rng swig_types[6]
-#define SWIGTYPE_p_gsl_vector swig_types[7]
-#define SWIGTYPE_p_mcmclib_amh swig_types[8]
-#define SWIGTYPE_p_mcmclib_at7_gamma swig_types[9]
-#define SWIGTYPE_p_mcmclib_at7_suff swig_types[10]
-#define SWIGTYPE_p_mcmclib_iwishart_lpdf swig_types[11]
-#define SWIGTYPE_p_mcmclib_mcar_model swig_types[12]
-#define SWIGTYPE_p_mcmclib_mcar_tilde_lpdf swig_types[13]
-#define SWIGTYPE_p_mcmclib_mh swig_types[14]
-#define SWIGTYPE_p_mcmclib_mh_q swig_types[15]
-#define SWIGTYPE_p_mcmclib_mixem_online swig_types[16]
-#define SWIGTYPE_p_mcmclib_mixnorm_lpdf swig_types[17]
-#define SWIGTYPE_p_mcmclib_mixolem_suff swig_types[18]
-#define SWIGTYPE_p_mcmclib_monitor swig_types[19]
-#define SWIGTYPE_p_mcmclib_monitor_ecdf swig_types[20]
-#define SWIGTYPE_p_mcmclib_mvnorm_lpdf swig_types[21]
-#define SWIGTYPE_p_mcmclib_pmodel_sampler swig_types[22]
-#define SWIGTYPE_p_mcmclib_pois_model swig_types[23]
-#define SWIGTYPE_p_mcmclib_raptor_gamma swig_types[24]
-#define SWIGTYPE_p_p_gsl_matrix swig_types[25]
-#define SWIGTYPE_p_p_gsl_vector swig_types[26]
-#define SWIGTYPE_p_p_mcmclib_mvnorm_lpdf swig_types[27]
-#define SWIGTYPE_p_unsigned_long swig_types[28]
-#define SWIGTYPE_p_void swig_types[29]
-static swig_type_info *swig_types[31];
-static swig_module_info swig_module = {swig_types, 30, 0, 0, 0, 0};
+#define SWIGTYPE_p_f_p_gsl_vector_p_void__int swig_types[2]
+#define SWIGTYPE_p_f_p_void__void swig_types[3]
+#define SWIGTYPE_p_f_p_void_p_gsl_vector__double swig_types[4]
+#define SWIGTYPE_p_f_p_void_p_mcmclib_raptor_gamma__double swig_types[5]
+#define SWIGTYPE_p_gsl_matrix swig_types[6]
+#define SWIGTYPE_p_gsl_rng swig_types[7]
+#define SWIGTYPE_p_gsl_vector swig_types[8]
+#define SWIGTYPE_p_mcmclib_amh swig_types[9]
+#define SWIGTYPE_p_mcmclib_at7_gamma swig_types[10]
+#define SWIGTYPE_p_mcmclib_at7_suff swig_types[11]
+#define SWIGTYPE_p_mcmclib_iwishart_lpdf swig_types[12]
+#define SWIGTYPE_p_mcmclib_mcar_model swig_types[13]
+#define SWIGTYPE_p_mcmclib_mcar_tilde_lpdf swig_types[14]
+#define SWIGTYPE_p_mcmclib_mh swig_types[15]
+#define SWIGTYPE_p_mcmclib_mh_q swig_types[16]
+#define SWIGTYPE_p_mcmclib_mixem_online swig_types[17]
+#define SWIGTYPE_p_mcmclib_mixnorm_lpdf swig_types[18]
+#define SWIGTYPE_p_mcmclib_mixolem_suff swig_types[19]
+#define SWIGTYPE_p_mcmclib_monitor swig_types[20]
+#define SWIGTYPE_p_mcmclib_monitor_ecdf swig_types[21]
+#define SWIGTYPE_p_mcmclib_mvnorm_lpdf swig_types[22]
+#define SWIGTYPE_p_mcmclib_pmodel_sampler swig_types[23]
+#define SWIGTYPE_p_mcmclib_pois_model swig_types[24]
+#define SWIGTYPE_p_mcmclib_raptor_gamma swig_types[25]
+#define SWIGTYPE_p_p_gsl_matrix swig_types[26]
+#define SWIGTYPE_p_p_gsl_vector swig_types[27]
+#define SWIGTYPE_p_p_mcmclib_mvnorm_lpdf swig_types[28]
+#define SWIGTYPE_p_unsigned_long swig_types[29]
+#define SWIGTYPE_p_void swig_types[30]
+static swig_type_info *swig_types[32];
+static swig_module_info swig_module = {swig_types, 31, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -1392,6 +1393,14 @@ SWIGINTERN mcmclib_amh *new_mcmclib_amh(mcmclib_mh *mh,void *suff,mcmclib_amh_up
 SWIGINTERN void delete_mcmclib_amh(mcmclib_amh *self){
     mcmclib_amh_free(self);
   }
+
+  static int mcmclib_guile_region_fun(gsl_vector* x, void* p) {
+    SCM sx = SWIG_NewPointerObj(x, SWIGTYPE_p_gsl_vector, 0);
+    SCM ans = scm_call_1((SCM) p, sx);
+    return scm_to_int(ans);
+  }
+
+static int (*gswig_const_mcmclib_guile_region_fun_cb)(gsl_vector *,void *) = (int (*)(gsl_vector *x,void *p))(mcmclib_guile_region_fun);
 SWIGINTERN mcmclib_raptor_gamma *new_mcmclib_raptor_gamma(gsl_vector *beta_hat,gsl_vector **mu_hat,gsl_matrix **Sigma_hat){
     return mcmclib_raptor_gamma_alloc(beta_hat, mu_hat, Sigma_hat);
   }
@@ -5401,6 +5410,135 @@ _wrap_mcmclib_gauss_am_set_sf (SCM s_0, SCM s_1)
 
 
 static SCM
+_wrap_mcmclib_guile_region_fun_cb(SCM s_0)
+{
+#define FUNC_NAME "mcmclib-guile-region-fun-cb"
+  SCM gswig_result;
+  
+  {
+    gswig_result = SWIG_NewPointerObj (gswig_const_mcmclib_guile_region_fun_cb, SWIGTYPE_p_f_p_gsl_vector_p_void__int, 0);
+  }
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_guile_region_fun (SCM s_0, SCM s_1)
+{
+#define FUNC_NAME "mcmclib-guile-region-fun"
+  gsl_vector *arg1 = (gsl_vector *) 0 ;
+  void *arg2 = (void *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  int result;
+  
+  {
+    arg1 = (gsl_vector *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_gsl_vector, 1, 0);
+  }
+  {
+    arg2 = (void *)SWIG_MustGetPtr(s_1, NULL, 2, 0);
+  }
+  result = (int)mcmclib_guile_region_fun(arg1,arg2);
+  {
+    gswig_result = scm_long2num(result);
+  }
+  
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_rapt_alloc (SCM s_0, SCM s_1, SCM s_2, SCM s_3, SCM s_4, SCM s_5, SCM s_6, SCM s_7, SCM s_8, SCM s_9)
+{
+#define FUNC_NAME "mcmclib-rapt-alloc"
+  gsl_rng *arg1 = (gsl_rng *) 0 ;
+  distrfun_p arg2 = (distrfun_p) 0 ;
+  void *arg3 = (void *) 0 ;
+  gsl_vector *arg4 = (gsl_vector *) 0 ;
+  int arg5 ;
+  gsl_matrix *arg6 = (gsl_matrix *) 0 ;
+  int arg7 ;
+  gsl_matrix **arg8 = (gsl_matrix **) 0 ;
+  region_fun_t arg9 = (region_fun_t) 0 ;
+  void *arg10 = (void *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  mcmclib_amh *result = 0 ;
+  
+  {
+    arg1 = (gsl_rng *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_gsl_rng, 1, 0);
+  }
+  {
+    arg2 = (distrfun_p)SWIG_MustGetPtr(s_1, SWIGTYPE_p_f_p_void_p_gsl_vector__double, 2, 0);
+  }
+  {
+    arg3 = (void *)SWIG_MustGetPtr(s_2, NULL, 3, 0);
+  }
+  {
+    arg4 = (gsl_vector *)SWIG_MustGetPtr(s_3, SWIGTYPE_p_gsl_vector, 4, 0);
+  }
+  {
+    arg5 = (int) scm_num2int(s_4, SCM_ARG1, FUNC_NAME);
+  }
+  {
+    arg6 = (gsl_matrix *)SWIG_MustGetPtr(s_5, SWIGTYPE_p_gsl_matrix, 6, 0);
+  }
+  {
+    arg7 = (int) scm_num2int(s_6, SCM_ARG1, FUNC_NAME);
+  }
+  {
+    arg8 = (gsl_matrix **)SWIG_MustGetPtr(s_7, SWIGTYPE_p_p_gsl_matrix, 8, 0);
+  }
+  {
+    arg9 = (region_fun_t)SWIG_MustGetPtr(s_8, SWIGTYPE_p_f_p_gsl_vector_p_void__int, 9, 0);
+  }
+  {
+    arg10 = (void *)SWIG_MustGetPtr(s_9, NULL, 10, 0);
+  }
+  result = (mcmclib_amh *)mcmclib_rapt_alloc(arg1,arg2,arg3,arg4,arg5,(gsl_matrix const *)arg6,arg7,arg8,arg9,arg10);
+  {
+    gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_mcmclib_amh, 0);
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
+_wrap_mcmclib_rapt_free (SCM s_0)
+{
+#define FUNC_NAME "mcmclib-rapt-free"
+  mcmclib_amh *arg1 = (mcmclib_amh *) 0 ;
+  SCM gswig_result;
+  SWIGUNUSED int gswig_list_p = 0;
+  
+  {
+    arg1 = (mcmclib_amh *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_amh, 1, 0);
+  }
+  mcmclib_rapt_free(arg1);
+  gswig_result = SCM_UNSPECIFIED;
+  
+  
+  return gswig_result;
+#undef FUNC_NAME
+}
+
+
+static SCM
 _wrap_mcmclib_raptor_alloc (SCM s_0, SCM s_1, SCM s_2, SCM s_3, SCM s_4, SCM s_5, SCM s_6, SCM s_7, SCM s_8)
 {
 #define FUNC_NAME "mcmclib-raptor-alloc"
@@ -6931,6 +7069,7 @@ extern "C" {
 
 static swig_type_info _swigt__p_FILE = {"_p_FILE", "FILE *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_double = {"_p_double", "double *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_f_p_gsl_vector_p_void__int = {"_p_f_p_gsl_vector_p_void__int", "region_fun_t|int (*)(gsl_vector *,void *)", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_f_p_void__void = {"_p_f_p_void__void", "mcmclib_amh_update_gamma_p|void (*)(void *)", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_f_p_void_p_gsl_vector__double = {"_p_f_p_void_p_gsl_vector__double", "distrfun_p|double (*)(void *,gsl_vector *)", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_f_p_void_p_mcmclib_raptor_gamma__double = {"_p_f_p_void_p_mcmclib_raptor_gamma__double", "mcmclib_raptor_alpha_fun_t|double (*)(void *,mcmclib_raptor_gamma *)", 0, 0, (void*)0, 0};
@@ -6963,6 +7102,7 @@ static swig_type_info _swigt__p_void = {"_p_void", "void *", 0, 0, (void*)0, 0};
 static swig_type_info *swig_type_initial[] = {
   &_swigt__p_FILE,
   &_swigt__p_double,
+  &_swigt__p_f_p_gsl_vector_p_void__int,
   &_swigt__p_f_p_void__void,
   &_swigt__p_f_p_void_p_gsl_vector__double,
   &_swigt__p_f_p_void_p_mcmclib_raptor_gamma__double,
@@ -6995,6 +7135,7 @@ static swig_type_info *swig_type_initial[] = {
 
 static swig_cast_info _swigc__p_FILE[] = {  {&_swigt__p_FILE, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_double[] = {  {&_swigt__p_double, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_f_p_gsl_vector_p_void__int[] = {  {&_swigt__p_f_p_gsl_vector_p_void__int, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_f_p_void__void[] = {  {&_swigt__p_f_p_void__void, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_f_p_void_p_gsl_vector__double[] = {  {&_swigt__p_f_p_void_p_gsl_vector__double, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_f_p_void_p_mcmclib_raptor_gamma__double[] = {  {&_swigt__p_f_p_void_p_mcmclib_raptor_gamma__double, 0, 0, 0},{0, 0, 0, 0}};
@@ -7027,6 +7168,7 @@ static swig_cast_info _swigc__p_void[] = {  {&_swigt__p_void, 0, 0, 0},{0, 0, 0,
 static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_FILE,
   _swigc__p_double,
+  _swigc__p_f_p_gsl_vector_p_void__int,
   _swigc__p_f_p_void__void,
   _swigc__p_f_p_void_p_gsl_vector__double,
   _swigc__p_f_p_void_p_mcmclib_raptor_gamma__double,
@@ -7488,6 +7630,10 @@ SWIG_init(void)
   scm_c_define_gsubr("mcmclib-gauss-am-alloc", 6, 0, 0, (swig_guile_proc) _wrap_mcmclib_gauss_am_alloc);
   scm_c_define_gsubr("mcmclib-gauss-am-free", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_gauss_am_free);
   scm_c_define_gsubr("mcmclib-gauss-am-set-sf", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_gauss_am_set_sf);
+  scm_c_define_gsubr("mcmclib-guile-region-fun-cb", 0, 0, 0, (swig_guile_proc) _wrap_mcmclib_guile_region_fun_cb);
+  scm_c_define_gsubr("mcmclib-guile-region-fun", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_guile_region_fun);
+  scm_c_define_gsubr("mcmclib-rapt-alloc", 10, 0, 0, (swig_guile_proc) _wrap_mcmclib_rapt_alloc);
+  scm_c_define_gsubr("mcmclib-rapt-free", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_rapt_free);
   scm_c_define_gsubr("mcmclib-raptor-alloc", 9, 0, 0, (swig_guile_proc) _wrap_mcmclib_raptor_alloc);
   scm_c_define_gsubr("mcmclib-raptor-free", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_raptor_free);
   SWIG_TypeClientData(SWIGTYPE_p_mcmclib_raptor_gamma, (void *) &_swig_guile_clientdatamcmclib_raptor_gamma);
