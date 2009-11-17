@@ -1,3 +1,6 @@
+Version 0.20 A. F. Di Narzo <antonio.fabio@gmail.com>
+	* removed obsolete examples
+
 Version 0.19 A. F. Di Narzo <antonio.fabio@gmail.com>
 	* added a new RAPTOR consistency check
 	* added README file with compiling instructions
