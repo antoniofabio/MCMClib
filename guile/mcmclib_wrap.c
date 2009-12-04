@@ -1376,13 +1376,12 @@ SWIGINTERN void delete_mcmclib_amh(mcmclib_amh *self){
     mcmclib_amh_free(self);
   }
 
-  static int mcmclib_guile_region_fun(gsl_vector* x, void* p) {
+  int mcmclib_guile_region_fun(gsl_vector* x, void* p) {
     SCM sx = SWIG_NewPointerObj(x, SWIGTYPE_p_gsl_vector, 0);
     SCM ans = scm_call_1((SCM) p, sx);
     return scm_to_int(ans);
   }
 
-static int (*gswig_const_mcmclib_guile_region_fun_cb)(gsl_vector *,void *) = (int (*)(gsl_vector *x,void *p))(mcmclib_guile_region_fun);
 SWIGINTERN mcmclib_raptor_gamma *new_mcmclib_raptor_gamma(gsl_vector *beta_hat,gsl_vector **mu_hat,gsl_matrix **Sigma_hat){
     return mcmclib_raptor_gamma_alloc(beta_hat, mu_hat, Sigma_hat);
   }
@@ -5275,50 +5274,7 @@ _wrap_mcmclib_gauss_am_set_sf (SCM s_0, SCM s_1)
 
 
 static SCM
-_wrap_mcmclib_guile_region_fun_cb(SCM s_0)
-{
-#define FUNC_NAME "mcmclib-guile-region-fun-cb"
-  SCM gswig_result;
-  
-  {
-    gswig_result = SWIG_NewPointerObj (gswig_const_mcmclib_guile_region_fun_cb, SWIGTYPE_p_f_p_gsl_vector_p_void__int, 0);
-  }
-  
-  return gswig_result;
-#undef FUNC_NAME
-}
-
-
-static SCM
-_wrap_mcmclib_guile_region_fun (SCM s_0, SCM s_1)
-{
-#define FUNC_NAME "mcmclib-guile-region-fun"
-  gsl_vector *arg1 = (gsl_vector *) 0 ;
-  void *arg2 = (void *) 0 ;
-  SCM gswig_result;
-  SWIGUNUSED int gswig_list_p = 0;
-  int result;
-  
-  {
-    arg1 = (gsl_vector *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_gsl_vector, 1, 0);
-  }
-  {
-    arg2 = (void *)SWIG_MustGetPtr(s_1, NULL, 2, 0);
-  }
-  result = (int)mcmclib_guile_region_fun(arg1,arg2);
-  {
-    gswig_result = scm_long2num(result);
-  }
-  
-  
-  
-  return gswig_result;
-#undef FUNC_NAME
-}
-
-
-static SCM
-_wrap_mcmclib_rapt_alloc (SCM s_0, SCM s_1, SCM s_2, SCM s_3, SCM s_4, SCM s_5, SCM s_6, SCM s_7, SCM s_8)
+_wrap_mcmclib_rapt_alloc (SCM s_0, SCM s_1, SCM s_2, SCM s_3, SCM s_4, SCM s_5, SCM s_6, SCM s_7)
 {
 #define FUNC_NAME "mcmclib-rapt-alloc"
   gsl_rng *arg1 = (gsl_rng *) 0 ;
@@ -5364,10 +5320,9 @@ _wrap_mcmclib_rapt_alloc (SCM s_0, SCM s_1, SCM s_2, SCM s_3, SCM s_4, SCM s_5, 
     }
   }
   {
-    arg9 = (region_fun_t)SWIG_MustGetPtr(s_7, SWIGTYPE_p_f_p_gsl_vector_p_void__int, 9, 0);
-  }
-  {
-    arg10 = (void *)SWIG_MustGetPtr(s_8, NULL, 10, 0);
+    scm_permanent_object(s_7); /*FIXME. Maybe solve it by proper use of '$owner'*/
+    arg9 = mcmclib_guile_region_fun;
+    arg10 = (void*) s_7;
   }
   result = (mcmclib_amh *)mcmclib_rapt_alloc(arg1,arg2,arg3,arg4,arg5,(gsl_matrix const *)arg6,arg7,arg8,arg9,arg10);
   {
@@ -5379,8 +5334,6 @@ _wrap_mcmclib_rapt_alloc (SCM s_0, SCM s_1, SCM s_2, SCM s_3, SCM s_4, SCM s_5, 
   {
     free(arg8);
   }
-  
-  
   
   return gswig_result;
 #undef FUNC_NAME
@@ -7593,9 +7546,7 @@ SWIG_init(void)
   scm_c_define_gsubr("mcmclib-gauss-am-alloc", 5, 0, 0, (swig_guile_proc) _wrap_mcmclib_gauss_am_alloc);
   scm_c_define_gsubr("mcmclib-gauss-am-free", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_gauss_am_free);
   scm_c_define_gsubr("mcmclib-gauss-am-set-sf", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_gauss_am_set_sf);
-  scm_c_define_gsubr("mcmclib-guile-region-fun-cb", 0, 0, 0, (swig_guile_proc) _wrap_mcmclib_guile_region_fun_cb);
-  scm_c_define_gsubr("mcmclib-guile-region-fun", 2, 0, 0, (swig_guile_proc) _wrap_mcmclib_guile_region_fun);
-  scm_c_define_gsubr("mcmclib-rapt-alloc", 9, 0, 0, (swig_guile_proc) _wrap_mcmclib_rapt_alloc);
+  scm_c_define_gsubr("mcmclib-rapt-alloc", 8, 0, 0, (swig_guile_proc) _wrap_mcmclib_rapt_alloc);
   scm_c_define_gsubr("mcmclib-rapt-free", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_rapt_free);
   scm_c_define_gsubr("mcmclib-raptor-alloc", 8, 0, 0, (swig_guile_proc) _wrap_mcmclib_raptor_alloc);
   scm_c_define_gsubr("mcmclib-raptor-free", 1, 0, 0, (swig_guile_proc) _wrap_mcmclib_raptor_free);
