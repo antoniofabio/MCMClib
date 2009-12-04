@@ -4,16 +4,12 @@
 
 (define (make-gamma d S)
   (let*
-      ((beta (new-gsl-vector 2))
-       (mu (vector (new-gsl-vector dim) (new-gsl-vector dim)))
-       (Sigma (vector (new-gsl-matrix dim dim) (new-gsl-matrix dim dim))))
-    (gsl-vector-set-all beta 0.5)
-    (gsl-vector-set-all (vector-ref mu 0) (* -1.0 d))
-    (gsl-matrix-set-identity (vector-ref Sigma 0))
-    (gsl-vector-set-all (vector-ref mu 1) d)
-    (gsl-matrix-set-identity (vector-ref Sigma 1))
-    (gsl-matrix-scale (vector-ref Sigma 1) S)
-    (new-mcmclib-raptor-gamma beta (va2ca mu) (ma2ca Sigma))))
+      ((beta (make-filled-vector 0.5 2))
+       (mu (vector (make-filled-vector (* -1.0 d) dim)
+                   (make-filled-vector d dim)))
+       (Sigma (vector (diag 1.0 dim)
+                      (diag S dim))))
+    (new-mcmclib-raptor-gamma beta mu Sigma)))
 (define (alpha-star d S)
   (mcmclib-raptor-alpha-star-fun (make-gamma d S)))
 
