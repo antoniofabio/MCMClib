@@ -100,7 +100,8 @@ double mcmclib_guile_lpdf(void* p, gsl_vector* x);
   size_t $1_size = scm_c_vector_length($input);
   $1 = malloc($1_size * sizeof(gsl_vector*));
   for(int i=0; i<$1_size; i++) {
-    $1[i] = (gsl_vector*) scm_c_vector_ref($input, i);
+    $1[i] = (gsl_vector*) SWIG_MustGetPtr(scm_c_vector_ref($input, i),
+					  SWIGTYPE_p_gsl_vector, $argnum, 0);
   }
 }
 %typemap(freearg) gsl_vector** {
@@ -111,7 +112,8 @@ double mcmclib_guile_lpdf(void* p, gsl_vector* x);
   size_t $1_size = scm_c_vector_length($input);
   $1 = malloc($1_size * sizeof(gsl_matrix*));
   for(int i=0; i<$1_size; i++) {
-    $1[i] = (gsl_matrix*) scm_c_vector_ref($input, i);
+    $1[i] = (gsl_matrix*) SWIG_MustGetPtr(scm_c_vector_ref($input, i),
+					  SWIGTYPE_p_gsl_matrix, $argnum, 0);
   }
 }
 %typemap(freearg) gsl_matrix** {
