@@ -9,11 +9,8 @@
 (define *beta-hat* (new-gsl-vector *K*)) ;;starting mixture weigths estimates
 (gsl-vector-set-all *beta-hat* (/ *K*))
 
-(define *Sigma-zero* (new-gsl-matrix *n* *n*)) ;;starting variances estimates
-(gsl-matrix-set-identity *Sigma-zero*)
-(define *Sigma-hat* (new-matrixArray *K*))
-(matrixArray-setitem *Sigma-hat* 0 *Sigma-zero*)
-(matrixArray-setitem *Sigma-hat* 1 *Sigma-zero*)
+(define *Sigma-zero* (diag 1.0 *n*)) ;;starting variances estimates
+(define *Sigma-hat* (vector *Sigma-zero* *Sigma-zero*))
 
 (define (make-target d S)
   "Build a gaussian-mixture target distribution
@@ -59,8 +56,7 @@
        (ecdf (new-mcmclib-monitor-ecdf *X0*)))
     (gsl-vector-set-all x 0.0)
     (set! monitor (new-mcmclib-monitor x))
-    (set! sampler (sampler-builder (mcmclib-guile-lpdf-cb) (guile-to-voidptr target)
-                                   x))
+    (set! sampler (sampler-builder target x))
     (do-ec (: i *T0*)
            (mcmclib-amh-update sampler))
     (do-ec (: i *N*)
@@ -72,12 +68,11 @@
 
 (define (simulate-raptor d S)
   (let*
-      ((mu-hat (new-vectorArray *K*))
-       (mu-vec (vector (new-gsl-vector *n*) (new-gsl-vector *n*)))
-       (raptor-builder (lambda (fun fun-data x)
+      ((mu-hat (vector (new-gsl-vector *n*) (new-gsl-vector *n*)))
+       (raptor-builder (lambda (fun x)
                          (mcmclib-raptor-alloc
                           *rng*
-                          fun fun-data
+                          fun
                           x *T0*
                           *Sigma-zero*
                           *beta-hat*
@@ -85,16 +80,14 @@
                           *Sigma-hat*))))
     (gsl-vector-set-all (vector-ref mu-vec 0) (+ (* d -2) -1))
     (gsl-vector-set-all (vector-ref mu-vec 1) (+ (* d 2) 1))
-    (do-ec (: i *K*)
-           (vectorArray-setitem mu-hat i (vector-ref mu-vec i)))
     (simulate-amh d S raptor-builder)))
 
 (define (simulate-gauss-am d S)
   (let*
-      ((gauss-am-builder (lambda (fun fun-data x)
+      ((gauss-am-builder (lambda (fun x)
                         (mcmclib-gauss-am-alloc
                          *rng*
-                         fun fun-data
+                         fun
                          x *Sigma-zero* *T0*))))
   (simulate-amh d S gauss-am-builder)))
 
@@ -108,10 +101,6 @@
 (print-diags 0 4)
 (print-diags 3 1)
 (print-diags 3 4)
-
-(define (gv2v gv)
-  "from gsl-vector to vector"
-  (vector-ec (: i (gsl-vector-size-get gv)) (gsl-vector-get gv i)))
 
 ;;MSE comparison
 (define (estimate-MSE replicas simulator)
@@ -143,15 +132,6 @@
 
 (estimate-MSE 100 (lambda () (simulate-raptor 3 1)))
 (estimate-MSE 100 (lambda () (simulate-gauss-am 3 1)))
-
-;;Distance from target distribution comparison
-(define (v2gv v)
-  (let*
-      ((n (vector-length v))
-       (gv (new-gsl-vector n)))
-    (do-ec (: i n)
-           (gsl-vector-set gv i (vector-ref v i)))
-    gv))
 
 ;;compute target CDF
 (define *monitor* (new-mcmclib-monitor-ecdf *X0*))

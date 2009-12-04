@@ -31,12 +31,7 @@
         mcmclib-iwishart-lpdf-free
         mcmclib-iwishart-lpdf-compute-cb
         mcmclib-iwishart-lpdf-compute
-        test-distrfun-alloc
-        test-distrfun-cb
-        test-distrfun
         guile-to-voidptr
-        mcmclib-guile-lpdf-cb
-        mcmclib-guile-lpdf
         mcmclib-monitor-x-set
         mcmclib-monitor-x-get
         mcmclib-monitor-sum-x-set
@@ -168,8 +163,6 @@
         mcmclib-gauss-am-alloc
         mcmclib-gauss-am-free
         mcmclib-gauss-am-set-sf
-        mcmclib-guile-region-fun-cb
-        mcmclib-guile-region-fun
         mcmclib-rapt-alloc
         mcmclib-rapt-free
         mcmclib-raptor-alloc

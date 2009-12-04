@@ -17,8 +17,7 @@
      (log 0.0))))
 (define amh (mcmclib-gauss-am-alloc
              rng
-             (mcmclib-guile-lpdf-cb)
-             (guile-to-voidptr dunif)
+             dunif
              v
              S
              100))

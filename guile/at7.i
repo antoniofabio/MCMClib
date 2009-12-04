@@ -35,7 +35,7 @@ typedef struct {
 } mcmclib_at7_suff;
 
 mcmclib_amh* mcmclib_at7_alloc(gsl_rng* r,
-			       distrfun_p logdistr, void* logdistr_data,
+			       distrfun_p f, void* data,
 			       gsl_vector* x, int t0,
 			       const gsl_vector* beta_hat,
 			       gsl_vector** mu_hat,

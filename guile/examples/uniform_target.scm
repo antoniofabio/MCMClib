@@ -1,5 +1,3 @@
-(set! %load-path (cons "." %load-path))
-
 (use-modules
  (oop goops)
  (oop goops describe)
@@ -20,16 +18,17 @@
              (> (gsl-vector-get x i) 1))
             (set! ans (log 0.0))))
   ans))
+(define rng (new-gsl-rng (gsl-rng-default)))
 (define s (make-mh 'gauss-rw
-                   (new-gsl-rng (gsl-rng-default))
-                   (make-guile-distrfun pi)
+                   rng
+                   pi
                    (new-gsl-vector 5)
                    0.1))
 (do-ec (: i 100000) (update s))
 
 (define s (make-amh 'gauss-am
-                   (new-gsl-rng (gsl-rng-default))
-                   (make-guile-distrfun pi)
+                   rng
+                   pi
                    (new-gsl-vector 3)
                    (M2gM #(#(1 0 0) #(0 1 0) #(0 0 1)))
                    10))
