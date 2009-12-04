@@ -80,6 +80,33 @@
   (do-ec (: i (gsl-vector-size-get src))
          (gsl-vector-set dest (+ offset i) (gsl-vector-get src i))))
 
+(define (gM-clone x)
+  (let
+      ((y (new-gsl-matrix (gsl-matrix-size1-get x) (gsl-matrix-size2-get x))))
+    (gsl-matrix-memcpy y x)
+    y))
+
+(define (gv-clone x)
+  (let
+      ((y (new-gsl-vector (gsl-vector-size-get x))))
+    (gsl-vector-memcpy y x)
+    y))
+
+(define (gv-op-ip x f)
+  "map function f to gsl-vector x, in place"
+  (do-ec (: i (gsl-vector-size-get x))
+         (gsl-vector-set x i (f (gsl-vector-get x i))))
+  x)
+
+(define (gv-op x f) (gv-op-ip (gv-clone x) f))
+
+(define (gv-fold x x0 f)
+  (fold-ec x0 (: i (gsl-vector-size-get x)) (gsl-vector-get x i) f))
+
+(define (gv-sum x)
+  "sum elements of vector 'x'"
+  (gv-fold x 0 +))
+
 (define (va2ca va)
   "convert a vector of g-vectors into a C array of g-vectors"
   (let*
