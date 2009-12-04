@@ -1,3 +1,7 @@
+Version 0.21 A. F. Di Narzo <antonio.fabio@gmail.com>
+	* cleaned guile bindings: scheme distrib. funs and region funs are
+		used trasparently
+
 Version 0.20 4-12-2009 A. F. Di Narzo <antonio.fabio@gmail.com>
 	* cleaned distrib tarball: now includes swig generated files
 	* cleaned handling of vector and matrix arrays in guile bindings
