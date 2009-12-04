@@ -5492,7 +5492,12 @@ _wrap_mcmclib_rapt_alloc (SCM s_0, SCM s_1, SCM s_2, SCM s_3, SCM s_4, SCM s_5, 
     arg7 = (int) scm_num2int(s_6, SCM_ARG1, FUNC_NAME);
   }
   {
-    arg8 = (gsl_matrix **)SWIG_MustGetPtr(s_7, SWIGTYPE_p_p_gsl_matrix, 8, 0);
+    size_t arg8_size = scm_c_vector_length(s_7);
+    arg8 = malloc(arg8_size * sizeof(gsl_matrix*));
+    for(int i=0; i<arg8_size; i++) {
+      arg8[i] = (gsl_matrix*) SWIG_MustGetPtr(scm_c_vector_ref(s_7, i),
+        SWIGTYPE_p_gsl_matrix, 8, 0);
+    }
   }
   {
     arg9 = (region_fun_t)SWIG_MustGetPtr(s_8, SWIGTYPE_p_f_p_gsl_vector_p_void__int, 9, 0);
@@ -5509,7 +5514,9 @@ _wrap_mcmclib_rapt_alloc (SCM s_0, SCM s_1, SCM s_2, SCM s_3, SCM s_4, SCM s_5, 
   
   
   
-  
+  {
+    free(arg8);
+  }
   
   
   
@@ -5577,10 +5584,20 @@ _wrap_mcmclib_raptor_alloc (SCM s_0, SCM s_1, SCM s_2, SCM s_3, SCM s_4, SCM s_5
     arg7 = (gsl_vector *)SWIG_MustGetPtr(s_6, SWIGTYPE_p_gsl_vector, 7, 0);
   }
   {
-    arg8 = (gsl_vector **)SWIG_MustGetPtr(s_7, SWIGTYPE_p_p_gsl_vector, 8, 0);
+    size_t arg8_size = scm_c_vector_length(s_7);
+    arg8 = malloc(arg8_size * sizeof(gsl_vector*));
+    for(int i=0; i<arg8_size; i++) {
+      arg8[i] = (gsl_vector*) SWIG_MustGetPtr(scm_c_vector_ref(s_7, i),
+        SWIGTYPE_p_gsl_vector, 8, 0);
+    }
   }
   {
-    arg9 = (gsl_matrix **)SWIG_MustGetPtr(s_8, SWIGTYPE_p_p_gsl_matrix, 9, 0);
+    size_t arg9_size = scm_c_vector_length(s_8);
+    arg9 = malloc(arg9_size * sizeof(gsl_matrix*));
+    for(int i=0; i<arg9_size; i++) {
+      arg9[i] = (gsl_matrix*) SWIG_MustGetPtr(scm_c_vector_ref(s_8, i),
+        SWIGTYPE_p_gsl_matrix, 9, 0);
+    }
   }
   result = (mcmclib_amh *)mcmclib_raptor_alloc(arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9);
   {
@@ -5592,8 +5609,12 @@ _wrap_mcmclib_raptor_alloc (SCM s_0, SCM s_1, SCM s_2, SCM s_3, SCM s_4, SCM s_5
   
   
   
-  
-  
+  {
+    free(arg8);
+  }
+  {
+    free(arg9);
+  }
   
   return gswig_result;
 #undef FUNC_NAME
@@ -5681,12 +5702,19 @@ _wrap_mcmclib_raptor_gamma_mu_hat_set (SCM s_0, SCM s_1)
     arg1 = (mcmclib_raptor_gamma *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_raptor_gamma, 1, 0);
   }
   {
-    arg2 = (gsl_vector **)SWIG_MustGetPtr(s_1, SWIGTYPE_p_p_gsl_vector, 2, 0);
+    size_t arg2_size = scm_c_vector_length(s_1);
+    arg2 = malloc(arg2_size * sizeof(gsl_vector*));
+    for(int i=0; i<arg2_size; i++) {
+      arg2[i] = (gsl_vector*) SWIG_MustGetPtr(scm_c_vector_ref(s_1, i),
+        SWIGTYPE_p_gsl_vector, 2, 0);
+    }
   }
   if (arg1) (arg1)->mu_hat = arg2;
   gswig_result = SCM_UNSPECIFIED;
   
-  
+  {
+    free(arg2);
+  }
   
   return gswig_result;
 #undef FUNC_NAME
@@ -5729,12 +5757,19 @@ _wrap_mcmclib_raptor_gamma_Sigma_hat_set (SCM s_0, SCM s_1)
     arg1 = (mcmclib_raptor_gamma *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_raptor_gamma, 1, 0);
   }
   {
-    arg2 = (gsl_matrix **)SWIG_MustGetPtr(s_1, SWIGTYPE_p_p_gsl_matrix, 2, 0);
+    size_t arg2_size = scm_c_vector_length(s_1);
+    arg2 = malloc(arg2_size * sizeof(gsl_matrix*));
+    for(int i=0; i<arg2_size; i++) {
+      arg2[i] = (gsl_matrix*) SWIG_MustGetPtr(scm_c_vector_ref(s_1, i),
+        SWIGTYPE_p_gsl_matrix, 2, 0);
+    }
   }
   if (arg1) (arg1)->Sigma_hat = arg2;
   gswig_result = SCM_UNSPECIFIED;
   
-  
+  {
+    free(arg2);
+  }
   
   return gswig_result;
 #undef FUNC_NAME
@@ -5875,18 +5910,32 @@ _wrap_new_mcmclib_raptor_gamma (SCM s_0, SCM s_1, SCM s_2)
     arg1 = (gsl_vector *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_gsl_vector, 1, 0);
   }
   {
-    arg2 = (gsl_vector **)SWIG_MustGetPtr(s_1, SWIGTYPE_p_p_gsl_vector, 2, 0);
+    size_t arg2_size = scm_c_vector_length(s_1);
+    arg2 = malloc(arg2_size * sizeof(gsl_vector*));
+    for(int i=0; i<arg2_size; i++) {
+      arg2[i] = (gsl_vector*) SWIG_MustGetPtr(scm_c_vector_ref(s_1, i),
+        SWIGTYPE_p_gsl_vector, 2, 0);
+    }
   }
   {
-    arg3 = (gsl_matrix **)SWIG_MustGetPtr(s_2, SWIGTYPE_p_p_gsl_matrix, 3, 0);
+    size_t arg3_size = scm_c_vector_length(s_2);
+    arg3 = malloc(arg3_size * sizeof(gsl_matrix*));
+    for(int i=0; i<arg3_size; i++) {
+      arg3[i] = (gsl_matrix*) SWIG_MustGetPtr(scm_c_vector_ref(s_2, i),
+        SWIGTYPE_p_gsl_matrix, 3, 0);
+    }
   }
   result = (mcmclib_raptor_gamma *)new_mcmclib_raptor_gamma(arg1,arg2,arg3);
   {
     gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_mcmclib_raptor_gamma, 1);
   }
   
-  
-  
+  {
+    free(arg2);
+  }
+  {
+    free(arg3);
+  }
   
   return gswig_result;
 #undef FUNC_NAME
@@ -6167,12 +6216,19 @@ _wrap_mcmclib_at7_gamma_mu_set (SCM s_0, SCM s_1)
     arg1 = (mcmclib_at7_gamma *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_at7_gamma, 1, 0);
   }
   {
-    arg2 = (gsl_vector **)SWIG_MustGetPtr(s_1, SWIGTYPE_p_p_gsl_vector, 2, 0);
+    size_t arg2_size = scm_c_vector_length(s_1);
+    arg2 = malloc(arg2_size * sizeof(gsl_vector*));
+    for(int i=0; i<arg2_size; i++) {
+      arg2[i] = (gsl_vector*) SWIG_MustGetPtr(scm_c_vector_ref(s_1, i),
+        SWIGTYPE_p_gsl_vector, 2, 0);
+    }
   }
   if (arg1) (arg1)->mu = arg2;
   gswig_result = SCM_UNSPECIFIED;
   
-  
+  {
+    free(arg2);
+  }
   
   return gswig_result;
 #undef FUNC_NAME
@@ -6215,12 +6271,19 @@ _wrap_mcmclib_at7_gamma_Sigma_set (SCM s_0, SCM s_1)
     arg1 = (mcmclib_at7_gamma *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_at7_gamma, 1, 0);
   }
   {
-    arg2 = (gsl_matrix **)SWIG_MustGetPtr(s_1, SWIGTYPE_p_p_gsl_matrix, 2, 0);
+    size_t arg2_size = scm_c_vector_length(s_1);
+    arg2 = malloc(arg2_size * sizeof(gsl_matrix*));
+    for(int i=0; i<arg2_size; i++) {
+      arg2[i] = (gsl_matrix*) SWIG_MustGetPtr(scm_c_vector_ref(s_1, i),
+        SWIGTYPE_p_gsl_matrix, 2, 0);
+    }
   }
   if (arg1) (arg1)->Sigma = arg2;
   gswig_result = SCM_UNSPECIFIED;
   
-  
+  {
+    free(arg2);
+  }
   
   return gswig_result;
 #undef FUNC_NAME
@@ -6359,12 +6422,19 @@ _wrap_mcmclib_at7_gamma_qVariances_set (SCM s_0, SCM s_1)
     arg1 = (mcmclib_at7_gamma *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_mcmclib_at7_gamma, 1, 0);
   }
   {
-    arg2 = (gsl_matrix **)SWIG_MustGetPtr(s_1, SWIGTYPE_p_p_gsl_matrix, 2, 0);
+    size_t arg2_size = scm_c_vector_length(s_1);
+    arg2 = malloc(arg2_size * sizeof(gsl_matrix*));
+    for(int i=0; i<arg2_size; i++) {
+      arg2[i] = (gsl_matrix*) SWIG_MustGetPtr(scm_c_vector_ref(s_1, i),
+        SWIGTYPE_p_gsl_matrix, 2, 0);
+    }
   }
   if (arg1) (arg1)->qVariances = arg2;
   gswig_result = SCM_UNSPECIFIED;
   
-  
+  {
+    free(arg2);
+  }
   
   return gswig_result;
 #undef FUNC_NAME
@@ -6670,18 +6740,32 @@ _wrap_mcmclib_at7_gamma_alloc (SCM s_0, SCM s_1, SCM s_2)
     arg1 = (gsl_vector *)SWIG_MustGetPtr(s_0, SWIGTYPE_p_gsl_vector, 1, 0);
   }
   {
-    arg2 = (gsl_vector **)SWIG_MustGetPtr(s_1, SWIGTYPE_p_p_gsl_vector, 2, 0);
+    size_t arg2_size = scm_c_vector_length(s_1);
+    arg2 = malloc(arg2_size * sizeof(gsl_vector*));
+    for(int i=0; i<arg2_size; i++) {
+      arg2[i] = (gsl_vector*) SWIG_MustGetPtr(scm_c_vector_ref(s_1, i),
+        SWIGTYPE_p_gsl_vector, 2, 0);
+    }
   }
   {
-    arg3 = (gsl_matrix **)SWIG_MustGetPtr(s_2, SWIGTYPE_p_p_gsl_matrix, 3, 0);
+    size_t arg3_size = scm_c_vector_length(s_2);
+    arg3 = malloc(arg3_size * sizeof(gsl_matrix*));
+    for(int i=0; i<arg3_size; i++) {
+      arg3[i] = (gsl_matrix*) SWIG_MustGetPtr(scm_c_vector_ref(s_2, i),
+        SWIGTYPE_p_gsl_matrix, 3, 0);
+    }
   }
   result = (mcmclib_at7_gamma *)mcmclib_at7_gamma_alloc((gsl_vector const *)arg1,arg2,arg3);
   {
     gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_mcmclib_at7_gamma, 0);
   }
   
-  
-  
+  {
+    free(arg2);
+  }
+  {
+    free(arg3);
+  }
   
   return gswig_result;
 #undef FUNC_NAME
@@ -6812,10 +6896,20 @@ _wrap_mcmclib_at7_alloc (SCM s_0, SCM s_1, SCM s_2, SCM s_3, SCM s_4, SCM s_5, S
     arg6 = (gsl_vector *)SWIG_MustGetPtr(s_5, SWIGTYPE_p_gsl_vector, 6, 0);
   }
   {
-    arg7 = (gsl_vector **)SWIG_MustGetPtr(s_6, SWIGTYPE_p_p_gsl_vector, 7, 0);
+    size_t arg7_size = scm_c_vector_length(s_6);
+    arg7 = malloc(arg7_size * sizeof(gsl_vector*));
+    for(int i=0; i<arg7_size; i++) {
+      arg7[i] = (gsl_vector*) SWIG_MustGetPtr(scm_c_vector_ref(s_6, i),
+        SWIGTYPE_p_gsl_vector, 7, 0);
+    }
   }
   {
-    arg8 = (gsl_matrix **)SWIG_MustGetPtr(s_7, SWIGTYPE_p_p_gsl_matrix, 8, 0);
+    size_t arg8_size = scm_c_vector_length(s_7);
+    arg8 = malloc(arg8_size * sizeof(gsl_matrix*));
+    for(int i=0; i<arg8_size; i++) {
+      arg8[i] = (gsl_matrix*) SWIG_MustGetPtr(scm_c_vector_ref(s_7, i),
+        SWIGTYPE_p_gsl_matrix, 8, 0);
+    }
   }
   result = (mcmclib_amh *)mcmclib_at7_alloc(arg1,arg2,arg3,arg4,arg5,(gsl_vector const *)arg6,arg7,arg8);
   {
@@ -6826,8 +6920,12 @@ _wrap_mcmclib_at7_alloc (SCM s_0, SCM s_1, SCM s_2, SCM s_3, SCM s_4, SCM s_5, S
   
   
   
-  
-  
+  {
+    free(arg7);
+  }
+  {
+    free(arg8);
+  }
   
   return gswig_result;
 #undef FUNC_NAME
@@ -6988,10 +7086,20 @@ _wrap_new_mcmclib_mixem_online (SCM s_0, SCM s_1, SCM s_2, SCM s_3, SCM s_4)
   mcmclib_mixem_online *result = 0 ;
   
   {
-    arg1 = (gsl_vector **)SWIG_MustGetPtr(s_0, SWIGTYPE_p_p_gsl_vector, 1, 0);
+    size_t arg1_size = scm_c_vector_length(s_0);
+    arg1 = malloc(arg1_size * sizeof(gsl_vector*));
+    for(int i=0; i<arg1_size; i++) {
+      arg1[i] = (gsl_vector*) SWIG_MustGetPtr(scm_c_vector_ref(s_0, i),
+        SWIGTYPE_p_gsl_vector, 1, 0);
+    }
   }
   {
-    arg2 = (gsl_matrix **)SWIG_MustGetPtr(s_1, SWIGTYPE_p_p_gsl_matrix, 2, 0);
+    size_t arg2_size = scm_c_vector_length(s_1);
+    arg2 = malloc(arg2_size * sizeof(gsl_matrix*));
+    for(int i=0; i<arg2_size; i++) {
+      arg2[i] = (gsl_matrix*) SWIG_MustGetPtr(scm_c_vector_ref(s_1, i),
+        SWIGTYPE_p_gsl_matrix, 2, 0);
+    }
   }
   {
     arg3 = (gsl_vector *)SWIG_MustGetPtr(s_2, SWIGTYPE_p_gsl_vector, 3, 0);
@@ -7006,8 +7114,12 @@ _wrap_new_mcmclib_mixem_online (SCM s_0, SCM s_1, SCM s_2, SCM s_3, SCM s_4)
   {
     gswig_result = SWIG_NewPointerObj (result, SWIGTYPE_p_mcmclib_mixem_online, 1);
   }
-  
-  
+  {
+    free(arg1);
+  }
+  {
+    free(arg2);
+  }
   
   
   return gswig_result;

@@ -96,6 +96,30 @@ double test_distrfun(void* p, gsl_vector* x);
 double mcmclib_guile_lpdf(void* p, gsl_vector* x);
 %nocallback;
 
+%typemap(in) gsl_vector** {
+  size_t $1_size = scm_c_vector_length($input);
+  $1 = malloc($1_size * sizeof(gsl_vector*));
+  for(int i=0; i<$1_size; i++) {
+    $1[i] = (gsl_vector*) SWIG_MustGetPtr(scm_c_vector_ref($input, i),
+					  SWIGTYPE_p_gsl_vector, $argnum, 0);
+  }
+}
+%typemap(freearg) gsl_vector** {
+  free($1);
+}
+
+%typemap(in) gsl_matrix** {
+  size_t $1_size = scm_c_vector_length($input);
+  $1 = malloc($1_size * sizeof(gsl_matrix*));
+  for(int i=0; i<$1_size; i++) {
+    $1[i] = (gsl_matrix*) SWIG_MustGetPtr(scm_c_vector_ref($input, i),
+					  SWIGTYPE_p_gsl_matrix, $argnum, 0);
+  }
+}
+%typemap(freearg) gsl_matrix** {
+  free($1);
+}
+
 %include "monitor.i"
 %include "distrfuns.i"
 %include "amh.i"
