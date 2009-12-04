@@ -6,7 +6,7 @@ SWIG_FLAGS := -guile -scm -nodefaultctor -package swig -Linkage passive -scmstub
 GUILE_LDFLAGS := $(LDFLAGS) -lguile
 GUILE_CFLAGS := $(CFLAGS) -I./src
 
-TOCLEAN += $(GUILE_MODULES_TARGETS) $(GUILE_MODULES:%=guile/%_wrap.c)
+TOCLEAN += $(GUILE_MODULES:%=guile/swig/libguile%.so)
 
 guile: $(GUILE_MODULES_TARGETS)
 
