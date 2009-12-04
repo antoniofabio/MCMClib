@@ -208,21 +208,9 @@
 ;;(make-amh 'gauss-am rng lambda (x) 0.0) x sigma_zero t0)
 (export-syntax make-amh)
 
-(define-public (make-rapt rng distrfun x t0 sigma-whole K sigma-local region-fun-obj)
+(define-public (make-rapt rng distrfun x t0 sigma-whole K sigma-local region-fun)
   "alloc a new 'rapt' sampler object"
-  (make-amh 'rapt rng distrfun x t0 sigma-whole K sigma-local
-            (slot-ref region-fun-obj 'fun-ptr)
-            (slot-ref region-fun-obj 'fun-data-ptr)))
-
-(define-class <regionfun> ()
-  (fun-ptr #:init-keyword #:fun-ptr)
-  (fun-data-ptr #:init-keyword #:fun-data-ptr)
-  (keep #:init-keyword #:keep))
-(define-public (make-guile-regionfun fun)
-  (make <regionfun>
-    #:fun-ptr (mcmclib-guile-region-fun-cb)
-    #:fun-data-ptr (guile-to-voidptr fun)
-    #:keep fun))
+  (make-amh 'rapt rng distrfun x t0 sigma-whole K sigma-local region-fun))
 
 ;;
 ;;wrap monitor objects
