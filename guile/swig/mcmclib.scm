@@ -31,12 +31,7 @@
         mcmclib-iwishart-lpdf-free
         mcmclib-iwishart-lpdf-compute-cb
         mcmclib-iwishart-lpdf-compute
-        test-distrfun-alloc
-        test-distrfun-cb
-        test-distrfun
         guile-to-voidptr
-        mcmclib-guile-lpdf-cb
-        mcmclib-guile-lpdf
         mcmclib-monitor-x-set
         mcmclib-monitor-x-get
         mcmclib-monitor-sum-x-set

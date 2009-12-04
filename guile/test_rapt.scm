@@ -18,7 +18,7 @@
      (log 0.0))))
 (define s (make-rapt
            rng
-           (make-guile-distrfun dunif)
+           dunif
            v
            100 ;t0
            S ;sigma-whole

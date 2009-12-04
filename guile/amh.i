@@ -30,7 +30,7 @@ void mcmclib_amh_reset(mcmclib_amh* p);
 
 /*Gaussian AM*/
 mcmclib_amh* mcmclib_gauss_am_alloc(gsl_rng* r,
-				    distrfun_p logdistr, void* logdistr_data,
+				    distrfun_p f, void* data,
 				    gsl_vector* start_x,
 				    const gsl_matrix* sigma_zero, int t0);
 void mcmclib_gauss_am_free(mcmclib_amh* p);
@@ -50,7 +50,7 @@ int mcmclib_guile_region_fun(gsl_vector* x, void* p);
 %nocallback;
 
 mcmclib_amh* mcmclib_rapt_alloc(gsl_rng* r,
-				distrfun_p logdistr, void* logdistr_data,
+				distrfun_p f, void* data,
 				gsl_vector* x,
 				int t0,
 				const gsl_matrix* sigma_whole,
@@ -62,7 +62,7 @@ void mcmclib_rapt_free(mcmclib_amh* p);
 
 /*RAPTOR*/
 mcmclib_amh* mcmclib_raptor_alloc(gsl_rng* r,
-				  distrfun_p logdistr, void* logdistr_data,
+				  distrfun_p f, void* data,
 				  gsl_vector* x, int t0, gsl_matrix* Sigma_zero,
 				  gsl_vector* beta_hat,
 				  gsl_vector** mu_hat,

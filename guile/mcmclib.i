@@ -27,6 +27,22 @@ static void guile_mcmclib_err_handler(const char * reason,
   gsl_set_error_handler(guile_mcmclib_err_handler);
 %}
 
+%{
+  double mcmclib_guile_lpdf(void* p, gsl_vector* x) {
+    SCM sx = SWIG_NewPointerObj(x, SWIGTYPE_p_gsl_vector, 0);
+    SCM ans = scm_call_1((SCM) p, sx);
+    return scm_to_double(ans);
+  }
+%}
+
+typedef double (*distrfun_p) (void* data, gsl_vector* x);
+
+%typemap(in) (distrfun_p f, void* data) {
+  scm_permanent_object($input); /*FIXME. Maybe solve it by proper use of '$owner'*/
+  $1 = mcmclib_guile_lpdf;
+  $2 = (void*) $input;
+}
+
 typedef struct {
   gsl_rng* r; /**< rng*/
   distrfun_p logdistr; /**< target log-density fun*/
@@ -42,12 +58,11 @@ int mcmclib_mh_update(mcmclib_mh* p);
 typedef double (*distrfun_p)(void*, gsl_vector*);
 
 mcmclib_mh* mcmclib_gauss_rw_alloc(gsl_rng* r,
-				   distrfun_p logdistr, void* data,
+				   distrfun_p f, void* data,
 				   gsl_vector* start_x, double step_size);
 void mcmclib_gauss_rw_free(mcmclib_mh*);
 mcmclib_mh* mcmclib_gauss_mrw_alloc(gsl_rng* r,
-				    distrfun_p distrfun,
-				    void* logdistr_data,
+				    distrfun_p f, void* data,
 				    gsl_vector* x,
 				    const gsl_matrix* sigma_zero);
 void mcmclib_gauss_mrw_free(mcmclib_mh*);
@@ -58,43 +73,11 @@ void mcmclib_iwishart_lpdf_free(mcmclib_iwishart_lpdf* p);
 double mcmclib_iwishart_lpdf_compute(void* p, gsl_vector* x);
 %nocallback;
 
-%{
-  void* test_distrfun_alloc(double what) {
-    double* ans = malloc(sizeof(double));
-    ans[0] = what;
-    return ans;
-  }
-
-  double test_distrfun(void* p, gsl_vector* x) {
-    double* pwhat = (double*) p;
-    double x0 = gsl_vector_get(x, 0);
-    if((x0 >= 0.0) && (x0 <= pwhat[0]))
-      return log(1.0);
-    else
-      return log(0.0);
-  }
-%}
-void* test_distrfun_alloc(double what);
-%callback("%s_cb");
-double test_distrfun(void* p, gsl_vector* x);
-%nocallback;
-
-%{
-  static double mcmclib_guile_lpdf(void* p, gsl_vector* x) {
-    SCM sx = SWIG_NewPointerObj(x, SWIGTYPE_p_gsl_vector, 0);
-    SCM ans = scm_call_1((SCM) p, sx);
-    return scm_to_double(ans);
-  }
-%}
 %inline %{
   void* guile_to_voidptr(SCM p) {
     return (void*) p;
   }
 %}
-
-%callback("%s_cb");
-double mcmclib_guile_lpdf(void* p, gsl_vector* x);
-%nocallback;
 
 %typemap(in) gsl_vector** {
   size_t $1_size = scm_c_vector_length($input);
