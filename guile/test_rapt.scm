@@ -24,6 +24,6 @@
            S ;sigma-whole
            2 ;K
            Sk;sigma-local
-           (make-guile-regionfun reg)))
+           reg))
 
 (do-ec (: i 10000) (update s))
