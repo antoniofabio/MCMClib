@@ -1,3 +1,6 @@
+Version 0.21 A. F. Di Narzo <antonio.fabio@gmail.com>
+	* cleaned handling of vector and matrix arrays in guile bindings
+
 Version 0.20 A. F. Di Narzo <antonio.fabio@gmail.com>
 	* removed obsolete examples
 
