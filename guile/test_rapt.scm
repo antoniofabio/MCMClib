@@ -4,7 +4,7 @@
 (define v (new-gsl-vector 1))
 (gsl-vector-set v 0 0.1)
 (define S (diag 1.0 1))
-(define Sk (ma2ca (vector-ec (: k 2) S)))
+(define Sk (vector-ec (: k 2) S))
 (define (reg x)
   (if (< (gsl-vector-get x 0) 0) 0 1))
 (define (dunif x)

@@ -8,7 +8,7 @@
              (ice-9 pretty-print))
 (use-syntax (ice-9 syncase))
 
-(export v2gv gv2v gM2M M2gM va2ca ma2ca)
+(export v2gv gv2v gM2M M2gM)
 
 (define (v2gv v)
   "convert the scheme vector 'v' into a gsl vector"
@@ -75,58 +75,37 @@
    using the new data point 'new-data'"
   (scale (add (scale old-value old-n) new-data) (/ (+ 1.0 old-n))))
 
-(define (gsl-copy-subvec dest src offset)
+(define-public (gsl-copy-subvec dest src offset)
   "copy a gvector into a subset of another gvector"
   (do-ec (: i (gsl-vector-size-get src))
          (gsl-vector-set dest (+ offset i) (gsl-vector-get src i))))
 
-(define (gM-clone x)
+(define-public (gM-clone x)
   (let
       ((y (new-gsl-matrix (gsl-matrix-size1-get x) (gsl-matrix-size2-get x))))
     (gsl-matrix-memcpy y x)
     y))
 
-(define (gv-clone x)
+(define-public (gv-clone x)
   (let
       ((y (new-gsl-vector (gsl-vector-size-get x))))
     (gsl-vector-memcpy y x)
     y))
 
-(define (gv-op-ip x f)
+(define-public (gv-op-ip x f)
   "map function f to gsl-vector x, in place"
   (do-ec (: i (gsl-vector-size-get x))
          (gsl-vector-set x i (f (gsl-vector-get x i))))
   x)
 
-(define (gv-op x f) (gv-op-ip (gv-clone x) f))
+(define-public (gv-op x f) (gv-op-ip (gv-clone x) f))
 
-(define (gv-fold x x0 f)
+(define-public (gv-fold x x0 f)
   (fold-ec x0 (: i (gsl-vector-size-get x)) (gsl-vector-get x i) f))
 
-(define (gv-sum x)
+(define-public (gv-sum x)
   "sum elements of vector 'x'"
   (gv-fold x 0 +))
-
-(define (va2ca va)
-  "convert a vector of g-vectors into a C array of g-vectors"
-  (let*
-      ((n (vector-length va))
-       (ca (new-vectorArray n)))
-    (do-ec (: i n)
-           (vectorArray-setitem ca i (vector-ref va i)))
-    ca))
-(define (ca2va ca size)
-  (vector-ec (: i size) (gv2v (vectorArray-getitem ca i))))
-(define (ma2ca ma)
-  "convert a vector of g-matrices into a C array of g-matrices"
-  (let*
-      ((n (vector-length ma))
-       (ca (new-matrixArray n)))
-    (do-ec (: i n)
-           (matrixArray-setitem ca i (vector-ref ma i)))
-    ca))
-(define (ca2ma ca size)
-  (vector-ec (: i size) (gM2M (matrixArray-getitem ca i))))
 
 (define (xor a b)
   (or (and a (not b))
