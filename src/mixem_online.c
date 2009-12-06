@@ -25,7 +25,7 @@ mcmclib_mixem_online* mcmclib_mixem_online_alloc(gsl_vector** mu,
   a->mu = mu;
   a->Sigma = Sigma;
   a->gamma = mcmclib_mixolem_suff_makeref(beta, mu, Sigma);
-  assert((eta_eps > 0) && (eta_eps <= 0.5));
+  assert(eta_eps > 0.0);
   a->eta_eps = eta_eps;
   a->n0 = n0;
   a->n = 0;
