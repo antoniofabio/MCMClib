@@ -1,4 +1,5 @@
 Version 0.21 A. F. Di Narzo <antonio.fabio@gmail.com>
+	* modified 'n' exponent in online em RAPTOR: -1.1 instead of -1.0
 	* cleaned guile bindings: scheme distrib. funs and region funs are
 		used trasparently
 
