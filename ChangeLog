@@ -1,5 +1,22 @@
+Version 0.22 A. F. Di Narzo <antonio.fabio@gmail.com>
+	* added utility 'install' and 'install-guile' make targets
+
+Version 0.21 A. F. Di Narzo <antonio.fabio@gmail.com>
+	* improved source tarball generation
+	* modified 'n' exponent in online em RAPTOR: -1.1 instead of -1.0
+	* cleaned guile bindings: scheme distrib. funs and region funs are
+		used trasparently
+
+Version 0.20 4-12-2009 A. F. Di Narzo <antonio.fabio@gmail.com>
+	* cleaned distrib tarball: now includes swig generated files
+	* cleaned handling of vector and matrix arrays in guile bindings
+	* removed obsolete examples
+
 Version 0.19 A. F. Di Narzo <antonio.fabio@gmail.com>
+	* added a new RAPTOR consistency check
 	* added README file with compiling instructions
+	* added some minimal guile example scripts
+	* added some minimal guile testing scripts
 	* added (undocumented) guile bindings
 
 Version 0.18 15-09-2009 A. F. Di Narzo <antonio.fabio@gmail.com>

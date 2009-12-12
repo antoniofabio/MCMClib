@@ -58,7 +58,7 @@ void mcmclib_raptor_gamma_free(mcmclib_raptor_gamma* p) {
 mcmclib_raptor_suff* mcmclib_raptor_suff_alloc(mcmclib_raptor_gamma* g, int t0,
 					       mcmclib_rapt_gamma* rg) {
   mcmclib_raptor_suff* a = (mcmclib_raptor_suff*) malloc(sizeof(mcmclib_raptor_suff));
-  a->em = mcmclib_mixem_online_alloc(g->mu_hat, g->Sigma_hat, g->beta_hat, 0.5, t0);
+  a->em = mcmclib_mixem_online_alloc(g->mu_hat, g->Sigma_hat, g->beta_hat, 0.6, t0);
   int d = g->mu_hat[0]->size;
   a->Sigma_eps = gsl_matrix_alloc(d, d);
   gsl_matrix_set_identity(a->Sigma_eps);

@@ -62,7 +62,7 @@ int main(int argc, char** argv) {
   gsl_vector_set_all(w_hat, 1.0 / (double) K);
   gsl_vector* beta = gsl_vector_alloc(K);
   gsl_vector_memcpy(beta, w_hat);
-  mcmclib_mixem_online* olem = mcmclib_mixem_online_alloc(mu, Sigma, beta, 0.5, T0);
+  mcmclib_mixem_online* olem = mcmclib_mixem_online_alloc(mu, Sigma, beta, 0.6, T0);
 
   mcmclib_amh* sampler = mcmclib_raptor_alloc(rng,
 					      dunif, NULL,
@@ -111,7 +111,6 @@ int main(int argc, char** argv) {
   }
   gsl_vector_free(w_hat);
   gsl_vector_free(beta);
-  mcmclib_mixem_online_free(olem);
 
   return 0;
 }
