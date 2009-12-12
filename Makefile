@@ -1,5 +1,8 @@
 CFLAGS+=  --std=gnu99 -O0 -g -Wall -fpic
 LDFLAGS+= -lgsl -lgslcblas -lm
+PREFIX:=/usr
+LIBDIR:=$(PREFIX)/lib
+INCLUDEDIR:=$(PREFIX)/include
 
 MODULES := src test examples guile
 
@@ -23,3 +26,10 @@ clean:
 
 distrib:
 	./distrib.sh
+
+install: all
+	mkdir -p $(LIBDIR)
+	install -p -m 0755 src/libmcmclib.so $(LIBDIR)
+	install -p -m 0644 src/libmcmclib.a $(LIBDIR)
+	mkdir -p $(INCLUDEDIR)
+	install -p -m 0644 -t $(INCLUDEDIR) src/*.h

@@ -1,3 +1,6 @@
+Version 0.22 A. F. Di Narzo <antonio.fabio@gmail.com>
+	* added utility 'install' and 'install-guile' make targets
+
 Version 0.21 A. F. Di Narzo <antonio.fabio@gmail.com>
 	* improved source tarball generation
 	* modified 'n' exponent in online em RAPTOR: -1.1 instead of -1.0

@@ -1,6 +1,7 @@
 GUILE_MODULES := gsl mcmclib
-GUILE_MODULES_TARGETS := $(GUILE_MODULES:%=guile/swig/libguile%.so)\
-	$(GUILE_MODULES:%=guile/%_wrap.c)
+GUILE_MODULES_LIBS := $(GUILE_MODULES:%=guile/swig/libguile%.so)
+GUILE_MODULES_TARGETS := $(GUILE_MOULES_LIBS) $(GUILE_MODULES:%=guile/%_wrap.c)
+GUILE_LIBRARY_PATH:= $(shell guile -c "(display (%package-data-dir))")
 
 SWIG_FLAGS := -guile -scm -nodefaultctor -package swig -Linkage passive -scmstub
 GUILE_LDFLAGS := $(LDFLAGS) -lguile
@@ -16,3 +17,9 @@ guile/%_wrap.c: guile/%.i
 
 guile/swig/libguile%.so: guile/%_wrap.c src/libmcmclib.a
 	$(CC) -shared $(GUILE_CFLAGS) -fPIC $^ $(GUILE_LDFLAGS) -o $@
+
+install-guile: guile
+	mkdir -p $(GUILE_LIBRARY_PATH)/swig
+	install -p -m 0644 -t $(GUILE_LIBRARY_PATH)/swig guile/swig/*
+	mkdir -p $(LIBDIR)
+	install -p -m 0755 -t $(LIBDIR) $(GUILE_MODULES_LIBS)
