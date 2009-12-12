@@ -5,6 +5,7 @@
              (swig gsl)
              (swig mcmclib)
              (oop goops)
+	     (ice-9 optargs)
              (ice-9 pretty-print))
 (use-syntax (ice-9 syncase))
 
@@ -66,7 +67,11 @@
 (define-method (scale (a <list>) s) (map (lambda (x) (scale x s)) a))
 (define-method (add (a <number>) (b <number>)) (+ a b))
 (define-method (scale (a <number>) s) (* a s))
-(export add scale)
+(define-method (mul (x <vector>) . rest)
+  (let-optional rest
+   ((y x))
+   (vector-ec (: i (vector-length x)) (* (vector-ref x i) (vector-ref y i)))))
+(export add scale mul)
 
 (define-public (update-mean old-value new-data old-n)
   "update mean value 'old-value' based on sample size 'old-n'
