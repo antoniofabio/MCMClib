@@ -16,8 +16,8 @@
   "convert a gsl vector into a scheme vector"
   (vector-ec (:range i (gsl-vector-size-get gv)) (gsl-vector-get gv i)))
 
+;; gsl vector eager comprehension
 (define-syntax gv-ec
-  "gsl vector eager comprehension"
   (syntax-rules (nested)
     ((gv-ec expression)
      (gv-ec (nested) expression))
@@ -26,8 +26,8 @@
      (sv->gv (vector-ec qualifier expression)))))
 (export-syntax gv-ec)
 
+;; gsl vector generator
 (define-syntax :gv
-  "gsl vector generator"
   (syntax-rules (index)
     ((:gv cc var (index var1) arg)
      (:vector cc var (index var1) (gv->sv arg)))
@@ -35,8 +35,8 @@
      (:vector cc var (gv->sv arg)))))
 (export-syntax :gv)
 
+;; gsl vector index generator
 (define-syntax :gv-along
-  "gsl vector index generator"
   (syntax-rules ()
     ((:gv-along cc var arg)
      (:range cc var (gsl-vector-size-get arg)))))
@@ -91,8 +91,8 @@
 (define-public (gm-rows gm)
   "clone rows of matrix 'gm' into a scheme vector of gsl vectors"
   (vector-ec (:range i (gsl-matrix-size1-get gm)) (gm-row gm i)))
+;; gsl matrix rows generator
 (define-syntax :gm-rows
-  "gsl matrix rows generator"
   (syntax-rules (index)
     ((:gm-rows cc var (index var1) arg)
      (:vector cc var (index var1) (gm-rows arg)))
@@ -106,8 +106,8 @@
 (define-public (gm-cols gm)
   "clone columns of matrix 'gm' into a scheme vector of gsl vectors"
   (vector-ec (:range j (gsl-matrix-size2-get gm)) (gm-col gm j)))
+;; gsl matrix columns generator
 (define-syntax :gm-cols
-  "gsl matrix columns generator"
   (syntax-rules (index)
     ((:gm-cols cc var (index var1) arg)
      (:vector cc var (index var1) (gm-rows arg)))
