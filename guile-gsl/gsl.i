@@ -43,3 +43,4 @@ static void guile_gsl_err_handler(const char * reason,
 %include "blas.i"
 %include "rng.i"
 %include "qrng.i"
+%include "sf.i"
