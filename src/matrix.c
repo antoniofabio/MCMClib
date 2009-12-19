@@ -3,6 +3,13 @@
 #include <gsl/gsl_eigen.h>
 #include "matrix.h"
 
+void mcmclib_matrix_addscale(gsl_matrix* dest,
+			     const gsl_matrix* A, const gsl_matrix* B, double alpha) {
+  gsl_matrix_memcpy(dest, A);
+  gsl_matrix_add(dest, B);
+  gsl_matrix_scale(dest, alpha);
+}
+
 int mcmclib_cholesky_decomp(gsl_matrix* A) {
   gsl_error_handler_t *hnd = gsl_set_error_handler_off();
   int status = gsl_linalg_cholesky_decomp(A);
