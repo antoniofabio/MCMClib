@@ -33,6 +33,7 @@ void mcmclib_mh_reset(mcmclib_mh* p) {
 
 void mcmclib_mh_free(mcmclib_mh* p) {
   gsl_vector_free(p->x_old);
+  mcmclib_mh_q_free(p->q);
   free(p);
 }
 
