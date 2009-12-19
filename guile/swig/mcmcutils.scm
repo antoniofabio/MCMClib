@@ -5,12 +5,11 @@
              (swig gsl)
              (swig mcmclib)
              (oop goops)
+	     (ice-9 optargs)
              (ice-9 pretty-print))
 (use-syntax (ice-9 syncase))
 
-(export v2gv gv2v gM2M M2gM)
-
-(define (v2gv v)
+(define-public (v2gv v)
   "convert the scheme vector 'v' into a gsl vector"
   (let*
       ((n (vector-length v))
@@ -18,11 +17,11 @@
     (do-ec (: i n)
            (gsl-vector-set gv i (vector-ref v i)))
     gv))
-(define (gv2v gv)
+(define-public (gv2v gv)
   "convert the gsl vector 'gv' into a scheme vector"
   (vector-ec (: i (gsl-vector-size-get gv)) (gsl-vector-get gv i)))
 
-(define (gM2M gM)
+(define-public (gM2M gM)
   "convert a gsl matrix into a scheme matrix"
   (let*
       ((nr (gsl-matrix-size1-get gM))
@@ -37,7 +36,7 @@
 (define-public (matrix-numcolumns M)
   "get the number of columns of matrix M"
   (cadr (array-dimensions M)))
-(define (M2gM M)
+(define-public (M2gM M)
   "convert a scheme matrix into a gsl matrix"
   (let*
       ((nr (matrix-numrows M))
@@ -68,7 +67,11 @@
 (define-method (scale (a <list>) s) (map (lambda (x) (scale x s)) a))
 (define-method (add (a <number>) (b <number>)) (+ a b))
 (define-method (scale (a <number>) s) (* a s))
-(export add scale)
+(define-method (mul (x <vector>) . rest)
+  (let-optional rest
+   ((y x))
+   (vector-ec (: i (vector-length x)) (* (vector-ref x i) (vector-ref y i)))))
+(export add scale mul)
 
 (define-public (update-mean old-value new-data old-n)
   "update mean value 'old-value' based on sample size 'old-n'
@@ -107,28 +110,28 @@
   "sum elements of vector 'x'"
   (gv-fold x 0 +))
 
-(define (xor a b)
+(define-public (xor a b)
   (or (and a (not b))
       (and (not a) b)))
 
-(define (square x) (* x x))
+(define-public (square x) (* x x))
 
-(define (dist x y)
+(define-public (dist x y)
   "euclidean distance between two gsl vectors"
   (sum-ec (: i (gsl-vector-size-get x))
           (square (- (gsl-vector-get x i) (gsl-vector-get y i)))))
 
-(define (get-dists x pts)
+(define-public (get-dists x pts)
   "compute distances between point x and list of points 'pts'. gsl vectors"
   (map (lambda (y) (dist x y)) pts))
 
-(define (which-min x)
+(define-public (which-min x)
   "0-based index of the minimum value in list 'x'"
   (let
       ((m (apply min x)))
     (list-index (lambda (y) (= y m)) x)))
 
-(define (diag value size)
+(define-public (diag value size)
   "gsl diagonal matrix 'size x size'"
   (let
       ((ans (new-gsl-matrix size size)))
@@ -136,14 +139,12 @@
     (gsl-matrix-scale ans value)
     ans))
 
-(define (make-filled-vector value dim)
+(define-public (make-filled-vector value dim)
   "make gsl vector of dimension 'dim' filled with 'value'"
   (let
       ((ans (new-gsl-vector dim)))
     (gsl-vector-set-all ans value)
     ans))
-
-(export xor square dist get-dists which-min diag make-filled-vector)
 
 ;;
 ;;keep references of referenced objects to avoid premature garbage collection
@@ -163,9 +164,8 @@
 (define-method (update (obj <amh>)) (mcmclib-amh-update (get-c-ref obj)))
 (export <swig-obj> <mh> <amh> update get-c-ref get-subtype free)
 
-(define (symbol-concatenate lst)
+(define-public (symbol-concatenate lst)
   (string->symbol (string-concatenate (map symbol->string lst))))
-(export symbol-concatenate)
 
 (define-syntax make-mh
   (syntax-rules ()
@@ -216,7 +216,7 @@
 ;;wrap monitor objects
 ;;
 (define-class <monitor> (<swig-obj>) (x #:init-keyword #:x))
-(define (make-monitor x)
+(define-public (make-monitor x)
   (make <monitor> #:x x #:c-ref (new-mcmclib-monitor x)))
 (define-method (update (obj <monitor>))
   (mcmclib-monitor-update (get-c-ref obj)))
@@ -248,13 +248,13 @@
 (define-class <monitor-ecdf> (<swig-obj>) (x #:init-keyword #:x))
 (define-method (update (obj <monitor-ecdf>))
   (mcmclib-monitor-ecdf-update (get-c-ref obj) (slot-ref obj 'x)))
-(export <monitor> get-monitor-value <monitor-ecdf> make-monitor)
+(export <monitor> get-monitor-value <monitor-ecdf>)
 
 ;;
 ;;transition frequencies of a finite state machine
 ;;
 (define-class <transition-matrix> () counts state)
-(define (make-transition-matrix n init)
+(define-public (make-transition-matrix n init)
   "builds a new transition matrix. 'n' is the number of states, 'init' the initial value"
   (let
       ((ans (make <transition-matrix>)))
@@ -268,4 +268,4 @@
     (array-set! (slot-ref obj 'counts) (+ old-count 1) old-state new-state)
     (slot-set! obj 'state new-state)
     obj))
-(export <transition-matrix> make-transition-matrix)
+(export <transition-matrix>)

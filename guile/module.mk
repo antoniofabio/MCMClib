@@ -1,4 +1,4 @@
-GUILE_MODULES := gsl mcmclib
+GUILE_MODULES := mcmclib
 GUILE_MODULES_LIBS := $(GUILE_MODULES:%=guile/swig/libguile%.so)
 GUILE_MODULES_TARGETS := $(GUILE_MOULES_LIBS) $(GUILE_MODULES:%=guile/%_wrap.c)
 GUILE_LIBRARY_PATH:= $(shell guile -c "(display (%package-data-dir))")
