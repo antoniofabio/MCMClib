@@ -115,7 +115,7 @@ mcmclib_pmodel_sampler* mcmclib_pmodel_sampler_alloc(const gsl_matrix* X,
 }
 
 void mcmclib_pmodel_sampler_free(mcmclib_pmodel_sampler* p) {
-  mcmclib_gauss_am_free(p->sampler);
+  mcmclib_amh_free(p->sampler);
   mcmclib_pois_model_free(p->model);
   free(p);
 }
