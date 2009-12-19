@@ -30,9 +30,12 @@
 ;; gsl vector eager comprehension
 (define-syntax gv-ec
   (syntax-rules (nested)
+    ((gv-ec q1 q2 expression)
+     (gv-ec (nested q1 q2) expression))
+    ((gv-ec (nested q1 ...) q2 expression)
+     (gv-ec (nested q1 ... q2) expression))
     ((gv-ec expression)
      (gv-ec (nested) expression))
-
     ((gv-ec qualifier expression)
      (sv->gv (vector-ec qualifier expression)))))
 (export-syntax gv-ec)
