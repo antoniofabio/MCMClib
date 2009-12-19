@@ -16,17 +16,10 @@
 @{*/
 #include "mh.h"
 
-typedef struct {
-  gsl_rng* r;
-  gsl_matrix* Sigma;
-} mcmclib_gauss_mrw_gamma;
-
-mcmclib_gauss_mrw_gamma* mcmclib_gauss_mrw_gamma_alloc(gsl_rng* r, const gsl_matrix* Sigma);
-void mcmclib_gauss_mrw_gamma_free(mcmclib_gauss_mrw_gamma* p);
-double mcmclib_gauss_mrw_qd(void* ignore, gsl_vector* x, gsl_vector* y);
-
-mcmclib_mh_q* mcmclib_gauss_mrw_q_alloc(gsl_rng* r, const gsl_matrix* Sigma);
-void mcmclib_gauss_mrw_q_free(mcmclib_mh_q* p);
+/** GRW proposal log-density (fake) \internal*/
+double mcmclib_gauss_mrw_qd(mcmclib_mh_q* ignore, gsl_vector* x, gsl_vector* y);
+/** GRW proposal sampler */
+void mcmclib_gauss_mrw_sample(mcmclib_mh_q* q, gsl_vector* x);
 
 /** alloc (and init) a Gaussian RW object
 @param r RNG state
@@ -39,17 +32,6 @@ mcmclib_mh* mcmclib_gauss_mrw_alloc(gsl_rng* r,
 				    distrfun_p logdistr, void* data,
 				    gsl_vector* start_x, const gsl_matrix* sigma_prop);
 
-/** free extra Gaussian RW data*/
-void mcmclib_gauss_mrw_free(mcmclib_mh* p);
-
-/** GRW proposal log-density (fake) \internal*/
-double mcmclib_gauss_mrw_qd(void* ignore, gsl_vector* x, gsl_vector* y);
-
-/** GRW proposal sampler
-@param q ptr to an mh_q object allocated by 'mcmclib_gauss_mrw_q_alloc'
-@param x object in which to put result
-*/
-void mcmclib_gauss_mrw_sample(mcmclib_mh_q* q, gsl_vector* x);
 
 /**@}*/
 /**@}*/
