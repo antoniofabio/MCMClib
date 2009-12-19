@@ -21,4 +21,4 @@
 (vector-ec (:gv xi v) xi)
 (define v (sv->gv #(11 10 12)))
 (do-ec (:gv xi (index i) v) (format #t "v[~a] = ~a\n" i xi))
-(do-ec (:parallel (:gv-along i v) (:gv xi v)) (format #t "v[~a] = ~a\n" i xi))
+(do-ec (:gv-along i v) (format #t "v[~a] = ~a\n" i (gsl-vector-get v i)))
