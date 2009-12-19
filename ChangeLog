@@ -1,4 +1,5 @@
 Version 0.22 A. F. Di Narzo <antonio.fabio@gmail.com>
+	* removed guile-gsl bindings: they are now distributed separately
 	* added utility 'install' and 'install-guile' make targets
 
 Version 0.21 A. F. Di Narzo <antonio.fabio@gmail.com>

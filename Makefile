@@ -24,8 +24,17 @@ doc:
 clean:
 	@rm -rf *~ $(SRC:%.c=%.o) $(SRC:%=%~) $(TOCLEAN) doc/html doc/latex
 
-distrib:
-	./distrib.sh
+VERSION:=$(shell git describe --abbrev=5)
+TARBALL_NAME:=MCMClib_$(VERSION)
+
+distrib: $(SRC) doc
+	tar cf $(TARBALL_NAME).tar $(SRC) doc Makefile $(MODULES:%=%/module.mk)\
+		ChangeLog README COPYING
+	mkdir $(TARBALL_NAME)
+	cd $(TARBALL_NAME) && tar xf ../$(TARBALL_NAME).tar
+	rm $(TARBALL_NAME).tar
+	tar czf $(TARBALL_NAME).tar.gz $(TARBALL_NAME)
+	rm -rf $(TARBALL_NAME)
 
 install: all
 	mkdir -p $(LIBDIR)
