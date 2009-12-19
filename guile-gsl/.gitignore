@@ -1,2 +1,4 @@
 *.so
+gsl_wrap.c
+swig/gsl.scm
 
