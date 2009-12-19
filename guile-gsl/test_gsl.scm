@@ -1,6 +1,6 @@
-(use-modules (swig gsl)
-	     (srfi srfi-42)
+(use-modules (srfi srfi-42)
 	     (swig gsl-utils))
+(use-modules ((swig gsl) :renamer gsl-renamer))
 
 (define v (new-gsl-vector 3))
 (gsl-vector-set v 0 2.0)
