@@ -6,15 +6,18 @@
 	     (swig gsl))
 
 (define-public (sv->gv sv)
+  "convert a scheme vector into a gsl vector"
   (let*
       ((size (vector-length sv))
        (ans (new-gsl-vector size)))
     (do-ec (:range i size) (gsl-vector-set ans i (vector-ref sv i)))
     ans))
 (define-public (gv->sv gv)
+  "convert a gsl vector into a scheme vector"
   (vector-ec (:range i (gsl-vector-size-get gv)) (gsl-vector-get gv i)))
 
 (define-syntax gv-ec
+  "gsl vector eager comprehension"
   (syntax-rules (nested)
     ((gv-ec expression)
      (gv-ec (nested) expression))
@@ -24,6 +27,7 @@
 (export-syntax gv-ec)
 
 (define-syntax :gv
+  "gsl vector generator"
   (syntax-rules (index)
     ((:gv cc var (index var1) arg)
      (:vector cc var (index var1) (gv->sv arg)))
@@ -32,6 +36,7 @@
 (export-syntax :gv)
 
 (define-syntax :gv-along
+  "gsl vector index generator"
   (syntax-rules ()
     ((:gv-along cc var arg)
      (:range cc var (gsl-vector-size-get arg)))))
@@ -45,6 +50,7 @@
 (define-public (gv-max gv) (max-ec (:gv x gv) x))
 (define-public (gv-map f gv) (gv-ec (:gv x gv) (f x)))
 (define-public (gv-map-ip f gv)
+  "map the function 'f' over the gsl vector 'gv' in place"
   (do-ec (:gv gvi (index i) gv)
 	 (gsl-vector-set gv i (f gvi)))
   gv)
@@ -60,6 +66,7 @@
 	  (* di di)))
 
 (define-public (gm->sm gm)
+  "convert a gsl matrix into a scheme matrix"
   (let*
       ((size1 (gsl-matrix-size1-get gm))
        (size2 (gsl-matrix-size2-get gm))
@@ -68,6 +75,7 @@
 	   (array-set! ans (gsl-matrix-get gm i j) i j))
     ans))
 (define-public (sm->gm sm)
+  "convert a scheme matrix into a gsl matrix"
   (let*
       ((sizes (array-dimensions sm))
        (size1 (car sizes))
@@ -78,10 +86,13 @@
     ans))
 
 (define-public (gm-row gm i)
+  "clone row 'i' of gsl matrix 'gm'"
   (gv-ec (:range j (gsl-matrix-size2-get gm)) (gsl-matrix-get gm i j)))
 (define-public (gm-rows gm)
+  "clone rows of matrix 'gm' into a scheme vector of gsl vectors"
   (vector-ec (:range i (gsl-matrix-size1-get gm)) (gm-row gm i)))
 (define-syntax :gm-rows
+  "gsl matrix rows generator"
   (syntax-rules (index)
     ((:gm-rows cc var (index var1) arg)
      (:vector cc var (index var1) (gm-rows arg)))
@@ -90,10 +101,13 @@
 (export-syntax :gm-rows)
 
 (define-public (gm-col gm j)
+  "clone column 'i' of gsl matrix 'gm'"
   (gv-ec (:range i (gsl-matrix-size1-get gm)) (gsl-matrix-get gm i j)))
 (define-public (gm-cols gm)
+  "clone columns of matrix 'gm' into a scheme vector of gsl vectors"
   (vector-ec (:range j (gsl-matrix-size2-get gm)) (gm-col gm j)))
 (define-syntax :gm-cols
+  "gsl matrix columns generator"
   (syntax-rules (index)
     ((:gm-cols cc var (index var1) arg)
      (:vector cc var (index var1) (gm-rows arg)))
@@ -101,7 +115,8 @@
      (:vector cc var (gm-rows arg)))))
 (export-syntax :gm-cols)
 
-(define-public (gm-copy-from-gv gm gv)
+(define-public (gm-memcpy-gv gm gv)
+  "copy contents of gsl vector 'gv' into gsl matrix 'gm'"
   (let
       ((size1 (gsl-matrix-size1-get gm))
        (size2 (gsl-matrix-size2-get gm)))
@@ -126,6 +141,7 @@
   (gm-map-ip (gm-clone gm) f))
 
 (define-public (make-gm-diag dim . rest)
+  "make a diagonal gsl matrix of dimension 'dim' and optional value 'value'"
   (let-optional rest
    ((value 1.0))
    (let
