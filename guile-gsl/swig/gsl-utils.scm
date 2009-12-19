@@ -41,9 +41,16 @@
 (define-syntax :gv
   (syntax-rules (index)
     ((:gv cc var (index var1) arg)
-     (:vector cc var (index var1) (gv->sv arg)))
+     (:parallel cc (:gv var arg) (:integers var1)))
     ((:gv cc var arg)
-     (:vector cc var (gv->sv arg)))))
+     (:do cc
+	  (let ((gv arg) (len 0))
+	    (set! len (gv-size-get gv)))
+	  ((i 0))
+	  (< i len)
+          (let ((var (gv-get gv i))))
+	  #t
+	  ((+ i 1))))))
 (export-syntax :gv)
 
 ;; gsl vector index generator
