@@ -1,7 +1,5 @@
 %module gsl
 
-%include "carrays.i"
-
 %scheme %{(load-extension "libguilegsl.so" "scm_init_swig_gsl_module")%}
 
 %{
