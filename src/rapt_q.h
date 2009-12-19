@@ -19,7 +19,7 @@
 @{*/
 
 /** Pointer to a region-computing function */
-typedef int (*region_fun_t) (gsl_vector*, void*);
+typedef int (*region_fun_t) (void*, gsl_vector*);
 
 /**\brief RAPT proposal kernel parameters*/
 typedef struct {
@@ -49,7 +49,7 @@ mcmclib_mh_q* mcmclib_rapt_q_alloc(gsl_rng* r,
 				   void* which_region_data);
 
 /**< free a previously allocated RAPT kernel*/
-void mcmclib_rapt_q_free(mcmclib_mh_q* p);
+void mcmclib_rapt_q_free(void* in_p);
 
 /** customly set global proposal weight (same for all regions)*/
 void mcmclib_rapt_gamma_set_alpha(mcmclib_rapt_gamma* p, double alpha);
