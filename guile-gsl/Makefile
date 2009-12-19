@@ -13,7 +13,8 @@ GUILE_CFLAGS := $(CFLAGS) -I./src
 
 all: $(MODULES_TARGETS)
 
-gsl_wrap.c: vector.i matrix.i blas.i rng.i qrng.i
+gsl_wrap.c: vector.i matrix.i blas.i rng.i qrng.i sf.i mode.i permutation.i \
+	linalg.i
 
 %_wrap.c: %.i
 	swig $(SWIG_FLAGS) -o $@ $<

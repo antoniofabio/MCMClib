@@ -1,7 +1,5 @@
 %module gsl
 
-%include "carrays.i"
-
 %scheme %{(load-extension "libguilegsl.so" "scm_init_swig_gsl_module")%}
 
 %{
@@ -26,16 +24,16 @@ static void guile_gsl_err_handler(const char * reason,
 %}
 
 %typemap(in) FILE* {
-  $1 = fdopen(SCM_FPORT_FDES($input), "rw");
+  $1 = fdopen(scm_to_int(scm_fileno($input)), "rw");
 }
 %typemap(freearg) FILE* {
   fclose($1);
 }
 %typemap(in) (FILE* istream) {
-  $1 = fdopen(SCM_FPORT_FDES($input), "r");
+  $1 = fdopen(scm_to_int(scm_fileno($input)), "r");
 }
 %typemap(in) (FILE* ostream) {
-  $1 = fdopen(SCM_FPORT_FDES($input), "w");
+  $1 = fdopen(scm_to_int(scm_fileno($input)), "w");
 }
 
 %include "vector.i"
@@ -43,3 +41,7 @@ static void guile_gsl_err_handler(const char * reason,
 %include "blas.i"
 %include "rng.i"
 %include "qrng.i"
+%include "sf.i"
+%include "mode.i"
+%include "permutation.i"
+%include "linalg.i"
