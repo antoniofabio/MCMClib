@@ -8,7 +8,7 @@ SWIG_FLAGS := -guile -scm -nodefaultctor -package swig -Linkage passive -scmstub
 GUILE_LDFLAGS := $(LDFLAGS) -lguile
 GUILE_CFLAGS := $(CFLAGS) -I./src
 
-TOCLEAN += $(GUILE_MODULES_LIBS)
+TOCLEAN += $(GUILE_MODULES_LIBS) $(GUILE_MODULES:%=guile/%_wrap.o)
 
 guile: $(GUILE_MODULES_LIBS)
 
