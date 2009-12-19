@@ -33,6 +33,9 @@ typedef struct {
   double sf; /**< scaling factor*/
 } mcmclib_gauss_am_suff;
 
+/** free extra AM data*/
+void mcmclib_gauss_am_suff_free(void* p);
+
 /** alloc (and init) extra AM data
 @param r RNG state
 @param logdistr pointer to a log-distribution function
@@ -45,16 +48,12 @@ mcmclib_amh* mcmclib_gauss_am_alloc(gsl_rng* r,
 				    distrfun_p logdistr, void* logdistr_data,
 				    gsl_vector* start_x,
 				    const gsl_matrix* sigma_zero, int t0);
-/** free extra AM data*/
-void mcmclib_gauss_am_free(mcmclib_amh* p);
 
 /** set scaling factor for the gaussian AM sampler 'p'*/
 void mcmclib_gauss_am_set_sf(mcmclib_amh* p, double sf);
 
-/** AM gamma update function \internal
-@param in_p ptr to an mcmclib_amh object
-*/
-void mcmclib_gauss_am_update_gamma(void* in_p);
+/** AM gamma update function \internal */
+void mcmclib_gauss_am_update_gamma(mcmclib_amh* p);
 
 /**@}*/
 /**@}*/
