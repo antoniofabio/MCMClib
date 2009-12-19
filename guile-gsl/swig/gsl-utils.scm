@@ -30,9 +30,12 @@
 ;; gsl vector eager comprehension
 (define-syntax gv-ec
   (syntax-rules (nested)
+    ((gv-ec q1 q2 expression)
+     (gv-ec (nested q1 q2) expression))
+    ((gv-ec (nested q1 ...) q2 expression)
+     (gv-ec (nested q1 ... q2) expression))
     ((gv-ec expression)
      (gv-ec (nested) expression))
-
     ((gv-ec qualifier expression)
      (sv->gv (vector-ec qualifier expression)))))
 (export-syntax gv-ec)
@@ -41,9 +44,16 @@
 (define-syntax :gv
   (syntax-rules (index)
     ((:gv cc var (index var1) arg)
-     (:vector cc var (index var1) (gv->sv arg)))
+     (:parallel cc (:gv var arg) (:integers var1)))
     ((:gv cc var arg)
-     (:vector cc var (gv->sv arg)))))
+     (:do cc
+	  (let ((gv arg) (len 0))
+	    (set! len (gv-size-get gv)))
+	  ((i 0))
+	  (< i len)
+          (let ((var (gv-get gv i))))
+	  #t
+	  ((+ i 1))))))
 (export-syntax :gv)
 
 ;; gsl vector index generator
