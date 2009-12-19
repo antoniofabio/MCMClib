@@ -26,16 +26,16 @@ static void guile_gsl_err_handler(const char * reason,
 %}
 
 %typemap(in) FILE* {
-  $1 = fdopen(SCM_FPORT_FDES($input), "rw");
+  $1 = fdopen(scm_to_int(scm_fileno($input)), "rw");
 }
 %typemap(freearg) FILE* {
   fclose($1);
 }
 %typemap(in) (FILE* istream) {
-  $1 = fdopen(SCM_FPORT_FDES($input), "r");
+  $1 = fdopen(scm_to_int(scm_fileno($input)), "r");
 }
 %typemap(in) (FILE* ostream) {
-  $1 = fdopen(SCM_FPORT_FDES($input), "w");
+  $1 = fdopen(scm_to_int(scm_fileno($input)), "w");
 }
 
 %include "vector.i"
