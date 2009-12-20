@@ -18,7 +18,7 @@
 (pass-if (= Q-par 0.5))
 (mcmclib-amh-update amh)
 (pass-if (= (gv-get x 0) 2.0))
-(pass-if (= Q-par 0.5))
+(pass-if (= Q-par 0.25))
 
 (define rng (new-gsl-rng (gsl-rng-default)))
 (define S (make-gm-diag 1 0.1))
