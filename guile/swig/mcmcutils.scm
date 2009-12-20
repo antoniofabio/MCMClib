@@ -9,54 +9,6 @@
              (ice-9 pretty-print))
 (use-syntax (ice-9 syncase))
 
-(define-public (v2gv v)
-  "convert the scheme vector 'v' into a gsl vector"
-  (let*
-      ((n (vector-length v))
-       (gv (new-gsl-vector n)))
-    (do-ec (: i n)
-           (gsl-vector-set gv i (vector-ref v i)))
-    gv))
-(define-public (gv2v gv)
-  "convert the gsl vector 'gv' into a scheme vector"
-  (vector-ec (: i (gsl-vector-size-get gv)) (gsl-vector-get gv i)))
-
-(define-public (gM2M gM)
-  "convert a gsl matrix into a scheme matrix"
-  (let*
-      ((nr (gsl-matrix-size1-get gM))
-       (nc (gsl-matrix-size2-get gM))
-       (ans (make-array 0.0 nr nc)))
-    (do-ec (: i nr) (: j nc)
-           (array-set! ans (gsl-matrix-get gM i j) i j))
-    ans))
-(define-public (matrix-numrows M)
-  "get the number of rows of matrix M"
-  (car (array-dimensions M)))
-(define-public (matrix-numcolumns M)
-  "get the number of columns of matrix M"
-  (cadr (array-dimensions M)))
-(define-public (M2gM M)
-  "convert a scheme matrix into a gsl matrix"
-  (let*
-      ((nr (matrix-numrows M))
-       (nc (matrix-numcolumns M))
-       (gM (new-gsl-matrix nr nc)))
-    (do-ec (: i nr) (: j nc)
-           (gsl-matrix-set gM i j (array-ref M i j)))
-    gM))
-
-(define-public (matrix-add a b)
-  (let
-      ((ans (M2gM a)))
-    (gsl-matrix-add ans (M2gM b))
-    (gM2M ans)))
-(define-public (matrix-scale a b)
-  (let
-      ((ans (M2gM a)))
-    (gsl-matrix-scale ans b)
-    (gM2M ans)))
-
 (define-method (add (x <vector>) (y <vector>))
   (vector-ec (: i (vector-length x)) (+ (vector-ref x i) (vector-ref y i))))
 (define-method (scale (x <vector>) s)
@@ -78,73 +30,21 @@
    using the new data point 'new-data'"
   (scale (add (scale old-value old-n) new-data) (/ (+ 1.0 old-n))))
 
-(define-public (gsl-copy-subvec dest src offset)
-  "copy a gvector into a subset of another gvector"
-  (do-ec (: i (gsl-vector-size-get src))
-         (gsl-vector-set dest (+ offset i) (gsl-vector-get src i))))
-
-(define-public (gM-clone x)
-  (let
-      ((y (new-gsl-matrix (gsl-matrix-size1-get x) (gsl-matrix-size2-get x))))
-    (gsl-matrix-memcpy y x)
-    y))
-
-(define-public (gv-clone x)
-  (let
-      ((y (new-gsl-vector (gsl-vector-size-get x))))
-    (gsl-vector-memcpy y x)
-    y))
-
-(define-public (gv-op-ip x f)
-  "map function f to gsl-vector x, in place"
-  (do-ec (: i (gsl-vector-size-get x))
-         (gsl-vector-set x i (f (gsl-vector-get x i))))
-  x)
-
-(define-public (gv-op x f) (gv-op-ip (gv-clone x) f))
-
-(define-public (gv-fold x x0 f)
-  (fold-ec x0 (: i (gsl-vector-size-get x)) (gsl-vector-get x i) f))
-
-(define-public (gv-sum x)
-  "sum elements of vector 'x'"
-  (gv-fold x 0 +))
-
 (define-public (xor a b)
   (or (and a (not b))
       (and (not a) b)))
 
 (define-public (square x) (* x x))
 
-(define-public (dist x y)
-  "euclidean distance between two gsl vectors"
-  (sum-ec (: i (gsl-vector-size-get x))
-          (square (- (gsl-vector-get x i) (gsl-vector-get y i)))))
-
 (define-public (get-dists x pts)
   "compute distances between point x and list of points 'pts'. gsl vectors"
-  (map (lambda (y) (dist x y)) pts))
+  (map (lambda (y) (gv-dist x y)) pts))
 
 (define-public (which-min x)
   "0-based index of the minimum value in list 'x'"
   (let
       ((m (apply min x)))
     (list-index (lambda (y) (= y m)) x)))
-
-(define-public (diag value size)
-  "gsl diagonal matrix 'size x size'"
-  (let
-      ((ans (new-gsl-matrix size size)))
-    (gsl-matrix-set-identity ans)
-    (gsl-matrix-scale ans value)
-    ans))
-
-(define-public (make-filled-vector value dim)
-  "make gsl vector of dimension 'dim' filled with 'value'"
-  (let
-      ((ans (new-gsl-vector dim)))
-    (gsl-vector-set-all ans value)
-    ans))
 
 ;;
 ;;keep references of referenced objects to avoid premature garbage collection
@@ -224,16 +124,16 @@
   "get values 'what' (a symbol) from monitor object 'obj' as a scheme vector"
   (let*
       ((cobj (get-c-ref obj))
-       (d (gsl-vector-size-get (mcmclib-monitor-x-get cobj)))
-       (v (new-gsl-vector d))
+       (d (gv-size-get (mcmclib-monitor-x-get cobj)))
+       (v (new-gv d))
        (fun-name (symbol-concatenate (list 'mcmclib-monitor-get- what))))
     ((eval fun-name (interaction-environment)) cobj v)
     (gv2v v)))
 (define-method (write (obj <monitor>) port)
   (let*
       ((cobj (get-c-ref obj))
-       (d (gsl-vector-size-get (mcmclib-monitor-x-get cobj)))
-       (v (new-gsl-vector d)))
+       (d (gv-size-get (mcmclib-monitor-x-get cobj)))
+       (v (new-gv d)))
     (format #t "<monitor>\n")
     (format #t "monitoring: ~a\n" (slot-ref obj 'x))
     (format #t "means:\n")
