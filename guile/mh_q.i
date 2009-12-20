@@ -21,20 +21,16 @@ struct mcmclib_mh_q_t;
     SCM sx = SWIG_NewPointerObj(x, SWIGTYPE_p_gsl_vector, 0);
     scm_call_1(rq, sx);
   }
-  void mcmclib_mh_q_guile_free(void* in_p) {
-    /*scm_gc_unprotect_object((SCM) in_p);*/ //FIXME: find the correct way to
-					     //release 'in_p'
-  }
 %}
 
 %newobject mcmclib_mh_q_guile_alloc;
 %inline %{
   mcmclib_mh_q* mcmclib_mh_q_guile_alloc(gsl_rng* r, SCM rq_dq) {
-    scm_gc_protect_object(rq_dq);
+    scm_permanent_object(rq_dq); /*FIXME: find a better way to handle this*/
     return mcmclib_mh_q_alloc(r,
 			      mcmclib_mh_q_guile_rq,
 			      mcmclib_mh_q_guile_dq,
-			      (void*) rq_dq, mcmclib_mh_q_guile_free);
+			      (void*) rq_dq, NULL);
   }
 %}
 
