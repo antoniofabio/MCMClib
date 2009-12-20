@@ -52,7 +52,7 @@ static double dunif(void* ignore, gsl_vector* x) {
       mcmclib_amh_update(sampler);					\
       mcmclib_monitor_update(m);					\
     }									\
-    mcmclib_at7_free(sampler);						\
+    mcmclib_amh_free(sampler);						\
     mcmclib_monitor_free(m);						\
   }									\
 

@@ -63,10 +63,10 @@ int main(int argc, char** argv) {
   assert(check_dequal(sum_x, v0(suff->sum_x)));
   assert(check_dequal(sum_xx, m00(suff->sum_xx)));
   double eps = m00(suff->Sigma_eps);
-  mcmclib_gauss_mrw_gamma* gamma = (mcmclib_gauss_mrw_gamma*) s->mh->q->gamma;
+  gsl_matrix* Sigma = (gsl_matrix*) s->mh->q->gamma;
   double mean = sum_x / (double) N;
   double variance = sum_xx / (double) N - mean * mean;
-  assert(check_dequal(fix(variance, eps), m00(gamma->Sigma)));
+  assert(check_dequal(fix(variance, eps), m00(Sigma)));
 
   /*check against uniform distribution*/
   assert(check_dequal(0.461706, mean));
@@ -75,7 +75,7 @@ int main(int argc, char** argv) {
   /*free memory*/
   gsl_matrix_free(sigma);
   gsl_vector_free(x);
-  mcmclib_gauss_am_free(s);
+  mcmclib_amh_free(s);
   gsl_rng_free(rng);
 
   return 0;

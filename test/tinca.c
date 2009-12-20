@@ -23,7 +23,7 @@ static double dtarget(void* ignore, gsl_vector* x) {
   return log(0.0);
 }
 
-static double qd(void* ignore, gsl_vector* x, gsl_vector* y) {
+static double qd(mcmclib_mh_q* ignore, gsl_vector* x, gsl_vector* y) {
   return 0.0;
 }
 
@@ -32,8 +32,7 @@ static void sampler(mcmclib_mh_q* q, gsl_vector* x) {
   gsl_vector_set(x, 0, x0 + (*o));
 }
 
-static void update_gamma(void* in_p) {
-  mcmclib_amh* p = (mcmclib_amh*) in_p;
+static void update_gamma(mcmclib_amh* p) {
   double *s = (double*) p->suff;
   (*s)+= v0(p->mh->x);
 }
@@ -47,9 +46,9 @@ int main(int argc, char** argv) {
   }
   double inc = 0.2;
   double suff = 0.0;
-  mcmclib_mh_q* q = mcmclib_mh_q_alloc(r, sampler, &inc, qd, NULL, &inc);
+  mcmclib_mh_q* q = mcmclib_mh_q_alloc(r, sampler, qd, &inc, NULL);
   mcmclib_mh* mh = mcmclib_mh_alloc(r, dtarget, NULL, q, gsl_vector_alloc(1));
-  mcmclib_amh* amh = mcmclib_amh_alloc(mh, &suff, update_gamma);
+  mcmclib_amh* amh = mcmclib_amh_alloc(mh, &suff, update_gamma, NULL);
   mcmclib_inca* s = mcmclib_inca_alloc(amh, x, 2);
   double suff_check = 0.0;
   for(int n=0; n<2; n++) {
@@ -62,9 +61,6 @@ int main(int argc, char** argv) {
   assert(check_dequal(v0(x[1]), inc * 2 + 0.1));
 
   mcmclib_inca_free(s);
-  mcmclib_amh_free(amh);
-  mcmclib_mh_free(mh);
-  mcmclib_mh_q_free(q);
   for(int m=0; m<2; m++)
     gsl_vector_free(x[m]);
   gsl_rng_free(r);

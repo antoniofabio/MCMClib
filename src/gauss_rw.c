@@ -26,11 +26,13 @@ double mcmclib_gauss_rw_qd(mcmclib_mh_q* q, gsl_vector* x, gsl_vector* y) {
 mcmclib_mh* mcmclib_gauss_rw_alloc(gsl_rng* r,
 				   distrfun_p logdistr, void* data,
 				   gsl_vector* start_x, double step_size) {
+  double* pstep_size = (double*) malloc(sizeof(double));
+  pstep_size[0] = step_size;
   return mcmclib_mh_alloc(r, logdistr, data,
 			  mcmclib_mh_q_alloc(r,
 					     mcmclib_gauss_rw_sample,
 					     mcmclib_gauss_rw_qd,
-					     &step_size,
-					     NULL),
+					     pstep_size,
+					     free),
 			  start_x);
 }

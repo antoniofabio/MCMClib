@@ -23,7 +23,7 @@ static double dtarget(void* ignore, gsl_vector* x) {
   return log(0.0);
 }
 
-static double qd(void* ignore, gsl_vector* x, gsl_vector* y) {
+static double qd(mcmclib_mh_q* q, gsl_vector* x, gsl_vector* y) {
   return 0.0;
 }
 
@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
   gsl_vector* x = gsl_vector_alloc(1);
   gsl_vector_set(x, 0, -0.5);
   double inc = 0.2;
-  mcmclib_mh_q* q = mcmclib_mh_q_alloc(r, sampler, &inc, qd, NULL, &inc);
+  mcmclib_mh_q* q = mcmclib_mh_q_alloc(r, sampler, qd, &inc, NULL);
   mcmclib_mh* s = mcmclib_mh_alloc(r, dtarget, NULL, q, x);
 
   for(int n=0; n<10; n++) {
@@ -65,7 +65,6 @@ int main(int argc, char** argv) {
   gsl_vector_free(x);
   gsl_rng_free(r);
   mcmclib_mh_free(s);
-  mcmclib_mh_q_free(q);
 
   return 0;
 }
