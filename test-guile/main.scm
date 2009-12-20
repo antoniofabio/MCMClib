@@ -1,0 +1,6 @@
+(use-modules (srfi srfi-42)
+  	     (test-guile lib)
+	     (swig gsl-utils)
+             (swig mcmclib)
+             (swig mcmcutils))
+(use-modules ((swig gsl) :renamer gsl-renamer))

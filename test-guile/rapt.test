@@ -1,22 +1,22 @@
 (load "main.scm")
 
 (define rng (new-gsl-rng (gsl-rng-default)))
-(define v (new-gsl-vector 1))
-(gsl-vector-set v 0 0.1)
-(define S (diag 1.0 1))
+(define v (new-gv 1))
+(gv-set v 0 0.1)
+(define S (make-gm-diag 1))
 (define Sk (vector-ec (: k 2) S))
 (define (reg x)
-  (if (< (gsl-vector-get x 0) 0) 0 1))
+  (if (< (gv-get x 0) 0) 0 1))
 (define (dunif x)
   (let
-      ((x0 (gsl-vector-get x 0)))
+      ((x0 (gv-get x 0)))
     (if
      (and
       (>= x0 0)
       (<= x0 1))
      0.0
      (log 0.0))))
-(define s (make-rapt
+(define s (mcmclib-rapt-alloc
            rng
            dunif
            v
@@ -26,4 +26,5 @@
            Sk;sigma-local
            reg))
 
-(do-ec (: i 10000) (update s))
+(do-ec (: i 10000) (mcmclib-amh-update s))
+(pass-if (= 1 1))

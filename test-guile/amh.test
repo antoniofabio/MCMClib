@@ -1,0 +1,68 @@
+(load "main.scm")
+
+(define rng (new-gsl-rng (gsl-rng-default)))
+(define Q-par 1.0)
+(define Q (mcmclib-mh-q-guile-alloc
+	   rng
+	   (list
+	    (lambda (x)
+	      (gv-map-ip (lambda (xi) (+ xi Q-par)) x))
+	    (lambda (x y)
+	      (abs (- (gv-get x 0) (gv-get y 0)))))))
+(define x (sv->gv #(0.5)))
+(define (f x) 0.0)
+(define mh (mcmclib-mh-alloc rng f Q x))
+(define (update-Q)
+  (set! Q-par (/ Q-par 2.0)))
+(define amh (mcmclib-amh-guile-alloc mh update-Q))
+(mcmclib-amh-update amh)
+(pass-if (= (gv-get x 0) 1.5))
+(pass-if (= Q-par 0.5))
+(mcmclib-amh-update amh)
+(pass-if (= (gv-get x 0) 2.0))
+(pass-if (= Q-par 0.25))
+
+(define rng (new-gsl-rng (gsl-rng-default)))
+(define S (make-gm-diag 1 0.1))
+(define (dunif x)
+  (let
+      ((x0 (gv-get x 0)))
+    (if
+     (and
+      (>= x0 0)
+      (<= x0 1))
+     0.0
+     (log 0.0))))
+(define x (sv->gv (make-vector 1 0.5)))
+(define amh (mcmclib-gauss-am-alloc
+             rng
+             dunif
+             x
+             S
+             100))
+
+(define mon (new-mcmclib-monitor x))
+(define (update N)
+  (do-ec (: i N)
+         (begin
+           (mcmclib-amh-update amh)
+           (mcmclib-monitor-update mon))))
+(update 10000)
+;(mcmclib-monitor-fprintf-all mon (stdout))
+
+(define beta (sv->gv (make-vector 2 0.5)))
+(define muk (vector-ec (: k 2) (sv->gv (make-vector 1 0.5))))
+(define Sigmak (vector-ec (: k 2) (make-gm-diag 1 0.1)))
+
+(define amh (mcmclib-raptor-alloc
+             rng
+	     dunif
+             x
+             100
+             S
+             beta
+             muk
+             Sigmak))
+
+(update 1000)
+;(mcmclib-monitor-fprintf-all mon (stdout))

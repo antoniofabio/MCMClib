@@ -1,0 +1,15 @@
+(load "main.scm")
+
+(define rng (new-gsl-rng (gsl-rng-default)))
+(define Q (mcmclib-mh-q-guile-alloc
+	   rng
+	   (list
+	    (lambda (x) (gv-map-ip (lambda (xi) (+ xi 1)) x))
+	    (lambda (x y)
+	      (abs (- (gv-get x 0) (gv-get y 0)))))))
+(define x (sv->gv #(0.5)))
+(define (f x) 0.0)
+(define mh (mcmclib-mh-alloc rng f Q x))
+
+(define rw (mcmclib-gauss-rw-alloc rng f x 0.5))
+(define mrw (mcmclib-gauss-mrw-alloc rng f x (make-gm-diag 1 0.5)))

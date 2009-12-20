@@ -1,3 +1,7 @@
+%{
+#include <monitor.h>
+  %}
+
 /** Scalar MCMC diagnostics on a 'monitored' vector */
 typedef struct {
   const gsl_vector* x; /**< current value */
