@@ -99,7 +99,7 @@
       ((sizes (array-dimensions sm))
        (size1 (car sizes))
        (size2 (cadr sizes))
-       (ans (new-gm 0.0 size1 size2)))
+       (ans (new-gm size1 size2)))
     (do-ec (:range i size1) (:range j size2)
 	   (gm-set ans i j (array-ref sm i j)))
     ans))
