@@ -15,6 +15,12 @@
 /**\addtogroup misc
  @{*/
 
+/** add and scale matrices
+
+    dest = alpha * (A + B) */
+void mcmclib_matrix_addscale(gsl_matrix* dest,
+			     const gsl_matrix* A, const gsl_matrix* B, double alpha);
+
 /** Compute Cholesky dec. in place.
     @return !GSL_SUCCESS if the cholesky decomposition fails */
 int mcmclib_cholesky_decomp(gsl_matrix* A);

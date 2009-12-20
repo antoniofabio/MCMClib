@@ -52,6 +52,8 @@ typedef struct {
 
   mcmclib_raptor_alpha_fun_t alpha_fun;
   void* alpha_fun_data;
+
+  mcmclib_raptor_gamma* gamma; /**< utility ptr to raptor-gamma object*/
 } mcmclib_raptor_suff;
 
 /** alloc a new RAPTOR sampler suff stats object
@@ -61,7 +63,7 @@ typedef struct {
 mcmclib_raptor_suff* mcmclib_raptor_suff_alloc(mcmclib_raptor_gamma* g, int t0,
 					       mcmclib_rapt_gamma* rg);
 /** free raptor_suff data*/
-void mcmclib_raptor_suff_free(mcmclib_raptor_suff* p);
+void mcmclib_raptor_suff_free(void* p);
 /** Update suff stats of a RAPTOR chain*/
 int mcmclib_raptor_suff_update(mcmclib_raptor_suff* p);
 
@@ -82,8 +84,6 @@ mcmclib_amh* mcmclib_raptor_alloc(gsl_rng* r,
 				  gsl_vector* beta_hat,
 				  gsl_vector** mu_hat,
 				  gsl_matrix** Sigma_hat);
-/**\brief free a previously allocated RAPTOR sampler*/
-void mcmclib_raptor_free(mcmclib_amh* p);
 
 /**\brief set scaling factor */
 void mcmclib_raptor_set_sf(mcmclib_amh* p, double sf);

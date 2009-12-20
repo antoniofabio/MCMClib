@@ -37,7 +37,8 @@ mcmclib_rapt_suff* mcmclib_rapt_suff_alloc(int t0, int K, int dim) {
   return a;
 }
 
-void mcmclib_rapt_suff_free(mcmclib_rapt_suff* p) {
+void mcmclib_rapt_suff_free(void* in_p) {
+  mcmclib_rapt_suff* p = (mcmclib_rapt_suff*) in_p;
   int K = p->n->size;
   gsl_vector_free(p->n);
   for(int k=0; k< K; k++) {
@@ -53,7 +54,7 @@ void mcmclib_rapt_suff_free(mcmclib_rapt_suff* p) {
   free(p);
 }
 
-void mcmclib_rapt_update(void* p);
+void mcmclib_rapt_update(mcmclib_amh* p);
 
 mcmclib_amh* mcmclib_rapt_alloc(gsl_rng* r,
 				distrfun_p logdistr, void* logdistr_data,
@@ -72,14 +73,8 @@ mcmclib_amh* mcmclib_rapt_alloc(gsl_rng* r,
   mcmclib_mh* mh = mcmclib_mh_alloc(r, logdistr, logdistr_data, q, x);
   mcmclib_rapt_suff* suff = mcmclib_rapt_suff_alloc(t0, K, dim);
 
-  return mcmclib_amh_alloc(mh, suff, mcmclib_rapt_update);
-}
-
-void mcmclib_rapt_free(mcmclib_amh* p) {
-  mcmclib_rapt_q_free(p->mh->q);
-  mcmclib_mh_free(p->mh);
-  mcmclib_rapt_suff_free((mcmclib_rapt_suff*) p->suff);
-  mcmclib_amh_free(p);
+  return mcmclib_amh_alloc(mh, suff, mcmclib_rapt_update,
+			   mcmclib_rapt_suff_free);
 }
 
 void mcmclib_rapt_update_proposals_custom(mcmclib_amh* p,
@@ -113,8 +108,7 @@ void mcmclib_rapt_update_suff(mcmclib_amh* p) {
   gsl_vector_set(s->n, g->which_region_x, gsl_vector_get(s->n, g->which_region_x) + 1);
 }
 
-void mcmclib_rapt_update(void* in_p) {
-  mcmclib_amh* p = (mcmclib_amh*) in_p;
+void mcmclib_rapt_update(mcmclib_amh* p) {
   mcmclib_rapt_update_suff(p);
   mcmclib_rapt_update_proposals(p);
 }

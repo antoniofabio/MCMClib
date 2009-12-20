@@ -49,7 +49,8 @@ mcmclib_rapt_gamma* mcmclib_rapt_gamma_alloc(const gsl_matrix* sigma_whole,
   return a;
 }
 
-void mcmclib_rapt_gamma_free(mcmclib_rapt_gamma* p) {
+void mcmclib_rapt_gamma_free(void* in_p) {
+  mcmclib_rapt_gamma* p = (mcmclib_rapt_gamma*) in_p;
   gsl_vector_free(p->workspace);
   gsl_matrix_free(p->lambda);
 
@@ -67,7 +68,7 @@ void mcmclib_rapt_gamma_free(mcmclib_rapt_gamma* p) {
 }
 
 void mcmclib_rapt_q_sample(mcmclib_mh_q* q, gsl_vector* x);
-double mcmclib_rapt_q_d(void* gamma, gsl_vector* x, gsl_vector* y);
+double mcmclib_rapt_q_d(mcmclib_mh_q* q, gsl_vector* x, gsl_vector* y);
 
 mcmclib_mh_q* mcmclib_rapt_q_alloc(gsl_rng* r,
 				   distrfun_p logdistr, void* logdistr_data,
@@ -79,14 +80,9 @@ mcmclib_mh_q* mcmclib_rapt_q_alloc(gsl_rng* r,
   mcmclib_rapt_gamma* gamma = mcmclib_rapt_gamma_alloc(sigma_whole,
 						       K, sigma_local,
 						       which_region, which_region_data);
-  return mcmclib_mh_q_alloc(r, mcmclib_rapt_q_sample, gamma,
-			    mcmclib_rapt_q_d, gamma,
-			    gamma);
-}
-
-void mcmclib_rapt_q_free(mcmclib_mh_q* p) {
-  mcmclib_rapt_gamma_free(p->gamma);
-  mcmclib_mh_q_free(p);
+  return mcmclib_mh_q_alloc(r, mcmclib_rapt_q_sample,
+			    mcmclib_rapt_q_d,
+			    gamma, mcmclib_rapt_gamma_free);
 }
 
 /*sample a discrete value from the discrete distribution with probs. 'probs'*/
@@ -104,7 +100,7 @@ static int sample(gsl_rng* r, gsl_vector* probs) {
 void mcmclib_rapt_q_sample(mcmclib_mh_q* q, gsl_vector* x) {
   mcmclib_rapt_gamma* g = (mcmclib_rapt_gamma*) q->gamma;
 
-  g->which_region_old = g->which_region_x = g->which_region(x, g->which_region_data);
+  g->which_region_old = g->which_region_x = g->which_region(g->which_region_data, x);
   gsl_vector_memcpy(g->workspace, x);
 
   gsl_vector_view lambda_vw = gsl_matrix_row(g->lambda, g->which_region_old);
@@ -123,9 +119,9 @@ void mcmclib_rapt_q_sample(mcmclib_mh_q* q, gsl_vector* x) {
 /*parametrized log-density of the (mixture) proposal function.
   To be used for computing M-H ratio correctly when doing the metropolis step
  */
-double mcmclib_rapt_q_d(void* gamma, gsl_vector* x, gsl_vector* y) {
-  mcmclib_rapt_gamma* p = (mcmclib_rapt_gamma*) gamma;
-  int region_x = p->which_region(x, p->which_region_data);
+double mcmclib_rapt_q_d(mcmclib_mh_q* q, gsl_vector* x, gsl_vector* y) {
+  mcmclib_rapt_gamma* p = (mcmclib_rapt_gamma*) q->gamma;
+  int region_x = p->which_region(p->which_region_data, x);
   gsl_vector_view lambda_vw = gsl_matrix_row(p->lambda, region_x);
   gsl_vector* lambda_p = &(lambda_vw.vector);
 

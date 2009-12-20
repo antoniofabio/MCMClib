@@ -18,6 +18,7 @@ mcmclib_inca* mcmclib_inca_alloc(mcmclib_amh* amh, gsl_vector** x, int M) {
 }
 
 void mcmclib_inca_free(mcmclib_inca* p) {
+  mcmclib_amh_free(p->amh);
   free(p);
 }
 

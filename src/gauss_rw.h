@@ -17,17 +17,7 @@
 \defgroup gauss_rw Component-wise Gaussian Random Walk
 @{*/
 
-typedef struct {
-  gsl_rng* r;
-  double step_size;
-} mcmclib_gauss_rw_gamma;
-
-mcmclib_gauss_rw_gamma* mcmclib_gauss_rw_gamma_alloc(gsl_rng* r, double step_size);
-void mcmclib_gauss_rw_gamma_free(mcmclib_gauss_rw_gamma* p);
-double mcmclib_gauss_rw_qd(void* ignore, gsl_vector* x, gsl_vector* y);
-
-mcmclib_mh_q* mcmclib_gauss_rw_q_alloc(gsl_rng* r, double step_size);
-void mcmclib_gauss_rw_q_free(mcmclib_mh_q* p);
+double mcmclib_gauss_rw_qd(mcmclib_mh_q* ignore, gsl_vector* x, gsl_vector* y);
 void mcmclib_gauss_rw_sample(mcmclib_mh_q* q, gsl_vector* x);
 
 /** alloc (and init) Gaussian RW object
@@ -40,9 +30,6 @@ void mcmclib_gauss_rw_sample(mcmclib_mh_q* q, gsl_vector* x);
 mcmclib_mh* mcmclib_gauss_rw_alloc(gsl_rng* r,
 				   distrfun_p logdistr, void* data,
 				   gsl_vector* start_x, double step_size);
-
-/** free Gaussian RW object*/
-void mcmclib_gauss_rw_free(mcmclib_mh* p);
 
 /**@}*/
 /**@}*/
