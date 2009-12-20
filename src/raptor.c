@@ -65,7 +65,7 @@ mcmclib_raptor_suff* mcmclib_raptor_suff_alloc(mcmclib_raptor_gamma* g, int t0,
   gsl_matrix_scale(a->Sigma_eps, 0.001);
   a->alpha_fun = mcmclib_raptor_alpha_default_fun;
   a->alpha_fun_data = rg;
-  a->gamma = rg;
+  a->gamma = g;
   return a;
 }
 
