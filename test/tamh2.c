@@ -22,12 +22,12 @@ static double dtarget(void* ignore, gsl_vector* x) {
     return log(0.0);
 }
 
-static double qd(void* ignore, gsl_vector* x, gsl_vector* y) {
+static double qd(mcmclib_mh_q* ignore, gsl_vector* x, gsl_vector* y) {
   return 0.0;
 }
 
 static void sampler(mcmclib_mh_q* q, gsl_vector* x) {
-  gsl_rng* r = (gsl_rng*) q->gamma;
+  gsl_rng* r = q->r;
   double coin = gsl_rng_uniform(r);
   if(coin < 0.5)
     gsl_vector_set(x, 0, 0.0);
@@ -35,7 +35,7 @@ static void sampler(mcmclib_mh_q* q, gsl_vector* x) {
     gsl_vector_set(x, 0, 1.0);
 }
 
-static void update_gamma(void* p) {
+static void update_gamma(mcmclib_amh* p) {
   //DOES NOTHING
 }
 
@@ -43,9 +43,9 @@ int main(int argc, char** argv) {
   gsl_rng* r = gsl_rng_alloc(gsl_rng_default);
   gsl_vector* x = gsl_vector_alloc(1);
   gsl_vector_set(x, 0, -0.5);
-  mcmclib_mh_q* q = mcmclib_mh_q_alloc(r, sampler, r, qd, NULL, r);
-  mcmclib_mh* mh = mcmclib_mh_alloc(r, dtarget, NULL, q, x);
-  mcmclib_amh* s = mcmclib_amh_alloc(mh, NULL, update_gamma);
+  mcmclib_amh* s = mcmclib_amh_alloc(mcmclib_mh_alloc(r, dtarget, NULL,
+						      mcmclib_mh_q_alloc(r, sampler, qd, NULL, NULL), x),
+				     &gamma, update_gamma, NULL);
 
   double pi1 = 0.0;
   for(int n=0; n<N; n++) {
@@ -58,8 +58,6 @@ int main(int argc, char** argv) {
   gsl_vector_free(x);
   gsl_rng_free(r);
   mcmclib_amh_free(s);
-  mcmclib_mh_free(mh);
-  mcmclib_mh_q_free(q);
 
   return 0;
 }

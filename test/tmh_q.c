@@ -10,8 +10,8 @@
 #define v0(x) gsl_vector_get(x, 0)
 #define x0 v0(x)
 
-static double qd(void* in_inc, gsl_vector* x, gsl_vector* y) {
-  double* inc = (double*) in_inc;
+static double qd(mcmclib_mh_q *q, gsl_vector* x, gsl_vector* y) {
+  double* inc = (double*) q->gamma;
   return (*inc) * (v0(x) - v0(y));
 }
 
@@ -27,10 +27,8 @@ int main(int argc, char** argv) {
   gsl_vector* y = gsl_vector_alloc(1);
   gsl_vector_set(y, 0, 4.0);
   double inc = 1.0;
-  mcmclib_mh_q* q = mcmclib_mh_q_alloc(r, sampler, &inc, qd, &inc, &inc);
+  mcmclib_mh_q* q = mcmclib_mh_q_alloc(r, sampler, qd, &inc, NULL);
 
-  assert(mcmclib_mh_q_logd(q, x, y) == qd(&inc, x, y));
-  assert(mcmclib_mh_q_ratio_offset(q, x, y) == qd(&inc, y, x) - qd(&inc, x, y));
   mcmclib_mh_q_sample(q, x);
   assert(x0 == 3.0);
 
