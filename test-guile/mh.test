@@ -9,7 +9,7 @@
 	      (abs (- (gv-get x 0) (gv-get y 0)))))))
 (define x (sv->gv #(0.5)))
 (define (f x) 0.0)
-(define mh (new-mcmclib-mh rng f Q x))
+(define mh (mcmclib-mh-alloc rng f Q x))
 
 (define rw (mcmclib-gauss-rw-alloc rng f x 0.5))
 (define mrw (mcmclib-gauss-mrw-alloc rng f x (make-gm-diag 1 0.5)))

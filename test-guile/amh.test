@@ -11,7 +11,7 @@
 	      (abs (- (gv-get x 0) (gv-get y 0)))))))
 (define x (sv->gv #(0.5)))
 (define (f x) 0.0)
-(define mh (new-mcmclib-mh rng f Q x))
+(define mh (mcmclib-mh-alloc rng f Q x))
 (define (update-Q)
   (set! Q-par (/ Q-par 2.0)))
 (define amh (mcmclib-amh-guile-alloc mh update-Q))

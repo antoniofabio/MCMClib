@@ -29,25 +29,17 @@ typedef struct {
   int last_accepted; /**< flag: last move has been accepted?*/
 } mcmclib_mh;
 
-%extend mcmclib_mh {
-  mcmclib_mh(gsl_rng* r, distrfun_p f, void* data,
-	     mcmclib_mh_q* q, gsl_vector* x) {
-    return mcmclib_mh_alloc(r, f, data, q, x);
-  }
-  ~mcmclib_mh() {
-    mcmclib_mh_free($self);
-  }
-}
+mcmclib_mh* mcmclib_mh_alloc(gsl_rng* r, distrfun_p f, void* data,
+			     mcmclib_mh_q* q, gsl_vector* x);
+void mcmclib_mh_free(mcmclib_mh* p);
 
 int mcmclib_mh_update(mcmclib_mh* p);
 
 typedef double (*distrfun_p)(void*, gsl_vector*);
 
-%newobject mcmclib_gauss_rw_alloc;
 mcmclib_mh* mcmclib_gauss_rw_alloc(gsl_rng* r,
 				   distrfun_p f, void* data,
 				   gsl_vector* start_x, double step_size);
-%newobject mcmclib_gauss_mrw_alloc;
 mcmclib_mh* mcmclib_gauss_mrw_alloc(gsl_rng* r,
 				    distrfun_p f, void* data,
 				    gsl_vector* x,

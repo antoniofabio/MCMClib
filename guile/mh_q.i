@@ -23,7 +23,6 @@ struct mcmclib_mh_q_t;
   }
 %}
 
-%newobject mcmclib_mh_q_guile_alloc;
 %inline %{
   mcmclib_mh_q* mcmclib_mh_q_guile_alloc(gsl_rng* r, SCM rq_dq) {
     scm_permanent_object(rq_dq); /*FIXME: find a better way to handle this*/
@@ -43,11 +42,7 @@ typedef struct mcmclib_mh_q_t {
   free_fun_t free_gamma_fun; /**< optional gamma de-allocator fun*/
 } mcmclib_mh_q;
 
-%extend mcmclib_mh_q {
-  ~mcmclib_mh_q() {
-    mcmclib_mh_q_free($self);
-  }
-}
+void mcmclib_mh_q_free(mcmclib_mh_q* p);
 
 void mcmclib_mh_q_sample(mcmclib_mh_q* p, gsl_vector* x);
 double mcmclib_mh_q_logd(mcmclib_mh_q* p, gsl_vector* x, gsl_vector* y);
