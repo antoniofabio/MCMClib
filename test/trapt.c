@@ -22,7 +22,7 @@ static int check_dequal(double a, double b) {
 #define x0 v0(x)
 #define m00(m) gsl_matrix_get(m, 0, 0)
 
-static int which_region(gsl_vector* x, void* ignore) {
+static int which_region(void* ignore, gsl_vector* x) {
   return x0 < 0.5 ? 0 : 1;
 }
 
@@ -33,7 +33,6 @@ static double dunif(void* ignore, gsl_vector* x) {
 }
 
 int main(int argc, char** argv) {
-
   gsl_vector* x = gsl_vector_alloc(DIM);
   gsl_vector_set_all(x, 0.0);
 
@@ -106,7 +105,7 @@ int main(int argc, char** argv) {
     gsl_matrix_free(sigma_local[k]);
   gsl_matrix_free(sigma_whole);
   gsl_vector_free(x);
-  mcmclib_rapt_free(s);
+  mcmclib_amh_free(s);
   gsl_rng_free(rng);
   gsl_vector_free(which_region_n);
 

@@ -13,7 +13,7 @@
 #define v0(x) gsl_vector_get(x, 0)
 #define x0 v0(x)
 
-static int which_region(gsl_vector* x, void* ignore) {
+static int which_region(void* ignore, gsl_vector* x) {
   return x0 < 0.5 ? 0 : 1;
 }
 
@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
   gsl_matrix_free(sigma_whole);
   gsl_vector_free(x);
   gsl_vector_free(y);
-  mcmclib_rapt_q_free(q);
+  mcmclib_mh_q_free(q);
   gsl_rng_free(rng);
 
   return 0;
