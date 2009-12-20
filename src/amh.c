@@ -29,6 +29,7 @@ void mcmclib_amh_reset(mcmclib_amh* p) {
 void mcmclib_amh_free(mcmclib_amh* p) {
   if(p->free_suff)
     p->free_suff(p->suff);
+  mcmclib_mh_free(p->mh);
   free(p);
 }
 
