@@ -12,7 +12,8 @@ TOCLEAN += $(GUILE_MODULES_LIBS) $(GUILE_MODULES:%=guile/%_wrap.o)
 
 guile: $(GUILE_MODULES_LIBS)
 
-guile/mcmclib_wrap.c: guile/mh_q.i guile/monitor.i guile/amh.i guile/distrfuns.i guile/mixem.i guile/at7.i
+guile/mcmclib_wrap.c: guile/mh_q.i guile/mh.i guile/amh.i guile/at7.i \
+	guile/monitor.i guile/distrfuns.i guile/mixem.i
 guile/%_wrap.c guile/swig/%.scm: guile/%.i
 	swig $(SWIG_FLAGS) -o $@ $<
 

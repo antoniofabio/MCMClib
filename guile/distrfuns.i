@@ -1,10 +1,17 @@
 %{
+#include <lpdf_iwishart.h>
 #include <mvnorm.h>
 #include <mixnorm.h>
 #include <mcar_tilde.h>
 #include <mcar_model.h>
 #include <pois_model.h>
 %}
+
+mcmclib_iwishart_lpdf* mcmclib_iwishart_lpdf_alloc(gsl_matrix* Psi, int m);
+void mcmclib_iwishart_lpdf_free(mcmclib_iwishart_lpdf* p);
+%callback("%s_cb");
+double mcmclib_iwishart_lpdf_compute(void* p, gsl_vector* x);
+%nocallback;
 
 /*Multivariate normal distribution*/
 void mcmclib_mvnorm_iid(const gsl_rng* r, gsl_vector* out);
