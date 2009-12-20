@@ -1,3 +1,5 @@
 *.so
 swig/*.so
+*_wrap.c
+swig/mcmclib.scm
 
