@@ -2,11 +2,13 @@
 
 (use-modules (srfi srfi-1)
 	     (srfi srfi-42)
-             (swig gsl)
+             (swig gsl-utils)
              (swig mcmclib)
              (oop goops)
 	     (ice-9 optargs)
              (ice-9 pretty-print))
+(use-modules ((swig gsl) :renamer gsl-renamer))
+
 (use-syntax (ice-9 syncase))
 
 (define-method (add (x <vector>) (y <vector>))
