@@ -23,7 +23,7 @@ static double dtarget(void* ignore, gsl_vector* x) {
   return log(0.0);
 }
 
-static double qd(void* ignore, gsl_vector* x, gsl_vector* y) {
+static double qd(mcmclib_mh_q* ignore, gsl_vector* x, gsl_vector* y) {
   return 0.0;
 }
 
@@ -32,8 +32,7 @@ static void sampler(mcmclib_mh_q* q, gsl_vector* x) {
   gsl_vector_set(x, 0, x0 + (*o));
 }
 
-static void update_gamma(void* in_p) {
-  mcmclib_amh* p = (mcmclib_amh*) in_p;
+static void update_gamma(mcmclib_amh* p) {
   double *s = (double*) p->suff;
   (*s)+= v0(p->mh->x);
 }
