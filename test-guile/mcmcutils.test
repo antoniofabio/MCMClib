@@ -3,24 +3,22 @@
 (use-modules (oop goops)
              (oop goops describe))
 
-;;check gsl support functions
-(gv2v (v2gv #(1 2 3)))
-;#(1.0 2.0 3.0)
-(gM2M (M2gM #2((1 2 3) (4 5 6))))
-;#2((1.0 2.0 3.0) (4.0 5.0 6.0))
-
-(define s (make-amh 'gauss-am
-                    (new-gsl-rng (gsl-rng-default))
-                    (lambda (x) 0.0)
-                    (new-gsl-vector 1)
-                    (M2gM #2((1.0)))
-                    10))
-;(do-ec (: i 100000) (update s)) ;;this should stop on values divergence
+(define rng (new-gsl-rng (gsl-rng-default)))
+(define x (new-gv 1))
+(define s (mcmclib-gauss-am-alloc
+	   rng
+	   (lambda (x) 0.0)
+	   x
+	   (sm->gm #2((1.0)))
+	   10))
+;; this should stop on values divergence:
+(pass-if-exception "stop on divergence" exception:miscellaneous-error
+		   (do-ec (: i 100000) (mcmclib-amh-update s)))
 
 (define s (make-mh 'gauss-mrw
                     (new-gsl-rng (gsl-rng-default))
                     (lambda (x) 0.0)
-                    (new-gsl-vector 1)
-                    (M2gM #2((1.0)))))
+                    (new-gv 1)
+                    (sm->gm #2((1.0)))))
 (do-ec (: i 100000) (update s)) ;;this should not stop
-(gv2v (slot-ref s 'x))
+(format #t "~a\n" (gv->sv (slot-ref s 'x)))
