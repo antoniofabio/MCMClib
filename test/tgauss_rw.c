@@ -50,13 +50,13 @@ int main(int argc, char** argv) {
   variance = variance / ((double) N) - (mean * mean);
   kurt /= (double) N;
 
-  //assert(check_dequal(0.066613, mean));
-  //assert(check_dequal(0.999890, variance));
-  //assert(check_dequal(2.985794, kurt));
+  assert(check_dequal(0.066613, mean));
+  assert(check_dequal(0.999890, variance));
+  assert(check_dequal(2.985794, kurt));
 
   /*free memory*/
   gsl_vector_free(x);
-  mcmclib_amh_free(s);
+  mcmclib_mh_free(s);
   gsl_rng_free(rng);
 
   return 0;
