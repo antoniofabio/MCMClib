@@ -43,6 +43,8 @@ typedef double (*distrfun_p) (void* data, gsl_vector* x);
   $2 = (void*) $input;
 }
 
+%include "mh_q.i"
+
 typedef struct {
   gsl_rng* r; /**< rng*/
   distrfun_p logdistr; /**< target log-density fun*/
