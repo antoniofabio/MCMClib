@@ -15,10 +15,12 @@
 (pass-if-exception "stop on divergence" exception:miscellaneous-error
 		   (do-ec (: i 100000) (mcmclib-amh-update s)))
 
-(define s (make-mh 'gauss-mrw
-                    (new-gsl-rng (gsl-rng-default))
-                    (lambda (x) 0.0)
-                    (new-gv 1)
-                    (sm->gm #2((1.0)))))
-(do-ec (: i 100000) (update s)) ;;this should not stop
-(format #t "~a\n" (gv->sv (slot-ref s 'x)))
+(gv-set x 0 0.0)
+
+(define s (mcmclib-gauss-mrw-alloc
+	   rng
+	   (lambda (x) 0.0)
+	   x
+	   (sm->gm #2((1.0)))))
+(do-ec (: i 100000) (mcmclib-mh-update s)) ;;this should not stop
+(pass-if (= (gv-get x 0) -156.768173361319))

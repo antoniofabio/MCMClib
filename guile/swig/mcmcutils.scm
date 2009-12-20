@@ -57,62 +57,9 @@
 (define-method (free (obj <swig-obj>))
   (let ((destructor-name (symbol-concatenate (list (get-subtype obj) '-free))))
     ((eval destructor-name (interaction-environment)) (get-c-ref obj))))
-(define-class <mh> (<swig-obj>)
-  (rng #:init-keyword #:rng)
-  (distrfun #:init-keyword #:distrfun)
-  (x #:init-keyword #:x))
-(define-method (update (obj <mh>)) (mcmclib-mh-update (get-c-ref obj)))
-(define-class <amh> (<mh>))
-(define-method (update (obj <amh>)) (mcmclib-amh-update (get-c-ref obj)))
-(export <swig-obj> <mh> <amh> update get-c-ref get-subtype free)
 
 (define-public (symbol-concatenate lst)
   (string->symbol (string-concatenate (map symbol->string lst))))
-
-(define-syntax make-mh
-  (syntax-rules ()
-    ((make-mh sub-type rng-in distrfun-in x-in rest ...)
-     (let
-         ((constructor-name (symbol-concatenate (list 'mcmclib- sub-type '-alloc)))
-          (rng rng-in)
-          (x x-in)
-          (distrfun distrfun-in))
-     (make <mh>
-       #:c-ref ((eval constructor-name (interaction-environment))
-                rng
-                distrfun
-                x rest ...)
-       #:subtype (symbol-concatenate (list 'mcmclib- sub-type))
-       #:rng rng
-       #:distrfun distrfun
-       #:x x)))))
-(export-syntax make-mh)
-
-(define-syntax make-amh
-  (syntax-rules ()
-    ((make-amh sub-type rng-in distrfun-in x-in rest ...)
-     (let
-         ((constructor-name (symbol-concatenate (list 'mcmclib- sub-type '-alloc)))
-          (rng rng-in)
-          (x x-in)
-          (distrfun distrfun-in))
-     (make <amh>
-       #:c-ref ((eval constructor-name (interaction-environment))
-                rng
-                distrfun
-                x rest ...)
-       #:subtype (symbol-concatenate (list 'mcmclib- sub-type))
-       #:rng rng
-       #:distrfun distrfun
-       #:x x)))))
-;;use as follows:
-;;
-;;(make-amh 'gauss-am rng lambda (x) 0.0) x sigma_zero t0)
-(export-syntax make-amh)
-
-(define-public (make-rapt rng distrfun x t0 sigma-whole K sigma-local region-fun)
-  "alloc a new 'rapt' sampler object"
-  (make-amh 'rapt rng distrfun x t0 sigma-whole K sigma-local region-fun))
 
 ;;
 ;;wrap monitor objects
