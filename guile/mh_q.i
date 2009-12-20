@@ -9,20 +9,17 @@ struct mcmclib_mh_q_t;
 			       gsl_vector* x, gsl_vector* y) {
     SCM gamma = (SCM) data->gamma;
     SCM dq = scm_cadr(gamma);
-    SCM sx = scm_gc_protect_object(SWIG_NewPointerObj(x, SWIGTYPE_p_gsl_vector, 0));
-    SCM sy = scm_gc_protect_object(SWIG_NewPointerObj(y, SWIGTYPE_p_gsl_vector, 0));
+    SCM sx = SWIG_NewPointerObj(x, SWIGTYPE_p_gsl_vector, 0);
+    SCM sy = SWIG_NewPointerObj(y, SWIGTYPE_p_gsl_vector, 0);
     double ans = scm_to_double(scm_call_2(dq, sx, sy));
-    scm_gc_unprotect_object(sx);
-    scm_gc_unprotect_object(sy);
     return ans;
   }
   void mcmclib_mh_q_guile_rq(struct mcmclib_mh_q_t* data,
 			       gsl_vector* x) {
     SCM gamma = (SCM) data->gamma;
     SCM rq = scm_car(gamma);
-    SCM sx = scm_gc_protect_object(SWIG_NewPointerObj(x, SWIGTYPE_p_gsl_vector, 0));
+    SCM sx = SWIG_NewPointerObj(x, SWIGTYPE_p_gsl_vector, 0);
     scm_call_1(rq, sx);
-    scm_gc_unprotect_object(sx);
   }
   void mcmclib_mh_q_guile_free(void* in_p) {
     /*scm_gc_unprotect_object((SCM) in_p);*/ //FIXME: find the correct way to
