@@ -3,10 +3,9 @@ TEST_LDFLAGS:= src/libmcmclib.a $(LDFLAGS)
 TEST_names:= t1 t2 trecursive_variance tmixem tmixem_rec tmixem_online \
 	tmh_q tmh tmh2 tgauss_rw tgauss_mrw \
 	tamh tamh2 trapt_q trapt traptor tgauss_am \
-	tinca trapt_inca tam_inca tinca_raptor \
-	tmcar_tilde twishart tmcar_model tiwishart \
+	tinca tmcar_tilde twishart tmcar_model tiwishart \
 	tgivens tmonitor thier tpois_model tmonitor2 tmixem_online2 \
-	traptor2 tmh3 tat7 traptor3
+	tmh3 tat7 traptor3
 SRC += $(wildcard test/*.c)
 SRC += $(wildcard test/*.h)
 SRC += $(wildcard test/*.dat)
