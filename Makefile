@@ -4,25 +4,23 @@ PREFIX:=/usr
 LIBDIR:=$(PREFIX)/lib
 INCLUDEDIR:=$(PREFIX)/include
 
-MODULES := src test examples guile
+MODULES := src test guile
 
 SRC :=
 TOCLEAN :=
 include $(MODULES:%=%/module.mk)
 
-.PHONY : all lib test examples guile clean doc
+.PHONY : all lib test guile clean doc
 
-all: lib examples
+all: lib
 
 lib: src/libmcmclib.a src/libmcmclib.so
-
-examples: $(EXAMPLES_BIN)
 
 doc:
 	cd doc; sh makeDoxyfile.sh; doxygen
 
 clean:
-	@rm -rf *~ $(SRC:%.c=%.o) $(SRC:%=%~) $(TOCLEAN) doc/html doc/latex
+	@rm -rf *~ $(TOCLEAN) doc/html doc/latex
 
 VERSION:=$(shell git describe --abbrev=5)
 TARBALL_NAME:=MCMClib_$(VERSION)

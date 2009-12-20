@@ -1,4 +1,0 @@
-*.so
-*.o
-mcmclib_wrap.c
-
