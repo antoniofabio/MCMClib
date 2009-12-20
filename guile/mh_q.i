@@ -10,7 +10,7 @@ struct mcmclib_mh_q_t;
     SCM gamma = (SCM) data->gamma;
     SCM dq = scm_cadr(gamma);
     SCM sx = SWIG_NewPointerObj(x, SWIGTYPE_p_gsl_vector, 0);
-    SCM sy = SWIG_NewPointerObj(x, SWIGTYPE_p_gsl_vector, 0);
+    SCM sy = SWIG_NewPointerObj(y, SWIGTYPE_p_gsl_vector, 0);
     double ans = scm_to_double(scm_call_2(dq, sx, sy));
     return ans;
   }
@@ -22,12 +22,15 @@ struct mcmclib_mh_q_t;
     scm_call_1(rq, sx);
   }
   void mcmclib_mh_q_guile_free(void* in_p) {
-    scm_gc_unprotect_object((SCM) in_p);
+    /*scm_gc_unprotect_object((SCM) in_p);*/ //FIXME: find the correct way to
+					     //release 'in_p'
   }
 %}
 
+%newobject mcmclib_mh_q_guile_alloc;
 %inline %{
   mcmclib_mh_q* mcmclib_mh_q_guile_alloc(gsl_rng* r, SCM rq_dq) {
+    scm_gc_protect_object(rq_dq);
     return mcmclib_mh_q_alloc(r,
 			      mcmclib_mh_q_guile_rq,
 			      mcmclib_mh_q_guile_dq,
@@ -44,7 +47,11 @@ typedef struct mcmclib_mh_q_t {
   free_fun_t free_gamma_fun; /**< optional gamma de-allocator fun*/
 } mcmclib_mh_q;
 
-void mcmclib_mh_q_free(mcmclib_mh_q* p);
+%extend mcmclib_mh_q {
+  ~mcmclib_mh_q() {
+    mcmclib_mh_q_free($self);
+  }
+}
 
 void mcmclib_mh_q_sample(mcmclib_mh_q* p, gsl_vector* x);
 double mcmclib_mh_q_logd(mcmclib_mh_q* p, gsl_vector* x, gsl_vector* y);
