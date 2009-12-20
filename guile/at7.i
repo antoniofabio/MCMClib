@@ -9,7 +9,6 @@ typedef struct {
   gsl_vector** mu; /**< current mixture means*/
   gsl_matrix** Sigma; /**< current mixture variances*/
 
-  mcmclib_mvnorm_lpdf** pik; /**< single mixture components densities*/
   mcmclib_mixnorm_lpdf* pi; /**< fitted mixture density*/
 
   gsl_matrix** qVariances; /**< local proposal variances*/
@@ -17,9 +16,6 @@ typedef struct {
 
   gsl_matrix* Sigma_eps; /**< positive-definiteness correction factor*/
   gsl_vector* scaling_factors; /**< region-specific scaling factors*/
-
-  gsl_vector* tmpMean; /**< internal workspace memory*/
-  gsl_vector* weights; /**< internal workspace memory*/
 } mcmclib_at7_gamma;
 
 /** alloc a new at7_gamma object. Input arguments are copied @internal */

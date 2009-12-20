@@ -1,6 +1,7 @@
 %{
 #include <amh.h>
 #include <gauss_am.h>
+#include <rapt.h>
 #include <raptor.h>
 %}
 
