@@ -5,9 +5,21 @@
 #include <raptor.h>
 %}
 
-typedef void (*free_fun_t) (void* data);
+typedef void (*mcmclib_amh_update_gamma_p) (struct mcmclib_amh_t* p);
 
-typedef void (*mcmclib_amh_update_gamma_p) (void* p);
+%{
+  void mcmclib_amh_guile_update_gamma(struct mcmclib_amh_t* p) {
+    scm_call_0((SCM) p->suff);
+  }
+%}
+
+%newobject mcmclib_amh_guile_alloc;
+%inline %{
+  mcmclib_amh* mcmclib_amh_guile_alloc(mcmclib_mh* mh, SCM update_gamma_fun) {
+    return mcmclib_amh_alloc(mh, update_gamma_fun,
+			     mcmclib_amh_guile_update_gamma, NULL);
+  }
+%}
 
 /**\brief Generic Adaptive Metropolis-Hastings sampler */
 typedef struct {
@@ -18,11 +30,6 @@ typedef struct {
 } mcmclib_amh;
 
 %extend mcmclib_amh {
-  mcmclib_amh(mcmclib_mh* mh, void* suff,
-	      mcmclib_amh_update_gamma_p update_gamma,
-	      free_fun_t free_suff) {
-    return mcmclib_amh_alloc(mh, suff, update_gamma, free_suff);
-  }
   ~mcmclib_amh() {
     mcmclib_amh_free($self);
   }
@@ -41,7 +48,7 @@ mcmclib_amh* mcmclib_gauss_am_alloc(gsl_rng* r,
 void mcmclib_gauss_am_set_sf(mcmclib_amh* p, double sf);
 
 /*RAPT*/
-typedef int (*region_fun_t) (void*, gsl_vector*);
+typedef int (*region_fun_t) (gsl_vector*, void*);
 %{
   int mcmclib_guile_region_fun(void* p, gsl_vector* x) {
     SCM sx = SWIG_NewPointerObj(x, SWIGTYPE_p_gsl_vector, 0);
@@ -50,7 +57,7 @@ typedef int (*region_fun_t) (void*, gsl_vector*);
   }
 %}
 
-%typemap(in) (void* which_region_data, region_fun_t which_region) {
+%typemap(in) (region_fun_t which_region, void* which_region_data) {
   scm_permanent_object($input); /*FIXME. Maybe solve it by proper use of '$owner'*/
   $1 = mcmclib_guile_region_fun;
   $2 = (void*) $input;
@@ -75,14 +82,12 @@ mcmclib_amh* mcmclib_raptor_alloc(gsl_rng* r,
 				  gsl_vector* beta_hat,
 				  gsl_vector** mu_hat,
 				  gsl_matrix** Sigma_hat);
-typedef double (*mcmclib_raptor_alpha_fun_t) (void* data, mcmclib_raptor_gamma*);
 /** \brief RAPTOR sampler gamma values */
 typedef struct {
   gsl_vector* beta_hat; /**< current mixture weights estimates*/
   gsl_vector** mu_hat; /**< current mixture means estimates*/
   gsl_matrix** Sigma_hat; /**< current mixture variances estimates*/
 
-  mcmclib_mvnorm_lpdf** pik_hat; /**< single mixture components densities*/
   mcmclib_mixnorm_lpdf* pi_hat; /**< mixture density*/
 } mcmclib_raptor_gamma;
 %extend mcmclib_raptor_gamma {
