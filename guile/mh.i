@@ -30,6 +30,10 @@ typedef struct {
 } mcmclib_mh;
 
 %extend mcmclib_mh {
+  mcmclib_mh(gsl_rng* r, distrfun_p f, void* data,
+	     mcmclib_mh_q* q, gsl_vector* x) {
+    return mcmclib_mh_alloc(r, f, data, q, x);
+  }
   ~mcmclib_mh() {
     mcmclib_mh_free($self);
   }
