@@ -4,13 +4,13 @@ PREFIX:=/usr
 LIBDIR:=$(PREFIX)/lib
 INCLUDEDIR:=$(PREFIX)/include
 
-MODULES := src test guile
+MODULES := src test guile test-guile
 
 SRC :=
 TOCLEAN :=
 include $(MODULES:%=%/module.mk)
 
-.PHONY : all lib test guile clean doc
+.PHONY : all lib test guile clean doc test-guile
 
 all: lib
 

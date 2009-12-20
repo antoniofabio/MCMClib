@@ -1,7 +1,6 @@
-(set! %load-path (cons "." %load-path))
-
-(use-modules (srfi srfi-1)
-	     (srfi srfi-42)
-             (swig gsl)
+(use-modules (srfi srfi-42)
+  	     (test-guile lib)
+	     (swig gsl-utils)
              (swig mcmclib)
              (swig mcmcutils))
+(use-modules ((swig gsl) :renamer gsl-renamer))
