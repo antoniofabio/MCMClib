@@ -101,7 +101,7 @@ int main(int argc, char** argv) {
   mcmclib_mixem_online_free(olem);
   gsl_matrix_free(sigma_whole);
   gsl_vector_free(x);
-  mcmclib_raptor_free(sampler);
+  mcmclib_amh_free(sampler);
   gsl_rng_free(rng);
   for(int k=0; k<K; k++) {
     gsl_vector_free(mu_hat[k]);
