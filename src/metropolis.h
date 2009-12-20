@@ -39,7 +39,7 @@ int mcmclib_metropolis_symmetric_step(const gsl_rng* r, gsl_vector* old, gsl_vec
 */
 int mcmclib_metropolis_generic_step(const gsl_rng* r, gsl_vector* old,
 				    gsl_vector* x, distrfun_p logdistr, void* data,
-				    proposal_distr_t q, void* q_data);
+				    proposal_distr_fun_t q, void* q_data);
 
 /**@}*/
 #endif

@@ -68,25 +68,27 @@ mcmclib_raptor_suff* mcmclib_raptor_suff_alloc(mcmclib_raptor_gamma* g, int t0,
   return a;
 }
 
-void mcmclib_raptor_suff_free(mcmclib_raptor_suff* p) {
+void mcmclib_raptor_suff_free(void* in_p) {
+  mcmclib_raptor_suff* p = (mcmclib_raptor_suff*) in_p;
   mcmclib_mixem_online_free(p->em);
   gsl_matrix_free(p->Sigma_eps);
+  mcmclib_raptor_gamma_free(p->gamma);
   free(p);
 }
 
-int raptor_which_region_fun(gsl_vector* x, void* in_g) {
+int raptor_which_region_fun(void* in_g, gsl_vector* x) {
   mcmclib_raptor_gamma* g = (mcmclib_raptor_gamma*) in_g;
   return mcmclib_region_mixnorm_compute(x, g->pi_hat);
 }
 
-void mcmclib_raptor_update(void* in_p);
+void mcmclib_raptor_update(mcmclib_amh* p);
 
 mcmclib_amh* mcmclib_raptor_alloc(gsl_rng* r,
-				 distrfun_p logdistr, void* logdistr_data,
-				 gsl_vector* x, int t0, gsl_matrix* Sigma_zero,
-				 gsl_vector* beta_hat,
-				 gsl_vector** mu_hat,
-				 gsl_matrix** Sigma_hat){
+				  distrfun_p logdistr, void* logdistr_data,
+				  gsl_vector* x, int t0, gsl_matrix* Sigma_zero,
+				  gsl_vector* beta_hat,
+				  gsl_vector** mu_hat,
+				  gsl_matrix** Sigma_hat){
   int K = beta_hat->size;
 
   mcmclib_raptor_gamma* gamma = mcmclib_raptor_gamma_alloc(beta_hat,
@@ -97,18 +99,11 @@ mcmclib_amh* mcmclib_raptor_alloc(gsl_rng* r,
 					 raptor_which_region_fun, gamma);
   mcmclib_mh* mh = mcmclib_mh_alloc(r, logdistr, logdistr_data, q, x);
   mcmclib_raptor_suff* suff = mcmclib_raptor_suff_alloc(gamma, t0, q->gamma);
-  mcmclib_amh* ans = mcmclib_amh_alloc(mh, suff, mcmclib_raptor_update);
+  mcmclib_amh* ans = mcmclib_amh_alloc(mh, suff, mcmclib_raptor_update,
+				       mcmclib_raptor_suff_free);
 
   mcmclib_raptor_set_sf(ans, 2.38*2.38 / (double) x->size);
   return ans;
-}
-
-void mcmclib_raptor_free(mcmclib_amh* p) {
-  mcmclib_raptor_suff_free(RAPTOR_SUFF(p));
-  mcmclib_raptor_gamma_free(RAPTOR_GAMMA(p));
-  mcmclib_rapt_q_free(p->mh->q);
-  mcmclib_mh_free(p->mh);
-  mcmclib_amh_free(p);
 }
 
 void mcmclib_raptor_set_sf(mcmclib_amh* p, double sf) {
@@ -126,8 +121,7 @@ void mcmclib_raptor_set_sf_local(mcmclib_amh* p, double sf) {
   s->scaling_factor_local = sf;
 }
 
-void mcmclib_raptor_update(void* in_p) {
-  mcmclib_amh* p = (mcmclib_amh*) in_p;
+void mcmclib_raptor_update(mcmclib_amh* p) {
   mcmclib_raptor_suff* s = (mcmclib_raptor_suff*) p->suff;
   mcmclib_mixem_online* em = s->em;
   mcmclib_mixem_online_update(em, p->mh->x);

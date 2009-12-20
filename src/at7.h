@@ -47,12 +47,10 @@ mcmclib_at7_gamma* mcmclib_at7_gamma_alloc(const gsl_vector* beta_hat,
 					   gsl_vector** mu_hat,
 					   gsl_matrix** Sigma_hat);
 /** frees an at7_gamma object @internal*/
-void mcmclib_at7_gamma_free(mcmclib_at7_gamma* p);
+void mcmclib_at7_gamma_free(void* p);
 
 /** \brief AT7 sufficient data */
-typedef struct {
-  mcmclib_mixem_online* em; /**< online-EM mixture fitter*/
-} mcmclib_at7_suff;
+typedef mcmclib_mixem_online* mcmclib_at7_suff;
 
 /** alloc a new AT7 sampler suff stats object
 @param t0 burn-in length before starting adaptation
@@ -60,7 +58,7 @@ typedef struct {
 */
 mcmclib_at7_suff* mcmclib_at7_suff_alloc(mcmclib_at7_gamma* g, int t0);
 /** free raptor_suff data*/
-void mcmclib_at7_suff_free(mcmclib_at7_suff* p);
+void mcmclib_at7_suff_free(void* in_p);
 /** Update suff stats of an AT7 chain*/
 int mcmclib_at7_suff_update(mcmclib_raptor_suff* p);
 
@@ -82,9 +80,9 @@ mcmclib_amh* mcmclib_at7_alloc(gsl_rng* r,
 			       gsl_vector** mu_hat,
 			       gsl_matrix** Sigma_hat);
 /**\brief free a previously allocated AT7 sampler*/
-void mcmclib_at7_free(mcmclib_amh* p);
+void mcmclib_at7_free(void* p);
 /**@internal */
-void mcmclib_at7_update(void* p);
+void mcmclib_at7_update(mcmclib_amh* p);
 
 /**\brief set scaling factors */
 void mcmclib_at7_set_sf(mcmclib_amh* p, const gsl_vector* sf);

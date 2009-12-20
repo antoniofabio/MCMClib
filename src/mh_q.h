@@ -18,41 +18,43 @@
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_vector.h>
 
+typedef void (*free_fun_t) (void* data);
+
+struct mcmclib_mh_q_t;
+
 /** pointer to a proposal log-distribution function
 @param data extra data
 @param  x conditioning value
 @param  y new value
 */
-typedef double (*proposal_distr_t) (void* data, gsl_vector* x, gsl_vector* y);
+typedef double (*proposal_distr_fun_t) (struct mcmclib_mh_q_t* data,
+					gsl_vector* x, gsl_vector* y);
 
-struct mcmclib_mh_q_t;
 /** pointer to a sampler function
 @param data ptr to an mcmclib_mh_q object
 */
-typedef void (*samplerfun_p) (struct mcmclib_mh_q_t* data, gsl_vector* x);
+typedef void (*sampler_fun_t) (struct mcmclib_mh_q_t* data, gsl_vector* x);
 
 /**\brief Metropolis-Hastings proposal kernel*/
 typedef struct mcmclib_mh_q_t {
   gsl_rng* r; /**< RNG used by the sampler function*/
-  samplerfun_p sampler_fun; /**< proposal sampler fun*/
-  void* sampler_data; /**< proposal sampler data*/
-  proposal_distr_t qd_fun; /**< proposal density fun*/
-  void* qd_data; /**< proposal density data*/
-  void* gamma; /**< misc kernel parameters data*/
+  sampler_fun_t rq; /**< proposal sampler fun*/
+  proposal_distr_fun_t dq; /**< proposal density fun*/
+  void* gamma; /**< extra proposal kernel data*/
+  free_fun_t free_gamma_fun; /**< optional gamma de-allocator fun*/
 } mcmclib_mh_q;
 
 /**\brief alloc a new M-H proposal kernel
    @param r RNG
-   @param sampler_fun proposal sampler fun
-   @param sampler_data proposal sampler data
-   @param qd_fun proposal density fun
-   @param qd_data proposal density data
-   @param gamma misc kernel parameters data
+   @param rq proposal sampler fun
+   @param dq proposal density fun
+   @param gamma misc kernel parameters extra data
+   @param free_gamma_fun gamma de-allocator function
  */
 mcmclib_mh_q* mcmclib_mh_q_alloc(gsl_rng* r,
-				 samplerfun_p sampler_fun, void* sampler_data,
-				 proposal_distr_t qd_fun, void* qd_data,
-				 void* gamma);
+				 sampler_fun_t rq,
+				 proposal_distr_fun_t dq,
+				 void* gamma, free_fun_t free_gamma_fun);
 void mcmclib_mh_q_free(mcmclib_mh_q* p);
 
 /**\brief sample a new proposal point*/
