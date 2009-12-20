@@ -4,6 +4,8 @@
 #include <raptor.h>
 %}
 
+typedef void (*free_fun_t) (void* data);
+
 typedef void (*mcmclib_amh_update_gamma_p) (void* p);
 
 /**\brief Generic Adaptive Metropolis-Hastings sampler */
@@ -16,8 +18,9 @@ typedef struct {
 
 %extend mcmclib_amh {
   mcmclib_amh(mcmclib_mh* mh, void* suff,
-	      mcmclib_amh_update_gamma_p update_gamma) {
-    return mcmclib_amh_alloc(mh, suff, update_gamma);
+	      mcmclib_amh_update_gamma_p update_gamma,
+	      free_fun_t free_suff) {
+    return mcmclib_amh_alloc(mh, suff, update_gamma, free_suff);
   }
   ~mcmclib_amh() {
     mcmclib_amh_free($self);
@@ -29,29 +32,30 @@ void mcmclib_amh_reset(mcmclib_amh* p);
 /*Concrete AMH samplers implementations*/
 
 /*Gaussian AM*/
+%newobject mcmclib_gauss_am_alloc;
 mcmclib_amh* mcmclib_gauss_am_alloc(gsl_rng* r,
 				    distrfun_p f, void* data,
 				    gsl_vector* start_x,
 				    const gsl_matrix* sigma_zero, int t0);
-void mcmclib_gauss_am_free(mcmclib_amh* p);
 void mcmclib_gauss_am_set_sf(mcmclib_amh* p, double sf);
 
 /*RAPT*/
-typedef int (*region_fun_t) (gsl_vector*, void*);
+typedef int (*region_fun_t) (void*, gsl_vector*);
 %{
-  int mcmclib_guile_region_fun(gsl_vector* x, void* p) {
+  int mcmclib_guile_region_fun(void* p, gsl_vector* x) {
     SCM sx = SWIG_NewPointerObj(x, SWIGTYPE_p_gsl_vector, 0);
     SCM ans = scm_call_1((SCM) p, sx);
     return scm_to_int(ans);
   }
 %}
 
-%typemap(in) (region_fun_t which_region, void* which_region_data) {
+%typemap(in) (void* which_region_data, region_fun_t which_region) {
   scm_permanent_object($input); /*FIXME. Maybe solve it by proper use of '$owner'*/
   $1 = mcmclib_guile_region_fun;
   $2 = (void*) $input;
 }
 
+%newobject mcmclib_rapt_alloc;
 mcmclib_amh* mcmclib_rapt_alloc(gsl_rng* r,
 				distrfun_p f, void* data,
 				gsl_vector* x,
@@ -61,16 +65,15 @@ mcmclib_amh* mcmclib_rapt_alloc(gsl_rng* r,
 				gsl_matrix** sigma_local,
 				region_fun_t which_region,
 				void* which_region_data);
-void mcmclib_rapt_free(mcmclib_amh* p);
 
 /*RAPTOR*/
+%newobject mcmclib_raptor_alloc;
 mcmclib_amh* mcmclib_raptor_alloc(gsl_rng* r,
 				  distrfun_p f, void* data,
 				  gsl_vector* x, int t0, gsl_matrix* Sigma_zero,
 				  gsl_vector* beta_hat,
 				  gsl_vector** mu_hat,
 				  gsl_matrix** Sigma_hat);
-void mcmclib_raptor_free(mcmclib_amh* p);
 typedef double (*mcmclib_raptor_alpha_fun_t) (void* data, mcmclib_raptor_gamma*);
 /** \brief RAPTOR sampler gamma values */
 typedef struct {
@@ -95,9 +98,6 @@ void mcmclib_raptor_set_sf(mcmclib_amh* p, double sf);
 void mcmclib_raptor_set_sf_global(mcmclib_amh* p, double sf);
 void mcmclib_raptor_set_sf_local(mcmclib_amh* p, double sf);
 void mcmclib_raptor_set_alpha(mcmclib_amh* p, double alpha);
-void mcmclib_raptor_set_alpha_fun(mcmclib_amh* p, void* data, mcmclib_raptor_alpha_fun_t fun);
-void mcmclib_raptor_set_alpha_fun_identity(mcmclib_amh* p);
-double mcmclib_raptor_alpha_star_fun(mcmclib_raptor_gamma* g);
 
 %{
 #define RAPT_GAMMA(p) ((mcmclib_rapt_gamma*) (p)->mh->q->gamma)

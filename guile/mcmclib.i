@@ -57,15 +57,15 @@ int mcmclib_mh_update(mcmclib_mh* p);
 
 typedef double (*distrfun_p)(void*, gsl_vector*);
 
+%newobject mcmclib_gauss_rw_alloc;
 mcmclib_mh* mcmclib_gauss_rw_alloc(gsl_rng* r,
 				   distrfun_p f, void* data,
 				   gsl_vector* start_x, double step_size);
-void mcmclib_gauss_rw_free(mcmclib_mh*);
+%newobject mcmclib_gauss_mrw_alloc;
 mcmclib_mh* mcmclib_gauss_mrw_alloc(gsl_rng* r,
 				    distrfun_p f, void* data,
 				    gsl_vector* x,
 				    const gsl_matrix* sigma_zero);
-void mcmclib_gauss_mrw_free(mcmclib_mh*);
 
 mcmclib_iwishart_lpdf* mcmclib_iwishart_lpdf_alloc(gsl_matrix* Psi, int m);
 void mcmclib_iwishart_lpdf_free(mcmclib_iwishart_lpdf* p);
