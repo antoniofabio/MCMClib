@@ -1,4 +1,8 @@
 Version 0.22 A. F. Di Narzo <antonio.fabio@gmail.com>
+	* added full guile bindings to mh_q and amh:
+		now custom guile samplers can be defined
+	* added a 'test-guile' make target
+	* refactored mh and amh apis: ownership is passed to the container object
 	* removed guile-gsl bindings: they are now distributed separately
 	* added utility 'install' and 'install-guile' make targets
 
