@@ -5,7 +5,7 @@ MODULES := gsl
 MODULES_LIBS := $(MODULES:%=libguile%.so)
 SWIG_TARGETS := $(MODULES:%=%_wrap.c) $(MODULES:%=swig/%.scm)
 
-GUILE_LIBRARY_PATH:= $(shell guile -c "(display (%package-data-dir))")
+GUILE_LIBRARY_PATH:= $(shell guile-config info pkgdatadir)
 
 SWIG_FLAGS := -guile -scm -nodefaultctor -package swig -Linkage passive -scmstub
 GUILE_LDFLAGS := $(LDFLAGS) -lguile -lgsl -lgslcblas -lm
