@@ -2,7 +2,7 @@ GUILE_MODULES := mcmclib
 GUILE_MODULES_LIBS := $(GUILE_MODULES:%=guile/libguile%.so)
 SRC += $(GUILE_MODULES:%=guile/%_wrap.c) $(GUILE_MODULES:%=guile/swig/%.scm)
 SRC += $(wildcard guile/*.i)
-GUILE_LIBRARY_PATH:= $(shell guile -c "(display (%package-data-dir))")
+GUILE_LIBRARY_PATH:= $(shell guile-config info pkgdatadir)
 
 SWIG_FLAGS := -guile -scm -nodefaultctor -package swig -Linkage passive -scmstub
 GUILE_LDFLAGS := $(LDFLAGS) -lguile
