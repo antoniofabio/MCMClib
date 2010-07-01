@@ -39,7 +39,9 @@ void mcmclib_mh_free(mcmclib_mh* p) {
 
 int mcmclib_mh_update(mcmclib_mh* p) {
   //assert(p->logdistr(p->logdistr_data, p->x) == p->logdistr_old);
+#ifndef COMPUTE_POSTERIOR_ONCE
   p->logdistr_old = p->logdistr(p->logdistr_data, p->x);
+#endif
   gsl_vector_memcpy(p->x_old, p->x);
   mcmclib_mh_q_sample(p->q, p->x);
   if(!mcmclib_vector_finite(p->x))
