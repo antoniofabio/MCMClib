@@ -1,4 +1,6 @@
-CFLAGS+=  --std=gnu99 -O0 -g -Wall -fpic
+CFLAGS+=  -ansi -pedantic -std=c99 -Wall -W  -Wconversion -Wshadow -Wpointer-arith \
+	-Wcast-qual -Wcast-align -Wwrite-strings -Wnested-externs -fshort-enums \
+	-fno-common -Dinline= -g -O2 -fPIC
 LDFLAGS+= -lgsl -lgslcblas -lm
 PREFIX:=/usr
 LIBDIR:=$(PREFIX)/lib
