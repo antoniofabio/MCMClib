@@ -1,6 +1,6 @@
 /*
  *  MCMClib: A C Library for doing MCMC
- *  Copyright (C) 2009 Antonio, Fabio Di Narzo
+ *  Copyright (C) 2009,2010 Antonio, Fabio Di Narzo
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ vector_list* mcmclib_vector_list_append(gsl_vector* v, vector_list* last);
 /** compute list length
 @param first	pointer to list head
 */
-int mcmclib_vector_list_length(vector_list* first);
+size_t mcmclib_vector_list_length(vector_list* first);
 
 /** de-allocates the full list from the heap
 @param first pointer to list head

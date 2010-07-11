@@ -42,3 +42,6 @@ install: all
 	install -p -m 0644 src/libmcmclib.a $(LIBDIR)
 	mkdir -p $(INCLUDEDIR)
 	install -p -m 0644 -t $(INCLUDEDIR) src/*.h
+
+check-syntax:
+	$(CC) $(CFLAGS) --std=c99 -Wall -Wextra -pedantic -fsyntax-only $(CHK_SOURCES)
