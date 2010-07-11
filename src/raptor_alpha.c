@@ -1,6 +1,6 @@
 /*
  *  MCMClib: A C Library for doing MCMC
- *  Copyright (C) 2009 Antonio, Fabio Di Narzo
+ *  Copyright (C) 2009,2010 Antonio, Fabio Di Narzo
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@ static double matrix_max_eigenvalue(const gsl_matrix* A) {
 }
 
 double mcmclib_raptor_alpha_star_fun(mcmclib_raptor_gamma* g) {
-  int K = g->beta_hat->size;
-  int d = g->mu_hat[0]->size;
+  const size_t K = g->beta_hat->size;
+  const size_t d = g->mu_hat[0]->size;
   gsl_matrix* work = gsl_matrix_alloc(d, d);
   gsl_matrix* W = gsl_matrix_alloc(d, d);
   gsl_matrix_set_zero(W);
-  for(int k=0; k<K; k++) {
+  for(size_t k=0; k<K; k++) {
     gsl_matrix_memcpy(work, g->Sigma_hat[k]);
     gsl_matrix_scale(work, gsl_vector_get(g->beta_hat, k));
     gsl_matrix_add(W, work);
@@ -41,7 +41,7 @@ double mcmclib_raptor_alpha_star_fun(mcmclib_raptor_gamma* g) {
   gsl_matrix_free(W);
   gsl_matrix* B = gsl_matrix_alloc(d, d);
   gsl_matrix_set_zero(B);
-  for(int k=0; k<K; k++) {
+  for(size_t k=0; k<K; k++) {
     gsl_matrix_view Mkv = gsl_matrix_view_vector(g->mu_hat[k], d, 1);
     gsl_matrix* Mk = &(Mkv.matrix);
     double wk = gsl_vector_get(g->beta_hat, k);
