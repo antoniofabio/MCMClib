@@ -1,4 +1,5 @@
 Version 0.23 A. F. Di Narzo <antonio.fabio@gmail.com>
+	* refactor most of the code to comply with the new compiler checks
 	* add more strict gcc compile check flags
 
 Version 0.22 11-07-2010 A. F. Di Narzo <antonio.fabio@gmail.com>

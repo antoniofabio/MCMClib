@@ -22,15 +22,15 @@ static int check_dequal(double a, double b) {
   return (fabs(a-b) < TOL);
 }
 
-static int sample(gsl_rng* r, gsl_vector* probs);
+static size_t sample(gsl_rng* r, gsl_vector* probs);
 
-int main(int argc, char** argv) {
+int main() {
   /*setup target distrib. parameters*/
   double w[] = {beta, 1-beta};
   gsl_vector_view wv = gsl_vector_view_array(w, K);
   gsl_matrix* Sigma[K];
   gsl_vector* mu[K];
-  for(int k=0; k<K; k++) {
+  for(size_t k=0; k<K; k++) {
     Sigma[k] = gsl_matrix_alloc(DIM, DIM);
     gsl_matrix_set_identity(Sigma[k]);
     gsl_matrix_scale(Sigma[k], V[k]);
@@ -41,7 +41,7 @@ int main(int argc, char** argv) {
   /*generate random data*/
   gsl_rng* rng = gsl_rng_alloc(gsl_rng_default);
   gsl_matrix* X = gsl_matrix_alloc(N, DIM);
-  for(int n=0; n<N; n++) {
+  for(size_t n=0; n<N; n++) {
     gsl_vector_view rv = gsl_matrix_row(X, n);
     gsl_vector* r = &(rv.vector);
     int k = sample(rng, &(wv.vector));
@@ -56,7 +56,7 @@ int main(int argc, char** argv) {
   /*fit mixture*/
   gsl_vector* mu_hat[K];
   gsl_matrix* Sigma_hat[K];
-  for(int k=0; k<K; k++) {
+  for(size_t k=0; k<K; k++) {
     mu_hat[k] = gsl_vector_alloc(DIM);
     gsl_vector_set_all(mu_hat[k], MU[k]);
     Sigma_hat[k] = gsl_matrix_alloc(DIM, DIM);
@@ -72,7 +72,7 @@ int main(int argc, char** argv) {
   assert(check_dequal(w_hat->data[1], 0.200986));
   FILE* out_mu = fopen("tmixem_mu.dat", "w");
   FILE* out_Sigma = fopen("tmixem_Sigma.dat", "w");
-  for(int k=0; k<K; k++) {
+  for(size_t k=0; k<K; k++) {
     gsl_vector_fprintf(out_mu, mu_hat[k], "%f");
     gsl_matrix_fprintf(out_Sigma, Sigma_hat[k], "%f");
   }
@@ -80,7 +80,7 @@ int main(int argc, char** argv) {
   fclose(out_mu);
 
   /*free memory*/
-  for(int k=0; k<K; k++) {
+  for(size_t k=0; k<K; k++) {
     gsl_matrix_free(Sigma[k]);
     gsl_matrix_free(Sigma_hat[k]);
     gsl_vector_free(mu[k]);
@@ -91,11 +91,11 @@ int main(int argc, char** argv) {
   return 0;
 }
 
-static int sample(gsl_rng* r, gsl_vector* probs) {
-  int size = probs->size;
+static size_t sample(gsl_rng* r, gsl_vector* probs) {
+  size_t size = probs->size;
   double cum_sum = 0.0;
   double who = gsl_rng_uniform(r);
-  for(int which=0; which<size; which++) {
+  for(size_t which=0; which<size; which++) {
     if(who < (cum_sum += gsl_vector_get(probs, which)))
       return(which);
   }

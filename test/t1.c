@@ -18,12 +18,12 @@ static int check_dequal(double a, double b) {
   return (fabs(a-b) < TOL);
 }
 
-int main(int argc, char** argv) {
+int main() {
   /*set a non-trivial covariance matrix*/
   gsl_matrix* Sigma = gsl_matrix_alloc(DIM, DIM);
   gsl_matrix_set_identity(Sigma);
   gsl_matrix_scale(Sigma, V0);
-  for(int i=0; i<DIM; i++) for(int j=i+1; j < DIM; j++) {
+  for(size_t i=0; i<DIM; i++) for(size_t j=i+1; j < DIM; j++) {
       gsl_matrix_set(Sigma, i, j, 1.0);
       gsl_matrix_set(Sigma, j, i, 1.0);
   }
@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
   gsl_matrix_fscanf(check_f, check_m);
   fclose(check_f);
 
-  for(int i=0; i<20; i++) {
+  for(size_t i=0; i<20; i++) {
     gsl_vector_set_all(x, gsl_matrix_get(check_m, i, 0));
     double lpdf = mcmclib_mvnorm_lpdf_compute(p, x);
     double lpdf_check = gsl_matrix_get(check_m, i, 1);
@@ -58,9 +58,9 @@ int main(int argc, char** argv) {
   mcmclib_mvnorm_lpdf_free(p);
 
   /*negative correlations*/
-  for(int i=0; i<DIM; i++) {
+  for(size_t i=0; i<DIM; i++) {
     gsl_matrix_set(Sigma, i, i, 1.0);
-    for(int j=0; j<i; j++){
+    for(size_t j=0; j<i; j++){
       gsl_matrix_set(Sigma, i, j, -1.0 / (double)DIM);
       gsl_matrix_set(Sigma, j, i, -1.0 / (double)DIM);
     }
@@ -68,8 +68,8 @@ int main(int argc, char** argv) {
   p = mcmclib_mvnorm_lpdf_alloc(mu, Sigma->data);
   gsl_vector_set_all(x, -1.0);
   assert(check_dequal(mcmclib_mvnorm_lpdf_compute(p, x), -320.966989));
-  for(int i=0; i<DIM; i++)
-    gsl_vector_set(x, i, pow(-1, i+1));
+  for(size_t i=0; i<DIM; i++)
+    gsl_vector_set(x, i, pow(-1, (double) i + 1.0));
   assert(check_dequal(mcmclib_mvnorm_lpdf_compute(p, x), -125.512443));
   mcmclib_mvnorm_lpdf_free(p);
 
