@@ -1,6 +1,6 @@
 /*
  *  MCMClib: A C Library for doing MCMC
- *  Copyright (C) 2009 Antonio, Fabio Di Narzo
+ *  Copyright (C) 2009,2010 Antonio, Fabio Di Narzo
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -26,11 +26,11 @@ mcmclib_mixem_rec* mcmclib_mixem_rec_alloc(gsl_vector** mu,
   a->beta = beta;
 
   a->n = 0;
-  int K = beta->size;
+  const size_t K = beta->size;
   a->pi_k = (mcmclib_mvnorm_lpdf**) malloc(sizeof(mcmclib_mvnorm_lpdf*) * K);
   a->X_sq_sum = (gsl_matrix**) malloc(sizeof(gsl_matrix*) * K);
   a->X_sum = (gsl_vector**) malloc(sizeof(gsl_vector*) * K);
-  for(int k=0; k<K; k++) {
+  for(size_t k=0; k<K; k++) {
     a->pi_k[k] = mcmclib_mvnorm_lpdf_alloc(mu[k], Sigma[k]->data);
     a->X_sq_sum[k] = gsl_matrix_alloc(mu[k]->size, mu[k]->size);
     gsl_matrix_set_all(a->X_sq_sum[k], 0.0);
@@ -45,7 +45,8 @@ mcmclib_mixem_rec* mcmclib_mixem_rec_alloc(gsl_vector** mu,
 }
 
 void mcmclib_mixem_rec_free(mcmclib_mixem_rec* p) {
-  for(int k=0; k < p->beta->size; k++) {
+  if(!p) return;
+  for(size_t k=0; k < p->beta->size; k++) {
     mcmclib_mvnorm_lpdf_free(p->pi_k[k]);
     gsl_matrix_free(p->X_sq_sum[k]);
     gsl_vector_free(p->X_sum[k]);
@@ -58,13 +59,13 @@ void mcmclib_mixem_rec_free(mcmclib_mixem_rec* p) {
   free(p);
 }
 
-void mcmclib_mixem_rec_add(mcmclib_mixem_rec* p, gsl_vector* y) {
-  int K = p->beta->size; /*# mixture components*/
+void mcmclib_mixem_rec_add(mcmclib_mixem_rec* p, const gsl_vector* y) {
+  const size_t K = p->beta->size; /*# mixture components*/
   (p->n)++;
 
   /*store posterior class probs. of y in beta_i*/
   double pi_sum = 0.0;
-  for(int k = 0; k<K; k++) {
+  for(size_t k = 0; k<K; k++) {
     double pik = exp(mcmclib_mvnorm_lpdf_compute(p->pi_k[k], y)) * gsl_vector_get(p->beta, k);
     gsl_vector_set(p->beta_i, k, pik);
     pi_sum += pik;
@@ -73,9 +74,9 @@ void mcmclib_mixem_rec_add(mcmclib_mixem_rec* p, gsl_vector* y) {
 
   /*update weighted sum of p(yi|theta), yi, yi*t(yi) for each class*/
   gsl_vector_add(p->beta_sum, p->beta_i);
-  gsl_matrix_view myv = gsl_matrix_view_array(y->data, y->size, 1);
-  gsl_matrix* my = &(myv.matrix);
-  for(int k=0; k<K; k++) {
+  gsl_matrix_const_view myv = gsl_matrix_const_view_array(y->data, y->size, 1);
+  const gsl_matrix* my = &(myv.matrix);
+  for(size_t k=0; k<K; k++) {
     double wik = gsl_vector_get(p->beta_i, k);
     gsl_blas_daxpy(wik, y, p->X_sum[k]);
     gsl_blas_dgemm(CblasNoTrans, CblasTrans,
@@ -85,14 +86,14 @@ void mcmclib_mixem_rec_add(mcmclib_mixem_rec* p, gsl_vector* y) {
 
 /*update theta estimates basing on current accumulated values*/
 int mcmclib_mixem_rec_update(mcmclib_mixem_rec* p) {
-  int K = p->beta->size;
+  const size_t K = p->beta->size;
   if(p->n < 2)
     return GSL_SUCCESS;
-  for(int k=0; k<K; k++) {
+  for(size_t k=0; k<K; k++) {
     double wik = 1.0 / gsl_vector_get(p->beta_sum, k);
     if(!gsl_finite(wik)) {
       static char err_msg[1024];
-      sprintf(err_msg, "non-finite weight for component %d", k);
+      sprintf(err_msg, "non-finite weight for component %zd", k);
       GSL_ERROR(err_msg, GSL_EZERODIV);
     }
 

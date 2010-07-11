@@ -1,6 +1,6 @@
 /*
  *  MCMClib: A C Library for doing MCMC
- *  Copyright (C) 2009 Antonio, Fabio Di Narzo
+ *  Copyright (C) 2009,2010 Antonio, Fabio Di Narzo
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ typedef struct {
   gsl_vector* beta;
 
   /*extra data*/
-  int n;
+  size_t n;
   mcmclib_mvnorm_lpdf** pi_k;
   gsl_matrix** X_sq_sum;
   gsl_vector** X_sum;
@@ -48,7 +48,7 @@ mcmclib_mixem_rec* mcmclib_mixem_rec_alloc(gsl_vector** mu,
 void mcmclib_mixem_rec_free(mcmclib_mixem_rec* p);
 
 /**accumulate a new datapoint infos to mixem_rec data*/
-void mcmclib_mixem_rec_add(mcmclib_mixem_rec* p, gsl_vector* y);
+void mcmclib_mixem_rec_add(mcmclib_mixem_rec* p, const gsl_vector* y);
 
 /**update mixem_rec estimates using currently accumulated data
    @return GSL_SUCCESS if all goes right
