@@ -1,6 +1,7 @@
-Version 0.22 A. F. Di Narzo <antonio.fabio@gmail.com>
-	* add `define' option to turn off `double' target computation when
-  		not really needed
+Version 0.23 A. F. Di Narzo <antonio.fabio@gmail.com>
+
+Version 0.22 11-07-2010 A. F. Di Narzo <antonio.fabio@gmail.com>
+	* rm duplicated posterior computing in mh generic step
 	* added full guile bindings to mh_q and amh:
 		now custom guile samplers can be defined
 	* added a 'test-guile' make target
