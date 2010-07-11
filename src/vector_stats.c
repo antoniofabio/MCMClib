@@ -20,7 +20,7 @@ void mcmclib_matrix_colmeans(const gsl_matrix* m, gsl_vector* out) {
 void mcmclib_matrix_rowmeans(const gsl_matrix* m, gsl_vector* out) {
   for(size_t i=0; i<m->size1; i++) {
     gsl_vector_const_view rv = gsl_matrix_const_row(m, i);
-    gsl_vector_set(out, i, gsl_stats_mean(row.vector.data, row.vector.stride, row.vector.size));
+    gsl_vector_set(out, i, gsl_stats_mean(rv.vector.data, rv.vector.stride, rv.vector.size));
   }
 }
 
