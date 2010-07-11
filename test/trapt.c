@@ -22,17 +22,19 @@ static int check_dequal(double a, double b) {
 #define x0 v0(x)
 #define m00(m) gsl_matrix_get(m, 0, 0)
 
-static int which_region(void* ignore, gsl_vector* x) {
+static size_t which_region(void* ignore, const gsl_vector* x) {
+  ignore = NULL; /*keep compiler quiet*/
   return x0 < 0.5 ? 0 : 1;
 }
 
-static double dunif(void* ignore, gsl_vector* x) {
+static double dunif(void* ignore, const gsl_vector* x) {
+  ignore = NULL; /*keep compiler quiet*/
   if((x0 >= 0.0) && (x0 <= 1.0))
     return log(1.0);
   return log(0.0);
 }
 
-int main(int argc, char** argv) {
+int main() {
   gsl_vector* x = gsl_vector_alloc(DIM);
   gsl_vector_set_all(x, 0.0);
 
@@ -68,7 +70,7 @@ int main(int argc, char** argv) {
   /*Main MCMC loop*/
   gsl_matrix* X = gsl_matrix_alloc(N, DIM);
   gsl_vector* which_region_n = gsl_vector_alloc(N);
-  for(int n=0; n<N; n++) {
+  for(size_t n=0; n<N; n++) {
     mcmclib_amh_update(s);
 
     gsl_vector_view Xn = gsl_matrix_row(X, n);
@@ -84,7 +86,7 @@ int main(int argc, char** argv) {
   /*compute means and variances*/
   mean /= (double) N;
   variance = variance / ((double) N) - (mean * mean);
-  for(int k=0; k<K; k++) {
+  for(size_t k=0; k<K; k++) {
     means[k] /= nk[k];
     variances[k] = (variances[k] / nk[k]) - (means[k] * means[k]);
   }
@@ -93,7 +95,7 @@ int main(int argc, char** argv) {
   assert(suff->t0 == T0);
   assert(check_dequal(mean, v0(suff->global_mean)));
   assert(check_dequal(variance, m00(suff->global_variance)));
-  for(int k=0; k<K; k++) {
+  for(size_t k=0; k<K; k++) {
     assert(check_dequal(nk[k], gsl_vector_get(suff->n, k)));
     assert(check_dequal(means[k], v0(suff->means[k])));
     assert(check_dequal(variances[k], m00(suff->variances[k])));

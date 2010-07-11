@@ -11,7 +11,7 @@
 static const double beta = 0.8;
 static const double V[] = {1.0, 4.0};
 static const double MU[] = {-3.0, 3.0};
-static const int DIM = 3;
+static const size_t DIM = 3;
 
 #define N 1000
 
@@ -44,7 +44,7 @@ int main() {
   for(size_t n=0; n<N; n++) {
     gsl_vector_view rv = gsl_matrix_row(X, n);
     gsl_vector* r = &(rv.vector);
-    int k = sample(rng, &(wv.vector));
+    size_t k = sample(rng, &(wv.vector));
     mcmclib_mvnorm(rng, Sigma[k], r);
     gsl_vector_add(r, mu[k]);
   }

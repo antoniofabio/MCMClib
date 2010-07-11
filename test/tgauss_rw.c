@@ -18,11 +18,12 @@ static int check_dequal(double a, double b) {
 #define v0(x) gsl_vector_get(x, 0)
 #define x0 v0(x)
 
-static double dtarget(void* ignore, gsl_vector* x) {
+static double dtarget(void* ignore, const gsl_vector* x) {
+  ignore = NULL; /*keep compiler quiet*/
   return log(gsl_ran_gaussian_pdf(gsl_vector_get(x, 0), 1.0));
 }
 
-int main(int argc, char** argv) {
+int main() {
   gsl_rng* rng = gsl_rng_alloc(gsl_rng_default);
 
   gsl_vector* x = gsl_vector_alloc(DIM);

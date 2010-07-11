@@ -12,7 +12,7 @@ static const double beta = 0.8;
 static const double V[] = {1.0, 4.0};
 static const double MU[] = {-3.0, 3.0};
 static const double rho[] = {-0.6, -0.6};
-static const int DIM = 2;
+static const size_t DIM = 2;
 
 #define N 1000
 
@@ -23,20 +23,20 @@ static int check_dequal(double a, double b) {
   return (fabs(a-b) < TOL);
 }
 
-static int sample(gsl_rng* r, gsl_vector* probs);
+static size_t sample(gsl_rng* r, gsl_vector* probs);
 
-int main(int argc, char** argv) {
+int main() {
   /*setup target distrib. parameters*/
   double w[] = {beta, 1-beta};
   gsl_vector_view wv = gsl_vector_view_array(w, K);
   gsl_matrix* Sigma[K];
   gsl_vector* mu[K];
-  for(int k=0; k<K; k++) {
+  for(size_t k=0; k<K; k++) {
     Sigma[k] = gsl_matrix_alloc(DIM, DIM);
     gsl_matrix_set_identity(Sigma[k]);
-    for(int i=0; i<DIM; i++) for(int j=0; j<i; j++) {
-			       gsl_matrix_set(Sigma[k], i, j, rho[k]);
-			       gsl_matrix_set(Sigma[k], j, i, rho[k]);
+    for(size_t i=0; i<DIM; i++) for(size_t j=0; j<i; j++) {
+	gsl_matrix_set(Sigma[k], i, j, rho[k]);
+	gsl_matrix_set(Sigma[k], j, i, rho[k]);
       }
     gsl_matrix_scale(Sigma[k], V[k]);
     mu[k] = gsl_vector_alloc(DIM);
@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
   for(int n=0; n<N; n++) {
     gsl_vector_view rv = gsl_matrix_row(X, n);
     gsl_vector* r = &(rv.vector);
-    int k = sample(rng, &(wv.vector));
+    size_t k = sample(rng, &(wv.vector));
     mcmclib_mvnorm(rng, Sigma[k], r);
     gsl_vector_add(r, mu[k]);
   }
@@ -107,11 +107,11 @@ int main(int argc, char** argv) {
   return 0;
 }
 
-static int sample(gsl_rng* r, gsl_vector* probs) {
-  int size = probs->size;
+static size_t sample(gsl_rng* r, gsl_vector* probs) {
+  size_t size = probs->size;
   double cum_sum = 0.0;
-  double who = gsl_rng_uniform(r);
-  for(int which=0; which<size; which++) {
+  const double who = gsl_rng_uniform(r);
+  for(size_t which=0; which<size; which++) {
     if(who < (cum_sum += gsl_vector_get(probs, which)))
       return(which);
   }

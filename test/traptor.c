@@ -27,7 +27,8 @@ int check_dequal(double a, double b) {
   return (fabs(a-b) < TOL);
 }
 
-static double dunif(void* ignore, gsl_vector* x) {
+static double dunif(void* ignore, const gsl_vector* x) {
+  ignore = NULL; /*keep compiler quiet*/
   if((x0 >= 0.0) && (x0 <= 1.0))
     return log(1.0);
   return log(0.0);
@@ -37,7 +38,7 @@ double fix(double in) {
   return (in + 0.001) * SF;
 }
 
-int main(int argc, char** argv) {
+int main() {
   gsl_vector* x = gsl_vector_alloc(DIM);
   gsl_vector_set_all(x, 0.0);
 
@@ -60,9 +61,9 @@ int main(int argc, char** argv) {
   }
   gsl_vector* w_hat = gsl_vector_alloc(K);
   gsl_vector_set_all(w_hat, 1.0 / (double) K);
-  gsl_vector* beta = gsl_vector_alloc(K);
-  gsl_vector_memcpy(beta, w_hat);
-  mcmclib_mixem_online* olem = mcmclib_mixem_online_alloc(mu, Sigma, beta, 0.6, T0);
+  gsl_vector* beta_v = gsl_vector_alloc(K);
+  gsl_vector_memcpy(beta_v, w_hat);
+  mcmclib_mixem_online* olem = mcmclib_mixem_online_alloc(mu, Sigma, beta_v, 0.6, T0);
 
   mcmclib_amh* sampler = mcmclib_raptor_alloc(rng,
 					      dunif, NULL,
@@ -83,7 +84,7 @@ int main(int argc, char** argv) {
 
   /*check boundary function*/
   gsl_vector_set_all(x, -1.0);
-  int rx = mcmclib_region_mixnorm_compute(x, g->pi_hat);
+  size_t rx = mcmclib_region_mixnorm_compute(x, g->pi_hat);
   assert(rx == 0);
   gsl_vector_set_all(x, 1.0);
   rx = mcmclib_region_mixnorm_compute(x, g->pi_hat);
@@ -110,7 +111,7 @@ int main(int argc, char** argv) {
     gsl_matrix_free(Sigma[k]);
   }
   gsl_vector_free(w_hat);
-  gsl_vector_free(beta);
+  gsl_vector_free(beta_v);
 
   return 0;
 }
