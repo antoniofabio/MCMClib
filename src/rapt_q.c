@@ -30,7 +30,7 @@ mcmclib_rapt_gamma* mcmclib_rapt_gamma_alloc(const gsl_matrix* sigma_whole,
   gsl_matrix_memcpy(a->sigma_whole, sigma_whole);
   a->K = K;
   a->sigma_local = (gsl_matrix**) malloc(K * sizeof(gsl_matrix*));
-  for(int k=0; k<K; k++) {
+  for(size_t k=0; k<K; k++) {
     a->sigma_local[k] = gsl_matrix_alloc(dim, dim);
     gsl_matrix_memcpy(a->sigma_local[k], sigma_local[k]);
   }
@@ -71,7 +71,6 @@ void mcmclib_rapt_q_sample(mcmclib_mh_q* q, gsl_vector* x);
 double mcmclib_rapt_q_d(mcmclib_mh_q* q, gsl_vector* x, gsl_vector* y);
 
 mcmclib_mh_q* mcmclib_rapt_q_alloc(gsl_rng* r,
-				   distrfun_p logdistr, void* logdistr_data,
 				   const gsl_matrix* sigma_whole,
 				   size_t K,
 				   gsl_matrix** sigma_local,
@@ -147,9 +146,9 @@ void mcmclib_rapt_q_update_proposals_custom(mcmclib_rapt_gamma* p,
 					    gsl_matrix* Sigma_eps,
 					    double scaling_factor_local,
 					    double scaling_factor_global) {
-  for(int k=0; k< p->K; k++)
+  for(size_t k=0; k< p->K; k++)
     matrix_addscale(p->sigma_local[k],
-			  variances[k], Sigma_eps, scaling_factor_local);
+		    variances[k], Sigma_eps, scaling_factor_local);
   matrix_addscale(p->sigma_whole,
 		  global_variance, Sigma_eps, scaling_factor_global);
 }

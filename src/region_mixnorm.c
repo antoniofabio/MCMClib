@@ -13,7 +13,7 @@
 size_t mcmclib_region_mixnorm_compute(const gsl_vector* x, void* in_p) {
   mcmclib_mixnorm_lpdf* p = (mcmclib_mixnorm_lpdf*) in_p;
   double pik;
-  int ans = 0;
+  size_t ans = 0;
   double pimax = mcmclib_mvnorm_lpdf_compute(p->pis[0], x);
   for(size_t k=1; k < p->w->size; k++) {
     pik = mcmclib_mvnorm_lpdf_compute(p->pis[k], x);

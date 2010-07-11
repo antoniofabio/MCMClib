@@ -75,7 +75,7 @@ void mcmclib_mvnorm_lpdf_free(mcmclib_mvnorm_lpdf* p) {
   free(p);
 }
 
-double mcmclib_mvnorm_lpdf_compute(void* in_p, gsl_vector* x) {
+double mcmclib_mvnorm_lpdf_compute(void* in_p, const gsl_vector* x) {
   mcmclib_mvnorm_lpdf* p = (mcmclib_mvnorm_lpdf*) in_p;
 
   /*compute cholesky decomposition of var/cov matrix*/
@@ -160,7 +160,7 @@ double mcmclib_mvnorm_lpdf_noinv(gsl_vector* mu, gsl_matrix* iSigma, gsl_vector*
 }
 
 double mcmclib_mvnormzp_lpdf(const gsl_matrix* Psi, const gsl_vector* y) {
-  int n = y->size;
+  size_t n = y->size;
   gsl_matrix* tmp = gsl_matrix_alloc(n, n);
   gsl_matrix_memcpy(tmp, Psi);
   int status = mcmclib_cholesky_decomp(tmp);

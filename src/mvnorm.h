@@ -86,7 +86,7 @@ void mcmclib_mvnorm_lpdf_free(mcmclib_mvnorm_lpdf* p);
 @param in_p extra data, allocated via \ref mcmclib_mvnorm_lpdf_alloc
 @return log-pdf
 */
-double mcmclib_mvnorm_lpdf_compute(void* in_p, gsl_vector* x);
+double mcmclib_mvnorm_lpdf_compute(void* in_p, const gsl_vector* x);
 
 /**update cholesky decomposition info
    @return !0 if non pos.def. covariance matrix

@@ -41,7 +41,6 @@ typedef struct {
 
 /**< alloc a new RAPT proposal kernel*/
 mcmclib_mh_q* mcmclib_rapt_q_alloc(gsl_rng* r,
-				   distrfun_p logdistr, void* logdistr_data,
 				   const gsl_matrix* sigma_whole,
 				   size_t K,
 				   gsl_matrix** sigma_local,
