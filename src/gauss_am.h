@@ -1,6 +1,6 @@
 /*
  *  MCMClib: A C Library for doing MCMC
- *  Copyright (C) 2009 Antonio, Fabio Di Narzo
+ *  Copyright (C) 2009,2010 Antonio, Fabio Di Narzo
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ typedef struct {
   gsl_matrix* sum_xx; /**< cumulated sum of xxs*/
   gsl_matrix* Sigma_eps; /**< pos. definiteness cov. correction additive constant*/
   gsl_matrix* Sigma_zero; /**< starting proposal covariance matrix*/
-  int t0; /**< burn in before starting adaptation*/
+  size_t t0; /**< burn in before starting adaptation*/
   double sf; /**< scaling factor*/
 } mcmclib_gauss_am_suff;
 
@@ -47,7 +47,7 @@ void mcmclib_gauss_am_suff_free(void* p);
 mcmclib_amh* mcmclib_gauss_am_alloc(gsl_rng* r,
 				    distrfun_p logdistr, void* logdistr_data,
 				    gsl_vector* start_x,
-				    const gsl_matrix* sigma_zero, int t0);
+				    const gsl_matrix* sigma_zero, size_t t0);
 
 /** set scaling factor for the gaussian AM sampler 'p'*/
 void mcmclib_gauss_am_set_sf(mcmclib_amh* p, double sf);

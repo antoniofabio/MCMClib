@@ -1,6 +1,6 @@
 /*
  *  MCMClib: A C Library for doing MCMC
- *  Copyright (C) 2009 Antonio, Fabio Di Narzo
+ *  Copyright (C) 2009,2010 Antonio, Fabio Di Narzo
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -13,6 +13,7 @@
 #include "gauss_mrw.h"
 
 void mcmclib_gauss_am_suff_free(void* p) {
+  if(!p) return;
   mcmclib_gauss_am_suff* s = (mcmclib_gauss_am_suff*) p;
   gsl_matrix_free(s->Sigma_eps);
   gsl_matrix_free(s->Sigma_zero);
@@ -21,23 +22,23 @@ void mcmclib_gauss_am_suff_free(void* p) {
   free(s);
 }
 
-void mcmclib_gauss_am_update_suff(mcmclib_gauss_am_suff* s, gsl_vector* x) {
+void mcmclib_gauss_am_update_suff(mcmclib_gauss_am_suff* s, const gsl_vector* x) {
   gsl_vector_add(s->sum_x, x);
-  gsl_matrix_view x_cv = gsl_matrix_view_array(x->data, x->size, 1);
-  gsl_matrix* x_cm = &(x_cv.matrix);
+  gsl_matrix_const_view x_cv = gsl_matrix_const_view_array(x->data, x->size, 1);
+  const gsl_matrix* x_cm = &(x_cv.matrix);
   gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, x_cm, x_cm, 1.0, s->sum_xx);
 }
 
 void mcmclib_gauss_am_update_gamma(mcmclib_amh* p) {
   mcmclib_gauss_am_suff* s = p->suff;
-  int t0 = s->t0;
-  int t = p->n;
+  size_t t0 = s->t0;
+  size_t t = p->n;
 
   mcmclib_gauss_am_update_suff(s, p->mh->x);
 
   if(t >= t0) {
     gsl_matrix* Sigma = (gsl_matrix*) p->mh->q->gamma;
-    int d = p->mh->x->size;
+    const size_t d = p->mh->x->size;
     gsl_vector* mean = gsl_vector_alloc(d);
     gsl_vector_memcpy(mean, s->sum_x);
     gsl_vector_scale(mean, 1.0 / (double) t);
@@ -56,12 +57,12 @@ void mcmclib_gauss_am_update_gamma(mcmclib_amh* p) {
 mcmclib_amh* mcmclib_gauss_am_alloc(gsl_rng* r,
 				    distrfun_p logdistr, void* logdistr_data,
 				    gsl_vector* start_x,
-				    const gsl_matrix* sigma_zero, int t0) {
+				    const gsl_matrix* sigma_zero, size_t t0) {
   mcmclib_gauss_am_suff* suff = (mcmclib_gauss_am_suff*)
     malloc(sizeof(mcmclib_gauss_am_suff));
   assert(sigma_zero->size1 == sigma_zero->size2);
   assert(start_x->size == sigma_zero->size1);
-  int d = start_x->size;
+  const size_t d = start_x->size;
   suff->Sigma_zero = gsl_matrix_alloc(d, d);
   gsl_matrix_memcpy(suff->Sigma_zero, sigma_zero);
   suff->t0 = t0;
