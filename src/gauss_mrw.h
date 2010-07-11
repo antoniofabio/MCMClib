@@ -16,8 +16,6 @@
 @{*/
 #include "mh.h"
 
-/** GRW proposal log-density (fake) \internal*/
-double mcmclib_gauss_mrw_qd(mcmclib_mh_q* ignore, gsl_vector* x, gsl_vector* y);
 /** GRW proposal sampler */
 void mcmclib_gauss_mrw_sample(mcmclib_mh_q* q, gsl_vector* x);
 

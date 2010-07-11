@@ -11,10 +11,6 @@
 #include "gauss_mrw.h"
 #include "mvnorm.h"
 
-double mcmclib_gauss_mrw_qd(mcmclib_mh_q* ignore, gsl_vector* x, gsl_vector* y) {
-  return 0.0;
-}
-
 void mcmclib_gauss_mrw_sample(mcmclib_mh_q* q, gsl_vector* x) {
   gsl_matrix* Sigma = (gsl_matrix*) q->gamma;
   gsl_vector* x_old = gsl_vector_alloc(x->size);
@@ -35,7 +31,7 @@ mcmclib_mh* mcmclib_gauss_mrw_alloc(gsl_rng* r,
   gsl_matrix_memcpy(Sigma1, Sigma);
   return mcmclib_mh_alloc(r, logdistr, data,
 			  mcmclib_mh_q_alloc(r, mcmclib_gauss_mrw_sample,
-					     mcmclib_gauss_mrw_qd,
+					     NULL,
 					     Sigma1,
 					     mcmclib_gauss_mrw_free),
 			  start_x);
