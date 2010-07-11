@@ -95,8 +95,7 @@ mcmclib_amh* mcmclib_raptor_alloc(gsl_rng* r,
   mcmclib_raptor_gamma* gamma = mcmclib_raptor_gamma_alloc(beta_hat,
 							   mu_hat,
 							   Sigma_hat);
-  mcmclib_mh_q* q = mcmclib_rapt_q_alloc(r, logdistr, logdistr_data,
-					 Sigma_zero, K, Sigma_hat,
+  mcmclib_mh_q* q = mcmclib_rapt_q_alloc(r, Sigma_zero, K, Sigma_hat,
 					 raptor_which_region_fun, gamma);
   mcmclib_mh* mh = mcmclib_mh_alloc(r, logdistr, logdistr_data, q, x);
   mcmclib_raptor_suff* suff = mcmclib_raptor_suff_alloc(gamma, t0, q->gamma);

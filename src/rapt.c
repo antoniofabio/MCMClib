@@ -67,7 +67,7 @@ mcmclib_amh* mcmclib_rapt_alloc(gsl_rng* r,
 				void* which_region_data) {
   size_t dim = x->size;
 
-  mcmclib_mh_q* q = mcmclib_rapt_q_alloc(r, logdistr, logdistr_data,
+  mcmclib_mh_q* q = mcmclib_rapt_q_alloc(r,
 					 sigma_whole, K, sigma_local,
 					 which_region, which_region_data);
   mcmclib_mh* mh = mcmclib_mh_alloc(r, logdistr, logdistr_data, q, x);
