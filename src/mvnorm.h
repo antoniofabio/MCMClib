@@ -95,14 +95,14 @@ int mcmclib_mvnorm_lpdf_chol(mcmclib_mvnorm_lpdf* p);
 
 /**compute log-distrib without recomputing cholesky decomposition
 \internal*/
-double mcmclib_mvnorm_lpdf_compute_nochol(mcmclib_mvnorm_lpdf* p, gsl_vector* x);
+double mcmclib_mvnorm_lpdf_compute_nochol(mcmclib_mvnorm_lpdf* p, const gsl_vector* x);
 
 /**update inverse covariance matrix info
 \internal*/
 void mcmclib_mvnorm_lpdf_inverse(mcmclib_mvnorm_lpdf* p);
 /**compute log-distrib by exploiting previously computed inverse
 \internal*/
-double mcmclib_mvnorm_lpdf_compute_noinv(mcmclib_mvnorm_lpdf* p, gsl_vector* x);
+double mcmclib_mvnorm_lpdf_compute_noinv(mcmclib_mvnorm_lpdf* p, const gsl_vector* x);
 
 /** Multivariate normal distribution from precision matrix
     @param mu mean
@@ -113,8 +113,9 @@ double mcmclib_mvnorm_lpdf_compute_noinv(mcmclib_mvnorm_lpdf* p, gsl_vector* x);
     @param work2 same as work1
     @return log-pdf
  */
-double mcmclib_mvnorm_lpdf_noinv(gsl_vector* mu, gsl_matrix* iSigma, gsl_vector* x,
-				 double ldet, gsl_vector* work1, gsl_vector* work2);
+double mcmclib_mvnorm_lpdf_noinv(const gsl_vector* mu, const gsl_matrix* iSigma,
+				 const gsl_vector* x,
+				 const double ldet, gsl_vector* work1, gsl_vector* work2);
 
 /** multivariate zero-mean normal log-density based on precision matrix
     

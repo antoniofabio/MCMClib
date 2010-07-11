@@ -13,14 +13,14 @@
 #include "mvnorm.h"
 
 void mcmclib_mvnorm_iid(const gsl_rng* r, gsl_vector* out) {
-  for(int n=0; n < out->size; n++)
+  for(size_t n=0; n < out->size; n++)
     gsl_vector_set(out, out->size - n - 1, gsl_ran_gaussian(r, 1.0));
 }
 
 void mcmclib_mvnorm(const gsl_rng* r,
 		    const gsl_matrix* sigma,
 		    gsl_vector* out) {
-  int d = sigma->size1;
+  const size_t d = sigma->size1;
 
   gsl_matrix* sigma_chol = gsl_matrix_alloc(d, d);
   gsl_matrix_memcpy(sigma_chol, sigma);
@@ -49,7 +49,7 @@ void mcmclib_mvnorm_cholprec(const gsl_rng* r,
 void mcmclib_mvnorm_precision(const gsl_rng* r,
 			      const gsl_matrix* Psi,
 			      gsl_vector* out) {
-  int n = Psi->size1;
+  const size_t n = Psi->size1;
   gsl_matrix* tmp = gsl_matrix_alloc(n, n);
   gsl_matrix_memcpy(tmp, Psi);
   gsl_linalg_cholesky_decomp(tmp);
@@ -58,7 +58,7 @@ void mcmclib_mvnorm_precision(const gsl_rng* r,
 }
 
 mcmclib_mvnorm_lpdf* mcmclib_mvnorm_lpdf_alloc(gsl_vector* mean, double* vcov) {
-  int d = mean->size;
+  const size_t d = mean->size;
   mcmclib_mvnorm_lpdf* ans = (mcmclib_mvnorm_lpdf*) malloc(sizeof(mcmclib_mvnorm_lpdf));
   ans->mean = mean;
   ans->vcov = vcov;
@@ -86,15 +86,15 @@ double mcmclib_mvnorm_lpdf_compute(void* in_p, const gsl_vector* x) {
 }
 
 int mcmclib_mvnorm_lpdf_chol(mcmclib_mvnorm_lpdf* p) {
-  int d = p->mean->size;
+  const size_t d = p->mean->size;
   gsl_matrix_view mv = gsl_matrix_view_array(p->vcov, d, d);
   gsl_matrix* vcov = &(mv.matrix);
   gsl_matrix_memcpy(p->rooti, vcov);
   return mcmclib_cholesky_decomp(p->rooti);
 }
 
-double mcmclib_mvnorm_lpdf_compute_nochol(mcmclib_mvnorm_lpdf* p, gsl_vector* x) {
-  int d = x->size;
+double mcmclib_mvnorm_lpdf_compute_nochol(mcmclib_mvnorm_lpdf* p, const gsl_vector* x) {
+  const size_t d = x->size;
 
   /*compute mahlanobis distance between 'x' and 'mu'*/
   gsl_vector* x_mu = p->x_mu;
@@ -108,7 +108,7 @@ double mcmclib_mvnorm_lpdf_compute_nochol(mcmclib_mvnorm_lpdf* p, gsl_vector* x)
   double ans = 0.0;
   gsl_blas_ddot(p->mahal, x_mu, &ans);
   ans += log(2.0 * M_PI) * ((double) d);
-  for(int i=0; i<d; i++)
+  for(size_t i=0; i<d; i++)
     ans += log(gsl_matrix_get(p->rooti, i, i)) * 2.0;
   ans *= -0.5;
 
@@ -116,7 +116,7 @@ double mcmclib_mvnorm_lpdf_compute_nochol(mcmclib_mvnorm_lpdf* p, gsl_vector* x)
 }
 
 void mcmclib_mvnorm_lpdf_inverse(mcmclib_mvnorm_lpdf* p) {
-  int d = p->mean->size;
+  size_t d = p->mean->size;
   gsl_matrix* xx = p->rooti;
   gsl_matrix_view vcov_v = gsl_matrix_view_array(p->vcov, d, d);
   gsl_matrix_memcpy(xx, &(vcov_v.matrix));
@@ -132,14 +132,15 @@ void mcmclib_mvnorm_lpdf_inverse(mcmclib_mvnorm_lpdf* p) {
   gsl_permutation_free(perm);
 }
 
-double mcmclib_mvnorm_lpdf_compute_noinv(mcmclib_mvnorm_lpdf* p, gsl_vector* x) {
+double mcmclib_mvnorm_lpdf_compute_noinv(mcmclib_mvnorm_lpdf* p, const gsl_vector* x) {
   return mcmclib_mvnorm_lpdf_noinv(p->mean, p->rooti, x,
 				   p->determinant, p->x_mu, p->mahal);
 }
 
-double mcmclib_mvnorm_lpdf_noinv(gsl_vector* mu, gsl_matrix* iSigma, gsl_vector* x,
-				 double ldet, gsl_vector* work1, gsl_vector* work2) {
-  int d = x->size;
+double mcmclib_mvnorm_lpdf_noinv(const gsl_vector* mu, const gsl_matrix* iSigma,
+				 const gsl_vector* x,
+				 const double ldet, gsl_vector* work1, gsl_vector* work2) {
+  const size_t d = x->size;
   /*compute mahlanobis distance between 'x' and 'mu'*/
   gsl_vector* x_mu = work1;
   gsl_vector_memcpy(x_mu, x);
