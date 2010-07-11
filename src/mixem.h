@@ -1,6 +1,6 @@
 /*
  *  MCMClib: A C Library for doing MCMC
- *  Copyright (C) 2009 Antonio, Fabio Di Narzo
+ *  Copyright (C) 2009,2010 Antonio, Fabio Di Narzo
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 */
 int mcmclib_mixem_fit(gsl_matrix* X,
 		      gsl_vector** mu, gsl_matrix** Sigma,
-		      gsl_vector* w, int NITER);
+		      gsl_vector* w, size_t NITER);
 
 /**@}*/
 #endif
