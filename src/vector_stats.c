@@ -51,12 +51,12 @@ void mcmclib_matrix_covariance(const gsl_matrix* m, gsl_matrix* out) {
 	gsl_matrix_free(mean);
 }
 
-void mcmclib_covariance_update(gsl_matrix* cov, gsl_vector* mean, int* n, gsl_vector* x) {
+void mcmclib_covariance_update(gsl_matrix* cov, gsl_vector* mean, size_t* n, const gsl_vector* x) {
   const size_t d = cov->size1;
   gsl_matrix_view colmean_view = gsl_matrix_view_array(mean->data, d, 1);
   gsl_matrix* colmean = &(colmean_view.matrix);
-  gsl_matrix_view colx_view = gsl_matrix_view_array(x->data, d, 1);
-  gsl_matrix* colx = &(colx_view.matrix);
+  gsl_matrix_const_view colx_view = gsl_matrix_const_view_array(x->data, d, 1);
+  const gsl_matrix* colx = &(colx_view.matrix);
 
   if((*n) == 0) { /*this is the first call: do some cleanup*/
     gsl_vector_set_all(mean, 0.0);

@@ -1,6 +1,6 @@
 /*
  *  MCMClib: A C Library for doing MCMC
- *  Copyright (C) 2009 Antonio, Fabio Di Narzo
+ *  Copyright (C) 2009,2010 Antonio, Fabio Di Narzo
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,20 +19,20 @@
 @{*/
 
 /** Pointer to a region-computing function */
-typedef int (*region_fun_t) (void*, gsl_vector*);
+typedef size_t (*region_fun_t) (void*, const gsl_vector*);
 
 /**\brief RAPT proposal kernel parameters*/
 typedef struct {
   region_fun_t which_region; /**< region computing function*/
   void* which_region_data; /**< extra data for the region computing function*/
-  int K; /**< number of regions*/
+  size_t K; /**< number of regions*/
 
   gsl_matrix* sigma_whole; /**< global proposal covariance matrix*/
   gsl_matrix** sigma_local; /**< array of local proposal covariance matrices*/
   gsl_matrix* lambda; /**< K+1 weights for local and global proposals, in each region*/
 
-  int which_proposal; /**< which proposal have been used in last step*/
-  int which_region_x, which_region_old; /**< region info*/
+  size_t which_proposal; /**< which proposal have been used in last step*/
+  size_t which_region_x, which_region_old; /**< region info*/
 
   gsl_vector* workspace; /**< internal utility vector*/
   gsl_vector* q_mean; /**< extra data for (mixture) proposal densities comp.*/
@@ -43,7 +43,7 @@ typedef struct {
 mcmclib_mh_q* mcmclib_rapt_q_alloc(gsl_rng* r,
 				   distrfun_p logdistr, void* logdistr_data,
 				   const gsl_matrix* sigma_whole,
-				   int K,
+				   size_t K,
 				   gsl_matrix** sigma_local,
 				   region_fun_t which_region,
 				   void* which_region_data);

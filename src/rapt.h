@@ -21,7 +21,7 @@
 
 /**\brief RAPT sufficient statistics*/
 typedef struct {
-  int t0; /**< burn-in length*/
+  size_t t0; /**< burn-in length*/
   gsl_vector** means; /**< array of regions means*/
   gsl_matrix** variances; /**< array of regions variances*/
   gsl_vector* global_mean;
@@ -50,9 +50,9 @@ typedef struct {
 mcmclib_amh* mcmclib_rapt_alloc(gsl_rng* r,
 				distrfun_p logdistr, void* logdistr_data,
 				gsl_vector* x,
-				int t0,
+				size_t t0,
 				const gsl_matrix* sigma_whole,
-				int K,
+				size_t K,
 				gsl_matrix** sigma_local,
 				region_fun_t which_region,
 				void* which_region_data);

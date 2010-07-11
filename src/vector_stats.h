@@ -30,7 +30,7 @@ void mcmclib_matrix_covariance(const gsl_matrix* m, gsl_matrix* out);
 @param x new value
 @return nothing. 'cov', 'mean' and 'n' values will be updated as a side-effect
 */
-void mcmclib_covariance_update(gsl_matrix* cov, gsl_vector* mean, int* n, gsl_vector* x);
+void mcmclib_covariance_update(gsl_matrix* cov, gsl_vector* mean, size_t* n, const gsl_vector* x);
 
 /**Pooled weighted variance
 @param beta first component's weight

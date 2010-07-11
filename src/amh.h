@@ -26,7 +26,7 @@ typedef void (*mcmclib_amh_update_gamma_p) (struct mcmclib_amh_t* p);
 typedef struct mcmclib_amh_t {
   mcmclib_mh* mh;
   mcmclib_amh_update_gamma_p update_gamma;
-  int n; /**< current iteration number*/
+  size_t n; /**< current iteration number*/
   void* suff; /**< sufficient data accumulated up to current iteration*/
   free_fun_t free_suff; /**< sufficient data destructor*/
 } mcmclib_amh;
