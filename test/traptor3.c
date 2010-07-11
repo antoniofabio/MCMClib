@@ -26,7 +26,8 @@ int check_dequal(double a, double b) {
   return (fabs(a-b) < TOL);
 }
 
-static double dber(void* ignore, gsl_vector* x) {
+static double dber(void* ignore, const gsl_vector* x) {
+  ignore = NULL; /*keep compiler quiet*/
   if(fabs(x0) > 2.0)
     return log(0.0);
   else if(x0 >= 0.0)
@@ -35,7 +36,7 @@ static double dber(void* ignore, gsl_vector* x) {
     return log(1.0-beta);
 }
 
-int main(int argc, char** argv) {
+int main() {
   gsl_vector* x = gsl_vector_alloc(DIM);
   gsl_vector_set_all(x, 0.0);
 
@@ -71,8 +72,8 @@ int main(int argc, char** argv) {
     n1 += (x0 >= 0.0) ? 1 : 0;
   }
 
-  assert(n1 == 818);
-  assert(nacc == 467);
+  assert(n1 == 779);
+  assert(nacc == 321);
 
   /*free memory*/
   gsl_matrix_free(sigma_whole);
