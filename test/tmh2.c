@@ -40,7 +40,7 @@ static void sampler(mcmclib_mh_q* q, gsl_vector* x) {
 int main() {
   gsl_rng* r = gsl_rng_alloc(gsl_rng_default);
   gsl_vector* x = gsl_vector_alloc(1);
-  gsl_vector_set(x, 0, -0.5);
+  gsl_vector_set(x, 0, 0.0);
   mcmclib_mh* s = mcmclib_mh_alloc(r, dtarget, NULL,
 				   mcmclib_mh_q_alloc(r, sampler, NULL, NULL, NULL), x);
 
