@@ -1,6 +1,6 @@
 /*
  *  MCMClib: A C Library for doing MCMC
- *  Copyright (C) 2009 Antonio, Fabio Di Narzo
+ *  Copyright (C) 2009,2010 Antonio, Fabio Di Narzo
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -38,10 +38,6 @@ void mcmclib_mh_free(mcmclib_mh* p) {
 }
 
 int mcmclib_mh_update(mcmclib_mh* p) {
-  //assert(p->logdistr(p->logdistr_data, p->x) == p->logdistr_old);
-#ifndef COMPUTE_POSTERIOR_ONCE
-  p->logdistr_old = p->logdistr(p->logdistr_data, p->x);
-#endif
   gsl_vector_memcpy(p->x_old, p->x);
   mcmclib_mh_q_sample(p->q, p->x);
   if(!mcmclib_vector_finite(p->x))
@@ -60,12 +56,11 @@ int mcmclib_mh_generic_step(const gsl_rng* r, gsl_vector* old, gsl_vector* x,
   double logdistr_old = plogdistr_old[0];
   double mh_offset, mh_ratio;
 
-  if(!isfinite(logdistr_old)) {
-    plogdistr_old[0] = logdistr(data, x);
-    return 1;
+  if(!gsl_finite(logdistr_old)) {
+    GSL_ERROR("non-finite probability density in the starting point", GSL_EDOM);
   }
   mh_offset = mcmclib_mh_q_ratio_offset(q, old, x);
-  if(!isfinite(mh_offset)) {
+  if(!gsl_finite(mh_offset)) {
     if(mh_offset < 0) {
       gsl_vector_memcpy(x, old);
       return 0;
@@ -76,7 +71,7 @@ int mcmclib_mh_generic_step(const gsl_rng* r, gsl_vector* old, gsl_vector* x,
   }
 
   logdistr_new = logdistr(data, x);
-  if(!isfinite(logdistr_new)) {
+  if(!gsl_finite(logdistr_new)) {
     gsl_vector_memcpy(x, old);
     return 0;
   }

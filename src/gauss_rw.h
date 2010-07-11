@@ -17,7 +17,6 @@
 \defgroup gauss_rw Component-wise Gaussian Random Walk
 @{*/
 
-double mcmclib_gauss_rw_qd(mcmclib_mh_q* ignore, gsl_vector* x, gsl_vector* y);
 void mcmclib_gauss_rw_sample(mcmclib_mh_q* q, gsl_vector* x);
 
 /** alloc (and init) Gaussian RW object

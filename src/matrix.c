@@ -29,7 +29,7 @@ int mcmclib_cholesky_inverse(gsl_matrix* A) {
 
 double mcmclib_matrix_logtrace(const gsl_matrix* A) {
   double ans = 0.0;
-  for(int i=0; i < A->size1; i++)
+  for(size_t i=0; i < A->size1; i++)
     ans += log(gsl_matrix_get(A, i, i));
   return ans;
 }
@@ -46,7 +46,7 @@ void mcmclib_matrix_inverse(gsl_matrix* A) {
 }
 
 int mcmclib_vector_is_finite(const gsl_vector* x) {
-  for(int i=0; i < x->size; i++)
+  for(size_t i=0; i < x->size; i++)
     if(!gsl_finite(gsl_vector_get(x, i)))
       return 0;
   return 1;
@@ -54,7 +54,7 @@ int mcmclib_vector_is_finite(const gsl_vector* x) {
 
 int mcmclib_vector_is_sorted_desc(gsl_vector* v) {
   double m = gsl_vector_get(v, 0);
-  for(int i=1; i<v->size; i++) {
+  for(size_t i=1; i<v->size; i++) {
     double n = gsl_vector_get(v, i);
     if(n > m)
       return 0;
@@ -64,17 +64,17 @@ int mcmclib_vector_is_sorted_desc(gsl_vector* v) {
 }
 
 void mcmclib_vector_printf(gsl_vector* v) {
-  int n = v->size;
+  size_t n = v->size;
   printf("%.3f", gsl_vector_get(v, 0));
-  for(int i=1; i<n; i++) {
+  for(size_t i=1; i<n; i++) {
     printf(", %.3f", gsl_vector_get(v, i));
   }
   printf("\n");
 }
 
 void mcmclib_matrix_printf(gsl_matrix* A) {
-  int n = A->size1;
-  for(int i=0; i<n; i++) {
+  size_t n = A->size1;
+  for(size_t i=0; i<n; i++) {
     gsl_vector_view row = gsl_matrix_row(A, i);
     mcmclib_vector_printf(&row.vector);
   }

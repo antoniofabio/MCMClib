@@ -1,6 +1,6 @@
 /*
  *  MCMClib: A C Library for doing MCMC
- *  Copyright (C) 2009 Antonio, Fabio Di Narzo
+ *  Copyright (C) 2009,2010 Antonio, Fabio Di Narzo
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -10,39 +10,36 @@
 #include <gsl/gsl_math.h>
 #include "vector_stats.h"
 
-void mcmclib_matrix_colmeans(gsl_matrix* m, gsl_vector* out) {
-	gsl_vector_view cv;
-	gsl_vector* col;
-	for(int i=0; i<m->size2; i++) {
-		cv = gsl_matrix_column(m, i);
+void mcmclib_matrix_colmeans(const gsl_matrix* m, gsl_vector* out) {
+	const gsl_vector* col;
+	for(size_t i=0; i<m->size2; i++) {
+		gsl_vector_const_view cv = gsl_matrix_const_column(m, i);
 		col = &(cv.vector);
 		gsl_vector_set(out, i, gsl_stats_mean(col->data, col->stride, col->size));
 	}
 }
 
-void mcmclib_matrix_rowmeans(gsl_matrix* m, gsl_vector* out) {
-	gsl_vector_view rv;
-	gsl_vector* row;
-	for(int i=0; i<m->size1; i++) {
-		rv = gsl_matrix_row(m, i);
+void mcmclib_matrix_rowmeans(const gsl_matrix* m, gsl_vector* out) {
+	const gsl_vector* row;
+	for(size_t i=0; i<m->size1; i++) {
+		gsl_vector_const_view rv = gsl_matrix_const_row(m, i);
 		row = &(rv.vector);
 		gsl_vector_set(out, i, gsl_stats_mean(row->data, row->stride, row->size));
 	}
 }
 
-void mcmclib_matrix_covariance(gsl_matrix* m, gsl_matrix* out) {
-	int d = m->size2;
-	int n = m->size1;
+void mcmclib_matrix_covariance(const gsl_matrix* m, gsl_matrix* out) {
+	const size_t d = m->size2;
+	const size_t n = m->size1;
 	gsl_matrix* mean = gsl_matrix_alloc(1, d);
-	gsl_matrix_view rv;
-	gsl_matrix* row;
+	const gsl_matrix* row;
 
 	gsl_vector_view mv = gsl_matrix_row(mean, 0);
 	mcmclib_matrix_colmeans(m, &(mv.vector));
 
 	gsl_matrix_set_zero(out);
-	for(int i=0; i<n; i++) {
-		rv = gsl_matrix_submatrix (m, i, 0, 1, d);
+	for(size_t i=0; i<n; i++) {
+		gsl_matrix_const_view rv = gsl_matrix_const_submatrix (m, i, 0, 1, d);
 		row = &(rv.matrix);
 		gsl_blas_dgemm (CblasTrans, CblasNoTrans, 1.0, row, row, 1.0, out);
 	}
@@ -55,7 +52,7 @@ void mcmclib_matrix_covariance(gsl_matrix* m, gsl_matrix* out) {
 }
 
 void mcmclib_covariance_update(gsl_matrix* cov, gsl_vector* mean, int* n, gsl_vector* x) {
-  int d = cov->size1;
+  const size_t d = cov->size1;
   gsl_matrix_view colmean_view = gsl_matrix_view_array(mean->data, d, 1);
   gsl_matrix* colmean = &(colmean_view.matrix);
   gsl_matrix_view colx_view = gsl_matrix_view_array(x->data, d, 1);
@@ -82,11 +79,11 @@ void mcmclib_covariance_update(gsl_matrix* cov, gsl_vector* mean, int* n, gsl_ve
 }
 
 /*Pooled weighted variance*/
-void mcmclib_pooled_variance(double beta,
-			     gsl_vector** means,
-			     gsl_matrix** variances,
+void mcmclib_pooled_variance(const double beta,
+			     const gsl_vector** means,
+			     const gsl_matrix** variances,
 			     gsl_matrix* V) {
-  int dim = means[0]->size;
+  const size_t dim = means[0]->size;
   gsl_matrix_memcpy(V, variances[0]);
   gsl_matrix_scale(V, beta);
   gsl_matrix* tmp = gsl_matrix_alloc(dim, dim);
@@ -109,7 +106,7 @@ void mcmclib_pooled_variance(double beta,
 }
 
 int mcmclib_vector_finite(gsl_vector* x) {
-  for(int i=0; i<x->size; i++)
+  for(size_t i=0; i<x->size; i++)
     if(!gsl_finite(gsl_vector_get(x, i)))
       return 0;
   return 1;

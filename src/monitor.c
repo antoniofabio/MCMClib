@@ -14,7 +14,7 @@
 mcmclib_monitor* mcmclib_monitor_alloc(const gsl_vector* x) {
   mcmclib_monitor* p = (mcmclib_monitor*) malloc(sizeof(mcmclib_monitor));
   p->x = x;
-  int n = x->size;
+  const size_t n = x->size;
   p->sum_x = gsl_vector_alloc(n);
   gsl_vector_set_zero(p->sum_x);
   p->sum_xsq = gsl_vector_alloc(n);
@@ -54,12 +54,12 @@ void mcmclib_monitor_free(mcmclib_monitor* p) {
 }
 
 static void vec_is_null(gsl_vector* x) {
-  for(int i=0; i < x->size; i++)
+  for(size_t i=0; i < x->size; i++)
     gsl_vector_set(x, i, gsl_vector_get(x, i) > EQ_TOL ? 1.0 : 0.0);
 }
 
 static void vec_sq(gsl_vector* dest, const gsl_vector* x) {
-  for(int i=0; i < x->size; i++) {
+  for(size_t i=0; i < x->size; i++) {
     double xi = gsl_vector_get(x, i);
     gsl_vector_set(dest, i, xi*xi);
   }
@@ -186,7 +186,7 @@ void mcmclib_monitor_ecdf_free(mcmclib_monitor_ecdf* p) {
 }
 void mcmclib_monitor_ecdf_update(mcmclib_monitor_ecdf* p, const gsl_vector* y) {
   gsl_vector_scale(p->Fn, p->n);
-  for(int i=0; i < p->X0->size1; i++) {
+  for(size_t i=0; i < p->X0->size1; i++) {
     gsl_vector_view rv = gsl_matrix_row(p->X0, i);
     gsl_vector_memcpy(p->workspace, &(rv.vector));
     gsl_vector_sub(p->workspace, y);

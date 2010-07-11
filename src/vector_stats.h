@@ -16,12 +16,12 @@
 @{*/
 
 /** column means */
-void mcmclib_matrix_colmeans(gsl_matrix* m, gsl_vector* out);
+void mcmclib_matrix_colmeans(const gsl_matrix* m, gsl_vector* out);
 /** row means */
-void mcmclib_matrix_rowmeans(gsl_matrix* m, gsl_vector* out);
+void mcmclib_matrix_rowmeans(const gsl_matrix* m, gsl_vector* out);
 
 /** get variance/covariance matrix out of the 'vertical' matrix 'm' */
-void mcmclib_matrix_covariance(gsl_matrix* m, gsl_matrix* out);
+void mcmclib_matrix_covariance(const gsl_matrix* m, gsl_matrix* out);
 
 /** update covariance value 'recursively'
 @param cov current covariance matrix
@@ -38,8 +38,8 @@ void mcmclib_covariance_update(gsl_matrix* cov, gsl_vector* mean, int* n, gsl_ve
 @param variances array of two variances
 @param output result
 */
-void mcmclib_pooled_variance(double beta, gsl_vector** means,
-			     gsl_matrix** variances, gsl_matrix* V);
+void mcmclib_pooled_variance(const double beta, const gsl_vector** means,
+			     const gsl_matrix** variances, gsl_matrix* V);
 
 /**check if vector contains only finite values*/
 int mcmclib_vector_finite(gsl_vector* x);
