@@ -1,6 +1,6 @@
 /*
  *  MCMClib: A C Library for doing MCMC
- *  Copyright (C) 2009 Antonio, Fabio Di Narzo
+ *  Copyright (C) 2009,2010 Antonio, Fabio Di Narzo
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -26,11 +26,11 @@ void TYPE_METHOD(prefix, free)(TYPE_PAR(prefix)* p){\
 #define IMPLEMENT_1PAR(prefix, par1) \
 IMPLEMENT_1PAR_ALLOCFREE(prefix, par1)\
 \
-double TYPE_METHOD(prefix, compute)(void* in_p, gsl_vector* x) {\
+double TYPE_METHOD(prefix, compute)(void* in_p, const gsl_vector* x) {\
 	TYPE_PAR(prefix)* p = ( TYPE_PAR(prefix)* ) in_p;\
 	double ans = 0;\
 	double par1 = *(p->par1);\
-	for(int i=0; i< x->size; i++)\
+	for(size_t i=0; i < x->size; i++)\
 		ans += log( gsl_ran_ ## prefix ## _pdf(gsl_vector_get(x, i), par1) );\
 	return ans;\
 }
@@ -50,12 +50,12 @@ void TYPE_METHOD(prefix, free) (TYPE_PAR(prefix)* p){\
 #define IMPLEMENT_2PAR(prefix, par1, par2) \
 IMPLEMENT_2PAR_ALLOCFREE(prefix, par1, par2)\
 \
-double TYPE_METHOD(prefix, compute)(void* in_p, gsl_vector* x) {\
+double TYPE_METHOD(prefix, compute)(void* in_p, const gsl_vector* x) {\
 	TYPE_PAR(prefix)* p = ( TYPE_PAR(prefix)* ) in_p;\
 	double ans = 0;\
 	double par1 = *(p->par1);\
 	double par2 = *(p->par2);\
-	for(int i=0; i< x->size; i++)\
+	for(size_t i=0; i < x->size; i++)\
 		ans += log( gsl_ran_ ## prefix ## _pdf(gsl_vector_get(x, i), par1, par2) );\
 	return ans;\
 }
