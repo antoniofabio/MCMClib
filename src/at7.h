@@ -1,6 +1,6 @@
 /*
  *  MCMClib: A C Library for doing MCMC
- *  Copyright (C) 2009 Antonio, Fabio Di Narzo
+ *  Copyright (C) 2009,2010 Antonio, Fabio Di Narzo
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ typedef mcmclib_mixem_online* mcmclib_at7_suff;
 @param t0 burn-in length before starting adaptation
 @returns a new AT7_suff object
 */
-mcmclib_at7_suff* mcmclib_at7_suff_alloc(mcmclib_at7_gamma* g, int t0);
+mcmclib_at7_suff* mcmclib_at7_suff_alloc(mcmclib_at7_gamma* g, size_t t0);
 /** free raptor_suff data*/
 void mcmclib_at7_suff_free(void* in_p);
 /** Update suff stats of an AT7 chain*/
@@ -75,7 +75,7 @@ int mcmclib_at7_suff_update(mcmclib_raptor_suff* p);
 */
 mcmclib_amh* mcmclib_at7_alloc(gsl_rng* r,
 			       distrfun_p logdistr, void* logdistr_data,
-			       gsl_vector* x, int t0,
+			       gsl_vector* x, size_t t0,
 			       const gsl_vector* beta_hat,
 			       gsl_vector** mu_hat,
 			       gsl_matrix** Sigma_hat);
