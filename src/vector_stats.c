@@ -11,21 +11,17 @@
 #include "vector_stats.h"
 
 void mcmclib_matrix_colmeans(const gsl_matrix* m, gsl_vector* out) {
-	const gsl_vector* col;
-	for(size_t i=0; i<m->size2; i++) {
-		gsl_vector_const_view cv = gsl_matrix_const_column(m, i);
-		col = &(cv.vector);
-		gsl_vector_set(out, i, gsl_stats_mean(col->data, col->stride, col->size));
-	}
+  for(size_t i=0; i<m->size2; i++) {
+    gsl_vector_const_view cv = gsl_matrix_const_column(m, i);
+    gsl_vector_set(out, i, gsl_stats_mean(cv.vector.data, cv.vector.stride, cv.vector.size));
+  }
 }
 
 void mcmclib_matrix_rowmeans(const gsl_matrix* m, gsl_vector* out) {
-	const gsl_vector* row;
-	for(size_t i=0; i<m->size1; i++) {
-		gsl_vector_const_view rv = gsl_matrix_const_row(m, i);
-		row = &(rv.vector);
-		gsl_vector_set(out, i, gsl_stats_mean(row->data, row->stride, row->size));
-	}
+  for(size_t i=0; i<m->size1; i++) {
+    gsl_vector_const_view rv = gsl_matrix_const_row(m, i);
+    gsl_vector_set(out, i, gsl_stats_mean(row.vector.data, row.vector.stride, row.vector.size));
+  }
 }
 
 void mcmclib_matrix_covariance(const gsl_matrix* m, gsl_matrix* out) {
