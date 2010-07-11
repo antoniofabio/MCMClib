@@ -18,7 +18,8 @@ static int check_dequal(double a, double b) {
   return (fabs(a-b) < TOL);
 }
 
-static double dtarget(void* ignore, gsl_vector* x) {
+static double dtarget(void* ignore, const gsl_vector* x) {
+  ignore = NULL; /*keep compiler quiet*/
   if(x0 == 0.0)
     return log(1.0 - PI1);
   else if(x0 == 1.0)
@@ -28,6 +29,7 @@ static double dtarget(void* ignore, gsl_vector* x) {
 }
 
 static double qd(mcmclib_mh_q* q, gsl_vector* x, gsl_vector* y) {
+  q = NULL; x = NULL; /*keep compiler quiet*/
   if(gsl_vector_get(y,0) == 0.0)
     return log(1.0 / 3.0);
   return log(2.0 / 3.0);
@@ -42,7 +44,7 @@ static void sampler(mcmclib_mh_q* q, gsl_vector* x) {
     gsl_vector_set(x, 0, 1.0);
 }
 
-int main(int argc, char** argv) {
+int main() {
   gsl_rng* r = gsl_rng_alloc(gsl_rng_default);
   gsl_vector* x = gsl_vector_alloc(1);
   gsl_vector_set(x, 0, 0.0);
