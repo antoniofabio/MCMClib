@@ -13,14 +13,9 @@
 #define v0(x) gsl_vector_get(x, 0)
 #define x0 v0(x)
 
-static int which_region(void* ignore, gsl_vector* x) {
+static size_t which_region(void* ignore, const gsl_vector* x) {
+  ignore = NULL; /*keep compiler quiet*/
   return x0 < 0.5 ? 0 : 1;
-}
-
-static double dunif(void* ignore, gsl_vector* x) {
-  if((x0 >= 0.0) && (x0 <= 1.0))
-    return log(1.0);
-  return log(0.0);
 }
 
 #define TOL 1e-6
@@ -28,7 +23,7 @@ static int check_dequal(double a, double b) {
   return (fabs(a-b) < TOL);
 }
 
-int main(int argc, char** argv) {
+int main() {
   gsl_vector* x = gsl_vector_alloc(DIM);
   gsl_vector* y = gsl_vector_alloc(DIM);
   gsl_vector_set_all(x, 0.0);
@@ -38,13 +33,12 @@ int main(int argc, char** argv) {
   gsl_matrix* sigma_whole = gsl_matrix_alloc(DIM, DIM);
   gsl_matrix_set_identity(sigma_whole);
   gsl_matrix* sigma_local[K];
-  for(int k=0; k<K; k++) {
+  for(size_t k=0; k<K; k++) {
     sigma_local[k] = gsl_matrix_alloc(DIM, DIM);
     gsl_matrix_set_identity(sigma_local[k]);
   }
 
   mcmclib_mh_q* q = mcmclib_rapt_q_alloc(rng,
-					 dunif, NULL, /*target distrib.*/
 					 sigma_whole, K, sigma_local,
 					 which_region, NULL);
 
@@ -53,7 +47,7 @@ int main(int argc, char** argv) {
   assert(check_dequal(mcmclib_mh_q_logd(q, x, y), -1.048402));
 
   /*free memory*/
-  for(int k=0; k<K; k++)
+  for(size_t k=0; k<K; k++)
     gsl_matrix_free(sigma_local[k]);
   gsl_matrix_free(sigma_whole);
   gsl_vector_free(x);
