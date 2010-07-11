@@ -28,7 +28,7 @@ double lpdf(double s) {
   return ans;
 }
 
-int main(int argc, char** argv) {
+int main() {
   /*set a non-trivial location matrix*/
   gsl_matrix* V = gsl_matrix_alloc(DIM, DIM);
   gsl_matrix_set_identity(V);

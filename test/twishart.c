@@ -27,12 +27,12 @@ double lpdf(double s) {
   return ans;
 }
 
-int main(int argc, char** argv) {
+int main() {
   /*set a non-trivial location matrix*/
   gsl_matrix* V = gsl_matrix_alloc(DIM, DIM);
   gsl_matrix_set_identity(V);
   gsl_matrix_scale(V, V0);
-  for(int i=0; i<DIM; i++) for(int j=i+1; j < DIM; j++) {
+  for(size_t i=0; i<DIM; i++) for(size_t j=i+1; j < DIM; j++) {
       gsl_matrix_set(V, i, j, 1.0);
       gsl_matrix_set(V, j, i, 1.0);
   }
@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
   gsl_matrix_view X_v = gsl_matrix_view_vector(x, DIM, DIM);
   gsl_matrix* X = &(X_v.matrix);
   gsl_matrix_set_all(X, 0.2);
-  for(int i=0; i<DIM; i++)
+  for(size_t i=0; i<DIM; i++)
     gsl_matrix_set(X, i, i, 1.0);
 
   assert(check_dequal(lpdf(1.0), -7.152627));

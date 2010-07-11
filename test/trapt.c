@@ -75,7 +75,7 @@ int main() {
 
     gsl_vector_view Xn = gsl_matrix_row(X, n);
     gsl_vector_memcpy(&(Xn.vector), x);
-    gsl_vector_set(which_region_n, n, g->which_region_x);
+    gsl_vector_set(which_region_n, n, (double) g->which_region_x);
     means[g->which_region_x] += x0;
     variances[g->which_region_x] += x0 * x0;
     nk[g->which_region_x] += 1.0;

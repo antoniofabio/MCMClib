@@ -46,7 +46,7 @@ int main() {
   /*generate random data*/
   gsl_rng* rng = gsl_rng_alloc(gsl_rng_default);
   gsl_matrix* X = gsl_matrix_alloc(N, DIM);
-  for(int n=0; n<N; n++) {
+  for(size_t n=0; n<N; n++) {
     gsl_vector_view rv = gsl_matrix_row(X, n);
     gsl_vector* r = &(rv.vector);
     size_t k = sample(rng, &(wv.vector));
@@ -75,7 +75,7 @@ int main() {
 						       Sigma_hat,
 						       w_hat,
 						       0.5, 100);
-  for(int n=0; n<N; n++) {
+  for(size_t n=0; n<N; n++) {
     gsl_vector_view rv = gsl_matrix_row(X, n);
     mcmclib_mixem_online_update(m, &(rv.vector));
   }

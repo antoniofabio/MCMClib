@@ -22,7 +22,8 @@ static int check_dequal(double a, double b) {
 #define x0 v0(x)
 #define m00(m) gsl_matrix_get(m, 0, 0)
 
-static double dunif(void* ignore, gsl_vector* x) {
+static double dunif(void* ignore, const gsl_vector* x) {
+  ignore = NULL; /*keep compiler quiet*/
   if((x0 >= 0.0) && (x0 <= 1.0))
     return log(1.0);
   return log(0.0);
@@ -32,7 +33,7 @@ static double fix(double in, double correction) {
   return (in + correction) * SF;
 }
 
-int main(int argc, char** argv) {
+int main() {
   gsl_rng* rng = gsl_rng_alloc(gsl_rng_default);
 
   gsl_vector* x = gsl_vector_alloc(DIM);

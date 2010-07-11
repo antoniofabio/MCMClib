@@ -15,16 +15,13 @@ static int check_dequal(double a, double b) {
   return (fabs(a-b) < TOL);
 }
 
-static double dtarget(void* ignore, gsl_vector* x) {
+static double dtarget(void* ignore, const gsl_vector* x) {
+  ignore = NULL;
   if((x0 >= 0.0) && (x0 <= 1.0))
     return log(1.0);
   if((x0 < -10.0))
     return log(0.5);
   return log(0.0);
-}
-
-static double qd(mcmclib_mh_q* ignore, gsl_vector* x, gsl_vector* y) {
-  return 0.0;
 }
 
 static void sampler(mcmclib_mh_q* q, gsl_vector* x) {
@@ -37,7 +34,7 @@ static void update_gamma(mcmclib_amh* p) {
   (*s)+= v0(p->mh->x);
 }
 
-int main(int argc, char** argv) {
+int main() {
   gsl_rng* r = gsl_rng_alloc(gsl_rng_default);
   gsl_vector* x[2];
   for(int m=0; m<2; m++) {
@@ -46,7 +43,7 @@ int main(int argc, char** argv) {
   }
   double inc = 0.2;
   double suff = 0.0;
-  mcmclib_mh_q* q = mcmclib_mh_q_alloc(r, sampler, qd, &inc, NULL);
+  mcmclib_mh_q* q = mcmclib_mh_q_alloc(r, sampler, NULL, &inc, NULL);
   mcmclib_mh* mh = mcmclib_mh_alloc(r, dtarget, NULL, q, gsl_vector_alloc(1));
   mcmclib_amh* amh = mcmclib_amh_alloc(mh, &suff, update_gamma, NULL);
   mcmclib_inca* s = mcmclib_inca_alloc(amh, x, 2);
