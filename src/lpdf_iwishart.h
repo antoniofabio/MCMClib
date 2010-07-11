@@ -1,6 +1,6 @@
 /*
  *  MCMClib: A C Library for doing MCMC
- *  Copyright (C) 2009 Antonio, Fabio Di Narzo
+ *  Copyright (C) 2009,2010 Antonio, Fabio Di Narzo
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,19 +19,19 @@
 /**\brief Inverse Wishart distribution */
 typedef struct {
   gsl_matrix* Psi; /**< location parameter */
-  int m; /**< degrees of freedom */
+  unsigned int m; /**< degrees of freedom */
   double PsiDet; /**< log-determinant of location parameter x m/2*/
 
   gsl_matrix *PsiX, *X1; /**< workspace data */
 } mcmclib_iwishart_lpdf;
 
 /**\brief alloc a Wishart distribution object */
-mcmclib_iwishart_lpdf* mcmclib_iwishart_lpdf_alloc(gsl_matrix* Psi, int m);
+mcmclib_iwishart_lpdf* mcmclib_iwishart_lpdf_alloc(const gsl_matrix* Psi, const unsigned int m);
 /**\brief de-alloc a Wishart distribution object */
 void mcmclib_iwishart_lpdf_free(mcmclib_iwishart_lpdf* p);
 
 /**\brief compute log-InverseWishart distribution */
-double mcmclib_iwishart_lpdf_compute(void* in_p, gsl_vector* x);
+double mcmclib_iwishart_lpdf_compute(void* in_p, const gsl_vector* x);
 
 /**@}*/
 /**@}*/
