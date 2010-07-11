@@ -1,6 +1,6 @@
 /*
  *  MCMClib: A C Library for doing MCMC
- *  Copyright (C) 2009 Antonio, Fabio Di Narzo
+ *  Copyright (C) 2009,2010 Antonio, Fabio Di Narzo
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -10,12 +10,12 @@
 #include "mixnorm.h"
 #include "region_mixnorm.h"
 
-int mcmclib_region_mixnorm_compute(gsl_vector* x, void* in_p) {
+size_t mcmclib_region_mixnorm_compute(const gsl_vector* x, void* in_p) {
   mcmclib_mixnorm_lpdf* p = (mcmclib_mixnorm_lpdf*) in_p;
   double pik;
   int ans = 0;
   double pimax = mcmclib_mvnorm_lpdf_compute(p->pis[0], x);
-  for(int k=1; k < p->w->size; k++) {
+  for(size_t k=1; k < p->w->size; k++) {
     pik = mcmclib_mvnorm_lpdf_compute(p->pis[k], x);
     if(pik > pimax) {
       pimax = pik;

@@ -39,7 +39,7 @@ mcmclib_mixolem_suff* mcmclib_mixolem_suff_makeref(gsl_vector* delta,
 						   gsl_vector** delta_x,
 						   gsl_matrix** delta_xx);
 /**alloc a new mixolem_suff object*/
-mcmclib_mixolem_suff* mcmclib_mixolem_suff_alloc(int K, int dim);
+mcmclib_mixolem_suff* mcmclib_mixolem_suff_alloc(size_t K, size_t dim);
 /**free mixolem_suff object allocated with \ref mcmclib_mixolem_suff_alloc*/
 void mcmclib_mixolem_suff_free(mcmclib_mixolem_suff* p);
 /**copy contents of \a src in \a dest*/

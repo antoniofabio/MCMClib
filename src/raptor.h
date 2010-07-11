@@ -34,7 +34,7 @@ typedef struct {
 } mcmclib_raptor_gamma;
 
 /** alloc a new raptor_gamma object. Input arguments are copied @internal */
-mcmclib_raptor_gamma* mcmclib_raptor_gamma_alloc(gsl_vector* beta_hat,
+mcmclib_raptor_gamma* mcmclib_raptor_gamma_alloc(const gsl_vector* beta_hat,
 						 gsl_vector** mu_hat,
 						 gsl_matrix** Sigma_hat);
 /** frees a raptor_gamma object @internal*/
@@ -60,7 +60,7 @@ typedef struct {
 @param t0 burn-in length before starting adaptation
 @returns a new raptor_suff object
 */
-mcmclib_raptor_suff* mcmclib_raptor_suff_alloc(mcmclib_raptor_gamma* g, int t0,
+mcmclib_raptor_suff* mcmclib_raptor_suff_alloc(mcmclib_raptor_gamma* g, size_t t0,
 					       mcmclib_rapt_gamma* rg);
 /** free raptor_suff data*/
 void mcmclib_raptor_suff_free(void* p);
@@ -80,8 +80,8 @@ int mcmclib_raptor_suff_update(mcmclib_raptor_suff* p);
 */
 mcmclib_amh* mcmclib_raptor_alloc(gsl_rng* r,
 				  distrfun_p logdistr, void* logdistr_data,
-				  gsl_vector* x, int t0, gsl_matrix* Sigma_zero,
-				  gsl_vector* beta_hat,
+				  gsl_vector* x, size_t t0, gsl_matrix* Sigma_zero,
+				  const gsl_vector* beta_hat,
 				  gsl_vector** mu_hat,
 				  gsl_matrix** Sigma_hat);
 

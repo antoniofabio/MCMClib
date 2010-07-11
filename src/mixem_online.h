@@ -32,7 +32,7 @@ typedef struct {
   double eta_eps; /**< learning rate*/
 
   mcmclib_mvnorm_lpdf** pi_k; /**< array of mixture components densities*/
-  int n, n0; /**< current it. number, burn-in length*/
+  size_t n, n0; /**< current it. number, burn-in length*/
 
   gsl_vector* beta;
   gsl_vector** mu;
@@ -53,7 +53,7 @@ mcmclib_mixem_online* mcmclib_mixem_online_alloc(gsl_vector** mu,
 						 gsl_matrix** Sigma,
 						 gsl_vector* beta,
 						 double eta_eps,
-						 int n0);
+						 size_t n0);
 
 /**free mixem_online data*/
 void mcmclib_mixem_online_free(mcmclib_mixem_online* p);

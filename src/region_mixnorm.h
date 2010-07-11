@@ -1,6 +1,6 @@
 /*
  *  MCMClib: A C Library for doing MCMC
- *  Copyright (C) 2009 Antonio, Fabio Di Narzo
+ *  Copyright (C) 2009,2010 Antonio, Fabio Di Narzo
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -22,6 +22,6 @@ Intended to be used with \ref RAPT (and derived) samplers
 @param p pointer to an 'mcmclib_mixnorm' object
 @returns to which region belongs point 'x', as an integer between 0 and K-1
 */
-int mcmclib_region_mixnorm_compute(gsl_vector* x, void* p);
+size_t mcmclib_region_mixnorm_compute(const gsl_vector* x, void* p);
 
 #endif

@@ -19,7 +19,7 @@ mcmclib_mixem_online* mcmclib_mixem_online_alloc(gsl_vector** mu,
 						 gsl_matrix** Sigma,
 						 gsl_vector* beta,
 						 double eta_eps,
-						 int n0) {
+						 size_t n0) {
   mcmclib_mixem_online* a = (mcmclib_mixem_online*) malloc(sizeof(mcmclib_mixem_online));
   a->beta = beta;
   a->mu = mu;
@@ -30,13 +30,13 @@ mcmclib_mixem_online* mcmclib_mixem_online_alloc(gsl_vector** mu,
   a->n0 = n0;
   a->n = 0;
 
-  int K = beta->size;
-  int d = mu[0]->size;
+  size_t K = beta->size;
+  size_t d = mu[0]->size;
   a->s = mcmclib_mixolem_suff_alloc(K, d);
   a->si = mcmclib_mixolem_suff_alloc(K, d);
 
   a->pi_k = (mcmclib_mvnorm_lpdf**) malloc(K * sizeof(mcmclib_mvnorm_lpdf*));
-  for(int k=0; k<K; k++) {
+  for(size_t k=0; k<K; k++) {
     a->pi_k[k] = mcmclib_mvnorm_lpdf_alloc(mu[k], Sigma[k]->data);
   }
 
@@ -48,7 +48,7 @@ mcmclib_mixem_online* mcmclib_mixem_online_alloc(gsl_vector** mu,
 }
 
 void mcmclib_mixem_online_free(mcmclib_mixem_online* p) {
-  for(int k=0; k < p->gamma->delta->size; k++) {
+  for(size_t k=0; k < p->gamma->delta->size; k++) {
     mcmclib_mvnorm_lpdf_free(p->pi_k[k]);
   }
   free(p->gamma);
@@ -62,9 +62,9 @@ void mcmclib_mixem_online_free(mcmclib_mixem_online* p) {
 
 /*update sufficient statistic*/
 static int mixem_compute_si(mcmclib_mixem_online* p, gsl_vector* y) {
-  int K = p->si->delta->size;
+  const size_t K = p->si->delta->size;
   double delta_sum = 0.0;
-  for(int k=0; k < K; k++) {
+  for(size_t k=0; k < K; k++) {
     double delta_k = 0.0;
     delta_k = exp(mcmclib_mvnorm_lpdf_compute(p->pi_k[k], y) +
       log(gsl_vector_get(p->gamma->delta, k)));
@@ -76,7 +76,7 @@ static int mixem_compute_si(mcmclib_mixem_online* p, gsl_vector* y) {
     GSL_ERROR("non-finite mixture component weight", GSL_EDOM);
   }
 
-  for(int k=0; k< K; k++) {
+  for(size_t k=0; k < K; k++) {
     double delta_k = gsl_vector_get(p->si->delta, k);
     gsl_vector_memcpy(p->si->delta_x[k], y);
     gsl_vector_scale(p->si->delta_x[k], delta_k);
@@ -101,8 +101,8 @@ void mcmclib_mixem_online_update_s(mcmclib_mixem_online* p, gsl_vector* y) {
 void mcmclib_mixem_online_update_gamma(mcmclib_mixolem_suff* gamma,
 				       mcmclib_mixolem_suff* s) {
   mcmclib_mixolem_suff_memcpy(gamma, s);
-  int K = gamma->delta->size;
-  for(int k=0; k < K; k++) {
+  const size_t K = gamma->delta->size;
+  for(size_t k=0; k < K; k++) {
     double betak = 1.0 / gsl_vector_get(gamma->delta, k);
     gsl_vector_scale(gamma->delta_x[k], betak);
 
@@ -116,7 +116,7 @@ void mcmclib_mixem_online_update_gamma(mcmclib_mixolem_suff* gamma,
 }
 
 void mcmclib_mixem_online_update(mcmclib_mixem_online* p, gsl_vector* y) {
-  int n = p->n;
+  size_t n = p->n;
   mcmclib_covariance_update(p->Sigma_global, p->mu_global, &n, y);
   (p->n)++;
   mcmclib_mixem_online_update_s(p, y);

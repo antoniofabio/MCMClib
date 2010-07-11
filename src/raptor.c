@@ -16,17 +16,17 @@
 #define RAPTOR_GAMMA(p) ((mcmclib_raptor_gamma*) RAPT_GAMMA(p)->which_region_data)
 #define RAPTOR_SUFF(p) ((mcmclib_raptor_suff*) (p)->suff)
 
-mcmclib_raptor_gamma* mcmclib_raptor_gamma_alloc(gsl_vector* beta_hat,
+mcmclib_raptor_gamma* mcmclib_raptor_gamma_alloc(const gsl_vector* beta_hat,
 						 gsl_vector** mu_hat,
 						 gsl_matrix** Sigma_hat) {
   mcmclib_raptor_gamma* a = (mcmclib_raptor_gamma*) malloc(sizeof(mcmclib_raptor_gamma));
   a->beta_hat = gsl_vector_alloc(beta_hat->size);
   gsl_vector_memcpy(a->beta_hat, beta_hat);
-  int K = beta_hat->size;
-  int d = mu_hat[0]->size;
+  size_t K = beta_hat->size;
+  size_t d = mu_hat[0]->size;
   a->mu_hat = (gsl_vector**) malloc(K * sizeof(gsl_vector*));
   a->Sigma_hat = (gsl_matrix**) malloc(K * sizeof(gsl_matrix*));
-  for(int k=0; k < K; k++) {
+  for(size_t k=0; k < K; k++) {
     a->mu_hat[k] = gsl_vector_alloc(d);
     gsl_vector_memcpy(a->mu_hat[k], mu_hat[k]);
     a->Sigma_hat[k] = gsl_matrix_alloc(d, d);
@@ -34,7 +34,7 @@ mcmclib_raptor_gamma* mcmclib_raptor_gamma_alloc(gsl_vector* beta_hat,
   }
 
   a->pik_hat = (mcmclib_mvnorm_lpdf**) malloc(K * sizeof(mcmclib_mvnorm_lpdf*));
-  for(int k=0; k<K; k++)
+  for(size_t k=0; k<K; k++)
     a->pik_hat[k] = mcmclib_mvnorm_lpdf_alloc(a->mu_hat[k], a->Sigma_hat[k]->data);
 
   a->pi_hat = mcmclib_mixnorm_lpdf_alloc(a->beta_hat, a->pik_hat);
@@ -43,7 +43,7 @@ mcmclib_raptor_gamma* mcmclib_raptor_gamma_alloc(gsl_vector* beta_hat,
 
 void mcmclib_raptor_gamma_free(mcmclib_raptor_gamma* p) {
   mcmclib_mixnorm_lpdf_free(p->pi_hat);
-  for(int k=0; k< p->beta_hat->size; k++) {
+  for(size_t k=0; k < p->beta_hat->size; k++) {
     mcmclib_mvnorm_lpdf_free(p->pik_hat[k]);
     gsl_vector_free(p->mu_hat[k]);
     gsl_matrix_free(p->Sigma_hat[k]);
@@ -55,11 +55,11 @@ void mcmclib_raptor_gamma_free(mcmclib_raptor_gamma* p) {
   free(p);
 }
 
-mcmclib_raptor_suff* mcmclib_raptor_suff_alloc(mcmclib_raptor_gamma* g, int t0,
+mcmclib_raptor_suff* mcmclib_raptor_suff_alloc(mcmclib_raptor_gamma* g, size_t t0,
 					       mcmclib_rapt_gamma* rg) {
   mcmclib_raptor_suff* a = (mcmclib_raptor_suff*) malloc(sizeof(mcmclib_raptor_suff));
   a->em = mcmclib_mixem_online_alloc(g->mu_hat, g->Sigma_hat, g->beta_hat, 0.6, t0);
-  int d = g->mu_hat[0]->size;
+  size_t d = g->mu_hat[0]->size;
   a->Sigma_eps = gsl_matrix_alloc(d, d);
   gsl_matrix_set_identity(a->Sigma_eps);
   gsl_matrix_scale(a->Sigma_eps, 0.001);
@@ -77,7 +77,7 @@ void mcmclib_raptor_suff_free(void* in_p) {
   free(p);
 }
 
-int raptor_which_region_fun(void* in_g, gsl_vector* x) {
+static size_t raptor_which_region_fun(void* in_g, const gsl_vector* x) {
   mcmclib_raptor_gamma* g = (mcmclib_raptor_gamma*) in_g;
   return mcmclib_region_mixnorm_compute(x, g->pi_hat);
 }
@@ -86,11 +86,11 @@ void mcmclib_raptor_update(mcmclib_amh* p);
 
 mcmclib_amh* mcmclib_raptor_alloc(gsl_rng* r,
 				  distrfun_p logdistr, void* logdistr_data,
-				  gsl_vector* x, int t0, gsl_matrix* Sigma_zero,
-				  gsl_vector* beta_hat,
+				  gsl_vector* x, size_t t0, gsl_matrix* Sigma_zero,
+				  const gsl_vector* beta_hat,
 				  gsl_vector** mu_hat,
 				  gsl_matrix** Sigma_hat){
-  int K = beta_hat->size;
+  size_t K = beta_hat->size;
 
   mcmclib_raptor_gamma* gamma = mcmclib_raptor_gamma_alloc(beta_hat,
 							   mu_hat,
