@@ -72,8 +72,8 @@ int main() {
     n1 += (x0 >= 0.0) ? 1 : 0;
   }
 
-  assert(n1 == 779);
-  assert(nacc == 321);
+  assert(n1 == 818);
+  assert(nacc == 467);
 
   /*free memory*/
   gsl_matrix_free(sigma_whole);
