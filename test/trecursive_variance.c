@@ -21,6 +21,7 @@ int main() {
 
   size_t n1=0;
   for(size_t n=0; n<N; n++) {
+    assert(n1 == n);
     mcmclib_covariance_update(V, m, &n1, x[n]);
   }
 
@@ -34,9 +35,13 @@ int main() {
 
   /*check results*/
   assert(n1 == N);
-  for(size_t d1=0; d1<DIM; d1++)
-    for(size_t d2=0; d2<DIM; d2++)
-      assert(gsl_matrix_get(V, d1, d2) == gsl_matrix_get(Vt, d1, d2));
+  for(size_t d1=0; d1<DIM; d1++) {
+    for(size_t d2=0; d2<DIM; d2++) {
+      double cov_true = gsl_matrix_get(Vt, d1, d2);
+      double cov_check = gsl_matrix_get(V, d1, d2);
+      assert(cov_true == cov_check);
+    }
+  }
 
   /*free memory*/
   for(size_t n=0; n<N; n++)

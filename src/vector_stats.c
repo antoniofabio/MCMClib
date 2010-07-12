@@ -25,33 +25,33 @@ void mcmclib_matrix_rowmeans(const gsl_matrix* m, gsl_vector* out) {
 }
 
 void mcmclib_matrix_covariance(const gsl_matrix* m, gsl_matrix* out) {
-	const size_t d = m->size2;
-	const size_t n = m->size1;
-	gsl_matrix* mean = gsl_matrix_alloc(1, d);
-	const gsl_matrix* row;
+  const size_t d = m->size2;
+  const size_t n = m->size1;
+  gsl_matrix* mean = gsl_matrix_alloc(1, d);
+  const gsl_matrix* row;
 
-	gsl_vector_view mv = gsl_matrix_row(mean, 0);
-	mcmclib_matrix_colmeans(m, &(mv.vector));
+  gsl_vector_view mv = gsl_matrix_row(mean, 0);
+  mcmclib_matrix_colmeans(m, &(mv.vector));
 
-	gsl_matrix_set_zero(out);
-	for(size_t i=0; i<n; i++) {
-		gsl_matrix_const_view rv = gsl_matrix_const_submatrix (m, i, 0, 1, d);
-		row = &(rv.matrix);
-		gsl_blas_dgemm (CblasTrans, CblasNoTrans, 1.0, row, row, 1.0, out);
-	}
+  gsl_matrix_set_zero(out);
+  for(size_t i=0; i<n; i++) {
+    gsl_matrix_const_view rv = gsl_matrix_const_submatrix (m, i, 0, 1, d);
+    row = &(rv.matrix);
+    gsl_blas_dgemm (CblasTrans, CblasNoTrans, 1.0, row, row, 1.0, out);
+  }
 
-	gsl_blas_dgemm (CblasTrans, CblasNoTrans, (double) -n, mean, mean, 1.0, out);
+  gsl_blas_dgemm (CblasTrans, CblasNoTrans, ((double) n) * -1.0, mean, mean, 1.0, out);
 
-	gsl_matrix_scale(out, 1.0 / (double) n);
+  gsl_matrix_scale(out, 1.0 / (double) n);
 
-	gsl_matrix_free(mean);
+  gsl_matrix_free(mean);
 }
 
 void mcmclib_covariance_update(gsl_matrix* cov, gsl_vector* mean, size_t* n, const gsl_vector* x) {
   const size_t d = cov->size1;
-  gsl_matrix_view colmean_view = gsl_matrix_view_array(mean->data, d, 1);
+  gsl_matrix_view colmean_view = gsl_matrix_view_vector(mean, d, 1);
   gsl_matrix* colmean = &(colmean_view.matrix);
-  gsl_matrix_const_view colx_view = gsl_matrix_const_view_array(x->data, d, 1);
+  gsl_matrix_const_view colx_view = gsl_matrix_const_view_vector(x, d, 1);
   const gsl_matrix* colx = &(colx_view.matrix);
 
   if((*n) == 0) { /*this is the first call: do some cleanup*/
@@ -70,7 +70,7 @@ void mcmclib_covariance_update(gsl_matrix* cov, gsl_vector* mean, size_t* n, con
   gsl_vector_scale(mean, 1.0 / (double) (*n));
 
   /*update covariance value*/
-  gsl_blas_dgemm(CblasNoTrans, CblasTrans, (double) -(*n), colmean, colmean, 1.0, cov);
+  gsl_blas_dgemm(CblasNoTrans, CblasTrans, ((double) (*n)) * -1.0, colmean, colmean, 1.0, cov);
   gsl_matrix_scale(cov, 1.0 / (double) (*n));
 }
 
