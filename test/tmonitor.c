@@ -15,7 +15,7 @@ static int check_dequal(double a, double b) {
   return (fabs(a-b) < TOL);
 }
 
-int main(int argc, char** argv) {
+int main() {
   gsl_vector* x = gsl_vector_alloc(1);
   gsl_vector_set(x, 0, 2.0);
   mcmclib_monitor* p = mcmclib_monitor_alloc(x);

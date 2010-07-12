@@ -16,16 +16,16 @@ static double backTransform(double a) {
 }
 
 void backTransformVector(gsl_vector* v) {
-  int n = v->size;
-  for(int i=0; i<n; i++)
+  const size_t n = v->size;
+  for(size_t i=0; i<n; i++)
     gsl_vector_set(v, i, backTransform(gsl_vector_get(v, i)));
 }
 
-gsl_matrix* A;
+gsl_matrix* A_g;
 gsl_vector* alphasigma;
 
 static void singValues(gsl_matrix* A, gsl_vector* values) {
-  int n = A->size1;
+  const size_t n = A->size1;
   gsl_vector* work = gsl_vector_alloc(n);
   gsl_matrix* A1 = gsl_matrix_alloc(n, n);
   gsl_matrix_memcpy(A1, A);
@@ -38,12 +38,12 @@ static void singValues(gsl_matrix* A, gsl_vector* values) {
 
 static void sRepresentation(double s) {
   gsl_vector_set_all(alphasigma, s);
-  mcmclib_Givens_representation(A, alphasigma);
+  mcmclib_Givens_representation(A_g, alphasigma);
   gsl_vector* vals = gsl_vector_alloc(3);
-  singValues(A, vals);
-  for(int i=0; i<3; i++)
+  singValues(A_g, vals);
+  for(size_t i=0; i<3; i++)
     assert(check_dequal(gsl_vector_get(vals, i), exp(s)));
-  gsl_linalg_cholesky_decomp(A);
+  gsl_linalg_cholesky_decomp(A_g);
   gsl_vector_free(vals);
 }
 
@@ -52,31 +52,31 @@ static void sRepresentationAsymm(double s) {
   gsl_vector_set(alphasigma, 0, s + 2.0);
   gsl_vector_set(alphasigma, 1, s + 2.0);
   gsl_vector_set(alphasigma, 2, s + 2.0);
-  int offset = 6;
+  const size_t offset = 6;
   gsl_vector_set(alphasigma, offset, s - 1.0);
   gsl_vector_set(alphasigma, offset+2, s + 1.0);
-  mcmclib_Givens_representation_asymm(A, alphasigma);
+  mcmclib_Givens_representation_asymm(A_g, alphasigma);
   gsl_vector* values = gsl_vector_alloc(3);
-  singValues(A, values);
+  singValues(A_g, values);
   assert(check_dequal(gsl_vector_get(values, 0), exp(s + 1.0)));
   assert(check_dequal(gsl_vector_get(values, 1), exp(s)));
   assert(check_dequal(gsl_vector_get(values, 2), exp(s - 1.0)));
   gsl_vector_free(values);
 }
 
-int main(int argc, char** argv) {
+int main() {
   gsl_vector* alpha = gsl_vector_alloc(3);
   gsl_vector_set(alpha, 0, -0.5);
   gsl_vector_set(alpha, 1, 0.1);
   gsl_vector_set(alpha, 2, 0.5);
-  A = gsl_matrix_alloc(3, 3);
-  mcmclib_Givens_rotations(A, alpha);
+  A_g = gsl_matrix_alloc(3, 3);
+  mcmclib_Givens_rotations(A_g, alpha);
   gsl_matrix* A1 = gsl_matrix_alloc(3, 3);
-  gsl_matrix_memcpy(A1, A);
+  gsl_matrix_memcpy(A1, A_g);
   mcmclib_matrix_inverse(A1);
-  for(int i=0; i<3; i++)
-    for(int j=0; j<3; j++)
-      assert(check_dequal(gsl_matrix_get(A, i, j), gsl_matrix_get(A1, j, i)));
+  for(size_t i=0; i<3; i++)
+    for(size_t j=0; j<3; j++)
+      assert(check_dequal(gsl_matrix_get(A_g, i, j), gsl_matrix_get(A1, j, i)));
 
   alphasigma = gsl_vector_alloc(6);
   for(double s=-4.0; s<=4.0; s+=0.1)
@@ -89,6 +89,6 @@ int main(int argc, char** argv) {
   gsl_vector_free(alphasigma);
 
   gsl_matrix_free(A1);
-  gsl_matrix_free(A);
+  gsl_matrix_free(A_g);
   gsl_vector_free(alpha);
 }

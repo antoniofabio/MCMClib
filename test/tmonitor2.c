@@ -15,9 +15,9 @@ static int check_dequal(double a, double b) {
   return (fabs(a-b) < TOL);
 }
 
-int main(int argc, char** argv) {
+int main() {
   gsl_matrix* X0 = gsl_matrix_alloc(10, 2);
-  for(int i=0; i<X0->size1; i++) {
+  for(size_t i=0; i<X0->size1; i++) {
     gsl_vector_view X0i_v = gsl_matrix_row(X0, i);
     gsl_vector_set_all(&(X0i_v.vector), (double)i / (double)X0->size1);
   }
@@ -34,14 +34,14 @@ int main(int argc, char** argv) {
 
   gsl_vector_set_all(x, 1.1);
   mcmclib_monitor_ecdf_update(p, x);
-  for(int i=0; i< p->Fn->size; i++)
+  for(size_t i=0; i< p->Fn->size; i++)
     assert(gsl_vector_get(p->Fn, i) == 0.5);
 
   gsl_vector_set_all(x, 0.5);
   mcmclib_monitor_ecdf_update(p, x);
-  for(int i=0; i<6; i++)
+  for(size_t i=0; i<6; i++)
     assert(check_dequal(gsl_vector_get(p->Fn, i), 2.0 / 3.0));
-  for(int i=6; i<10; i++)
+  for(size_t i=6; i<10; i++)
     assert(check_dequal(gsl_vector_get(p->Fn, i), 1.0 / 3.0));
 
   mcmclib_monitor_ecdf_free(p);

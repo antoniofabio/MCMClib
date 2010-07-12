@@ -34,10 +34,10 @@ double lpdf(double sx) {
   return mcmclib_pois_model_lpdf(mod, x);
 }
 
-int main(int argc, char** argv) {
+int main() {
   gsl_matrix* X = gsl_matrix_alloc(N, P);
   gsl_matrix_set_zero(X);
-  for(int i=0; i<P; i++)
+  for(size_t i=0; i<P; i++)
     gsl_matrix_set(X, i, i, 1.0);
   gsl_vector* y = gsl_vector_alloc(N);
   gsl_vector_set_all(y, 2.0);

@@ -8,11 +8,11 @@
 #include <mvnorm.h>
 #include <mixem_online.h>
 
-static const int DIM = 2;
-static const int N = 5;
-static const int K = 2;
+static const size_t DIM = 2;
+static const size_t N = 5;
+static const size_t K = 2;
 
-static int count_errors = 0;
+static size_t count_errors = 0;
 static void test_handler (const char * reason,
 			  const char * file,
 			  int line,
@@ -20,7 +20,7 @@ static void test_handler (const char * reason,
   count_errors++;
 }
 
-int main(int argc, char** argv) {
+int main() {
   /*init data*/
   gsl_matrix* X = gsl_matrix_alloc(N, DIM);
   gsl_matrix_set_all(X, 1.0);
@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
   /*fit mixture by online EM*/
   gsl_vector* mu_hat[K];
   gsl_matrix* Sigma_hat[K];
-  for(int k=0; k<K; k++) {
+  for(size_t k=0; k<K; k++) {
     mu_hat[k] = gsl_vector_alloc(DIM);
     gsl_vector_set_all(mu_hat[k], 1.0);
     Sigma_hat[k] = gsl_matrix_alloc(DIM, DIM);
@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
 						       w_hat,
 						       0.5, 2);
   gsl_set_error_handler(test_handler);
-  for(int n=0; n<N; n++) {
+  for(size_t n=0; n<N; n++) {
     gsl_vector_view rv = gsl_matrix_row(X, n);
     mcmclib_mixem_online_update(m, &(rv.vector));
   }
@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
   gsl_matrix_free(X);
 
   /*free memory*/
-  for(int k=0; k<K; k++) {
+  for(size_t k=0; k<K; k++) {
     gsl_matrix_free(Sigma_hat[k]);
     gsl_vector_free(mu_hat[k]);
   }
