@@ -13,6 +13,7 @@
 #include "vector_stats.h"
 
 double mcmclib_raptor_alpha_default_fun(void* data, mcmclib_raptor_gamma* p) {
+  p = NULL; /*keep compiler quiet*/
   mcmclib_rapt_gamma* g = (mcmclib_rapt_gamma*) data;
   return gsl_matrix_get(g->lambda, 0, g->lambda->size2 - 1);
 }
@@ -57,6 +58,7 @@ double mcmclib_raptor_alpha_star_fun(mcmclib_raptor_gamma* g) {
 }
 
 double mcmclib_raptor_alpha_identity_fun(void* ignore, mcmclib_raptor_gamma* g) {
+  ignore = NULL; /*keep compiler quiet*/
   return mcmclib_raptor_alpha_star_fun(g);
 }
 
