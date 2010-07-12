@@ -17,22 +17,22 @@
 #include "givens.h"
 
 /*sum of the numbers from 'b' to 'a'*/
-static int partsum(int a, int b) {
+static size_t partsum(size_t a, size_t b) {
   if(b>a)
     return 0;
   return (a*(a+1) - b*(b-1))/2;
 }
 
-static int ALPHA(int i, int j, int p) {
+static size_t ALPHA(size_t i, size_t j, size_t p) {
   assert(i < j);
   return partsum(p-1, p-i) + j - i - 1;
 }
 
-static double alpha_get(const gsl_vector* a, int i, int j, int p) {
+static double alpha_get(const gsl_vector* a, size_t i, size_t j, size_t p) {
   return gsl_vector_get(a, ALPHA(i, j, p));
 }
 
-static void Givens_set_Shij(gsl_matrix* S, int i, int j, double alpha_ij) {
+static void Givens_set_Shij(gsl_matrix* S, size_t i, size_t j, double alpha_ij) {
   gsl_matrix_set_identity(S);
   gsl_matrix_set(S, i, i, cos(alpha_ij));
   gsl_matrix_set(S, j, j, cos(alpha_ij));
@@ -42,15 +42,15 @@ static void Givens_set_Shij(gsl_matrix* S, int i, int j, double alpha_ij) {
 
 void mcmclib_Givens_rotations(gsl_matrix* A, const gsl_vector* alpha) {
   assert(A->size1 == A->size2);
-  int p = A->size1;
+  const size_t p = A->size1;
   assert(alpha->size == (p * (p-1) / 2));
   gsl_matrix* S[2];
   for(int h=0; h<2; h++)
     S[h] = gsl_matrix_alloc(p, p);
   gsl_matrix_set_identity(S[1]);
 
-  for(int i=0; i<(p-1); i++) {
-    for(int j=i+1; j<p; j++) {
+  for(size_t i=0; i<(p-1); i++) {
+    for(size_t j=i+1; j<p; j++) {
       double bi = exp(alpha_get(alpha, i, j, p));
       bi = M_PI_2 * (bi - 1.0) / (bi + 1.0);
       Givens_set_Shij(S[0], i, j, bi);
@@ -73,14 +73,14 @@ static void vSortDesc(gsl_vector* v) {
 
 void mcmclib_Givens_representation(gsl_matrix* M,
 				   const gsl_vector* alpha_sigma) {
-  int n = M->size1;
-  int offset = n * (n-1) / 2;
+  size_t n = M->size1;
+  size_t offset = n * (n-1) / 2;
 
   gsl_vector* alpha1 = gsl_vector_alloc(offset);
-  for(int i=0; i<offset; i++)
+  for(size_t i=0; i<offset; i++)
     gsl_vector_set(alpha1, i, gsl_vector_get(alpha_sigma, i));
   gsl_vector* sigma1 = gsl_vector_alloc(n);
-  for(int i=0; i<n; i++) {
+  for(size_t i=0; i<n; i++) {
     double bi = exp(gsl_vector_get(alpha_sigma, i + offset));
     gsl_vector_set(sigma1, i, bi);
   }
@@ -90,7 +90,7 @@ void mcmclib_Givens_representation(gsl_matrix* M,
   mcmclib_Givens_rotations(A, alpha1);
   gsl_matrix* D = gsl_matrix_alloc(n, n);
   gsl_matrix_set_zero(D);
-  for(int i=0; i<n; i++)
+  for(size_t i=0; i<n; i++)
     gsl_matrix_set(D, i, i, gsl_vector_get(sigma1, i));
   gsl_matrix* AD = gsl_matrix_alloc(n, n);
   gsl_matrix_set_zero(AD);
@@ -110,10 +110,10 @@ static void anti_SVD(gsl_matrix* A,
 		     const gsl_matrix* P1,
 		     const gsl_matrix* P2,
 		     const gsl_vector* sigma) {
-  int p = A->size1;
+  const size_t p = A->size1;
   gsl_matrix* Delta = gsl_matrix_alloc(p, p);
   gsl_matrix_set_zero(Delta);
-  for(int i=0; i<p; i++)
+  for(size_t i=0; i<p; i++)
     gsl_matrix_set(Delta, i, i, exp(gsl_vector_get(sigma, i)));
   gsl_matrix* P1Delta = gsl_matrix_alloc(p, p);
   gsl_matrix_set_zero(P1Delta);
@@ -125,8 +125,8 @@ static void anti_SVD(gsl_matrix* A,
 }
 
 void mcmclib_Givens_representation_asymm(gsl_matrix* M, const gsl_vector* alpha12_sigma) {
-  int n = M->size1;
-  int offset = n*(n-1)/2;
+  const size_t n = M->size1;
+  const size_t offset = n*(n-1)/2;
   gsl_matrix* P1 = gsl_matrix_alloc(n, n);
   gsl_matrix* P2 = gsl_matrix_alloc(n, n);
   gsl_vector_const_view alpha1 = gsl_vector_const_subvector(alpha12_sigma, 0, offset);
