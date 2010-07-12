@@ -27,8 +27,9 @@ int check_dequal(double a, double b) {
   return (fabs(a-b) < TOL);
 }
 
-static double dunif(void* ignore, gsl_vector* x) {
-  for(int i=0; i < x->size; i++) {
+static double dunif(void* ignore, const gsl_vector* x) {
+  ignore = NULL; /*keep compiler quiet*/
+  for(size_t i=0; i < x->size; i++) {
     double xi = gsl_vector_get(x, i);
     if((xi < 0.0) || (xi > 1.0))
       return log(0.0);
@@ -89,7 +90,7 @@ static double dunif(void* ignore, gsl_vector* x) {
   }									\
   }									\
 
-int main(int argc, char** argv) {
+int main() {
   gsl_rng* rng;
   gsl_vector* x;
   mcmclib_amh* sampler;
