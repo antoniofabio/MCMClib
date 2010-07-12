@@ -20,8 +20,8 @@
 
 /**\brief MCAR(\tilde B, \Gamma) distribution */
 typedef struct {
-  int p; /**< dimension */
-  int n; /**< number of points */
+  size_t p; /**< dimension */
+  size_t n; /**< number of points */
 
   gsl_matrix* B_tilde; /**< variance par. matrix (p x p) */
   gsl_vector* alpha12sigma; /**< Givens angles and sing. values repr. of
@@ -42,7 +42,7 @@ typedef struct {
     @param p dimension
     @param M adiancency matrix (n x n)
 */
-mcmclib_mcar_tilde_lpdf* mcmclib_mcar_tilde_lpdf_alloc(int p, gsl_matrix* M);
+mcmclib_mcar_tilde_lpdf* mcmclib_mcar_tilde_lpdf_alloc(size_t p, gsl_matrix* M);
 
 /** Free extra data for an mcar_tilde distribution
     @param p

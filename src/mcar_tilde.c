@@ -15,12 +15,12 @@
 #include "matrix.h"
 #include "mcar_tilde.h"
 
-mcmclib_mcar_tilde_lpdf* mcmclib_mcar_tilde_lpdf_alloc(int p, gsl_matrix* M) {
+mcmclib_mcar_tilde_lpdf* mcmclib_mcar_tilde_lpdf_alloc(size_t p, gsl_matrix* M) {
   mcmclib_mcar_tilde_lpdf* a = (mcmclib_mcar_tilde_lpdf*) malloc(sizeof(mcmclib_mcar_tilde_lpdf));
   assert(p>0);
   assert(M->size1 == M->size2);
-  int n = M->size1;
-  int offset = p * (p-1) / 2;
+  const size_t n = M->size1;
+  const size_t offset = p * (p-1) / 2;
   a->p = p;
   a->n = n;
   a->B_tilde = gsl_matrix_alloc(p, p);
@@ -31,9 +31,9 @@ mcmclib_mcar_tilde_lpdf* mcmclib_mcar_tilde_lpdf_alloc(int p, gsl_matrix* M) {
   a->M = gsl_matrix_alloc(n, n);
   gsl_matrix_memcpy(a->M, M);
   a->m = gsl_vector_alloc(n);
-  for(int i=0; i<n; i++) {
-    int count = 0;
-    for(int j=0; j<n; j++)
+  for(size_t i=0; i<n; i++) {
+    size_t count = 0;
+    for(size_t j=0; j<n; j++)
       count += gsl_matrix_get(M, i, j) == 1.0;
     gsl_vector_set(a->m, i, (double) count);
   }
@@ -71,7 +71,7 @@ void mcmclib_mcar_tilde_lpdf_update_B_tilde(mcmclib_mcar_tilde_lpdf* p) {
 }
 
 static int is_positive_definite(mcmclib_mcar_tilde_lpdf* p) {
-  int offset = p->p;
+  size_t offset = p->p;
   offset = offset * (offset-1) / 2;
   double sigma_0 = gsl_vector_get(p->alpha12sigma, 2*offset);
   if(sigma_0 > 0.0)
@@ -81,7 +81,7 @@ static int is_positive_definite(mcmclib_mcar_tilde_lpdf* p) {
 
 static void get_Lambda_L(gsl_matrix* Lambda_L, const gsl_matrix* A,
 			 const gsl_matrix* B_tilde) {
-  int p = A->size1;
+  const size_t p = A->size1;
   gsl_matrix_set_zero(Lambda_L);
   gsl_matrix* AB = gsl_matrix_alloc(p, p);
   gsl_matrix_memcpy(AB, B_tilde);
@@ -91,9 +91,8 @@ static void get_Lambda_L(gsl_matrix* Lambda_L, const gsl_matrix* A,
   gsl_matrix_free(AB);
 }
 
-static inline void block_memcpy(gsl_matrix* dest, int i, int j, const gsl_matrix* src) {
-  gsl_matrix_view block_view = gsl_matrix_submatrix(dest, i, j,
-						    src->size1, src->size2);
+static inline void block_memcpy(gsl_matrix* dest, size_t i, size_t j, const gsl_matrix* src) {
+  gsl_matrix_view block_view = gsl_matrix_submatrix(dest, i, j, src->size1, src->size2);
   gsl_matrix_memcpy(&block_view.matrix, src);
 }
 
@@ -102,7 +101,7 @@ int mcmclib_mcar_tilde_lpdf_update_blocks(mcmclib_mcar_tilde_lpdf* p) {
   gsl_matrix* Gammai = p->Gammai;
   gsl_matrix* Block = p->Block;
 
-  int n = p->n;
+  const size_t n = p->n;
   gsl_matrix* A = gsl_matrix_alloc(p->p, p->p);
   gsl_matrix_memcpy(A, p->Gamma);
   int status = mcmclib_cholesky_decomp(A);
@@ -113,19 +112,19 @@ int mcmclib_mcar_tilde_lpdf_update_blocks(mcmclib_mcar_tilde_lpdf* p) {
   gsl_matrix* A1 = gsl_matrix_alloc(p->p, p->p);
   gsl_matrix_memcpy(A1, A);
   gsl_linalg_cholesky_invert(A1);
-  for(int i=0; i<(p->p - 1); i++)
-    for (int j=i+1; j < p->p; j++)
+  for(size_t i=0; i<(p->p - 1); i++)
+    for (size_t j=i+1; j < p->p; j++)
       gsl_matrix_set(A, i, j, 0.0);
 
   get_Lambda_L(Lambda_ij, A, p->B_tilde);
   gsl_matrix_free(A);
 
   gsl_matrix_set_zero(p->vcov);
-  for(int i=0; i<n; i++) {
+  for(size_t i=0; i<n; i++) {
     double mi = gsl_vector_get(p->m, i);
     gsl_matrix_memcpy(Gammai, A1);
     gsl_matrix_scale(Gammai, mi);
-    for(int j=i; j<n; j++) {
+    for(size_t j=i; j<n; j++) {
       if(i == j) {
 	block_memcpy(p->vcov, i * p->p, j * p->p, Gammai);
       } else if (gsl_matrix_get(p->M, i, j) == 1.0) {
