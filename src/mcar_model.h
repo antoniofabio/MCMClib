@@ -39,7 +39,7 @@ double mcmclib_mcar_model_alpha12sigma_lpdf(void* in_p, gsl_vector* alpha12sigma
 double mcmclib_mcar_model_alphasigma_lpdf(void* in_p, gsl_vector* alphasigma);
 
 /** phij full conditional log-distribution */
-double mcmclib_mcar_model_phi_fcond(mcmclib_mcar_model* in_p, int i, gsl_vector* x);
+double mcmclib_mcar_model_phi_fcond(mcmclib_mcar_model* in_p, size_t i, gsl_vector* x);
 
 /**@}*/
 /**@}*/

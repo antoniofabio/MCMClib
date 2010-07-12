@@ -21,10 +21,10 @@ mcmclib_mcar_model* mcmclib_mcar_model_alloc(mcmclib_mcar_tilde_lpdf* m, gsl_vec
   a->lpdf = m;
   a->e = e;
 
-  int p = m->p;
+  size_t p = m->p;
   gsl_matrix* V = gsl_matrix_alloc(p, p);
   gsl_matrix_set_identity(V);
-  a->w = mcmclib_iwishart_lpdf_alloc(V, p);
+  a->w = mcmclib_iwishart_lpdf_alloc(V, (unsigned int) p);
   gsl_matrix_free(V);
   return a;
 }
@@ -38,16 +38,16 @@ static double alphaij_logderiv(double x) {
   return x - 2 * log(exp(x) + 1.0);
 }
 
-static double alpha12sigma_logderiv(int p, const gsl_vector* x) {
+static double alpha12sigma_logderiv(size_t p, const gsl_vector* x) {
   double ans = 0.0;
-  const int offset = p*(p-1);
-  for(int n=0; n < offset; n++) {
+  const size_t offset = p*(p-1);
+  for(size_t n=0; n < offset; n++) {
     double xn = gsl_vector_get(x, n);
-    if(abs(xn) >= log(M_PI / TOL - 1.0))
+    if(fabs(xn) >= log(M_PI / TOL - 1.0))
       return log(0.0);
     ans += alphaij_logderiv(xn);
   }
-  for(int n=offset; n < x->size; n++) {
+  for(size_t n=offset; n < x->size; n++) {
     double xn = gsl_vector_get(x, n);
     if((xn <= log(TOL)) || (xn >= log(1.0 - TOL)))
       return log(0.0);
@@ -58,7 +58,7 @@ static double alpha12sigma_logderiv(int p, const gsl_vector* x) {
 
 double mcmclib_mcar_model_alpha12sigma_lpdf(void* in_p, gsl_vector* alpha12sigma) {
   mcmclib_mcar_model* p = (mcmclib_mcar_model*) in_p;
-  int n = p->lpdf->p;
+  const size_t n = p->lpdf->p;
   gsl_vector_view s_v = gsl_vector_subvector(alpha12sigma, n*(n-1), n);
   if(!mcmclib_vector_is_sorted_desc(&s_v.vector))
     return log(0.0);
@@ -74,16 +74,16 @@ double mcmclib_mcar_model_alpha12sigma_lpdf(void* in_p, gsl_vector* alpha12sigma
   return ans + prior;
 }
 
-static double alphasigma_logderiv(int p, const gsl_vector* x) {
+static double alphasigma_logderiv(size_t p, const gsl_vector* x) {
   double ans = 0.0;
-  int offset = p*(p-1)/2;
-  for(int n=0; n < offset; n++) {
+  const size_t offset = p*(p-1)/2;
+  for(size_t n=0; n < offset; n++) {
     double xn = gsl_vector_get(x, n);
-    if(abs(xn) >= log(M_PI / TOL - 1.0))
+    if(fabs(xn) >= log(M_PI / TOL - 1.0))
       return log(0.0);
     ans += alphaij_logderiv(xn);
   }
-  for(int n=offset; n < x->size; n++) {
+  for(size_t n=offset; n < x->size; n++) {
     double xn = gsl_vector_get(x, n);
     if(xn <= log(TOL))
       return log(0.0);
@@ -95,7 +95,7 @@ static double alphasigma_logderiv(int p, const gsl_vector* x) {
 double mcmclib_mcar_model_alphasigma_lpdf(void* in_p, gsl_vector* alphasigma) {
   mcmclib_mcar_model* p = (mcmclib_mcar_model*) in_p;
 
-  const int n = p->lpdf->p;
+  const size_t n = p->lpdf->p;
   gsl_vector_view s_v = gsl_vector_subvector(alphasigma, n*(n-1)/2, n);
   if(!mcmclib_vector_is_sorted_desc(&s_v.vector))
     return log(0.0);
@@ -115,12 +115,12 @@ double mcmclib_mcar_model_alphasigma_lpdf(void* in_p, gsl_vector* alphasigma) {
   return ans;
 }
 
-double mcmclib_mcar_model_phi_fcond(mcmclib_mcar_model* in_p, int i, gsl_vector* x) {
+double mcmclib_mcar_model_phi_fcond(mcmclib_mcar_model* in_p, size_t i, gsl_vector* x) {
   mcmclib_mcar_tilde_lpdf* lpdf = in_p->lpdf;
-  const int p = lpdf->p;
+  const size_t p = lpdf->p;
   if(x->size != p) {
     static char msg[1024];
-    sprintf(msg, "'x' vector size is %ld, it should be %d", x->size, p);
+    sprintf(msg, "'x' vector size is %zd, it should be %zd", x->size, p);
     GSL_ERROR(msg, GSL_FAILURE);
   }
   assert(x->size == p);
@@ -129,7 +129,7 @@ double mcmclib_mcar_model_phi_fcond(mcmclib_mcar_model* in_p, int i, gsl_vector*
   gsl_matrix* Lambdaij = lpdf->Lambda_ij;
   gsl_vector* mean = gsl_vector_alloc(p);
   gsl_vector_set_zero(mean);
-  for(int j=0; j < lpdf->n; j++) {
+  for(size_t j=0; j < lpdf->n; j++) {
     if(gsl_matrix_get(W, i, j) == 1.0) {
       gsl_vector_view phij_v = gsl_vector_subvector(in_p->e, j*p, p);
       gsl_blas_dgemv(CblasNoTrans, mi, Lambdaij, &phij_v.vector, 1.0, mean);

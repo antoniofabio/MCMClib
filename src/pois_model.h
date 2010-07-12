@@ -37,9 +37,9 @@ int mcmclib_pois_model_set_prior_mean(mcmclib_pois_model* p, const gsl_vector* b
 int mcmclib_pois_model_set_prior_var(mcmclib_pois_model* p, const gsl_matrix* B0);
 int mcmclib_pois_model_set_offset(mcmclib_pois_model* p, const gsl_vector* offset);
 
-double mcmclib_pois_model_llik(mcmclib_pois_model* p, gsl_vector* x);
-double mcmclib_pois_model_lprior(mcmclib_pois_model* p, gsl_vector* x);
-double mcmclib_pois_model_lpdf(void* in_p, gsl_vector* x);
+double mcmclib_pois_model_llik(mcmclib_pois_model* p, const gsl_vector* x);
+double mcmclib_pois_model_lprior(mcmclib_pois_model* p, const gsl_vector* x);
+double mcmclib_pois_model_lpdf(void* in_p, const gsl_vector* x);
 
 typedef struct {
   mcmclib_pois_model* model;
@@ -51,7 +51,7 @@ mcmclib_pmodel_sampler* mcmclib_pmodel_sampler_alloc(const gsl_matrix* X,
 						     const gsl_vector* offset,
 						     gsl_rng* rng,
 						     double sigma0,
-						     int burnin);
+						     size_t burnin);
 
 void mcmclib_pmodel_sampler_free(mcmclib_pmodel_sampler* p);
 

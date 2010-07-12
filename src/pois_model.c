@@ -19,8 +19,8 @@
 
 mcmclib_pois_model* mcmclib_pois_model_alloc(const gsl_matrix* X, const gsl_vector* y) {
   mcmclib_pois_model* a = (mcmclib_pois_model*) malloc(sizeof(mcmclib_pois_model));
-  const int n = X->size1;
-  const int p = X->size2;
+  const size_t n = X->size1;
+  const size_t p = X->size2;
   assert(y->size == n);
   a->X = gsl_matrix_alloc(n, p);
   gsl_matrix_memcpy(a->X, X);
@@ -74,22 +74,22 @@ static double lpois(double k, double lmu) {
   return lmu * k - exp(lmu);
 }
 
-double mcmclib_pois_model_llik(mcmclib_pois_model* p, gsl_vector* x) {
+double mcmclib_pois_model_llik(mcmclib_pois_model* p, const gsl_vector* x) {
   double ans = 0.0;
   gsl_vector_set_zero(p->mu);
   gsl_blas_dgemv(CblasNoTrans, 1.0, p->X, p->beta, 0.0, p->mu);
   if(p->offset)
     gsl_vector_add(p->mu, p->offset);
-  for(int i=0; i < p->X->size1; i++)
+  for(size_t i=0; i < p->X->size1; i++)
     ans += lpois(gsl_vector_get(p->y, i), gsl_vector_get(p->mu, i));
   return ans;
 }
 
-double mcmclib_pois_model_lprior(mcmclib_pois_model* p, gsl_vector* x) {
+double mcmclib_pois_model_lprior(mcmclib_pois_model* p, const gsl_vector* x) {
   return mcmclib_mvnorm_lpdf_noinv(p->b0, p->B0, x, p->ldet, p->work1, p->work2);
 }
 
-double mcmclib_pois_model_lpdf(void* in_p, gsl_vector* x) {
+double mcmclib_pois_model_lpdf(void* in_p, const gsl_vector* x) {
   mcmclib_pois_model* p = (mcmclib_pois_model*) in_p;
   return mcmclib_pois_model_lprior(p, x) + mcmclib_pois_model_llik(p, x);
 }
@@ -99,7 +99,7 @@ mcmclib_pmodel_sampler* mcmclib_pmodel_sampler_alloc(const gsl_matrix* X,
 						     const gsl_vector* offset,
 						     gsl_rng* rng,
 						     double sigma0,
-						     int burnin) {
+						     size_t burnin) {
   mcmclib_pmodel_sampler* a = (mcmclib_pmodel_sampler*) malloc(sizeof(mcmclib_pmodel_sampler));
   a->model = mcmclib_pois_model_alloc(X, y);
   if(offset)
