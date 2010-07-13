@@ -10,7 +10,7 @@
 mcmclib_iwishart_lpdf* mcmclib_iwishart_lpdf_alloc(gsl_matrix* Psi, int m);
 void mcmclib_iwishart_lpdf_free(mcmclib_iwishart_lpdf* p);
 %callback("%s_cb");
-double mcmclib_iwishart_lpdf_compute(void* p, gsl_vector* x);
+double mcmclib_iwishart_lpdf_compute(void* p, const gsl_vector* x);
 %nocallback;
 
 /*Multivariate normal distribution*/
@@ -40,14 +40,14 @@ typedef struct {
 }
 
 %callback("%s_cb");
-double mcmclib_mvnorm_lpdf_compute(void* in_p, gsl_vector* x);
+double mcmclib_mvnorm_lpdf_compute(void* in_p, const gsl_vector* x);
 %nocallback;
 int mcmclib_mvnorm_lpdf_chol(mcmclib_mvnorm_lpdf* p);
-double mcmclib_mvnorm_lpdf_compute_nochol(mcmclib_mvnorm_lpdf* p, gsl_vector* x);
+double mcmclib_mvnorm_lpdf_compute_nochol(mcmclib_mvnorm_lpdf* p, const gsl_vector* x);
 void mcmclib_mvnorm_lpdf_inverse(mcmclib_mvnorm_lpdf* p);
-double mcmclib_mvnorm_lpdf_compute_noinv(mcmclib_mvnorm_lpdf* p, gsl_vector* x);
-double mcmclib_mvnorm_lpdf_noinv(gsl_vector* mu, gsl_matrix* iSigma, gsl_vector* x,
-				 double ldet, gsl_vector* work1, gsl_vector* work2);
+double mcmclib_mvnorm_lpdf_compute_noinv(mcmclib_mvnorm_lpdf* p, const gsl_vector* x);
+double mcmclib_mvnorm_lpdf_noinv(const gsl_vector* mu, const gsl_matrix* iSigma, const gsl_vector* x,
+				 const double ldet, gsl_vector* work1, gsl_vector* work2);
 double mcmclib_mvnormzp_lpdf(const gsl_matrix* Psi, const gsl_vector* y);
 
 %array_functions(mcmclib_mvnorm_lpdf*, mvnormArray);
@@ -63,13 +63,13 @@ typedef struct {
   }
 }
 %callback("%s_cb");
-double mcmclib_mixnorm_lpdf_compute(void* p, gsl_vector* x);
+double mcmclib_mixnorm_lpdf_compute(void* p, const gsl_vector* x);
 %nocallback;
 
 /*MCAR distribution*/
 typedef struct {
-  int p; /**< dimension */
-  int n; /**< number of points */
+  size_t p; /**< dimension */
+  size_t n; /**< number of points */
 
   gsl_matrix* B_tilde; /**< variance par. matrix (p x p) */
   gsl_vector* alpha12sigma; /**< Givens angles and sing. values repr. of
@@ -84,7 +84,7 @@ typedef struct {
 } mcmclib_mcar_tilde_lpdf;
 
 %extend mcmclib_mcar_tilde_lpdf {
-  mcmclib_mcar_tilde_lpdf(int p, gsl_matrix* M) {
+  mcmclib_mcar_tilde_lpdf(size_t p, gsl_matrix* M) {
     return mcmclib_mcar_tilde_lpdf_alloc(p, M);
   }
   ~mcmclib_mcar_tilde_lpdf() {
@@ -92,7 +92,7 @@ typedef struct {
   }
 }
 %callback("%s_cb");
-double mcmclib_mcar_tilde_lpdf_compute(void* in_p, gsl_vector* x);
+double mcmclib_mcar_tilde_lpdf_compute(void* in_p, const gsl_vector* x);
 %nocallback;
 
 void mcmclib_mcar_tilde_lpdf_update_B_tilde(mcmclib_mcar_tilde_lpdf* p);
@@ -118,7 +118,7 @@ typedef struct {
 double mcmclib_mcar_model_alpha12sigma_lpdf(void* in_p, gsl_vector* alpha12sigma);
 double mcmclib_mcar_model_alphasigma_lpdf(void* in_p, gsl_vector* alphasigma);
 %nocallback;
-double mcmclib_mcar_model_phi_fcond(mcmclib_mcar_model* in_p, int i, gsl_vector* x);
+double mcmclib_mcar_model_phi_fcond(mcmclib_mcar_model* in_p, size_t i, gsl_vector* x);
 
 /*Poisson model sampler*/
 typedef struct {

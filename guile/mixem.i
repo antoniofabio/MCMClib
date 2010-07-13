@@ -12,7 +12,7 @@ typedef struct {
 		       gsl_matrix** Sigma,
 		       gsl_vector* beta,
 		       double eta_eps,
-		       int n0) {
+		       size_t n0) {
     return mcmclib_mixem_online_alloc(mu, Sigma, beta, eta_eps, n0);
   }
   ~mcmclib_mixem_online() {

@@ -3,14 +3,14 @@
 #include <gauss_rw.h>
 #include <gauss_mrw.h>
 
-  double mcmclib_guile_lpdf(void* p, gsl_vector* x) {
+  double mcmclib_guile_lpdf(void* p, const gsl_vector* x) {
     SCM sx = SWIG_NewPointerObj(x, SWIGTYPE_p_gsl_vector, 0);
     SCM ans = scm_call_1((SCM) p, sx);
     return scm_to_double(ans);
   }
 %}
 
-typedef double (*distrfun_p) (void* data, gsl_vector* x);
+typedef double (*distrfun_p) (void* data, const gsl_vector* x);
 
 %typemap(in) (distrfun_p f, void* data) {
   scm_permanent_object($input); /*FIXME. Maybe solve it by proper use of '$owner'*/
