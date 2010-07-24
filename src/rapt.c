@@ -12,10 +12,40 @@
 #include "mvnorm.h"
 #include "vector_stats.h"
 
-mcmclib_rapt_suff* mcmclib_rapt_suff_alloc(size_t t0, size_t K, size_t dim) {
-  mcmclib_rapt_suff* a = (mcmclib_rapt_suff*) malloc(sizeof(mcmclib_rapt_suff));
-  a->t0 = t0;
+/**\brief RAPT sufficient statistics*/
+typedef struct {
+  size_t t; /**current iteration number*/
+  gsl_vector** means; /**< array of regions means*/
+  gsl_matrix** variances; /**< array of regions variances*/
+  gsl_vector* global_mean;
+  gsl_matrix* global_variance;
+  gsl_vector* n; /**< number of visits in each region*/
 
+  /*internal data*/
+  gsl_matrix* Sigma_eps; /**< additive perturbation factor for variances updating*/
+  gsl_vector* workspace; /**< utility workspace memory*/
+  double scaling_factor_local; /**< local proposal variance scaling factor*/
+  double scaling_factor_global; /**< global proposal variance scaling factor*/
+  
+  region_fun_t which_region_fun;
+  void* which_region_data;
+} rapt_suff;
+
+static void rapt_suff_set_correction_factor(rapt_suff* p, const double eps) {
+  gsl_matrix_set_identity(p->Sigma_eps);
+  gsl_matrix_scale(p->Sigma_eps, eps);
+}
+
+static void rapt_suff_set_scaling_factors(rapt_suff* p, const double local, const double global) {
+  p->scaling_factor_local = local;
+  p->scaling_factor_global = global;
+}
+
+static rapt_suff* rapt_suff_alloc(mcmclib_rapt_gamma* gamma) {
+  rapt_suff* a = (rapt_suff*) malloc(sizeof(rapt_suff));
+  const size_t K = gamma->K;
+  const size_t dim = gamma->sigma_whole->size1;
+  a->t = 0;
   a->means = (gsl_vector**) malloc(K * sizeof(gsl_vector*));
   a->variances = (gsl_matrix**) malloc(K * sizeof(gsl_matrix*));
   for(size_t k=0; k<K; k++) {
@@ -30,15 +60,17 @@ mcmclib_rapt_suff* mcmclib_rapt_suff_alloc(size_t t0, size_t K, size_t dim) {
   gsl_vector_set_all(a->n, 0.0);
   a->Sigma_eps = gsl_matrix_alloc(dim, dim);
 
-  mcmclib_rapt_suff_set_correction_factor(a, 0.001);
+  rapt_suff_set_correction_factor(a, 0.001);
   double sf = 2.38 * 2.38 / ((double) dim);
-  mcmclib_rapt_suff_set_scaling_factors(a, sf, sf);
+  rapt_suff_set_scaling_factors(a, sf, sf);
 
+  a->which_region_fun = gamma->which_region;
+  a->which_region_data = gamma->which_region_data;
   return a;
 }
 
-void mcmclib_rapt_suff_free(void* in_p) {
-  mcmclib_rapt_suff* p = (mcmclib_rapt_suff*) in_p;
+static void rapt_suff_free(void* in_p) {
+  rapt_suff* p = (rapt_suff*) in_p;
   size_t K = p->n->size;
   gsl_vector_free(p->n);
   for(size_t k=0; k< K; k++) {
@@ -54,71 +86,52 @@ void mcmclib_rapt_suff_free(void* in_p) {
   free(p);
 }
 
-void mcmclib_rapt_update(mcmclib_amh* p);
-
-mcmclib_amh* mcmclib_rapt_alloc(gsl_rng* r,
-				distrfun_p logdistr, void* logdistr_data,
-				gsl_vector* x,
-				size_t t0,
-				const gsl_matrix* sigma_whole,
-				size_t K,
-				gsl_matrix** sigma_local,
-				region_fun_t which_region,
-				void* which_region_data) {
-  size_t dim = x->size;
-
-  mcmclib_mh_q* q = mcmclib_rapt_q_alloc(r,
-					 sigma_whole, K, sigma_local,
-					 which_region, which_region_data);
-  mcmclib_mh* mh = mcmclib_mh_alloc(r, logdistr, logdistr_data, q, x);
-  mcmclib_rapt_suff* suff = mcmclib_rapt_suff_alloc(t0, K, dim);
-
-  return mcmclib_amh_alloc(mh, suff, mcmclib_rapt_update,
-			   mcmclib_rapt_suff_free);
+static void rapt_suff_update(void* in_suff, const gsl_vector* x) {
+  rapt_suff* s = (rapt_suff*) in_suff;
+  s->t ++;
+  const size_t k = s->which_region_fun(s->which_region_data, x);
+  size_t fake_n = (size_t) gsl_vector_get(s->n, k);
+  mcmclib_covariance_update(s->variances[k], s->means[k], &fake_n, x);
+  fake_n = (size_t) (s->t - 1);
+  mcmclib_covariance_update(s->global_variance, s->global_mean, &fake_n, x);
+  gsl_vector_set(s->n, k, gsl_vector_get(s->n, k) + 1);
 }
 
-void mcmclib_rapt_update_proposals_custom(mcmclib_amh* p,
-					  gsl_matrix** variances,
-					  gsl_matrix* global_variance) {
-  mcmclib_rapt_gamma* g = (mcmclib_rapt_gamma*) p->mh->q->gamma;
-  mcmclib_rapt_suff* s = (mcmclib_rapt_suff*) p->suff;
-  mcmclib_rapt_q_update_proposals_custom(g, variances, global_variance,
+static void rapt_gamma_update(void* suff, void* gamma) {
+  rapt_suff* s = (rapt_suff*) suff;
+  mcmclib_rapt_gamma* g = (mcmclib_rapt_gamma*) gamma;
+  mcmclib_rapt_q_update_proposals_custom(g,
+					 s->variances, s->global_variance,
 					 s->Sigma_eps,
 					 s->scaling_factor_local,
 					 s->scaling_factor_global);
 }
 
-void mcmclib_rapt_update_proposals(mcmclib_amh* p) {
-  mcmclib_rapt_suff* s = (mcmclib_rapt_suff*) p->suff;
-  if((p->n) <= s->t0)
-    return;
-  mcmclib_rapt_update_proposals_custom(p, s->variances, s->global_variance);
+mcmclib_amh* mcmclib_rapt_alloc(gsl_rng* r,
+				distrfun_p logdistr, void* logdistr_data,
+				gsl_vector* x,
+				const size_t t0,
+				const gsl_matrix* sigma_whole,
+				size_t K,
+				gsl_matrix** sigma_local,
+				region_fun_t which_region,
+				void* which_region_data) {
+  mcmclib_mh_q* q = mcmclib_rapt_q_alloc(r,
+					 sigma_whole, K, sigma_local,
+					 which_region, which_region_data);
+  mcmclib_mh* mh = mcmclib_mh_alloc(r, logdistr, logdistr_data, q, x);
+  rapt_suff* suff = rapt_suff_alloc(q->gamma);
+
+  return mcmclib_amh_alloc(mh, t0, suff, rapt_suff_free, rapt_suff_update,
+			   rapt_gamma_update);
 }
 
-void mcmclib_rapt_update_suff(mcmclib_amh* p) {
-  mcmclib_rapt_suff* s = (mcmclib_rapt_suff*) p->suff;
-  mcmclib_mh* mh = p->mh;
-  mcmclib_rapt_gamma* g = (mcmclib_rapt_gamma*) mh->q->gamma;
-  gsl_vector* x = mh->x;
-  size_t k = g->which_region_x = g->which_region(g->which_region_data, x);
-  size_t fake_n = (size_t) gsl_vector_get(s->n, k);
-  mcmclib_covariance_update(s->variances[k], s->means[k], &fake_n, x);
-  fake_n = (size_t) (p->n - 1);
-  mcmclib_covariance_update(s->global_variance, s->global_mean, &fake_n, x);
-  gsl_vector_set(s->n, g->which_region_x, gsl_vector_get(s->n, g->which_region_x) + 1);
+void mcmclib_rapt_set_correction_factor(mcmclib_amh* p, const double eps) {
+  rapt_suff* s = (rapt_suff*) p->suff;
+  rapt_suff_set_correction_factor(s, eps);
 }
 
-void mcmclib_rapt_update(mcmclib_amh* p) {
-  mcmclib_rapt_update_suff(p);
-  mcmclib_rapt_update_proposals(p);
-}
-
-void mcmclib_rapt_suff_set_correction_factor(mcmclib_rapt_suff* p, double eps) {
-  gsl_matrix_set_identity(p->Sigma_eps);
-  gsl_matrix_scale(p->Sigma_eps, eps);
-}
-
-void mcmclib_rapt_suff_set_scaling_factors(mcmclib_rapt_suff* p, double local, double global) {
-  p->scaling_factor_local = local;
-  p->scaling_factor_global = global;
+void mcmclib_rapt_set_scaling_factors(mcmclib_amh* p, const double local, const double global) {
+  rapt_suff* s = (rapt_suff*) p->suff;
+  rapt_suff_set_scaling_factors(s, local, global);
 }

@@ -19,22 +19,6 @@
 \brief Regional AdaPTive
 @{*/
 
-/**\brief RAPT sufficient statistics*/
-typedef struct {
-  size_t t0; /**< burn-in length*/
-  gsl_vector** means; /**< array of regions means*/
-  gsl_matrix** variances; /**< array of regions variances*/
-  gsl_vector* global_mean;
-  gsl_matrix* global_variance;
-  gsl_vector* n; /**< number of visits in each region*/
-
-  /*internal data*/
-  gsl_matrix* Sigma_eps; /**< additive perturbation factor for variances updating*/
-  gsl_vector* workspace; /**< utility workspace memory*/
-  double scaling_factor_local; /**< local proposal variance scaling factor*/
-  double scaling_factor_global; /**< global proposal variance scaling factor*/
-} mcmclib_rapt_suff;
-
 /** alloc a new RAPT sampler object
 @param r RNG state
 @param logdistr pointer to a log-likelihood function
@@ -72,10 +56,10 @@ void mcmclib_rapt_update_proposals_custom(mcmclib_amh* p,
 					  gsl_matrix* global_variance);
 
 /** customly set additive variance correction factor */
-void mcmclib_rapt_suff_set_correction_factor(mcmclib_rapt_suff* p, double eps);
+void mcmclib_rapt_set_correction_factor(mcmclib_amh* p, const double eps);
 
 /** customly set local and global scaling factors */
-void mcmclib_rapt_suff_set_scaling_factors(mcmclib_rapt_suff* p, double local, double global);
+void mcmclib_rapt_set_scaling_factors(mcmclib_amh* p, const double local, const double global);
 
 /**@}*/
 /**@}*/
