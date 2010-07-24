@@ -61,7 +61,7 @@ void mcmclib_mixem_online_free(mcmclib_mixem_online* p) {
 }
 
 /*update sufficient statistic*/
-static int mixem_compute_si(mcmclib_mixem_online* p, gsl_vector* y) {
+static int mixem_compute_si(mcmclib_mixem_online* p, const gsl_vector* y) {
   const size_t K = p->si->delta->size;
   double delta_sum = 0.0;
   for(size_t k=0; k < K; k++) {
@@ -90,7 +90,7 @@ static int mixem_compute_si(mcmclib_mixem_online* p, gsl_vector* y) {
 
   return 0;
 }
-void mcmclib_mixem_online_update_s(mcmclib_mixem_online* p, gsl_vector* y) {
+void mcmclib_mixem_online_update_s(mcmclib_mixem_online* p, const gsl_vector* y) {
   mixem_compute_si(p, y);
   double eta_n = pow((double) p->n, -0.5 - p->eta_eps);
   mcmclib_mixolem_suff_scale(p->si, eta_n);
@@ -115,7 +115,7 @@ void mcmclib_mixem_online_update_gamma(mcmclib_mixolem_suff* gamma,
   }
 }
 
-void mcmclib_mixem_online_update(mcmclib_mixem_online* p, gsl_vector* y) {
+void mcmclib_mixem_online_update(mcmclib_mixem_online* p, const gsl_vector* y) {
   size_t n = p->n;
   mcmclib_covariance_update(p->Sigma_global, p->mu_global, &n, y);
   (p->n)++;
