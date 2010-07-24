@@ -25,7 +25,7 @@ typedef struct {
 /** free extra AM data*/
 static void gauss_am_suff_free(void* p) {
   if(!p) return;
-  mcmclib_gauss_am_suff* s = (mcmclib_gauss_am_suff*) p;
+  gauss_am_suff* s = (gauss_am_suff*) p;
   gsl_matrix_free(s->Sigma_eps);
   gsl_matrix_free(s->Sigma_zero);
   gsl_vector_free(s->sum_x);
@@ -92,12 +92,12 @@ mcmclib_amh* mcmclib_gauss_am_alloc(gsl_rng* r,
 
 void mcmclib_gauss_am_set_sf(mcmclib_amh* p, double sf) {
   assert(sf > 0.0);
-  ((mcmclib_gauss_am_suff*) (p->suff))->sf = sf;
+  ((gauss_am_suff*) (p->suff))->sf = sf;
 }
 
 void mcmclib_gauss_am_set_eps(mcmclib_amh* p, double eps) {
   assert(eps > 0.0);
-  mcmclib_gauss_am_suff* s = (mcmclib_gauss_am_suff*) p->suff;
+  gauss_am_suff* s = (gauss_am_suff*) p->suff;
   gsl_matrix_set_identity(s->Sigma_eps);
   gsl_matrix_scale(s->Sigma_eps, eps);
 }
