@@ -41,20 +41,6 @@ mcmclib_amh* mcmclib_rapt_alloc(gsl_rng* r,
 				region_fun_t which_region,
 				void* which_region_data);
 
-/** free  data*/
-void mcmclib_rapt_free(mcmclib_amh* p);
-
-/** update local and global proposals covariance matrices
-basing on current (region-specific) sample variances*/
-void mcmclib_rapt_update_proposals(mcmclib_amh* p);
-
-/** update local and global proposals covariance matrices
-using custom estimated local and global variances
- */
-void mcmclib_rapt_update_proposals_custom(mcmclib_amh* p,
-					  gsl_matrix** variances,
-					  gsl_matrix* global_variance);
-
 /** customly set additive variance correction factor */
 void mcmclib_rapt_set_correction_factor(mcmclib_amh* p, const double eps);
 
