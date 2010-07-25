@@ -5,7 +5,8 @@
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
-#include <rapt.h>
+#include "rapt.c"
+#include "CuTest.h"
 
 #define N 1000
 #define DIM 1
@@ -14,9 +15,6 @@
 #define T0 100
 
 #define TOL 1e-6
-static int check_dequal(double a, double b) {
-  return (fabs(a-b) < TOL);
-}
 
 #define v0(x) gsl_vector_get(x, 0)
 #define x0 v0(x)
@@ -34,7 +32,7 @@ static double dunif(void* ignore, const gsl_vector* x) {
   return log(0.0);
 }
 
-int main() {
+void Testrapt(CuTest* tc) {
   gsl_vector* x = gsl_vector_alloc(DIM);
   gsl_vector_set_all(x, 0.0);
 
@@ -64,8 +62,7 @@ int main() {
 				      x, T0,
 				      sigma_whole, K, sigma_local,
 				      which_region, NULL);
-  mcmclib_rapt_gamma* g = (mcmclib_rapt_gamma*) s->mh->q->gamma;
-  mcmclib_rapt_suff* suff = (mcmclib_rapt_suff*) s->suff;
+  rapt_suff* suff = (rapt_suff*) s->suff;
 
   /*Main MCMC loop*/
   gsl_matrix* X = gsl_matrix_alloc(N, DIM);
@@ -75,10 +72,10 @@ int main() {
 
     gsl_vector_view Xn = gsl_matrix_row(X, n);
     gsl_vector_memcpy(&(Xn.vector), x);
-    gsl_vector_set(which_region_n, n, (double) g->which_region_x);
-    means[g->which_region_x] += x0;
-    variances[g->which_region_x] += x0 * x0;
-    nk[g->which_region_x] += 1.0;
+    gsl_vector_set(which_region_n, n, (double) which_region(NULL, x));
+    means[which_region(NULL, x)] += x0;
+    variances[which_region(NULL, x)] += x0 * x0;
+    nk[which_region(NULL, x)] += 1.0;
     mean += x0;
     variance += x0 * x0;
   }
@@ -92,13 +89,14 @@ int main() {
   }
 
   /*check results*/
-  assert(suff->t0 == T0);
-  assert(check_dequal(mean, v0(suff->global_mean)));
-  assert(check_dequal(variance, m00(suff->global_variance)));
+  CuAssertDblEquals(tc, mean, v0(suff->global_mean), TOL);
+  CuAssertDblEquals(tc, variance, m00(suff->global_variance), TOL);
+  static char kmsg[3];
   for(size_t k=0; k<K; k++) {
-    assert(check_dequal(nk[k], gsl_vector_get(suff->n, k)));
-    assert(check_dequal(means[k], v0(suff->means[k])));
-    assert(check_dequal(variances[k], m00(suff->variances[k])));
+    sprintf(kmsg, "%zd", k);
+    CuAssertDblEquals_Msg(tc, kmsg, nk[k], gsl_vector_get(suff->n, k), TOL);
+    CuAssertDblEquals_Msg(tc, kmsg, means[k], v0(suff->means[k]), TOL);
+    CuAssertDblEquals_Msg(tc, kmsg, variances[k], m00(suff->variances[k]), TOL);
   }
 
   /*free memory*/
@@ -110,6 +108,4 @@ int main() {
   mcmclib_amh_free(s);
   gsl_rng_free(rng);
   gsl_vector_free(which_region_n);
-
-  return 0;
 }
