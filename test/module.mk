@@ -23,7 +23,7 @@ test: test/AllTests
 $(TEST_OBJ):%.o: %.c
 	$(CC) -c $< $(TEST_CFLAGS) -o $@
 
-test/AllTests.c: $(wildcard test/*.c) $(wildcard test/*.h)
+test/AllTests.c: $(TEST_names:%=test/%.c)
 	cd test; ./make-tests.sh > AllTests.c
 
 test/AllTests: test/AllTests.c src/libmcmclib.a test/CuTest.o $(TEST_OBJ)
