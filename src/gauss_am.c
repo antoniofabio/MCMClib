@@ -12,9 +12,20 @@
 #include "gauss_am.h"
 #include "gauss_mrw.h"
 
-void mcmclib_gauss_am_suff_free(void* p) {
+/**\brief Gaussian AM cumulated sufficient statistics and support data*/
+typedef struct {
+  size_t t; /**< number of iterations so far */
+  gsl_vector* sum_x; /**< cumulated sum of xs*/
+  gsl_matrix* sum_xx; /**< cumulated sum of xxs*/
+  gsl_matrix* Sigma_eps; /**< pos. definiteness cov. correction additive constant*/
+  gsl_matrix* Sigma_zero; /**< starting proposal covariance matrix*/
+  double sf; /**< scaling factor*/
+} gauss_am_suff;
+
+/** free extra AM data*/
+static void gauss_am_suff_free(void* p) {
   if(!p) return;
-  mcmclib_gauss_am_suff* s = (mcmclib_gauss_am_suff*) p;
+  gauss_am_suff* s = (gauss_am_suff*) p;
   gsl_matrix_free(s->Sigma_eps);
   gsl_matrix_free(s->Sigma_zero);
   gsl_vector_free(s->sum_x);
@@ -22,50 +33,47 @@ void mcmclib_gauss_am_suff_free(void* p) {
   free(s);
 }
 
-void mcmclib_gauss_am_update_suff(mcmclib_gauss_am_suff* s, const gsl_vector* x) {
+static void gauss_am_update_suff(void* in_s, const gsl_vector* x) {
+  gauss_am_suff* s = (gauss_am_suff*) in_s;
+  s->t++;
   gsl_vector_add(s->sum_x, x);
   gsl_matrix_const_view x_cv = gsl_matrix_const_view_array(x->data, x->size, 1);
   const gsl_matrix* x_cm = &(x_cv.matrix);
   gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1.0, x_cm, x_cm, 1.0, s->sum_xx);
 }
 
-void mcmclib_gauss_am_update_gamma(mcmclib_amh* p) {
-  mcmclib_gauss_am_suff* s = p->suff;
-  size_t t0 = s->t0;
-  size_t t = p->n;
+/** AM gamma update function \internal */
+static void gauss_am_update_gamma(void* in_suff, void* in_gamma) {
+  gauss_am_suff* s = (gauss_am_suff*) in_suff;
+  gsl_matrix* Sigma = (gsl_matrix*) in_gamma;
+  const size_t t = s->t;
 
-  mcmclib_gauss_am_update_suff(s, p->mh->x);
+  const size_t d = Sigma->size1;
+  gsl_vector* mean = gsl_vector_alloc(d);
+  gsl_vector_memcpy(mean, s->sum_x);
+  gsl_vector_scale(mean, 1.0 / (double) t);
+  gsl_matrix_view mean_cv = gsl_matrix_view_array(mean->data, d, 1);
+  gsl_matrix* mean_cm = &(mean_cv.matrix);
 
-  if(t >= t0) {
-    gsl_matrix* Sigma = (gsl_matrix*) p->mh->q->gamma;
-    const size_t d = p->mh->x->size;
-    gsl_vector* mean = gsl_vector_alloc(d);
-    gsl_vector_memcpy(mean, s->sum_x);
-    gsl_vector_scale(mean, 1.0 / (double) t);
-    gsl_matrix_view mean_cv = gsl_matrix_view_array(mean->data, d, 1);
-    gsl_matrix* mean_cm = &(mean_cv.matrix);
-
-    gsl_matrix_memcpy(Sigma, s->sum_xx);
-    gsl_matrix_scale(Sigma, 1.0 / (double) t);
-    gsl_blas_dgemm(CblasNoTrans, CblasTrans, -1.0, mean_cm, mean_cm, 1.0, Sigma);
-    gsl_matrix_add(Sigma, s->Sigma_eps);
-    gsl_matrix_scale(Sigma, s->sf);
-    gsl_vector_free(mean);
-  }
+  gsl_matrix_memcpy(Sigma, s->sum_xx);
+  gsl_matrix_scale(Sigma, 1.0 / (double) t);
+  gsl_blas_dgemm(CblasNoTrans, CblasTrans, -1.0, mean_cm, mean_cm, 1.0, Sigma);
+  gsl_matrix_add(Sigma, s->Sigma_eps);
+  gsl_matrix_scale(Sigma, s->sf);
+  gsl_vector_free(mean);
 }
 
 mcmclib_amh* mcmclib_gauss_am_alloc(gsl_rng* r,
 				    distrfun_p logdistr, void* logdistr_data,
 				    gsl_vector* start_x,
 				    const gsl_matrix* sigma_zero, size_t t0) {
-  mcmclib_gauss_am_suff* suff = (mcmclib_gauss_am_suff*)
-    malloc(sizeof(mcmclib_gauss_am_suff));
+  gauss_am_suff* suff = (gauss_am_suff*) malloc(sizeof(gauss_am_suff));
   assert(sigma_zero->size1 == sigma_zero->size2);
   assert(start_x->size == sigma_zero->size1);
   const size_t d = start_x->size;
   suff->Sigma_zero = gsl_matrix_alloc(d, d);
   gsl_matrix_memcpy(suff->Sigma_zero, sigma_zero);
-  suff->t0 = t0;
+  suff->t = 0;
   suff->sum_x = gsl_vector_alloc(d);
   gsl_vector_set_zero(suff->sum_x);
   suff->sum_xx = gsl_matrix_alloc(d, d);
@@ -78,18 +86,18 @@ mcmclib_amh* mcmclib_gauss_am_alloc(gsl_rng* r,
 
   return mcmclib_amh_alloc(mcmclib_gauss_mrw_alloc(r, logdistr, logdistr_data,
 						   start_x, sigma_zero),
-			   suff, mcmclib_gauss_am_update_gamma,
-			   mcmclib_gauss_am_suff_free);
+			   t0, suff,
+			   gauss_am_suff_free, gauss_am_update_suff, gauss_am_update_gamma);
 }
 
 void mcmclib_gauss_am_set_sf(mcmclib_amh* p, double sf) {
   assert(sf > 0.0);
-  ((mcmclib_gauss_am_suff*) (p->suff))->sf = sf;
+  ((gauss_am_suff*) (p->suff))->sf = sf;
 }
 
 void mcmclib_gauss_am_set_eps(mcmclib_amh* p, double eps) {
   assert(eps > 0.0);
-  mcmclib_gauss_am_suff* s = (mcmclib_gauss_am_suff*) p->suff;
+  gauss_am_suff* s = (gauss_am_suff*) p->suff;
   gsl_matrix_set_identity(s->Sigma_eps);
   gsl_matrix_scale(s->Sigma_eps, eps);
 }

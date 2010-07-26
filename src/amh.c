@@ -9,14 +9,18 @@
  */
 #include "amh.h"
 
-mcmclib_amh* mcmclib_amh_alloc(mcmclib_mh* mh, void* suff,
-			       mcmclib_amh_update_gamma_p update_gamma,
-			       free_fun_t free_suff) {
+mcmclib_amh* mcmclib_amh_alloc(mcmclib_mh* mh, const size_t n0,
+			       void* suff,
+			       free_fun_t free_suff,
+			       mcmclib_amh_update_suff_t update_suff,
+			       mcmclib_amh_update_gamma_t update_gamma) {
   mcmclib_amh* p = (mcmclib_amh*) malloc(sizeof(mcmclib_amh));
   p->mh = mh;
   p->suff = suff;
+  p->update_suff = update_suff;
   p->update_gamma = update_gamma;
   p->n = 0;
+  p->n0 = n0;
   p->free_suff = free_suff;
   return p;
 }
@@ -36,8 +40,11 @@ void mcmclib_amh_free(mcmclib_amh* p) {
 int mcmclib_amh_update(mcmclib_amh* p) {
   mcmclib_mh_update(p->mh);
   p->n++;
-  if(p->update_gamma) {
-    p->update_gamma(p);
+  if(p->update_suff) {
+    p->update_suff(p->suff, p->mh->x);
+  }
+  if(p->update_gamma && (p->n > p->n0)) {
+    p->update_gamma(p->suff, p->mh->q->gamma);
   }
   return(p->mh->last_accepted);
 }

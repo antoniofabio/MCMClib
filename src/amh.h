@@ -20,26 +20,35 @@
 struct mcmclib_amh_t;
 
 /**\brief Proposal kernel param updating function */
-typedef void (*mcmclib_amh_update_gamma_p) (struct mcmclib_amh_t* p);
+typedef void (*mcmclib_amh_update_gamma_t) (void* suff, void* gamma);
+
+/**\brief Proposal kernel param updating function */
+typedef void (*mcmclib_amh_update_suff_t) (void* suff, const gsl_vector* x);
 
 /**\brief Generic Adaptive Metropolis-Hastings sampler */
 typedef struct mcmclib_amh_t {
   mcmclib_mh* mh;
-  mcmclib_amh_update_gamma_p update_gamma;
+  mcmclib_amh_update_suff_t update_suff; /**< update sufficient statistics*/
+  mcmclib_amh_update_gamma_t update_gamma; /**< update proposal kernel params*/
   size_t n; /**< current iteration number*/
+  size_t n0; /**< adaptation burnin*/
   void* suff; /**< sufficient data accumulated up to current iteration*/
   free_fun_t free_suff; /**< sufficient data destructor*/
 } mcmclib_amh;
 
 /**\brief alloc a new generic AMH sampler
 @param mh base MH sampler to be extended
-@param suff extra data eventually used by the update_gamma function
-@param update_gamma update proposal kernel parameters
+@param n0 num. iterations to accumulate before starting to update the proposal kernel
+@param suff suff. stats. data accumulated by the update_suff function
 @param free_suff sufficient data destructor
+@param update_suff update sufficient stats
+@param update_gamma update proposal kernel parameters
 */
-mcmclib_amh* mcmclib_amh_alloc(mcmclib_mh* mh, void* suff,
-			       mcmclib_amh_update_gamma_p update_gamma,
-			       free_fun_t free_suff);
+mcmclib_amh* mcmclib_amh_alloc(mcmclib_mh* mh, const size_t n0,
+			       void* suff,
+			       free_fun_t free_suff,
+			       mcmclib_amh_update_suff_t update_suff,
+			       mcmclib_amh_update_gamma_t update_gamma);
 
 /**\brief free previously allocated AMH sampler*/
 void mcmclib_amh_free(mcmclib_amh* p);

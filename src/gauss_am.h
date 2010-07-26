@@ -23,19 +23,6 @@
 #include "amh.h"
 #include "gauss_mrw.h"
 
-/**\brief Gaussian AM cumulated sufficient statistics and support data*/
-typedef struct {
-  gsl_vector* sum_x; /**< cumulated sum of xs*/
-  gsl_matrix* sum_xx; /**< cumulated sum of xxs*/
-  gsl_matrix* Sigma_eps; /**< pos. definiteness cov. correction additive constant*/
-  gsl_matrix* Sigma_zero; /**< starting proposal covariance matrix*/
-  size_t t0; /**< burn in before starting adaptation*/
-  double sf; /**< scaling factor*/
-} mcmclib_gauss_am_suff;
-
-/** free extra AM data*/
-void mcmclib_gauss_am_suff_free(void* p);
-
 /** alloc (and init) extra AM data
 @param r RNG state
 @param logdistr pointer to a log-distribution function
@@ -51,9 +38,6 @@ mcmclib_amh* mcmclib_gauss_am_alloc(gsl_rng* r,
 
 /** set scaling factor for the gaussian AM sampler 'p'*/
 void mcmclib_gauss_am_set_sf(mcmclib_amh* p, double sf);
-
-/** AM gamma update function \internal */
-void mcmclib_gauss_am_update_gamma(mcmclib_amh* p);
 
 /**@}*/
 /**@}*/
