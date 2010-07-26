@@ -61,7 +61,7 @@ void Testrapt(CuTest* tc) {
 				      dunif, NULL, /*target distrib.*/
 				      x, T0,
 				      sigma_whole, K, sigma_local,
-				      which_region, NULL);
+				      which_region, NULL, NULL);
   rapt_suff* suff = (rapt_suff*) s->suff;
 
   /*Main MCMC loop*/

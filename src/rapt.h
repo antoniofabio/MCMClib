@@ -30,6 +30,7 @@
 @param sigma_local array of local proposal covariance matrices
 @param which_region boundary computing function
 @param which_region_data ptr to extra 'which_region' data
+@param region_data_free 'which_region' func data destructor
 */
 mcmclib_amh* mcmclib_rapt_alloc(gsl_rng* r,
 				distrfun_p logdistr, void* logdistr_data,
@@ -39,7 +40,8 @@ mcmclib_amh* mcmclib_rapt_alloc(gsl_rng* r,
 				size_t K,
 				gsl_matrix** sigma_local,
 				region_fun_t which_region,
-				void* which_region_data);
+				void* which_region_data,
+				free_fun_t region_data_free);
 
 /** customly set additive variance correction factor */
 void mcmclib_rapt_set_correction_factor(mcmclib_amh* p, const double eps);

@@ -115,10 +115,12 @@ mcmclib_amh* mcmclib_rapt_alloc(gsl_rng* r,
 				size_t K,
 				gsl_matrix** sigma_local,
 				region_fun_t which_region,
-				void* which_region_data) {
+				void* which_region_data,
+				free_fun_t region_data_free) {
   mcmclib_mh_q* q = mcmclib_rapt_q_alloc(r,
 					 sigma_whole, K, sigma_local,
-					 which_region, which_region_data);
+					 which_region, which_region_data,
+					 region_data_free);
   mcmclib_mh* mh = mcmclib_mh_alloc(r, logdistr, logdistr_data, q, x);
   rapt_suff* suff = rapt_suff_alloc(q->gamma);
 

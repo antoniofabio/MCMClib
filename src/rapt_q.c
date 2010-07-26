@@ -23,7 +23,8 @@ mcmclib_rapt_gamma* mcmclib_rapt_gamma_alloc(const gsl_matrix* sigma_whole,
 					     size_t K,
 					     gsl_matrix** sigma_local,
 					     region_fun_t which_region,
-					     void* which_region_data) {
+					     void* which_region_data,
+					     free_fun_t region_data_free) {
   size_t dim = sigma_whole->size1;
   mcmclib_rapt_gamma* a = (mcmclib_rapt_gamma*) malloc(sizeof(mcmclib_rapt_gamma));
   a->sigma_whole = gsl_matrix_alloc(dim, dim);
@@ -36,6 +37,7 @@ mcmclib_rapt_gamma* mcmclib_rapt_gamma_alloc(const gsl_matrix* sigma_whole,
   }
   a->which_region = which_region;
   a->which_region_data = which_region_data;
+  a->region_data_free = region_data_free;
 
   a->lambda = gsl_matrix_alloc(K, K+1);
   mcmclib_rapt_gamma_set_alpha(a, 0.5);
@@ -46,11 +48,16 @@ mcmclib_rapt_gamma* mcmclib_rapt_gamma_alloc(const gsl_matrix* sigma_whole,
       a->q_k[k] = mcmclib_mvnorm_lpdf_alloc(a->q_mean, a->sigma_local[k]->data);
   a->q_k[K] = mcmclib_mvnorm_lpdf_alloc(a->q_mean, a->sigma_whole->data);
   a->workspace = gsl_vector_alloc(dim);
+
   return a;
 }
 
 void mcmclib_rapt_gamma_free(void* in_p) {
+  if(!in_p) return;
   mcmclib_rapt_gamma* p = (mcmclib_rapt_gamma*) in_p;
+  if(p->region_data_free) {
+    p->region_data_free(p->which_region_data);
+  }
   gsl_vector_free(p->workspace);
   gsl_matrix_free(p->lambda);
 
@@ -75,10 +82,12 @@ mcmclib_mh_q* mcmclib_rapt_q_alloc(gsl_rng* r,
 				   size_t K,
 				   gsl_matrix** sigma_local,
 				   region_fun_t which_region,
-				   void* which_region_data) {
+				   void* which_region_data,
+				   free_fun_t region_data_free) {
   mcmclib_rapt_gamma* gamma = mcmclib_rapt_gamma_alloc(sigma_whole,
 						       K, sigma_local,
-						       which_region, which_region_data);
+						       which_region, which_region_data,
+						       region_data_free);
   return mcmclib_mh_q_alloc(r, mcmclib_rapt_q_sample,
 			    mcmclib_rapt_q_d,
 			    gamma, mcmclib_rapt_gamma_free);

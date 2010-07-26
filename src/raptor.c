@@ -70,8 +70,6 @@ typedef struct {
   gsl_matrix* Sigma_eps;
   double scaling_factor_local;
   double scaling_factor_global;
-
-  raptor_gamma* gamma; /**< utility ptr to raptor-gamma object*/
 } raptor_suff;
 
 /** alloc a new RAPTOR sampler suff stats object
@@ -85,7 +83,6 @@ static raptor_suff* raptor_suff_alloc(raptor_gamma* g, size_t t0) {
   a->Sigma_eps = gsl_matrix_alloc(d, d);
   gsl_matrix_set_identity(a->Sigma_eps);
   gsl_matrix_scale(a->Sigma_eps, 0.001);
-  a->gamma = g;
   return a;
 }
 
@@ -94,7 +91,6 @@ static void raptor_suff_free(void* in_p) {
   raptor_suff* p = (raptor_suff*) in_p;
   mcmclib_mixem_online_free(p->em);
   gsl_matrix_free(p->Sigma_eps);
-  raptor_gamma_free(p->gamma);
   free(p);
 }
 
@@ -118,7 +114,7 @@ static void raptor_gamma_update(void* in_s, void* in_g) {
 }
 
 static size_t which_region_fun(void* in_g, const gsl_vector* x) {
-  return mcmclib_region_mixnorm_compute(x, RAPTOR_GAMMA(in_g)->pi_hat);
+  return mcmclib_region_mixnorm_compute(x, ((raptor_gamma*) in_g)->pi_hat);
 }
 
 mcmclib_amh* mcmclib_raptor_alloc(gsl_rng* r,
@@ -133,7 +129,8 @@ mcmclib_amh* mcmclib_raptor_alloc(gsl_rng* r,
 					   mu_hat,
 					   Sigma_hat);
   mcmclib_mh_q* q = mcmclib_rapt_q_alloc(r, Sigma_zero, K, Sigma_hat,
-					 which_region_fun, gamma);
+					 which_region_fun, gamma,
+					 (free_fun_t) raptor_gamma_free);
   mcmclib_mh* mh = mcmclib_mh_alloc(r, logdistr, logdistr_data, q, x);
   raptor_suff* suff = raptor_suff_alloc(gamma, t0);
   mcmclib_amh* ans = mcmclib_amh_alloc(mh, t0, suff, raptor_suff_free,
