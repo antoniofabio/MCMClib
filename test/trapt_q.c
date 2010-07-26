@@ -38,7 +38,7 @@ void Testrapt_q(CuTest* tc) {
 
   mcmclib_mh_q* q = mcmclib_rapt_q_alloc(rng,
 					 sigma_whole, K, sigma_local,
-					 which_region, NULL);
+					 which_region, NULL, NULL);
 
   gsl_vector_memcpy(y, x);
   mcmclib_mh_q_sample(q, x);
