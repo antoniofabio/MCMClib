@@ -1,4 +1,7 @@
 Version 0.23 A. F. Di Narzo <antonio.fabio@gmail.com>
+	* add simple adaptive r.w. sampler, suited for huge-dimensional cases
+	* refactor the amh API for better encapsulation
+	  rewritten all the amh samplers
 	* rm obsolete 'metropolis' module
 	* refactor most of the code to comply with the new compiler checks
 	* add more strict gcc compile check flags
