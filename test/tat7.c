@@ -5,8 +5,9 @@
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
-#include <at7.h>
 #include <monitor.h>
+#include "at7.c"
+#include "CuTest.h"
 
 static const double beta = 0.5;
 static const double V[] = {1.0, 1.0};
@@ -23,9 +24,6 @@ static const double MU[] = {0.2, 0.8};
 #define m00(m) gsl_matrix_get(m, 0, 0)
 
 #define TOL 1e-6
-int check_dequal(double a, double b) {
-  return (fabs(a-b) < TOL);
-}
 
 static double dunif(void* ignore, const gsl_vector* x) {
   ignore = NULL; /*keep compiler quiet*/
@@ -90,7 +88,7 @@ static double dunif(void* ignore, const gsl_vector* x) {
   }									\
   }									\
 
-int main() {
+void Testat7(CuTest* tc) {
   gsl_rng* rng;
   gsl_vector* x;
   mcmclib_amh* sampler;
@@ -106,5 +104,4 @@ int main() {
   TRY_DIM(3);
 
   gsl_vector_free(w_hat);
-  return 0;
 }
