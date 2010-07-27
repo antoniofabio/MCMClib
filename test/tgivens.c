@@ -5,6 +5,9 @@
 #include <gsl/gsl_linalg.h>
 #include <matrix.h>
 #include <givens.h>
+#include "CuTest.h"
+
+static CuTest* tc;
 
 #define TOL 1e-6
 static int check_dequal(double a, double b) {
@@ -42,7 +45,7 @@ static void sRepresentation(double s) {
   gsl_vector* vals = gsl_vector_alloc(3);
   singValues(A_g, vals);
   for(size_t i=0; i<3; i++)
-    assert(check_dequal(gsl_vector_get(vals, i), exp(s)));
+    CuAssertTrue(tc, check_dequal(gsl_vector_get(vals, i), exp(s)));
   gsl_linalg_cholesky_decomp(A_g);
   gsl_vector_free(vals);
 }
@@ -58,13 +61,14 @@ static void sRepresentationAsymm(double s) {
   mcmclib_Givens_representation_asymm(A_g, alphasigma);
   gsl_vector* values = gsl_vector_alloc(3);
   singValues(A_g, values);
-  assert(check_dequal(gsl_vector_get(values, 0), exp(s + 1.0)));
-  assert(check_dequal(gsl_vector_get(values, 1), exp(s)));
-  assert(check_dequal(gsl_vector_get(values, 2), exp(s - 1.0)));
+  CuAssertTrue(tc, check_dequal(gsl_vector_get(values, 0), exp(s + 1.0)));
+  CuAssertTrue(tc, check_dequal(gsl_vector_get(values, 1), exp(s)));
+  CuAssertTrue(tc, check_dequal(gsl_vector_get(values, 2), exp(s - 1.0)));
   gsl_vector_free(values);
 }
 
-int main() {
+void Testgivens(CuTest* in_tc) {
+  tc = in_tc;
   gsl_vector* alpha = gsl_vector_alloc(3);
   gsl_vector_set(alpha, 0, -0.5);
   gsl_vector_set(alpha, 1, 0.1);
@@ -76,7 +80,7 @@ int main() {
   mcmclib_matrix_inverse(A1);
   for(size_t i=0; i<3; i++)
     for(size_t j=0; j<3; j++)
-      assert(check_dequal(gsl_matrix_get(A_g, i, j), gsl_matrix_get(A1, j, i)));
+      CuAssertTrue(tc, check_dequal(gsl_matrix_get(A_g, i, j), gsl_matrix_get(A1, j, i)));
 
   alphasigma = gsl_vector_alloc(6);
   for(double s=-4.0; s<=4.0; s+=0.1)
