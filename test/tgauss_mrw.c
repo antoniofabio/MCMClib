@@ -6,14 +6,12 @@
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 #include <gauss_mrw.h>
+#include "CuTest.h"
 
 #define N 1000
 #define DIM 1
 
 #define TOL 1e-6
-static int check_dequal(double a, double b) {
-  return (fabs(a-b) < TOL);
-}
 
 #define v0(x) gsl_vector_get(x, 0)
 #define x0 v0(x)
@@ -24,7 +22,7 @@ static double dtarget(void* ignore, const gsl_vector* x) {
   return log(gsl_ran_gaussian_pdf(x0, 1.0));
 }
 
-int main() {
+void Testgauss_mrw(CuTest* tc) {
   gsl_rng* rng = gsl_rng_alloc(gsl_rng_default);
 
   gsl_vector* x = gsl_vector_alloc(DIM);
@@ -51,14 +49,12 @@ int main() {
   mean /= (double) N;
   variance = variance / ((double) N) - (mean * mean);
 
-  assert(check_dequal(mean, 0.072261));
-  assert(check_dequal(variance, 0.927399));
+  CuAssertDblEquals(tc, 0.072261, mean, TOL);
+  CuAssertDblEquals(tc, 0.927399, variance, TOL);
 
   /*free memory*/
   gsl_matrix_free(sigma);
   gsl_vector_free(x);
   mcmclib_mh_free(s);
   gsl_rng_free(rng);
-
-  return 0;
 }
