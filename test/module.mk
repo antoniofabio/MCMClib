@@ -1,5 +1,4 @@
 # TEST_names:= trecursive_variance tmixem tmixem_rec tmixem_online \
-# 	tgauss_mrw \
 # 	tinca tmcar_tilde twishart tmcar_model tiwishart \
 # 	tgivens tmonitor thier tpois_model tmonitor2 tmixem_online2
 TEST_names := t1 t2 tmh_q tmh tmh2 tmh3 tgauss_rw tgauss_mrw \
