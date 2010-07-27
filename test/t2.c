@@ -15,10 +15,6 @@
 #define V0 2.0
 #define MU0 1.5
 
-static int check_dequal(double a, double b) {
-  return (fabs(a-b) < TOL);
-}
-
 void Testt2(CuTest* tc) {
   static mcmclib_mvnorm_lpdf* pis[2];
 
