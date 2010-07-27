@@ -4,11 +4,12 @@
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 #include <vector_stats.h>
+#include "CuTest.h"
 
 #define DIM 2
 #define N 3
 
-int main() {
+void Testrecursive_variance(CuTest* tc) {
   gsl_vector* x[N];
   for(size_t n=0; n<N; n++) {
     x[n] = gsl_vector_alloc(DIM);
@@ -34,12 +35,12 @@ int main() {
   mcmclib_matrix_covariance(X, Vt);
 
   /*check results*/
-  assert(n1 == N);
+  CuAssertIntEquals(tc, N, n1);
   for(size_t d1=0; d1<DIM; d1++) {
     for(size_t d2=0; d2<DIM; d2++) {
       double cov_true = gsl_matrix_get(Vt, d1, d2);
       double cov_check = gsl_matrix_get(V, d1, d2);
-      assert(cov_true == cov_check);
+      CuAssertDblEquals(tc, cov_true, cov_check, 1e-6);
     }
   }
 
@@ -50,6 +51,4 @@ int main() {
   gsl_matrix_free(Vt);
   gsl_matrix_free(X);
   gsl_vector_free(m);
-
-  return 0;
 }
