@@ -5,7 +5,8 @@
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
-#include <gauss_am.h>
+#include "gauss_am.c"
+#include "CuTest.h"
 
 #define N 1000
 #define DIM 1
@@ -14,9 +15,6 @@
 #define SF (2.38*2.38/(double) DIM)
 
 #define TOL 1e-6
-static int check_dequal(double a, double b) {
-  return (fabs(a-b) < TOL);
-}
 
 #define v0(x) gsl_vector_get(x, 0)
 #define x0 v0(x)
@@ -33,7 +31,7 @@ static double fix(double in, double correction) {
   return (in + correction) * SF;
 }
 
-int main() {
+void Testgauss_am(CuTest* tc) {
   gsl_rng* rng = gsl_rng_alloc(gsl_rng_default);
 
   gsl_vector* x = gsl_vector_alloc(DIM);
@@ -58,26 +56,24 @@ int main() {
   }
 
   /*check results*/
-  assert(s->n == N);
-  mcmclib_gauss_am_suff* suff = (mcmclib_gauss_am_suff*) s->suff;
+  gauss_am_suff* suff = (gauss_am_suff*) s->suff;
+  CuAssertIntEquals(tc, N, suff->t);
 
-  assert(check_dequal(sum_x, v0(suff->sum_x)));
-  assert(check_dequal(sum_xx, m00(suff->sum_xx)));
+  CuAssertDblEquals(tc, sum_x, v0(suff->sum_x), TOL);
+  CuAssertDblEquals(tc, sum_xx, m00(suff->sum_xx), TOL);
   double eps = m00(suff->Sigma_eps);
   gsl_matrix* Sigma = (gsl_matrix*) s->mh->q->gamma;
   double mean = sum_x / (double) N;
   double variance = sum_xx / (double) N - mean * mean;
-  assert(check_dequal(fix(variance, eps), m00(Sigma)));
+  CuAssertDblEquals(tc, fix(variance, eps), m00(Sigma), TOL);
 
   /*check against uniform distribution*/
-  assert(check_dequal(0.461706, mean));
-  assert(check_dequal(0.076635, variance));
+  CuAssertDblEquals(tc, 0.461706, mean, TOL);
+  CuAssertDblEquals(tc, 0.076635, variance, TOL);
 
   /*free memory*/
   gsl_matrix_free(sigma);
   gsl_vector_free(x);
   mcmclib_amh_free(s);
   gsl_rng_free(rng);
-
-  return 0;
 }

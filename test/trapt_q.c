@@ -6,6 +6,7 @@
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 #include <rapt_q.h>
+#include "CuTest.h"
 
 #define DIM 1
 #define K 2
@@ -19,11 +20,8 @@ static size_t which_region(void* ignore, const gsl_vector* x) {
 }
 
 #define TOL 1e-6
-static int check_dequal(double a, double b) {
-  return (fabs(a-b) < TOL);
-}
 
-int main() {
+void Testrapt_q(CuTest* tc) {
   gsl_vector* x = gsl_vector_alloc(DIM);
   gsl_vector* y = gsl_vector_alloc(DIM);
   gsl_vector_set_all(x, 0.0);
@@ -40,11 +38,11 @@ int main() {
 
   mcmclib_mh_q* q = mcmclib_rapt_q_alloc(rng,
 					 sigma_whole, K, sigma_local,
-					 which_region, NULL);
+					 which_region, NULL, NULL);
 
   gsl_vector_memcpy(y, x);
   mcmclib_mh_q_sample(q, x);
-  assert(check_dequal(mcmclib_mh_q_logd(q, x, y), -1.048402));
+  CuAssertDblEquals(tc, -1.048402, mcmclib_mh_q_logd(q, x, y), TOL);
 
   /*free memory*/
   for(size_t k=0; k<K; k++)
@@ -54,6 +52,4 @@ int main() {
   gsl_vector_free(y);
   mcmclib_mh_q_free(q);
   gsl_rng_free(rng);
-
-  return 0;
 }

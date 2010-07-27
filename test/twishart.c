@@ -6,6 +6,7 @@
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 #include <lpdf_wishart.h>
+#include "CuTest.h"
 
 #define TOL 1e-6
 
@@ -13,21 +14,17 @@
 #define V0 2.0
 #define P 2
 
-static int check_dequal(double a, double b) {
-  return (fabs(a-b) < TOL);
-}
+static mcmclib_wishart_lpdf* p;
+static gsl_vector* x;
 
-mcmclib_wishart_lpdf* p;
-gsl_vector* x;
-
-double lpdf(double s) {
+static double lpdf(double s) {
   gsl_vector_scale(x, s);
   double ans = mcmclib_wishart_lpdf_compute(p, x);
   gsl_vector_scale(x, 1.0 / s);
   return ans;
 }
 
-int main() {
+void Testwishart(CuTest* tc) {
   /*set a non-trivial location matrix*/
   gsl_matrix* V = gsl_matrix_alloc(DIM, DIM);
   gsl_matrix_set_identity(V);
@@ -45,9 +42,9 @@ int main() {
   for(size_t i=0; i<DIM; i++)
     gsl_matrix_set(X, i, i, 1.0);
 
-  assert(check_dequal(lpdf(1.0), -7.152627));
-  assert(check_dequal(lpdf(0.5), -29.549142));
-  assert(check_dequal(lpdf(2.0), 13.380252));
+  CuAssertDblEquals(tc, -7.152627, lpdf(1.0), TOL);
+  CuAssertDblEquals(tc, -29.549142, lpdf(0.5), TOL);
+  CuAssertDblEquals(tc, 13.380252, lpdf(2.0), TOL);
 
   mcmclib_wishart_lpdf_free(p);
   gsl_vector_free(x);

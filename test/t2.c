@@ -7,6 +7,7 @@
 #include <gsl/gsl_matrix.h>
 #include <mvnorm.h>
 #include <mixnorm.h>
+#include "CuTest.h"
 
 #define TOL 1e-6
 
@@ -14,11 +15,7 @@
 #define V0 2.0
 #define MU0 1.5
 
-static int check_dequal(double a, double b) {
-  return (fabs(a-b) < TOL);
-}
-
-int main() {
+void Testt2(CuTest* tc) {
   static mcmclib_mvnorm_lpdf* pis[2];
 
   /*set a non-trivial covariance matrix*/
@@ -49,7 +46,7 @@ int main() {
     double lpdf_check = exp(mcmclib_mvnorm_lpdf_compute(pis[0], x)) * gsl_vector_get(w, 0);
     lpdf_check += exp(mcmclib_mvnorm_lpdf_compute(pis[1], x)) * gsl_vector_get(w, 1);
     lpdf_check = log(lpdf_check);
-    assert(check_dequal(lpdf, lpdf_check));
+    CuAssertDblEquals(tc, lpdf_check, lpdf, TOL);
   }
 
   gsl_vector_free(w);

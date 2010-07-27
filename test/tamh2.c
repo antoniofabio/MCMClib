@@ -6,6 +6,7 @@
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 #include <amh.h>
+#include "CuTest.h"
 
 #define N 10000
 #define PI1 0.8
@@ -32,14 +33,14 @@ static void sampler(mcmclib_mh_q* q, gsl_vector* x) {
     gsl_vector_set(x, 0, 1.0);
 }
 
-int main() {
+void Testamh2(CuTest *tc) {
   gsl_rng* r = gsl_rng_alloc(gsl_rng_default);
   gsl_vector* x = gsl_vector_alloc(1);
   gsl_vector_set(x, 0, 0.0);
   mcmclib_amh* s = mcmclib_amh_alloc(mcmclib_mh_alloc(r, dtarget, NULL,
 						      mcmclib_mh_q_alloc(r, sampler,
 									 NULL, NULL, NULL), x),
-				     NULL, NULL, NULL);
+				     0, NULL, NULL, NULL, NULL);
 
   double pi1 = 0.0;
   for(int n=0; n<N; n++) {
@@ -47,11 +48,9 @@ int main() {
     pi1 += x0;
   }
   pi1 /= (double) N;
-  assert(0.795900 == pi1);
+  CuAssertDblEquals(tc, 0.795900, pi1, 0.0);
 
   gsl_vector_free(x);
   gsl_rng_free(r);
   mcmclib_amh_free(s);
-
-  return 0;
 }

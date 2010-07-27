@@ -43,7 +43,7 @@ int mcmclib_amh_update(mcmclib_amh* p) {
   if(p->update_suff) {
     p->update_suff(p->suff, p->mh->x);
   }
-  if(p->update_gamma && (p->n > p->n0)) {
+  if(p->update_gamma && (p->n >= p->n0)) {
     p->update_gamma(p->suff, p->mh->q->gamma);
   }
   return(p->mh->last_accepted);

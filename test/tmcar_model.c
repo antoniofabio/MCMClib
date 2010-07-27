@@ -7,17 +7,15 @@
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_blas.h>
 #include <mcar_model.h>
+#include "CuTest.h"
 
 #define TOL 1e-6
-int check_dequal(double a, double b) {
-  return (fabs(a-b) < TOL);
-}
 
-void mprint(gsl_matrix* A) {
-  int n = A->size1;
-  int p = A->size2;
-  for(int i=0; i<n; i++) {
-    for(int j=0; j<p; j++)
+void mprint(const gsl_matrix* A) {
+  size_t n = A->size1;
+  size_t p = A->size2;
+  for(size_t i=0; i<n; i++) {
+    for(size_t j=0; j<p; j++)
       printf("%.3f, ", gsl_matrix_get(A, i, j));
     printf("\n");
   }
@@ -26,11 +24,11 @@ void mprint(gsl_matrix* A) {
 int is_pos_def(gsl_matrix* A) {
   if(A->size1 != A->size2)
     return 0;
-  int n = A->size1;
-  for(int i=0; i<(n-1); i++) {
+  size_t n = A->size1;
+  for(size_t i=0; i<(n-1); i++) {
     if(gsl_matrix_get(A, i, i) <= 0.0)
       return 0;
-    for(int j=(i+1); j<n; j++)
+    for(size_t j=(i+1); j<n; j++)
       if(fabs(gsl_matrix_get(A, i, j) - gsl_matrix_get(A, j, i)) >= TOL)
 	return 0;
   }
@@ -56,10 +54,10 @@ double lpdf_alpha12sigma(double s) {
   return ans;
 }
 
-int main(int argc, char** argv) {
+void Testmcar_model(CuTest* tc) {
   gsl_matrix* W = gsl_matrix_alloc(N, N);
   gsl_matrix_set_zero(W);
-  for(int i=0; i<(N-1); i++)
+  for(size_t i=0; i<(N-1); i++)
     DECL_AD(i, i+1);
 
   mcmclib_mcar_tilde_lpdf* llik = mcmclib_mcar_tilde_lpdf_alloc(P, W);
@@ -69,18 +67,18 @@ int main(int argc, char** argv) {
 
   double l1 = lpdf_alpha12sigma(-2.0);
   double l2 = lpdf_alpha12sigma(-5.0);
-  assert(gsl_finite(l1));
-  assert(gsl_finite(l2));
-  assert(l1 > l2);
-  assert(l1 == lpdf_alpha12sigma(-2.0));
+  CuAssertTrue(tc, gsl_finite(l1));
+  CuAssertTrue(tc, gsl_finite(l2));
+  CuAssertTrue(tc, l1 > l2);
+  CuAssertTrue(tc, l1 == lpdf_alpha12sigma(-2.0));
 
   gsl_vector* alphasigma = gsl_vector_alloc(P * (P-1) / 2 + P);
   gsl_vector_set_all(llik->alpha12sigma, -1.0);
   gsl_vector_set_all(alphasigma, 0.0);
   l1 = mcmclib_mcar_model_alphasigma_lpdf(p, alphasigma);
-  assert(gsl_finite(l1));
+  CuAssertTrue(tc, gsl_finite(l1));
   gsl_vector_set(alphasigma, P+1, 1.0);
-  assert(!gsl_finite(mcmclib_mcar_model_alphasigma_lpdf(p, alphasigma)));
+  CuAssertTrue(tc, !gsl_finite(mcmclib_mcar_model_alphasigma_lpdf(p, alphasigma)));
   gsl_vector_free(alphasigma);
 
   mcmclib_mcar_model_free(p);

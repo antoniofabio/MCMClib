@@ -6,6 +6,7 @@
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 #include <mh.h>
+#include "CuTest.h"
 
 #define N 10000
 #define PI1 0.8
@@ -14,9 +15,6 @@
 #define x0 v0(x)
 
 #define TOL 1e-6
-static int check_dequal(double a, double b) {
-  return (fabs(a-b) < TOL);
-}
 
 static double dtarget(void* ignore, const gsl_vector* x) {
   ignore = NULL; /*keep compiler quiet*/
@@ -37,7 +35,7 @@ static void sampler(mcmclib_mh_q* q, gsl_vector* x) {
     gsl_vector_set(x, 0, 1.0);
 }
 
-int main() {
+void Testmh2(CuTest* tc) {
   gsl_rng* r = gsl_rng_alloc(gsl_rng_default);
   gsl_vector* x = gsl_vector_alloc(1);
   gsl_vector_set(x, 0, 0.0);
@@ -51,11 +49,9 @@ int main() {
     pi1 += x0;
   }
   pi1 /= (double) N;
-  assert(check_dequal(0.795900, pi1));
+  CuAssertDblEquals(tc, 0.795900, pi1, TOL);
 
   gsl_vector_free(x);
   gsl_rng_free(r);
   mcmclib_mh_free(s);
-
-  return 0;
 }

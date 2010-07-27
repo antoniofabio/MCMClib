@@ -7,6 +7,7 @@
 #include <gsl/gsl_matrix.h>
 #include <mvnorm.h>
 #include <mixem_online.h>
+#include "CuTest.h"
 
 static const double beta = 0.8;
 static const double V[] = {1.0, 4.0};
@@ -19,13 +20,10 @@ static const size_t DIM = 2;
 #define K 2
 
 #define TOL 1e-6
-static int check_dequal(double a, double b) {
-  return (fabs(a-b) < TOL);
-}
 
 static size_t sample(gsl_rng* r, gsl_vector* probs);
 
-int main() {
+void Testmixem_online(CuTest* tc) {
   /*setup target distrib. parameters*/
   double w[] = {beta, 1-beta};
   gsl_vector_view wv = gsl_vector_view_array(w, K);
@@ -84,8 +82,8 @@ int main() {
 
   /*print out estimation results*/
   //gsl_vector_fprintf(stdout, w_hat, "%f");
-  assert(check_dequal(w_hat->data[0], 0.801000));
-  assert(check_dequal(w_hat->data[1], 0.199000));
+  CuAssertDblEquals(tc, 0.801000, w_hat->data[0], TOL);
+  CuAssertDblEquals(tc, 0.199000, w_hat->data[1], TOL);
   FILE* out_mu = fopen("tmixem_online_mu.dat", "w");
   FILE* out_Sigma = fopen("tmixem_online_Sigma.dat", "w");
   for(int k=0; k<K; k++) {
@@ -103,8 +101,6 @@ int main() {
     gsl_vector_free(mu_hat[k]);
   }
   gsl_vector_free(w_hat);
-
-  return 0;
 }
 
 static size_t sample(gsl_rng* r, gsl_vector* probs) {

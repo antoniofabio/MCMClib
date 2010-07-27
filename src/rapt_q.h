@@ -25,14 +25,14 @@ typedef size_t (*region_fun_t) (void*, const gsl_vector*);
 typedef struct {
   region_fun_t which_region; /**< region computing function*/
   void* which_region_data; /**< extra data for the region computing function*/
+  free_fun_t region_data_free; /**< extra region data destructor*/
   size_t K; /**< number of regions*/
 
   gsl_matrix* sigma_whole; /**< global proposal covariance matrix*/
   gsl_matrix** sigma_local; /**< array of local proposal covariance matrices*/
   gsl_matrix* lambda; /**< K+1 weights for local and global proposals, in each region*/
 
-  size_t which_proposal; /**< which proposal have been used in last step*/
-  size_t which_region_x, which_region_old; /**< region info*/
+  size_t which_proposal; /**< which proposal has been used in last step*/
 
   gsl_vector* workspace; /**< internal utility vector*/
   gsl_vector* q_mean; /**< extra data for (mixture) proposal densities comp.*/
@@ -45,7 +45,8 @@ mcmclib_mh_q* mcmclib_rapt_q_alloc(gsl_rng* r,
 				   size_t K,
 				   gsl_matrix** sigma_local,
 				   region_fun_t which_region,
-				   void* which_region_data);
+				   void* which_region_data,
+				   free_fun_t region_data_free);
 
 /**< free a previously allocated RAPT kernel*/
 void mcmclib_rapt_q_free(void* in_p);

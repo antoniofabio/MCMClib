@@ -6,6 +6,7 @@
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 #include <monitor.h>
+#include "CuTest.h"
 
 #define v0(x) gsl_vector_get(x, 0)
 #define x0 v0(x)
@@ -15,7 +16,7 @@ static int check_dequal(double a, double b) {
   return (fabs(a-b) < TOL);
 }
 
-int main() {
+void Testmonitor(CuTest* tc) {
   gsl_vector* x = gsl_vector_alloc(1);
   gsl_vector_set(x, 0, 2.0);
   mcmclib_monitor* p = mcmclib_monitor_alloc(x);
@@ -24,41 +25,40 @@ int main() {
 
   /*check state right after init*/
   mcmclib_monitor_get_means(p, tmp);
-  assert(v0(tmp) == x0);
+  CuAssertTrue(tc, v0(tmp) == x0);
   mcmclib_monitor_get_vars(p, tmp);
-  assert(check_dequal(v0(tmp), 0.0));
+  CuAssertTrue(tc, check_dequal(v0(tmp), 0.0));
   mcmclib_monitor_get_ar(p, tmp);
-  assert(!gsl_finite(v0(tmp)));
+  CuAssertTrue(tc, !gsl_finite(v0(tmp)));
   mcmclib_monitor_get_msjd(p, tmp);
-  assert(!gsl_finite(v0(tmp)));
+  CuAssertTrue(tc, !gsl_finite(v0(tmp)));
 
   /*check state after 1 rejection*/
   mcmclib_monitor_update(p);
 
   mcmclib_monitor_get_means(p, tmp);
-  assert(check_dequal(v0(tmp), x0));
+  CuAssertTrue(tc, check_dequal(v0(tmp), x0));
   mcmclib_monitor_get_vars(p, tmp);
-  assert(check_dequal(v0(tmp), 0.0));
+  CuAssertTrue(tc, check_dequal(v0(tmp), 0.0));
   mcmclib_monitor_get_ar(p, tmp);
-  assert(check_dequal(v0(tmp), 0.0));
+  CuAssertTrue(tc, check_dequal(v0(tmp), 0.0));
   mcmclib_monitor_get_msjd(p, tmp);
-  assert(check_dequal(v0(tmp), 0.0));
+  CuAssertTrue(tc, check_dequal(v0(tmp), 0.0));
 
   /*check state after 1 rejection and 1 acceptance*/
   gsl_vector_set(x, 0, -4.0);
   mcmclib_monitor_update(p);
 
   mcmclib_monitor_get_means(p, tmp);
-  assert(check_dequal(v0(tmp), 0.0));
+  CuAssertTrue(tc, check_dequal(v0(tmp), 0.0));
   mcmclib_monitor_get_vars(p, tmp);
-  assert(check_dequal(v0(tmp), 8.0));
+  CuAssertTrue(tc, check_dequal(v0(tmp), 8.0));
   mcmclib_monitor_get_ar(p, tmp);
-  assert(check_dequal(v0(tmp), 0.5));
+  CuAssertTrue(tc, check_dequal(v0(tmp), 0.5));
   mcmclib_monitor_get_msjd(p, tmp);
-  assert(check_dequal(v0(tmp), 18.0)); /*(2+4)^2 / 2*/
+  CuAssertTrue(tc, check_dequal(v0(tmp), 18.0)); /*(2+4)^2 / 2*/
 
   mcmclib_monitor_free(p);
   gsl_vector_free(tmp);
   gsl_vector_free(x);
-  return 0;
 }

@@ -1,25 +1,31 @@
+TEST_names := t1 t2 \
+	twishart tiwishart tgivens tmcar_model \
+	trecursive_variance tmixem tmixem_rec tmixem_online tmixem_online2 \
+	thier tmcar_tilde tpois_model \
+	tmh_q tmh tmh2 tmh3 tgauss_rw tgauss_mrw \
+	tamh tamh2 trapt_q trapt traptor traptor3 tgauss_am tat7 \
+	tinca \
+	tmonitor tmonitor2
 TEST_CFLAGS := $(CFLAGS) -I./src
-TEST_LDFLAGS:= src/libmcmclib.a $(LDFLAGS)
-TEST_names:= t1 t2 trecursive_variance tmixem tmixem_rec tmixem_online \
-	tmh_q tmh tmh2 tgauss_rw tgauss_mrw \
-	tamh tamh2 trapt_q trapt traptor tgauss_am \
-	tinca tmcar_tilde twishart tmcar_model tiwishart \
-	tgivens tmonitor thier tpois_model tmonitor2 tmixem_online2 \
-	tmh3 tat7 traptor3
+TEST_OBJ:= $(TEST_names:%=test/%.o)
+TEST_LDFLAGS:= test/CuTest.o $(TEST_OBJ) src/libmcmclib.a $(LDFLAGS)
 SRC += $(wildcard test/*.c)
 SRC += $(wildcard test/*.h)
 SRC += $(wildcard test/*.dat)
 SRC += $(wildcard test/*.check)
 
-TEST_targets:=$(TEST_names:%=test_%)
-TEST_BIN:= $(TEST_names:%=test/%)
+TEST_BIN:= test/AllTests
 
 TOCLEAN += $(TEST_BIN)
 
-test: $(TEST_targets)
+test: test/AllTests
+	cd test; ./AllTests
 
-$(TEST_targets): test_%: test/%
-	@cd test; echo -n "$<: "; if ../$<; then echo OK; else echo FAIL; fi
+$(TEST_OBJ):%.o: %.c
+	$(CC) -c $< $(TEST_CFLAGS) -o $@
 
-$(TEST_BIN): %: %.c src/libmcmclib.a
+test/AllTests.c: $(TEST_names:%=test/%.c)
+	cd test; ./make-tests.sh > AllTests.c
+
+test/AllTests: test/AllTests.c src/libmcmclib.a test/CuTest.o $(TEST_OBJ)
 	$(CC) $(TEST_CFLAGS) $< $(TEST_LDFLAGS) -o $@

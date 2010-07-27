@@ -38,3 +38,6 @@ tmh3
 tat7
 traptor3
 .Rhistory
+AllTests
+AllTests.c
+*.o

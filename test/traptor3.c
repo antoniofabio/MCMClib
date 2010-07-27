@@ -6,6 +6,7 @@
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 #include <raptor.h>
+#include "CuTest.h"
 
 static double beta = 0.8;
 static const double V[] = {1.0, 1.0};
@@ -21,11 +22,6 @@ static const double MU[] = {-0.5, 0.5};
 #define x0 v0(x)
 #define m00(m) gsl_matrix_get(m, 0, 0)
 
-#define TOL 1e-6
-int check_dequal(double a, double b) {
-  return (fabs(a-b) < TOL);
-}
-
 static double dber(void* ignore, const gsl_vector* x) {
   ignore = NULL; /*keep compiler quiet*/
   if(fabs(x0) > 2.0)
@@ -36,7 +32,7 @@ static double dber(void* ignore, const gsl_vector* x) {
     return log(1.0-beta);
 }
 
-int main() {
+void Testraptor3(CuTest* tc) {
   gsl_vector* x = gsl_vector_alloc(DIM);
   gsl_vector_set_all(x, 0.0);
 
@@ -72,8 +68,8 @@ int main() {
     n1 += (x0 >= 0.0) ? 1 : 0;
   }
 
-  assert(n1 == 818);
-  assert(nacc == 467);
+  CuAssertIntEquals(tc, 818, n1);
+  CuAssertIntEquals(tc, 467, nacc);
 
   /*free memory*/
   gsl_matrix_free(sigma_whole);
@@ -85,6 +81,4 @@ int main() {
     gsl_matrix_free(Sigma_hat[k]);
   }
   gsl_vector_free(w_hat);
-
-  return 0;
 }
