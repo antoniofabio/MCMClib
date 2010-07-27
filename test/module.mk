@@ -1,10 +1,9 @@
-# TEST_names:= t1 t2 trecursive_variance tmixem tmixem_rec tmixem_online \
+# TEST_names:= trecursive_variance tmixem tmixem_rec tmixem_online \
 # 	tmh_q tmh tmh2 tgauss_rw tgauss_mrw \
-# 	tamh tamh2 trapt_q trapt traptor tgauss_am \
 # 	tinca tmcar_tilde twishart tmcar_model tiwishart \
 # 	tgivens tmonitor thier tpois_model tmonitor2 tmixem_online2 \
-# 	tmh3 tat7
-TEST_names := tamh tamh2 trapt_q trapt traptor tgauss_am tat7
+# 	tmh3
+TEST_names := t1 t2 tamh tamh2 trapt_q trapt traptor tgauss_am tat7
 TEST_CFLAGS := $(CFLAGS) -I./src
 TEST_OBJ:= $(TEST_names:%=test/%.o)
 TEST_LDFLAGS:= test/CuTest.o $(TEST_OBJ) src/libmcmclib.a $(LDFLAGS)

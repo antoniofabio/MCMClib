@@ -7,6 +7,7 @@
 #include <gsl/gsl_matrix.h>
 #include <matrix.h>
 #include <mvnorm.h>
+#include "CuTest.h"
 
 #define TOL 1e-6
 
@@ -18,7 +19,7 @@ static int check_dequal(double a, double b) {
   return (fabs(a-b) < TOL);
 }
 
-int main() {
+void Testt1(CuTest* tc) {
   /*set a non-trivial covariance matrix*/
   gsl_matrix* Sigma = gsl_matrix_alloc(DIM, DIM);
   gsl_matrix_set_identity(Sigma);
@@ -47,9 +48,9 @@ int main() {
     gsl_vector_set_all(x, gsl_matrix_get(check_m, i, 0));
     double lpdf = mcmclib_mvnorm_lpdf_compute(p, x);
     double lpdf_check = gsl_matrix_get(check_m, i, 1);
-    assert(check_dequal(lpdf, lpdf_check));
-    assert(check_dequal(mcmclib_mvnorm_lpdf_compute_nochol(p_nochol, x), lpdf_check));
-    assert(check_dequal(mcmclib_mvnorm_lpdf_compute_noinv(p_noinv, x), lpdf_check));
+    CuAssertDblEquals(tc, lpdf_check, lpdf, TOL);
+    CuAssertDblEquals(tc, lpdf_check, mcmclib_mvnorm_lpdf_compute_nochol(p_nochol, x), TOL);
+    CuAssertDblEquals(tc, lpdf_check, mcmclib_mvnorm_lpdf_compute_noinv(p_noinv, x), TOL);
   }
 
   gsl_matrix_free(check_m);
@@ -67,18 +68,18 @@ int main() {
   }
   p = mcmclib_mvnorm_lpdf_alloc(mu, Sigma->data);
   gsl_vector_set_all(x, -1.0);
-  assert(check_dequal(mcmclib_mvnorm_lpdf_compute(p, x), -320.966989));
+  CuAssertDblEquals(tc, -320.966989, mcmclib_mvnorm_lpdf_compute(p, x), TOL);
   for(size_t i=0; i<DIM; i++)
     gsl_vector_set(x, i, pow(-1, (double) i + 1.0));
-  assert(check_dequal(mcmclib_mvnorm_lpdf_compute(p, x), -125.512443));
+  CuAssertDblEquals(tc, -125.512443, mcmclib_mvnorm_lpdf_compute(p, x), TOL);
   mcmclib_mvnorm_lpdf_free(p);
 
   gsl_vector_set_all(mu, 0.0);
   gsl_vector_set_all(x, 0.0);
   p = mcmclib_mvnorm_lpdf_alloc(mu, Sigma->data);
   double check = mcmclib_mvnorm_lpdf_compute(p, x);
-  assert(!mcmclib_cholesky_inverse(Sigma));
-  assert(check_dequal(mcmclib_mvnormzp_lpdf(Sigma, x), check));
+  CuAssertTrue(tc, !mcmclib_cholesky_inverse(Sigma));
+  CuAssertDblEquals(tc, check, mcmclib_mvnormzp_lpdf(Sigma, x), TOL);
   mcmclib_mvnorm_lpdf_free(p);
 
   gsl_vector_free(x);
