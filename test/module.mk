@@ -1,9 +1,10 @@
-# TEST_names:= tinca tmcar_tilde tgivens thier tpois_model
+# TEST_names:= tmcar_tilde tgivens thier tpois_model
 TEST_names := t1 t2 \
 	twishart tiwishart tmcar_model \
 	trecursive_variance tmixem tmixem_rec tmixem_online tmixem_online2 \
 	tmh_q tmh tmh2 tmh3 tgauss_rw tgauss_mrw \
 	tamh tamh2 trapt_q trapt traptor tgauss_am tat7 \
+	tinca \
 	tmonitor tmonitor2
 TEST_CFLAGS := $(CFLAGS) -I./src
 TEST_OBJ:= $(TEST_names:%=test/%.o)
