@@ -7,6 +7,7 @@
 #include <gsl/gsl_matrix.h>
 #include <mvnorm.h>
 #include <mixem_online.h>
+#include "CuTest.h"
 
 static const size_t DIM = 2;
 static const size_t N = 5;
@@ -20,7 +21,7 @@ static void test_handler (const char * reason,
   count_errors++;
 }
 
-int main() {
+void Testmixem_online2(CuTest* tc) {
   /*init data*/
   gsl_matrix* X = gsl_matrix_alloc(N, DIM);
   gsl_matrix_set_all(X, 1.0);
@@ -46,7 +47,7 @@ int main() {
     gsl_vector_view rv = gsl_matrix_row(X, n);
     mcmclib_mixem_online_update(m, &(rv.vector));
   }
-  assert(count_errors == N);
+  CuAssertTrue(tc, count_errors == N);
   mcmclib_mixem_online_free(m);
   gsl_matrix_free(X);
 
@@ -56,6 +57,4 @@ int main() {
     gsl_vector_free(mu_hat[k]);
   }
   gsl_vector_free(w_hat);
-
-  return 0;
 }
