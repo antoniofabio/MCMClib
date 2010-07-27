@@ -7,20 +7,21 @@
 #include <gsl/gsl_matrix.h>
 #include <mcar_tilde.h>
 #include <matrix.h>
+#include "CuTest.h"
 
 #define TOL 1e-6
-int check_dequal(double a, double b) {
+static int check_dequal(double a, double b) {
   return (fabs(a-b) < TOL);
 }
 
-int is_pos_def(gsl_matrix* A) {
+static int is_pos_def(gsl_matrix* A) {
   if(A->size1 != A->size2)
     return 0;
-  int n = A->size1;
-  for(int i=0; i<(n-1); i++) {
+  size_t n = A->size1;
+  for(size_t i=0; i<(n-1); i++) {
     if(gsl_matrix_get(A, i, i) <= 0.0)
       return 0;
-    for(int j=(i+1); j<n; j++)
+    for(size_t j=(i+1); j<n; j++)
       if(fabs(gsl_matrix_get(A, i, j) - gsl_matrix_get(A, j, i)) >= TOL)
 	return 0;
   }
@@ -30,7 +31,7 @@ int is_pos_def(gsl_matrix* A) {
 #define P 2
 #define N 3
 
-mcmclib_mcar_tilde_lpdf* p;
+static mcmclib_mcar_tilde_lpdf* p;
 
 /* declare as near regions 'i' and 'j' */
 #define DECL_AD(i, j) if(1) {			\
@@ -38,26 +39,26 @@ mcmclib_mcar_tilde_lpdf* p;
     gsl_matrix_set(W, j, i, 1.0);		\
   }
 
-gsl_vector* x;
+static gsl_vector* x;
 static double lpdf(double s) {
   gsl_vector_set_all(x, s);
   return mcmclib_mcar_tilde_lpdf_compute(p, x);
 }
 
-int main(int argc, char** argv) {
+void Testmcar_tilde(CuTest* tc) {
   gsl_vector* mu = gsl_vector_alloc(N * P);
   gsl_vector_set_zero(mu);
   gsl_matrix* W = gsl_matrix_alloc(N, N);
   gsl_matrix_set_zero(W);
-  for(int i=0; i<(N-1); i++)
+  for(size_t i=0; i<(N-1); i++)
     DECL_AD(i, i+1);
   
   p = mcmclib_mcar_tilde_lpdf_alloc(P, W);
-  for(int i=0; i<N; i++) {
+  for(size_t i=0; i<N; i++) {
     int count = 0;
-    for(int j=0; j<N; j++)
-      count += gsl_matrix_get(W, i, j) == 1.0;
-    assert(gsl_vector_get(p->m, i) == (double) count);
+    for(size_t j=0; j<N; j++)
+      count += (gsl_matrix_get(W, i, j) == 1.0) ? 1 : 0;
+    CuAssertTrue(tc, gsl_vector_get(p->m, i) == (double) count);
   }
 
   gsl_vector_set_all(p->alphasigmag, 0.0);
@@ -71,11 +72,11 @@ int main(int argc, char** argv) {
   x = gsl_vector_alloc(N*P);
   gsl_vector_set_all(p->alpha12sigma, -2.0);
   double l1 = lpdf(0.0);
-  assert(gsl_finite(l1));
-  assert(gsl_finite(lpdf(1.0)));
-  assert(l1 = lpdf(-0.5)); /*check for side-effects*/
+  CuAssertTrue(tc, gsl_finite(l1));
+  CuAssertTrue(tc, gsl_finite(lpdf(1.0)));
+  CuAssertTrue(tc, l1 == lpdf(0.0)); /*check for side-effects*/
   gsl_vector_set_all(p->alpha12sigma, 0.1);
-  assert(!gsl_finite(lpdf(1.0)));
+  CuAssertTrue(tc, !gsl_finite(lpdf(1.0)));
 
   gsl_vector_free(x);
 

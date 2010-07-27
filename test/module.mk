@@ -1,7 +1,7 @@
-# TEST_names:= tmcar_tilde thier tpois_model
 TEST_names := t1 t2 \
 	twishart tiwishart tgivens tmcar_model \
 	trecursive_variance tmixem tmixem_rec tmixem_online tmixem_online2 \
+	thier tmcar_tilde tpois_model \
 	tmh_q tmh tmh2 tmh3 tgauss_rw tgauss_mrw \
 	tamh tamh2 trapt_q trapt traptor traptor3 tgauss_am tat7 \
 	tinca \

@@ -6,6 +6,7 @@
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 #include <lpdf_hierarchical.h>
+#include "CuTest.h"
 
 #define TOL 1e-6
 
@@ -33,7 +34,7 @@ static double lpost(double in_x) {
   return mcmclib_post_lpdf_compute(lpost_data, x_g);
 }
 
-int main() {
+void Testhier(CuTest* tc) {
   v_parent = gsl_vector_alloc(1);
   gsl_vector_set(v_parent, 0, 0.5);
   v_child = gsl_vector_alloc(1);
@@ -46,14 +47,14 @@ int main() {
 
   x_g = gsl_vector_alloc(1);
 
-  assert(lpost(0.5) == 3.0);
-  assert(lpost(1.0) == 2.0);
+  CuAssertTrue(tc, lpost(0.5) == 3.0);
+  CuAssertTrue(tc, lpost(1.0) == 2.0);
   gsl_vector_set(v_child, 0, 0.5);
-  assert(lpost(0.5) == 1.0);
+  CuAssertTrue(tc, lpost(0.5) == 1.0);
   gsl_vector_set(v_child, 0, 1.5);
-  assert(lpost(0.5) == 1.0);
-  assert(lpost(1.5) == 0.0);
-  assert(lpost(2.5) == 2.0);
+  CuAssertTrue(tc, lpost(0.5) == 1.0);
+  CuAssertTrue(tc, lpost(1.5) == 0.0);
+  CuAssertTrue(tc, lpost(2.5) == 2.0);
 
   gsl_vector_free(x_g);
   mcmclib_post_lpdf_free(lpost_data);

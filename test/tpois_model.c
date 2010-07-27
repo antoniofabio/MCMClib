@@ -7,6 +7,7 @@
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_blas.h>
 #include <pois_model.h>
+#include "CuTest.h"
 
 #define TOL 1e-6
 static int check_dequal(double a, double b) {
@@ -19,22 +20,22 @@ static int check_dequal(double a, double b) {
 static gsl_vector* x;
 static mcmclib_pois_model* mod;
 
-double llik(double sx) {
+static double llik(double sx) {
   gsl_vector_set_all(x, sx);
   return mcmclib_pois_model_llik(mod, x);
 }
 
-double lprior(double sx) {
+static double lprior(double sx) {
   gsl_vector_set_all(x, sx);
   return mcmclib_pois_model_lprior(mod, x);
 }
 
-double lpdf(double sx) {
+static double lpdf(double sx) {
   gsl_vector_set_all(x, sx);
   return mcmclib_pois_model_lpdf(mod, x);
 }
 
-int main() {
+void Testpois_model(CuTest* tc) {
   gsl_matrix* X = gsl_matrix_alloc(N, P);
   gsl_matrix_set_zero(X);
   for(size_t i=0; i<P; i++)
@@ -43,14 +44,14 @@ int main() {
   gsl_vector_set_all(y, 2.0);
   mod = mcmclib_pois_model_alloc(X, y);
 
-  assert(mod->beta->size == P);
+  CuAssertTrue(tc, mod->beta->size == P);
   x = gsl_vector_alloc(P);
   llik(0.0);
   llik(1.0);
   llik(2.0);
 
   lprior(1.0);
-  assert(check_dequal(lpdf(1.0), lprior(1.0) + llik(1.0)));
+  CuAssertTrue(tc, check_dequal(lpdf(1.0), lprior(1.0) + llik(1.0)));
 
   gsl_vector* b0 = gsl_vector_alloc(P);
   gsl_vector_set_all(b0, 1.0);
