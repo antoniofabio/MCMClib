@@ -37,16 +37,16 @@ void Testmonitor_acf(CuTest* tc) {
   double var = 1.0 - mean*mean;
   CuAssertDblEquals(tc, var, acf(0), TOL);
 
-  double acf_check = -1.0 / 1.0;
-  fprintf(stderr, "g[1] = %f\n", acf(1));
-  //  CuAssertDblEquals(tc, acf_check, acf(1), TOL);
+  double acf_check = (-1.0 - mean*mean) / var;
+  fprintf(stderr, "g[1] = %.3f\n", acf(1));
+  CuAssertDblEquals(tc, acf_check, acf(1), TOL);
 
   append(-1.0);
   mean = 0.0;
   var = 1.0;
   acf_check = -1.0;
   CuAssertDblEquals(tc, var, acf(0), TOL);
-  fprintf(stderr, "g[1] = %f\n", acf(1));
+  fprintf(stderr, "g[1] = %.3f\n", acf(1));
 
   gsl_matrix_free(ACF);
   mcmclib_monitor_acf_free(m);
