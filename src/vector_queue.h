@@ -24,7 +24,7 @@ void vector_queue_free(vector_queue_t* q);
 int vector_queue_append(vector_queue_t* q, const gsl_vector* x);
 void vector_queue_remove(vector_queue_t* q);
 size_t vector_queue_size(const vector_queue_t* q);
-void vector_queue_get(const vector_queue_t* q, const size_t lag, gsl_vector* x);
+int vector_queue_get(const vector_queue_t* q, const size_t lag, gsl_vector* x);
 
 /**@}*/
 /**@}*/
