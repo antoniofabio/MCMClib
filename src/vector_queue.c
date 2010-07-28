@@ -13,6 +13,15 @@ typedef struct vector_queue_t {
   size_t next_free;
 } vector_queue;
 
+static void perm_next(gsl_permutation* p) {
+  const size_t size = gsl_permutation_size(p);
+  size_t last = gsl_permutation_get(p, size - 1);
+  for(size_t i = size; i > 1; i--) {
+    p->data[i] = p->data[i-1];
+  }
+  p->data[0] = last;
+}
+
 vector_queue* vector_queue_alloc(const size_t dim, const size_t max_size) {
   vector_queue* a = (vector_queue*) malloc(sizeof(vector_queue));
   a->dim = dim;
@@ -35,21 +44,17 @@ void vector_queue_free(vector_queue_t* q) {
 
 int vector_queue_append(vector_queue* q, const gsl_vector* ix) {
   assert(ix->size == q->dim);
-  if(q->size == q->max_size) {
-    vector_queue_remove(q);
+  if(q->size < q->max_size) {
+    q->size = q->size + 1;
+    perm_next(q->perm);
+  } else {
+    perm_next(q->perm);
   }
-  q->size = q->size + 1;
+  q->next_free = (q->next_free == 0) ? q->max_size : q->next_free - 1;
   gsl_vector_view x_v = gsl_matrix_row(q->X, q->next_free);
   gsl_vector* x = &(x_v.vector);
   gsl_vector_memcpy(x, ix);
-  q->next_free = (q->next_free == 0) ? q->max_size : q->next_free - 1;
   return 0;
-}
-
-void vector_queue_remove(vector_queue* q) {
-  assert(q->size > 0);
-  q->size -= 1;
-  q->next_free = (q->next_free + 1) % q->max_size;
 }
 
 size_t vector_queue_size(const vector_queue* q) {
