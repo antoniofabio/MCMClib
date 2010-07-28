@@ -1,4 +1,5 @@
 Version 0.23 A. F. Di Narzo <antonio.fabio@gmail.com>
+	* add vector_queue utility data structure
 	* add simple adaptive r.w. sampler, suited for huge-dimensional cases
 	* refactor the amh API for better encapsulation
 	  rewritten all the amh samplers
