@@ -11,7 +11,7 @@ typedef struct mcmclib_vector_queue_t {
   gsl_matrix* X;
   gsl_permutation* perm;
   size_t next_free;
-} mcmclib_vector_queue;
+} vector_queue;
 
 static void perm_next(gsl_permutation* p) {
   const size_t size = gsl_permutation_size(p);
@@ -23,7 +23,7 @@ static void perm_next(gsl_permutation* p) {
 }
 
 mcmclib_vector_queue* mcmclib_vector_queue_alloc(const size_t dim, const size_t max_size) {
-  mcmclib_vector_queue* a = (mcmclib_vector_queue*) malloc(sizeof(mcmclib_vector_queue));
+  vector_queue* a = (vector_queue*) malloc(sizeof(vector_queue));
   a->dim = dim;
   a->max_size = max_size;
   a->size = 0;
@@ -35,7 +35,7 @@ mcmclib_vector_queue* mcmclib_vector_queue_alloc(const size_t dim, const size_t 
   return a;
 }
 
-void mcmclib_vector_queue_free(mcmclib_vector_queue_t* q) {
+void mcmclib_vector_queue_free(vector_queue* q) {
   if(!q) return;
   gsl_matrix_free(q->X);
   gsl_permutation_free(q->perm);
@@ -61,7 +61,7 @@ size_t mcmclib_vector_queue_size(const mcmclib_vector_queue* q) {
   return q->size;
 }
 
-int mcmclib_vector_queue_get(const mcmclib_vector_queue_t* q, const size_t i, gsl_vector* x) {
+int mcmclib_vector_queue_get(const mcmclib_vector_queue* q, const size_t i, gsl_vector* x) {
   assert(i < q->max_size);
   if(i == q->size) {
     static char msg[524];
