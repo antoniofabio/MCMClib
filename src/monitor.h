@@ -67,6 +67,13 @@ mcmclib_monitor_ecdf* mcmclib_monitor_ecdf_alloc(const gsl_matrix* X0);
 void mcmclib_monitor_ecdf_free(mcmclib_monitor_ecdf* p);
 void mcmclib_monitor_ecdf_update(mcmclib_monitor_ecdf* p, const gsl_vector* y);
 
+typedef struct monitor_acf_t* monitor_acf_h;
+monitor_acf_h monitor_acf_alloc(const size_t dim, const size_t lag);
+void monitor_acf_update(monitor_acf_h m, const gsl_vector* x);
+void monitor_acf_free(monitor_acf_h m);
+void monitor_acf_get(monitor_acf_h m, gsl_matrix* acf);
+void mcmclib_iact_from_acf(const gsl_matrix* ACF, gsl_vector* iact);
+
 /**@}*/
 /**@}*/
 
