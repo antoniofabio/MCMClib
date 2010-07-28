@@ -198,18 +198,18 @@ void mcmclib_monitor_ecdf_update(mcmclib_monitor_ecdf* p, const gsl_vector* y) {
   gsl_vector_scale(p->Fn, 1.0 / p->n);
 }
 
-typedef struct mcmclib_monitor_acf_t {
+struct mcmclib_monitor_acf_t {
   mcmclib_vector_queue* q;
   gsl_vector_uint* x_n; /*num. obs. so far, by lag*/
   gsl_matrix* x_sum;
   gsl_matrix* X_prod;
-} monitor_acf ;
+};
 
 static size_t monitor_acf_maxlag(const mcmclib_monitor_acf_h m) {
   return m->X_prod->size1 - 1;
 }
 
-static size_t monitor_acf_dim(const monitor_acf* m) {
+static size_t monitor_acf_dim(const mcmclib_monitor_acf_h m) {
   return m->x_sum->size2;
 }
 
@@ -234,7 +234,7 @@ void mcmclib_monitor_acf_free(mcmclib_monitor_acf_h m) {
   free(m);
 }
 
-#define DEBUG_PRINT_VEC(x) fprintf(stderr, "(%f, %f, ...)\n", gsl_vector_get(x, 0), gsl_vector_get(x, 1))
+#define DEBUG_PRINT_VEC(x) fprintf(stderr, "(%f, ...)\n", gsl_vector_get(x, 0))
 
 #define MIN(a, b) ((a) < (b) ? a : b)
 
