@@ -234,7 +234,7 @@ void mcmclib_monitor_acf_free(mcmclib_monitor_acf_h m) {
   free(m);
 }
 
-#define DEBUG_PRINT_VEC(x) fprintf(stderr, "(%f, ...)\n", gsl_vector_get(x, 0))
+#define DEBUG_PRINT_VEC(x) fprintf(stderr, "(%.3f, ...)\n", gsl_vector_get(x, 0))
 
 #define MIN(a, b) ((a) < (b) ? a : b)
 
@@ -283,30 +283,38 @@ void mcmclib_monitor_acf_get(mcmclib_monitor_acf_h m, gsl_matrix* acf) {
   const size_t dim = monitor_acf_dim(m);
   const size_t qsize = mcmclib_vector_queue_size(m->q);
   gsl_vector* x_sq = gsl_vector_alloc(dim);
+  const double n = (double) gsl_vector_uint_get(m->x_n, 0);
+
+  gsl_vector_const_view x0_sum_v = gsl_matrix_const_row(m->x_sum, 0);
+  gsl_vector_memcpy(x_sq, &(x0_sum_v.vector));
+  VECTOR_MAP(x_sq, xi*=xi);
+  gsl_vector_scale(x_sq, 1.0/n);
 
   for(size_t l = 0; l < qsize; l++) {
     gsl_vector_view x_cov_v = gsl_matrix_row(acf, l);
     gsl_vector* x_cov = &(x_cov_v.vector);
     gsl_vector_const_view xx_l_v = gsl_matrix_const_row(m->X_prod, l);
     gsl_vector_memcpy(x_cov, &(xx_l_v.vector));
-    gsl_vector_const_view x0_sum_v = gsl_matrix_const_row(m->x_sum, l);
-    gsl_vector_memcpy(x_sq, &(x0_sum_v.vector));
-    VECTOR_MAP(x_sq, xi*=xi);
     gsl_vector_sub(x_cov, x_sq);
+    fprintf(stderr, "lag=%zd; sum(xy) = %.3f; sum(x)^2/n=%.3f, cov = %.3f\n",
+	    l, gsl_vector_get(&(xx_l_v.vector), 0),
+	    gsl_vector_get(x_sq, 0),
+	    gsl_vector_get(x_cov, 0));
   }
+  gsl_vector_free(x_sq);
 
   gsl_vector_view var_v = gsl_matrix_row(acf, 0);
   gsl_vector* var = &(var_v.vector);
   assert(!gsl_vector_isneg(var));
+
   for(size_t l = 1; l < qsize; l++) {
     gsl_vector_view cv_l_v = gsl_matrix_row(acf, l);
     gsl_vector* cv_l = &(cv_l_v.vector);
     VECTOR_MAP(cv_l, xi /= gsl_vector_get(var, i));
+    fprintf(stderr, "acf[%zd] = %.3f; n=%.2f\n", l, gsl_vector_get(cv_l, 0), n);
   }
 
-  gsl_vector_free(x_sq);
-
-  gsl_matrix_scale(acf, 1.0 / ((double) gsl_vector_uint_get(m->x_n, 0)));
+  gsl_matrix_scale(acf, 1.0 / n);
 }
 
 void mcmclib_iact_from_acf(const gsl_matrix* ACF, gsl_vector* iact) {
