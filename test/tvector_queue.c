@@ -26,7 +26,6 @@ void Testvector_queue(CuTest* tc) {
   CuAssertIntEquals(tc, 0, mcmclib_vector_queue_size(q));
   append_value(1.0);
   CuAssertIntEquals(tc, 1, mcmclib_vector_queue_size(q));
-  printf("%f\n", get_value(0));
   CuAssertTrue(tc, get_value(0) == 1.0);
 
   append_value(2.0);
