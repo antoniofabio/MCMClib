@@ -29,7 +29,6 @@ void Testmonitor_acf(CuTest* tc) {
   ACF = gsl_matrix_alloc(MAX_LAG+1, 1);
   append(1.0);
   append(-1.0);
-  printf("%f\n", acf(0));
   CuAssertDblEquals(tc, 1.0, acf(0), TOL);
   append(1.0);
   double mean = 1.0/3.0;
