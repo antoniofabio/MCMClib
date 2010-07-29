@@ -338,7 +338,7 @@ void mcmclib_iact_from_acf(const gsl_matrix* ACF, gsl_vector* iact) {
   const size_t dim = ACF->size2;
   const size_t L = ACF->size1;
   assert(iact->size == dim);
-  for(size_t d = 0; d < dim; d++) {
+  for(size_t d = 1; d < dim; d++) {
     double a = 1.0;
     for(size_t l = 1; l <= L; l++) {
       a += (1.0 - (double) l / ((double) L)) * gsl_matrix_get(ACF, l, d);

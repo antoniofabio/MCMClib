@@ -48,6 +48,11 @@ void Testmonitor_acf(CuTest* tc) {
   CuAssertDblEquals(tc, var, acf(0), TOL);
   fprintf(stderr, "g[1] = %.3f\n", acf(1));
 
+  gsl_vector* iact = gsl_vector_alloc(1);
+  mcmclib_monitor_acf_get(m, ACF);
+  mcmclib_iact_from_acf(ACF, iact);
+  fprintf(stderr, "iact = %.3f\n", gsl_vector_get(iact, 0));
+
   gsl_matrix_free(ACF);
   mcmclib_monitor_acf_free(m);
   gsl_vector_free(x);
