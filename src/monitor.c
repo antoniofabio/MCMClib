@@ -234,17 +234,21 @@ void mcmclib_monitor_acf_free(mcmclib_monitor_acf_h m) {
   free(m);
 }
 
+#ifdef DEBUG
+#define PDEBUG(...) fprintf(stderr, ...)
 #define DEBUG_PRINT_VEC(x) fprintf(stderr, "(%.3f, ...)\n", gsl_vector_get(x, 0))
+#else
+#define PDEBUG(...)
+#define DEBUG_PRINT_VEC(x)
+#endif
 
 #define MIN(a, b) ((a) < (b) ? a : b)
 
 void mcmclib_monitor_acf_update(mcmclib_monitor_acf_h m, const gsl_vector* x) {
   const size_t dim = monitor_acf_dim(m);
   assert(x->size == dim);
-  fprintf(stderr, "acf_update: appending vector ");
+  PDEBUG("acf_update: appending vector ");
   DEBUG_PRINT_VEC(x);
-
-  const size_t maxlag = monitor_acf_maxlag(m);
 
   mcmclib_vector_queue_append(m->q, x);
 
@@ -252,21 +256,21 @@ void mcmclib_monitor_acf_update(mcmclib_monitor_acf_h m, const gsl_vector* x) {
   gsl_vector* y = gsl_vector_alloc(dim);
   const size_t qsize = mcmclib_vector_queue_size(m->q);
   for(size_t l = 0; l < qsize; l++) {
-    fprintf(stderr, "maxlag = %zd, lag %zd\n", maxlag, l);
+    PDEBUG("maxlag = %zd, lag %zd\n", qsize, l);
     mcmclib_vector_queue_get(m->q, l, y);
 
     gsl_vector_uint_set(m->x_n, l, gsl_vector_uint_get(m->x_n, l)+1);
 
     gsl_vector_view x_sum_l_v = gsl_matrix_row(m->x_sum, l);
     gsl_vector_add(&(x_sum_l_v.vector), y);
-    fprintf(stderr, "acf_update: lag %zd, partial lagged sum ", l);
+    PDEBUG("acf_update: lag %zd, partial lagged sum ", l);
     DEBUG_PRINT_VEC(&(x_sum_l_v.vector));
 
     gsl_vector_memcpy(xy, x);
     gsl_vector_mul(xy, y);
     gsl_vector_view xl_v = gsl_matrix_row(m->X_prod, l);
     gsl_vector_add(&xl_v.vector, xy);
-    fprintf(stderr, "acf_update: lag %zd, partial crossed product sum ", l);
+    PDEBUG("acf_update: lag %zd, partial crossed product sum ", l);
     DEBUG_PRINT_VEC(&xl_v.vector);
   }
   gsl_vector_free(y);
@@ -279,29 +283,42 @@ void mcmclib_monitor_acf_update(mcmclib_monitor_acf_h m, const gsl_vector* x) {
     gsl_vector_set(x, i, xi);						\
 }
 
+static double square(const double x) {
+  return x*x;
+}
+
 void mcmclib_monitor_acf_get(mcmclib_monitor_acf_h m, gsl_matrix* acf) {
   const size_t dim = monitor_acf_dim(m);
   const size_t qsize = mcmclib_vector_queue_size(m->q);
-  gsl_vector* x_sq = gsl_vector_alloc(dim);
+  gsl_vector* mu = gsl_vector_alloc(dim);
+  gsl_vector* mu_sq = gsl_vector_alloc(dim);
   const double n = (double) gsl_vector_uint_get(m->x_n, 0);
 
   gsl_vector_const_view x0_sum_v = gsl_matrix_const_row(m->x_sum, 0);
-  gsl_vector_memcpy(x_sq, &(x0_sum_v.vector));
-  VECTOR_MAP(x_sq, xi*=xi);
-  gsl_vector_scale(x_sq, 1.0/n);
+  const gsl_vector* x0_sum = &(x0_sum_v.vector);
+  gsl_vector_memcpy(mu, x0_sum);
+  gsl_vector_scale(mu, 1.0/n);
+  VECTOR_MAP(mu_sq, xi=square(gsl_vector_get(mu, i)));
 
   for(size_t l = 0; l < qsize; l++) {
+    gsl_vector_const_view xl_sum_v = gsl_matrix_const_row(m->x_sum, l);
+    const gsl_vector* xl_sum = &(xl_sum_v.vector);
     gsl_vector_view x_cov_v = gsl_matrix_row(acf, l);
     gsl_vector* x_cov = &(x_cov_v.vector);
+    gsl_vector_memcpy(x_cov, xl_sum);
+    gsl_vector_add(x_cov, x0_sum);
+    gsl_vector_mul(x_cov, mu);
+    gsl_vector_scale(x_cov, -1.0);
     gsl_vector_const_view xx_l_v = gsl_matrix_const_row(m->X_prod, l);
-    gsl_vector_memcpy(x_cov, &(xx_l_v.vector));
-    gsl_vector_sub(x_cov, x_sq);
-    fprintf(stderr, "lag=%zd; sum(xy) = %.3f; sum(x)^2/n=%.3f, cov = %.3f\n",
-	    l, gsl_vector_get(&(xx_l_v.vector), 0),
-	    gsl_vector_get(x_sq, 0),
-	    gsl_vector_get(x_cov, 0));
+    gsl_vector_add(x_cov, &(xx_l_v.vector));
+    gsl_vector_add(x_cov, mu_sq);
+    PDEBUG(stderr, "lag=%zd; sum(xy) = %.3f; sum(x)^2/n=%.3f, cov = %.3f\n",
+	   l, gsl_vector_get(&(xx_l_v.vector), 0),
+	   gsl_vector_get(mu_sq, 0),
+	   gsl_vector_get(x_cov, 0));
   }
-  gsl_vector_free(x_sq);
+  gsl_vector_free(mu_sq);
+  gsl_vector_free(mu);
 
   gsl_vector_view var_v = gsl_matrix_row(acf, 0);
   gsl_vector* var = &(var_v.vector);
@@ -311,7 +328,7 @@ void mcmclib_monitor_acf_get(mcmclib_monitor_acf_h m, gsl_matrix* acf) {
     gsl_vector_view cv_l_v = gsl_matrix_row(acf, l);
     gsl_vector* cv_l = &(cv_l_v.vector);
     VECTOR_MAP(cv_l, xi /= gsl_vector_get(var, i));
-    fprintf(stderr, "acf[%zd] = %.3f; n=%.2f\n", l, gsl_vector_get(cv_l, 0), n);
+    PDEBUG("acf[%zd] = %.3f; n=%.2f\n", l, gsl_vector_get(cv_l, 0), n);
   }
 
   gsl_matrix_scale(acf, 1.0 / n);
