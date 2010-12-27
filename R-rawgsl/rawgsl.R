@@ -20,3 +20,18 @@ dyn.import(pst("gsl_",
                  pst("rng_", c("alloc", "free")),
                  pst("ran_", pst(distribs, c("", "_pdf"))))),
            rawgsl)
+
+## utility functions
+with(rawgsl, {
+  gvec_get <- function(x, ii) sapply(as.list(ii), function(i) gsl_vector_get(x, as.integer(i), RETURN=doubleType))
+  gvec_set <- function(x, ii, val) {
+    mapply(function(i, val.i) gsl_vector_set(x, as.integer(i), as.double(val.i)),
+           as.list(ii), as.list(val))
+    return(invisible(val))
+  }
+  gmat_get <- function(x, ii, jj) {
+    outer(ii, jj, function(i, j) {
+      gsl_matrix_get(x, as.integer(i), as.integer(j), RETURN=doubleType)
+    })
+  }
+})
