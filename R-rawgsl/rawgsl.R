@@ -71,9 +71,9 @@ with(rawgsl, {
   }
 
   gmat_get <- function(x, ii, jj) {
-    outer(ii, jj, function(i, j) {
+    outer(ii, jj, Vectorize(function(i, j) {
       gsl_matrix_get(x, as.integer(i), as.integer(j), RETURN=doubleType)
-    })
+    }))
   }
 
   gmat2mat <- function(x) {
