@@ -48,3 +48,9 @@ int mcmclib_amh_update(mcmclib_amh* p) {
   }
   return(p->mh->last_accepted);
 }
+
+void mcmclib_amh_update_N(mcmclib_amh* p, size_t N) {
+  for(size_t i = 0; i<N; i++) {
+    mcmclib_amh_update(p);
+  }
+}

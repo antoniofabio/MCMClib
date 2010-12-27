@@ -49,6 +49,12 @@ int mcmclib_mh_update(mcmclib_mh* p) {
   return(p->last_accepted);
 }
 
+void mcmclib_mh_update_N(mcmclib_mh* p, size_t N) {
+  for(size_t i = 0; i < N; i++) {
+    mcmclib_mh_update(p);
+  }
+}
+
 int mcmclib_mh_generic_step(const gsl_rng* r, gsl_vector* old, gsl_vector* x,
 			    distrfun_p logdistr, void* data,
 			    double* plogdistr_old, mcmclib_mh_q* q) {

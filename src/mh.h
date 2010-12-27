@@ -52,6 +52,9 @@ void mcmclib_mh_free(mcmclib_mh* p);
 \return 1 if move accepted, 0 if rejected*/
 int mcmclib_mh_update(mcmclib_mh* p);
 
+/**\brief update chain value N times*/
+void mcmclib_mh_update_N(mcmclib_mh* p, size_t N);
+
 /**\brief reset chain */
 void mcmclib_mh_reset(mcmclib_mh* p);
 
