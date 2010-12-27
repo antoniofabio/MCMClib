@@ -15,9 +15,10 @@ rng <- gsl_rng_alloc(pp, RETURN=pointerType)
 
 xx <- replicate(1000, gsl_ran_gaussian(rng, 1.0, RETURN=doubleType))
 
-dyn.load("../src/libmcmclib.so")
+dyn.load("../src/libmcmclib.so", local=FALSE)
 x <- gsl_vector_alloc(100L, RETURN=pointerType)
-for(i in (seq_len(100)-1)) gsl_vector_set(x, as.integer(i), 0.0)
+gvec_set(x, 0:99, 0.0)
+
 dyn.load("f.so")
 f <- getNativeSymbolInfo("f")$address
 sampler <- mcmclib_gauss_scalar_am_alloc(rng, f, 0L, x, 3.0, 1000L,
