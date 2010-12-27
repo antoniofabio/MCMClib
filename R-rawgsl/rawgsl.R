@@ -31,7 +31,7 @@ dyn.constantPtr(pst("gsl_rng_",
 ## utility functions and additional types
 with(rawgsl, {
 
-  gvec.type <- structType(list(size = uint32Type, stride = uint32Type,
+  gvec.type <- structType(list(size = uint64Type, stride = uint64Type,
                                data = pointerType, block = pointerType,
                                owner = sint32Type))
 
@@ -55,8 +55,8 @@ with(rawgsl, {
     return(y)
   }
   
-  gmat.type <- structType(list(size1 = uint32Type, size2 = uint32Type,
-                               tda = uint32Type,
+  gmat.type <- structType(list(size1 = uint64Type, size2 = uint64Type,
+                               tda = uint64Type,
                                data = pointerType, block = pointerType,
                                owner = sint32Type))
 
