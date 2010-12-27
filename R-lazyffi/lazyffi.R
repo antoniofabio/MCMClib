@@ -32,3 +32,13 @@ dyn.import <- function(symbs, envir=parent.frame()) {
     assign(symbol, make.fun(symbol), envir=envir)
   }
 }
+
+dyn.constantPtr <- function(symbs, envir=parent.frame()) {
+  for(symbol in symbs) {
+    f <- function() {
+      force(symbol)
+      return(getNativeValue(getNativeSymbolInfo(symbol)$address, pointerType))
+    }
+    assign(symbol, f, envir=envir)
+  }
+}

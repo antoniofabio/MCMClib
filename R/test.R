@@ -10,11 +10,12 @@ x1 <- gvec2vec(gx)
 stopifnot(identical(x, x1))
 gsl_vector_free(gx)
 
-pp <- getNativeValue(getNativeSymbolInfo("gsl_rng_default")$address,
-                     pointerType)
-rng <- gsl_rng_alloc(pp, RETURN=pointerType)
-
-xx <- replicate(1000, gsl_ran_gaussian(rng, 1.0, RETURN=doubleType))
+rng <- gsl_rng_alloc(gsl_rng_default(), RETURN=pointerType)
+gsl_rng_set(rng, 1234L)
+x1 <- replicate(100, gsl_ran_gaussian(rng, 1.0, RETURN=doubleType))
+gsl_rng_set(rng, 1234L)
+x2 <- replicate(100, gsl_ran_gaussian(rng, 1.0, RETURN=doubleType))
+stopifnot(identical(x1, x2))
 
 dyn.load("../src/libmcmclib.so", local=FALSE)
 dim <- 1000
@@ -28,9 +29,7 @@ system.time(mcmclib_amh_update_N(sampler, 10000L))
 y <- gvec2vec(x)
 mcmclib_amh_free(sampler)
 
-pp <- getNativeValue(getNativeSymbolInfo("gsl_rng_default")$address,
-                     pointerType)
-rng <- gsl_rng_alloc(pp, RETURN=pointerType)
+rng <- gsl_rng_alloc(gsl_rng_default(), RETURN=pointerType)
 gvec_set(x, seq_len(dim)-1, 0.0)
 sampler <- mcmclib_gauss_rw_alloc(rng, f, 0L, x, 0.1,
                                   RETURN = pointerType)
