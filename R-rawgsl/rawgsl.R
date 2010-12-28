@@ -21,12 +21,12 @@ dyn.import(pst("gsl_",
                  pst("ran_", pst(distribs, c("", "_pdf"))))),
            rawgsl)
 
-dyn.constantPtr(pst("gsl_rng_",
-                    c("default",
-                      "mt19937", "ranlxs0", "ranlxs1", "ranlxs2",
-                      "ranlxd1", "ranlxd2", "ranlux", "ranlux389",
-                      "cmrg", "mrg", "taus", "taus2", "gfsr4")),
-                rawgsl)
+dyn.constant(pst("gsl_rng_",
+                 c("default",
+                   "mt19937", "ranlxs0", "ranlxs1", "ranlxs2",
+                   "ranlxd1", "ranlxd2", "ranlux", "ranlux389",
+                   "cmrg", "mrg", "taus", "taus2", "gfsr4")),
+             rawgsl)
 
 ## utility functions and additional types
 with(rawgsl, {
