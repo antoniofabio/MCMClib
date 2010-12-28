@@ -205,10 +205,6 @@ struct mcmclib_monitor_acf_t {
   gsl_matrix* X_prod;
 };
 
-static size_t monitor_acf_maxlag(const mcmclib_monitor_acf_h m) {
-  return m->X_prod->size1 - 1;
-}
-
 static size_t monitor_acf_dim(const mcmclib_monitor_acf_h m) {
   return m->x_sum->size2;
 }
