@@ -205,10 +205,6 @@ struct mcmclib_monitor_acf_t {
   gsl_matrix* X_prod;
 };
 
-static size_t monitor_acf_maxlag(const mcmclib_monitor_acf_h m) {
-  return m->X_prod->size1 - 1;
-}
-
 static size_t monitor_acf_dim(const mcmclib_monitor_acf_h m) {
   return m->x_sum->size2;
 }
@@ -235,7 +231,7 @@ void mcmclib_monitor_acf_free(mcmclib_monitor_acf_h m) {
 }
 
 #ifdef DEBUG
-#define PDEBUG(...) fprintf(stderr, ...)
+#define PDEBUG(...) fprintf(stderr, __VA_ARGS__)
 #define DEBUG_PRINT_VEC(x) fprintf(stderr, "(%.3f, ...)\n", gsl_vector_get(x, 0))
 #else
 #define PDEBUG(...)
@@ -295,6 +291,7 @@ void mcmclib_monitor_acf_get(mcmclib_monitor_acf_h m, gsl_matrix* acf) {
   gsl_vector* mu = gsl_vector_alloc(dim);
   gsl_vector* mu_sq = gsl_vector_alloc(dim);
   const double n = (double) gsl_vector_uint_get(m->x_n, 0);
+  PDEBUG("n = %.3f\n", n);
 
   gsl_vector_const_view x0_sum_v = gsl_matrix_const_row(m->x_sum, 0);
   const gsl_vector* x0_sum = &(x0_sum_v.vector);
@@ -303,19 +300,16 @@ void mcmclib_monitor_acf_get(mcmclib_monitor_acf_h m, gsl_matrix* acf) {
   VECTOR_MAP(mu_sq, xi=square(gsl_vector_get(mu, i)));
 
   for(size_t l = 0; l < qsize; l++) {
-    gsl_vector_const_view xl_sum_v = gsl_matrix_const_row(m->x_sum, l);
-    const gsl_vector* xl_sum = &(xl_sum_v.vector);
     gsl_vector_view x_cov_v = gsl_matrix_row(acf, l);
     gsl_vector* x_cov = &(x_cov_v.vector);
-    gsl_vector_memcpy(x_cov, xl_sum);
-    gsl_vector_add(x_cov, x0_sum);
-    gsl_vector_mul(x_cov, mu);
-    gsl_vector_scale(x_cov, -1.0);
     gsl_vector_const_view xx_l_v = gsl_matrix_const_row(m->X_prod, l);
-    gsl_vector_add(x_cov, &(xx_l_v.vector));
+    gsl_vector_memcpy(x_cov, &(xx_l_v.vector));
+    gsl_vector_scale(x_cov, 1.0/n);
+    gsl_vector_scale(mu_sq, -1.0);
     gsl_vector_add(x_cov, mu_sq);
-    PDEBUG(stderr, "lag=%zd; sum(xy) = %.3f; sum(x)^2/n=%.3f, cov = %.3f\n",
-	   l, gsl_vector_get(&(xx_l_v.vector), 0),
+    PDEBUG("lag=%zd; sum(xy) = %.3f; mean(x)^2=%.3f, cov = %.3f\n",
+	   l,
+	   gsl_vector_get(&(xx_l_v.vector), 0),
 	   gsl_vector_get(mu_sq, 0),
 	   gsl_vector_get(x_cov, 0));
   }
@@ -330,11 +324,8 @@ void mcmclib_monitor_acf_get(mcmclib_monitor_acf_h m, gsl_matrix* acf) {
     gsl_vector_view cv_l_v = gsl_matrix_row(acf, l);
     gsl_vector* cv_l = &(cv_l_v.vector);
     VECTOR_MAP(cv_l, xi /= gsl_vector_get(var, i));
-    gsl_vector_scale(cv_l, n);
     PDEBUG("acf[%zd] = %.3f; n=%.2f\n", l, gsl_vector_get(cv_l, 0), n);
   }
-
-  gsl_matrix_scale(acf, 1.0 / n);
 }
 
 void mcmclib_iact_from_acf(const gsl_matrix* ACF, gsl_vector* iact) {
