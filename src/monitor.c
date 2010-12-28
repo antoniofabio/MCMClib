@@ -330,6 +330,7 @@ void mcmclib_monitor_acf_get(mcmclib_monitor_acf_h m, gsl_matrix* acf) {
     gsl_vector_view cv_l_v = gsl_matrix_row(acf, l);
     gsl_vector* cv_l = &(cv_l_v.vector);
     VECTOR_MAP(cv_l, xi /= gsl_vector_get(var, i));
+    gsl_vector_scale(cv_l, n);
     PDEBUG("acf[%zd] = %.3f; n=%.2f\n", l, gsl_vector_get(cv_l, 0), n);
   }
 
