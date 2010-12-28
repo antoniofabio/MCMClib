@@ -21,4 +21,14 @@ with(mcmclib, {
   monitor_ecdf_get_Fn <- function(m) {
     return(gvec2vec(getStructField(m, "Fn", monitor_ecdf.type)))
   }
+
+  iact_from_acf <- function(ACF) {
+    gA <- mat2gmat(ACF)
+    iact <- vec2gvec(rep(0.0, NCOL(ACF)))
+    mcmclib_iact_from_acf(gA, iact)
+    ans <- gvec2vec(iact)
+    gsl_matrix_free(gA)
+    gsl_vector_free(iact)
+    return(ans)
+  }
 })

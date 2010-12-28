@@ -6,7 +6,6 @@ dyn.load("/usr/lib/libgslcblas.so", local=FALSE)
 dyn.load("/usr/lib/libgsl.so", local=FALSE)
 dyn.load("../src/libmcmclib.so", local=FALSE)
 
-set.seed(1234)
 xseq <- c(-1, 1)
 
 cv <- function(x, y) mean(x*y) - mean(x)*mean(y)
@@ -60,7 +59,4 @@ gen <- function() arima.sim(n=n, list(ar=c(-0.3, 0.3), ma=c()), sd = sqrt(2))
 xx <- cbind(x1=gen(), x2=gen(), x3=gen())
 
 A <- g1(xx, lag.max=100)
-gA <- mat2gmat(A)
-iact <- vec2gvec(rep(0.0, NCOL(xx)))
-mcmclib_iact_from_acf(gA, iact)
-gvec2vec(iact)
+iact_from_acf(A)
