@@ -328,15 +328,16 @@ void mcmclib_monitor_acf_get(mcmclib_monitor_acf_h m, gsl_matrix* acf) {
   }
 }
 
+/* 1 + 2 * sum(acf) */
 void mcmclib_iact_from_acf(const gsl_matrix* ACF, gsl_vector* iact) {
   const size_t dim = ACF->size2;
-  const size_t L = ACF->size1;
+  const size_t L = ACF->size1 - 1;
   assert(iact->size == dim);
-  for(size_t d = 1; d < dim; d++) {
-    double a = 1.0;
+  for(size_t d = 0; d < dim; d++) {
+    double a = 0.0;
     for(size_t l = 1; l <= L; l++) {
-      a += (1.0 - (double) l / ((double) L)) * gsl_matrix_get(ACF, l, d);
+      a += gsl_matrix_get(ACF, l, d);
     }
-    gsl_vector_set(iact, d, a);
+    gsl_vector_set(iact, d, 1.0 + 2.0 * a);
   }
 }

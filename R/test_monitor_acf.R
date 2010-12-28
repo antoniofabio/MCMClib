@@ -50,3 +50,17 @@ xx <- cbind(x1=gen(), x2=gen(), x3=gen())
 
 g(xx, lag.max=3)
 g1(xx, lag.max=3)
+
+##
+## Test IACT
+##
+set.seed(1234)
+n <- 1000
+gen <- function() arima.sim(n=n, list(ar=c(-0.3, 0.3), ma=c()), sd = sqrt(2))
+xx <- cbind(x1=gen(), x2=gen(), x3=gen())
+
+A <- g1(xx, lag.max=100)
+gA <- mat2gmat(A)
+iact <- vec2gvec(rep(0.0, NCOL(xx)))
+mcmclib_iact_from_acf(gA, iact)
+gvec2vec(iact)
