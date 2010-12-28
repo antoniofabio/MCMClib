@@ -290,6 +290,8 @@ static double square(const double x) {
 void mcmclib_monitor_acf_get(mcmclib_monitor_acf_h m, gsl_matrix* acf) {
   const size_t dim = monitor_acf_dim(m);
   const size_t qsize = mcmclib_vector_queue_size(m->q);
+  assert(acf->size1 >= qsize);
+  assert(acf->size2 == dim);
   gsl_vector* mu = gsl_vector_alloc(dim);
   gsl_vector* mu_sq = gsl_vector_alloc(dim);
   const double n = (double) gsl_vector_uint_get(m->x_n, 0);
