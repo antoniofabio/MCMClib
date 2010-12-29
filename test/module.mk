@@ -5,7 +5,7 @@ TEST_names := t1 t2 \
 	tmh_q tmh tmh2 tmh3 tgauss_rw tgauss_mrw \
 	tamh tamh2 trapt_q trapt traptor traptor3 tgauss_am tat7 \
 	tinca \
-	tmonitor tmonitor2 tvector_queue
+	tmonitor tmonitor2 tvector_queue tmonitor_acf
 TEST_CFLAGS := $(CFLAGS) -I./src
 TEST_OBJ:= $(TEST_names:%=test/%.o)
 TEST_LDFLAGS:= test/CuTest.o $(TEST_OBJ) src/libmcmclib.a $(LDFLAGS)

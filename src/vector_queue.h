@@ -23,6 +23,7 @@ mcmclib_vector_queue* mcmclib_vector_queue_alloc(const size_t dim, const size_t 
 void mcmclib_vector_queue_free(mcmclib_vector_queue* q);
 int mcmclib_vector_queue_append(mcmclib_vector_queue* q, const gsl_vector* x);
 size_t mcmclib_vector_queue_size(const mcmclib_vector_queue* q);
+size_t mcmclib_vector_queue_size_max(const mcmclib_vector_queue* q);
 int mcmclib_vector_queue_get(const mcmclib_vector_queue* q, const size_t lag, gsl_vector* x);
 
 /**@}*/
