@@ -69,6 +69,10 @@ size_t mcmclib_vector_queue_size(const mcmclib_vector_queue* q) {
   return q->size;
 }
 
+size_t mcmclib_vector_queue_size_max(const mcmclib_vector_queue* q) {
+  return q->max_size;
+}
+
 int mcmclib_vector_queue_get(const mcmclib_vector_queue* q, const size_t i, gsl_vector* x) {
   assert(i < q->max_size);
   if(i == q->size) {
