@@ -344,6 +344,7 @@ void mcmclib_monitor_acf_get(mcmclib_monitor_acf_h m, gsl_matrix* acf) {
 	   gsl_vector_get(mu, 0),
 	   gsl_vector_get(x_cov, 0));
   }
+  gsl_vector_free(y);
   gsl_vector_free(sum_last_l);
   gsl_vector_free(mu);
 

@@ -51,6 +51,7 @@ void Testmonitor_acf(CuTest* tc) {
   mcmclib_iact_from_acf(ACF, iact);
   CuAssertDblEquals(tc, -0.5, gsl_vector_get(iact, 0), TOL);
 
+  gsl_vector_free(iact);
   gsl_matrix_free(ACF);
   mcmclib_monitor_acf_free(m);
   gsl_vector_free(x);
