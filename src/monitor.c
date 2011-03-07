@@ -78,30 +78,6 @@ static void vec_sq(gsl_vector* dest, const gsl_vector* x) {
   }
 }
 
-int mcmclib_monitor_update(mcmclib_monitor_h p) {
-  if(!mcmclib_vector_is_finite(p->x))
-    GSL_ERROR("non-finite vector value", GSL_EDOM);
-
-  const gsl_vector* x = p->x;
-
-  p->n += 1.0;
-  gsl_vector_add(p->sum_x, x);
-
-  vec_sq(p->xsq, x);
-  gsl_vector_add(p->sum_xsq, p->xsq);
-
-  gsl_vector_memcpy(p->xsq, p->x_last);
-  gsl_vector_memcpy(p->x_last, x);
-  gsl_vector_sub(p->xsq, x);
-  vec_sq(p->xsq, p->xsq);
-  gsl_vector_add(p->SJD, p->xsq);
-
-  vec_is_null(p->xsq);
-  gsl_vector_add(p->AR, p->xsq);
-
-  return GSL_SUCCESS;
-}
-
 static void update_means(mcmclib_monitor_h p) {
   double n1 = 1.0 / p->n;
   gsl_vector_memcpy(p->xm, p->sum_x);
@@ -129,52 +105,65 @@ static void update_MSJD(mcmclib_monitor_h p) {
   gsl_vector_scale(p->msjd, n1);
 }
 
-void mcmclib_monitor_update_all(mcmclib_monitor_h p) {
+int mcmclib_monitor_update(mcmclib_monitor_h p) {
+  if(!mcmclib_vector_is_finite(p->x))
+    GSL_ERROR("non-finite vector value", GSL_EDOM);
+
+  const gsl_vector* x = p->x;
+
+  p->n += 1.0;
+  gsl_vector_add(p->sum_x, x);
+
+  vec_sq(p->xsq, x);
+  gsl_vector_add(p->sum_xsq, p->xsq);
+
+  gsl_vector_memcpy(p->xsq, p->x_last);
+  gsl_vector_memcpy(p->x_last, x);
+  gsl_vector_sub(p->xsq, x);
+  vec_sq(p->xsq, p->xsq);
+  gsl_vector_add(p->SJD, p->xsq);
+
+  vec_is_null(p->xsq);
+  gsl_vector_add(p->AR, p->xsq);
+
   update_means(p);
   update_variances(p);
   update_AR(p);
   update_MSJD(p);
+
+  return GSL_SUCCESS;
 }
 
-void mcmclib_monitor_get_means(mcmclib_monitor_h p, gsl_vector* out) {
-  update_means(p);
+void mcmclib_monitor_get_means(const mcmclib_monitor_h p, gsl_vector* out) {
   gsl_vector_memcpy(out, p->xm);
 }
-void mcmclib_monitor_get_vars(mcmclib_monitor_h p, gsl_vector* out) {
-  update_variances(p);
+void mcmclib_monitor_get_vars(const mcmclib_monitor_h p, gsl_vector* out) {
   gsl_vector_memcpy(out, p->xvar);
 }
-void mcmclib_monitor_get_ar(mcmclib_monitor_h p, gsl_vector* out) {
-  update_AR(p);
+void mcmclib_monitor_get_ar(const mcmclib_monitor_h p, gsl_vector* out) {
   gsl_vector_memcpy(out, p->ar);
 }
-void mcmclib_monitor_get_msjd(mcmclib_monitor_h p, gsl_vector* out) {
-  update_MSJD(p);
+void mcmclib_monitor_get_msjd(const mcmclib_monitor_h p, gsl_vector* out) {
   gsl_vector_memcpy(out, p->msjd);
 }
 
-void mcmclib_monitor_fprintf_means(mcmclib_monitor_h p, FILE* f) {
-  update_means(p);
+void mcmclib_monitor_fprintf_means(const mcmclib_monitor_h p, FILE* f) {
   gsl_vector_fprintf(f, p->xm, "%f");
 }
 
-void mcmclib_monitor_fprintf_vars(mcmclib_monitor_h p, FILE* f) {
-  update_means(p);
-  update_variances(p);
+void mcmclib_monitor_fprintf_vars(const mcmclib_monitor_h p, FILE* f) {
   gsl_vector_fprintf(f, p->xvar, "%f");
 }
 
-void mcmclib_monitor_fprintf_AR(mcmclib_monitor_h p, FILE* f) {
-  update_AR(p);
+void mcmclib_monitor_fprintf_AR(const mcmclib_monitor_h p, FILE* f) {
   gsl_vector_fprintf(f, p->ar, "%f");
 }
 
-void mcmclib_monitor_fprintf_MSJD(mcmclib_monitor_h p, FILE* f) {
-  update_MSJD(p);
+void mcmclib_monitor_fprintf_MSJD(const mcmclib_monitor_h p, FILE* f) {
   gsl_vector_fprintf(f, p->msjd, "%f");
 }
 
-void mcmclib_monitor_fprintf_all(mcmclib_monitor_h p, FILE* f) {
+void mcmclib_monitor_fprintf_all(const mcmclib_monitor_h p, FILE* f) {
   mcmclib_monitor_fprintf_means(p, f);
   mcmclib_monitor_fprintf_vars(p, f);
   mcmclib_monitor_fprintf_AR(p, f);

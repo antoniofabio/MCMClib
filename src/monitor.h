@@ -34,22 +34,20 @@ void mcmclib_monitor_free(mcmclib_monitor_h p);
 int mcmclib_monitor_update(mcmclib_monitor_h p);
 
 /** get scalar means */
-void mcmclib_monitor_get_means(mcmclib_monitor_h p, gsl_vector* out);
+void mcmclib_monitor_get_means(const mcmclib_monitor_h p, gsl_vector* out);
 /** get scalar variances */
-void mcmclib_monitor_get_vars(mcmclib_monitor_h p, gsl_vector* out);
+void mcmclib_monitor_get_vars(const mcmclib_monitor_h p, gsl_vector* out);
 /** get scalar acceptance rates */
-void mcmclib_monitor_get_ar(mcmclib_monitor_h p, gsl_vector* out);
+void mcmclib_monitor_get_ar(const mcmclib_monitor_h p, gsl_vector* out);
 /** get scalar MSJD */
-void mcmclib_monitor_get_msjd(mcmclib_monitor_h p, gsl_vector* out);
+void mcmclib_monitor_get_msjd(const mcmclib_monitor_h p, gsl_vector* out);
 
-/** update all the monitored stats*/
-void mcmclib_monitor_update_all(mcmclib_monitor_h p);
-void mcmclib_monitor_fprintf_means(mcmclib_monitor_h p, FILE* f);
-void mcmclib_monitor_fprintf_vars(mcmclib_monitor_h p, FILE* f);
-void mcmclib_monitor_fprintf_AR(mcmclib_monitor_h p, FILE* f);
-void mcmclib_monitor_fprintf_MSJD(mcmclib_monitor_h p, FILE* f);
+void mcmclib_monitor_fprintf_means(const mcmclib_monitor_h p, FILE* f);
+void mcmclib_monitor_fprintf_vars(const mcmclib_monitor_h p, FILE* f);
+void mcmclib_monitor_fprintf_AR(const mcmclib_monitor_h p, FILE* f);
+void mcmclib_monitor_fprintf_MSJD(const mcmclib_monitor_h p, FILE* f);
 /** formatted print of all the diagnostics on file 'f'*/
-void mcmclib_monitor_fprintf_all(mcmclib_monitor_h p, FILE* f);
+void mcmclib_monitor_fprintf_all(const mcmclib_monitor_h p, FILE* f);
 /**@}*/
 /**@}*/
 
