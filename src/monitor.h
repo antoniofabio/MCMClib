@@ -19,6 +19,10 @@
 
 #define EQ_TOL 1e-10 /**< equality check tolerance*/
 
+/**@{
+\defgroup Base Mean, Variance, Acceptance Rate, Mean Squared Jumping Distance
+@{*/
+
 /** Scalar MCMC diagnostics on a 'monitored' vector */
 typedef struct {
   const gsl_vector* x; /**< current value */
@@ -55,21 +59,41 @@ void mcmclib_monitor_fprintf_AR(mcmclib_monitor* p, FILE* f);
 void mcmclib_monitor_fprintf_MSJD(mcmclib_monitor* p, FILE* f);
 /** formatted print of all the diagnostics on file 'f'*/
 void mcmclib_monitor_fprintf_all(mcmclib_monitor* p, FILE* f);
+/**@}*/
+/**@}*/
 
+/**@{
+\defgroup ECDF Empirical Cumulative Distrubution Function
+@{*/
 typedef struct mcmclib_monitor_ecdf_t* mcmclib_monitor_ecdf_h;
 
-/** Empirical CDF function live computation */
+/** Alloc a new monitor_ecdf object*/
 mcmclib_monitor_ecdf_h mcmclib_monitor_ecdf_alloc(const gsl_matrix* X0);
+/** Free a previously allocated monitor_ecdf object*/
 void mcmclib_monitor_ecdf_free(mcmclib_monitor_ecdf_h p);
+/** Update the ECDF*/
 void mcmclib_monitor_ecdf_update(mcmclib_monitor_ecdf_h p, const gsl_vector* y);
+/** Get the current ECDF estimate*/
+void mcmclib_monitor_ecdf_get(const mcmclib_monitor_ecdf_h p, gsl_vector* Fn);
+/**@}*/
+/**@}*/
 
+
+/**@{
+\defgroup ACF AutoCorrelation Function
+@{*/
 typedef struct mcmclib_monitor_acf_t* mcmclib_monitor_acf_h;
-/** Autocorrelation function live computation */
+/** Alloc a new monitor_acf object*/
 mcmclib_monitor_acf_h mcmclib_monitor_acf_alloc(const size_t dim, const size_t lag);
-void mcmclib_monitor_acf_update(mcmclib_monitor_acf_h m, const gsl_vector* x);
+/** Free a previously allocated monitor_acf object*/
 void mcmclib_monitor_acf_free(mcmclib_monitor_acf_h m);
+/** Update the ACF*/
+void mcmclib_monitor_acf_update(mcmclib_monitor_acf_h m, const gsl_vector* x);
+/** Get the current ACF estimate*/
 void mcmclib_monitor_acf_get(mcmclib_monitor_acf_h m, gsl_matrix* acf);
 void mcmclib_iact_from_acf(const gsl_matrix* ACF, gsl_vector* iact);
+/**@}*/
+/**@}*/
 
 /**@}*/
 /**@}*/

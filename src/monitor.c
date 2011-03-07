@@ -204,6 +204,9 @@ void mcmclib_monitor_ecdf_update(mcmclib_monitor_ecdf_h p, const gsl_vector* y) 
   p->n += 1.0;
   gsl_vector_scale(p->Fn, 1.0 / p->n);
 }
+void mcmclib_monitor_ecdf_get(const mcmclib_monitor_ecdf_h p, gsl_vector* Fn) {
+  gsl_vector_memcpy(p->Fn, Fn);
+}
 
 struct mcmclib_monitor_acf_t {
   mcmclib_vector_queue* q; /* last 'lag_max' observed points */
