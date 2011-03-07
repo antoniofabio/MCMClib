@@ -35,23 +35,21 @@ void Testmonitor_acf(CuTest* tc) {
   append(1.0);
   double mean = 1.0/3.0;
   double var = 1.0 - mean*mean;
-  //  CuAssertDblEquals(tc, var, acf(0), TOL);
+  CuAssertDblEquals(tc, var, acf(0), TOL);
 
-  double acf_check = (-1.0 - mean*mean) / var;
-  fprintf(stderr, "g[1] = %.3f\n", acf(1));
-  //  CuAssertDblEquals(tc, acf_check, acf(1), TOL);
+  double acf_check = -2.0/3.0;
+  CuAssertDblEquals(tc, acf_check, acf(1), TOL);
 
   append(-1.0);
   mean = 0.0;
   var = 1.0;
-  acf_check = -1.0;
-  CuAssertDblEquals(tc, var, acf(0), TOL);
-  fprintf(stderr, "g[1] = %.3f\n", acf(1));
+  CuAssertDblEquals(tc, 1.0, acf(0), TOL);
+  CuAssertDblEquals(tc, -3.0/4.0, acf(1), TOL);
 
   gsl_vector* iact = gsl_vector_alloc(1);
   mcmclib_monitor_acf_get(m, ACF);
   mcmclib_iact_from_acf(ACF, iact);
-  fprintf(stderr, "iact = %.3f\n", gsl_vector_get(iact, 0));
+  CuAssertDblEquals(tc, -0.5, gsl_vector_get(iact, 0), TOL);
 
   gsl_matrix_free(ACF);
   mcmclib_monitor_acf_free(m);
