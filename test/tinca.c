@@ -45,7 +45,9 @@ void Testinca(CuTest* tc) {
   double inc = 0.2;
   double suff = 0.0;
   mcmclib_mh_q* q = mcmclib_mh_q_alloc(r, sampler, NULL, &inc, NULL);
-  mcmclib_mh* mh = mcmclib_mh_alloc(r, dtarget, NULL, q, gsl_vector_alloc(1));
+  gsl_vector* x_trash = gsl_vector_alloc(1);
+  gsl_vector_set_zero(x_trash);
+  mcmclib_mh* mh = mcmclib_mh_alloc(r, dtarget, NULL, q, x_trash);
   mcmclib_amh* amh = mcmclib_amh_alloc(mh, 0, &suff, NULL, update_suff, NULL);
   mcmclib_inca* s = mcmclib_inca_alloc(amh, x, 2);
   double suff_check = 0.0;
@@ -58,6 +60,7 @@ void Testinca(CuTest* tc) {
   CuAssertTrue(tc, check_dequal(v0(x[0]), inc * 2));
   CuAssertTrue(tc, check_dequal(v0(x[1]), inc * 2 + 0.1));
 
+  gsl_vector_free(x_trash);
   mcmclib_inca_free(s);
   for(int m=0; m<2; m++)
     gsl_vector_free(x[m]);
