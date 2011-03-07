@@ -26,10 +26,9 @@
 /** \brief alloc a new AT7 sampler
 @param r RNG
 @param logdistr target log-distrib. fun.
-@param logditsr_data log-distrib. fun. extra data
+@param logdistr_data log-distrib. fun. extra data
 @param x current chain value
 @param t0 burn in length
-@param Sigma_zero starting variance-covariance matrix
 @param beta_hat starting mixture weights estimates
 @param mu_hat starting mixture means estimates
 @param Sigma_hat starting mixture variance estimates

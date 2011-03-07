@@ -26,7 +26,7 @@
 /** alloc (and init) extra AM data
 @param r RNG state
 @param logdistr pointer to a log-distribution function
-@param logdistrib_data extra data to be passed to the log-distribution function
+@param logdistr_data extra data to be passed to the log-distribution function
 @param start_x starting value
 @param sigma_zero starting proposal covariance matrix
 @param t0 burn-in length before starting adaptation
