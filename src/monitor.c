@@ -20,7 +20,7 @@ struct mcmclib_monitor_t {
   double n;
 
   /*internal stuff*/
-  gsl_vector *xm, *xvar, *xsq, *ar, *msjd;
+  gsl_vector *xm, *xvar, *xsq, *ar, *msjd, *workspace;
   gsl_vector* x_last;
 };
 
@@ -42,6 +42,7 @@ mcmclib_monitor_h mcmclib_monitor_alloc(const gsl_vector* x) {
   p->xsq = gsl_vector_alloc(n);
   p->msjd = gsl_vector_alloc(n);
   p->ar = gsl_vector_alloc(n);
+  p->workspace = gsl_vector_alloc(n);
 
   p->x_last = gsl_vector_alloc(n);
   gsl_vector_memcpy(p->x_last, x);
@@ -53,6 +54,7 @@ mcmclib_monitor_h mcmclib_monitor_alloc(const gsl_vector* x) {
 void mcmclib_monitor_free(mcmclib_monitor_h p) {
   gsl_vector_free(p->x_last);
 
+  gsl_vector_free(p->workspace);
   gsl_vector_free(p->ar);
   gsl_vector_free(p->xm);
   gsl_vector_free(p->xvar);
@@ -64,11 +66,6 @@ void mcmclib_monitor_free(mcmclib_monitor_h p) {
   gsl_vector_free(p->sum_xsq);
   gsl_vector_free(p->sum_x);
   free(p);
-}
-
-static void vec_is_null(gsl_vector* x) {
-  for(size_t i=0; i < x->size; i++)
-    gsl_vector_set(x, i, gsl_vector_get(x, i) > EQ_TOL ? 1.0 : 0.0);
 }
 
 static void vec_sq(gsl_vector* dest, const gsl_vector* x) {
@@ -96,8 +93,11 @@ int mcmclib_monitor_update(mcmclib_monitor_h p) {
   vec_sq(p->xsq, p->xsq);
   gsl_vector_add(p->SJD, p->xsq);
 
-  vec_is_null(p->xsq);
-  gsl_vector_add(p->AR, p->xsq);
+  for(size_t i=0; i < x->size; i++) {
+    if(gsl_vector_get(p->xsq, i) > EQ_TOL) {
+      gsl_vector_set(p->AR, i, gsl_vector_get(p->AR, i) + 1.0);
+    }
+  }
 
   /*mean*/
   double n1 = 1.0 / p->n;
@@ -105,11 +105,10 @@ int mcmclib_monitor_update(mcmclib_monitor_h p) {
   gsl_vector_scale(p->xm, n1);
 
   /*variance*/
-  n1 = 1.0 / p->n;
   gsl_vector_memcpy(p->xvar, p->sum_xsq);
   gsl_vector_scale(p->xvar, n1);
-  vec_sq(p->xm, p->xm);
-  gsl_vector_sub(p->xvar, p->xm);
+  vec_sq(p->workspace, p->xm);
+  gsl_vector_sub(p->xvar, p->workspace);
 
   /*AR*/
   n1 = 1.0 / (p->n - 1.0);
@@ -117,7 +116,6 @@ int mcmclib_monitor_update(mcmclib_monitor_h p) {
   gsl_vector_scale(p->ar, n1);
 
   /*MSJD*/
-  n1 = 1.0 / (p->n - 1.0);
   gsl_vector_memcpy(p->msjd, p->SJD);
   gsl_vector_scale(p->msjd, n1);
 

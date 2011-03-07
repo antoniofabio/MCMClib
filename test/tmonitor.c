@@ -21,11 +21,11 @@ void Testmonitor(CuTest* tc) {
   gsl_vector_set(x, 0, 2.0);
   mcmclib_monitor_h p = mcmclib_monitor_alloc(x);
   gsl_vector* tmp = gsl_vector_alloc(1);
-  mcmclib_monitor_update(p);
 
-  /*check state right after init*/
+  /*check state after 1st update*/
+  mcmclib_monitor_update(p);
   mcmclib_monitor_get_means(p, tmp);
-  CuAssertTrue(tc, v0(tmp) == x0);
+  CuAssertDblEquals(tc, x0, v0(tmp), TOL);
   mcmclib_monitor_get_vars(p, tmp);
   CuAssertTrue(tc, check_dequal(v0(tmp), 0.0));
   mcmclib_monitor_get_ar(p, tmp);
