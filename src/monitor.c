@@ -78,33 +78,6 @@ static void vec_sq(gsl_vector* dest, const gsl_vector* x) {
   }
 }
 
-static void update_means(mcmclib_monitor_h p) {
-  double n1 = 1.0 / p->n;
-  gsl_vector_memcpy(p->xm, p->sum_x);
-  gsl_vector_scale(p->xm, n1);
-}
-
-/** IMPORTANT NOTE: update_means must be called before that func.*/
-static void update_variances(mcmclib_monitor_h p) {
-  double n1 = 1.0 / p->n;
-  gsl_vector_memcpy(p->xvar, p->sum_xsq);
-  gsl_vector_scale(p->xvar, n1);
-  vec_sq(p->xm, p->xm);
-  gsl_vector_sub(p->xvar, p->xm);
-}
-
-static void update_AR(mcmclib_monitor_h p) {
-  double n1 = 1.0 / (p->n - 1.0);
-  gsl_vector_memcpy(p->ar, p->AR);
-  gsl_vector_scale(p->ar, n1);
-}
-
-static void update_MSJD(mcmclib_monitor_h p) {
-  double n1 = 1.0 / (p->n - 1.0);
-  gsl_vector_memcpy(p->msjd, p->SJD);
-  gsl_vector_scale(p->msjd, n1);
-}
-
 int mcmclib_monitor_update(mcmclib_monitor_h p) {
   if(!mcmclib_vector_is_finite(p->x))
     GSL_ERROR("non-finite vector value", GSL_EDOM);
@@ -126,10 +99,27 @@ int mcmclib_monitor_update(mcmclib_monitor_h p) {
   vec_is_null(p->xsq);
   gsl_vector_add(p->AR, p->xsq);
 
-  update_means(p);
-  update_variances(p);
-  update_AR(p);
-  update_MSJD(p);
+  /*mean*/
+  double n1 = 1.0 / p->n;
+  gsl_vector_memcpy(p->xm, p->sum_x);
+  gsl_vector_scale(p->xm, n1);
+
+  /*variance*/
+  n1 = 1.0 / p->n;
+  gsl_vector_memcpy(p->xvar, p->sum_xsq);
+  gsl_vector_scale(p->xvar, n1);
+  vec_sq(p->xm, p->xm);
+  gsl_vector_sub(p->xvar, p->xm);
+
+  /*AR*/
+  n1 = 1.0 / (p->n - 1.0);
+  gsl_vector_memcpy(p->ar, p->AR);
+  gsl_vector_scale(p->ar, n1);
+
+  /*MSJD*/
+  n1 = 1.0 / (p->n - 1.0);
+  gsl_vector_memcpy(p->msjd, p->SJD);
+  gsl_vector_scale(p->msjd, n1);
 
   return GSL_SUCCESS;
 }
@@ -205,7 +195,7 @@ void mcmclib_monitor_ecdf_update(mcmclib_monitor_ecdf_h p, const gsl_vector* y) 
   gsl_vector_scale(p->Fn, 1.0 / p->n);
 }
 void mcmclib_monitor_ecdf_get(const mcmclib_monitor_ecdf_h p, gsl_vector* Fn) {
-  gsl_vector_memcpy(p->Fn, Fn);
+  gsl_vector_memcpy(Fn, p->Fn);
 }
 
 struct mcmclib_monitor_acf_t {
