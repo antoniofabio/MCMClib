@@ -1,4 +1,6 @@
 Version 0.24 A. F. Di Narzo <antonio.fabio@gmail.com>
+	* fix memory leak in monitor_acf and its test
+	* fix memory leak in inca test
 	* mv lazyffi and rawgsl to indep. projects
 
 Version 0.23 7-03-2011 A. F. Di Narzo <antonio.fabio@gmail.com>
