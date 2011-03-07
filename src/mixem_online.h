@@ -15,7 +15,7 @@
 #include "mixolem_suff.h"
 #include "mvnorm.h"
 
-/** \addtogroup misc Miscellanea
+/** \addtogroup misc
 @{
 \addtogroup mixolem
 @{

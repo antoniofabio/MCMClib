@@ -10,7 +10,7 @@
 #ifndef __MCMCLIB_VECTOR_QUEUE_H__
 #define __MCMCLIB_VECTOR_QUEUE_H__
 
-/**\addtogroup utils
+/**\addtogroup misc
 @{
 \defgroup vector_queue gsl_vector queue
 @{
