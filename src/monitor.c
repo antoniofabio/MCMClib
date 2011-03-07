@@ -13,8 +13,19 @@
 #include "matrix.h"
 #include "monitor.h"
 
-mcmclib_monitor* mcmclib_monitor_alloc(const gsl_vector* x) {
-  mcmclib_monitor* p = (mcmclib_monitor*) malloc(sizeof(mcmclib_monitor));
+struct mcmclib_monitor_t {
+  const gsl_vector* x; /**< current value */
+
+  gsl_vector *sum_x, *sum_xsq, *AR, *SJD;
+  double n;
+
+  /*internal stuff*/
+  gsl_vector *xm, *xvar, *xsq, *ar, *msjd;
+  gsl_vector* x_last;
+};
+
+mcmclib_monitor_h mcmclib_monitor_alloc(const gsl_vector* x) {
+  mcmclib_monitor_h p = (mcmclib_monitor_h) malloc(sizeof(struct mcmclib_monitor_t));
   p->x = x;
   const size_t n = x->size;
   p->sum_x = gsl_vector_alloc(n);
@@ -39,7 +50,7 @@ mcmclib_monitor* mcmclib_monitor_alloc(const gsl_vector* x) {
   return p;
 }
 
-void mcmclib_monitor_free(mcmclib_monitor* p) {
+void mcmclib_monitor_free(mcmclib_monitor_h p) {
   gsl_vector_free(p->x_last);
 
   gsl_vector_free(p->ar);
@@ -67,7 +78,7 @@ static void vec_sq(gsl_vector* dest, const gsl_vector* x) {
   }
 }
 
-int mcmclib_monitor_update(mcmclib_monitor* p) {
+int mcmclib_monitor_update(mcmclib_monitor_h p) {
   if(!mcmclib_vector_is_finite(p->x))
     GSL_ERROR("non-finite vector value", GSL_EDOM);
 
@@ -91,14 +102,14 @@ int mcmclib_monitor_update(mcmclib_monitor* p) {
   return GSL_SUCCESS;
 }
 
-static void update_means(mcmclib_monitor* p) {
+static void update_means(mcmclib_monitor_h p) {
   double n1 = 1.0 / p->n;
   gsl_vector_memcpy(p->xm, p->sum_x);
   gsl_vector_scale(p->xm, n1);
 }
 
 /** IMPORTANT NOTE: update_means must be called before that func.*/
-static void update_variances(mcmclib_monitor* p) {
+static void update_variances(mcmclib_monitor_h p) {
   double n1 = 1.0 / p->n;
   gsl_vector_memcpy(p->xvar, p->sum_xsq);
   gsl_vector_scale(p->xvar, n1);
@@ -106,64 +117,64 @@ static void update_variances(mcmclib_monitor* p) {
   gsl_vector_sub(p->xvar, p->xm);
 }
 
-static void update_AR(mcmclib_monitor* p) {
+static void update_AR(mcmclib_monitor_h p) {
   double n1 = 1.0 / (p->n - 1.0);
   gsl_vector_memcpy(p->ar, p->AR);
   gsl_vector_scale(p->ar, n1);
 }
 
-static void update_MSJD(mcmclib_monitor* p) {
+static void update_MSJD(mcmclib_monitor_h p) {
   double n1 = 1.0 / (p->n - 1.0);
   gsl_vector_memcpy(p->msjd, p->SJD);
   gsl_vector_scale(p->msjd, n1);
 }
 
-void mcmclib_monitor_update_all(mcmclib_monitor* p) {
+void mcmclib_monitor_update_all(mcmclib_monitor_h p) {
   update_means(p);
   update_variances(p);
   update_AR(p);
   update_MSJD(p);
 }
 
-void mcmclib_monitor_get_means(mcmclib_monitor* p, gsl_vector* out) {
+void mcmclib_monitor_get_means(mcmclib_monitor_h p, gsl_vector* out) {
   update_means(p);
   gsl_vector_memcpy(out, p->xm);
 }
-void mcmclib_monitor_get_vars(mcmclib_monitor* p, gsl_vector* out) {
+void mcmclib_monitor_get_vars(mcmclib_monitor_h p, gsl_vector* out) {
   update_variances(p);
   gsl_vector_memcpy(out, p->xvar);
 }
-void mcmclib_monitor_get_ar(mcmclib_monitor* p, gsl_vector* out) {
+void mcmclib_monitor_get_ar(mcmclib_monitor_h p, gsl_vector* out) {
   update_AR(p);
   gsl_vector_memcpy(out, p->ar);
 }
-void mcmclib_monitor_get_msjd(mcmclib_monitor* p, gsl_vector* out) {
+void mcmclib_monitor_get_msjd(mcmclib_monitor_h p, gsl_vector* out) {
   update_MSJD(p);
   gsl_vector_memcpy(out, p->msjd);
 }
 
-void mcmclib_monitor_fprintf_means(mcmclib_monitor* p, FILE* f) {
+void mcmclib_monitor_fprintf_means(mcmclib_monitor_h p, FILE* f) {
   update_means(p);
   gsl_vector_fprintf(f, p->xm, "%f");
 }
 
-void mcmclib_monitor_fprintf_vars(mcmclib_monitor* p, FILE* f) {
+void mcmclib_monitor_fprintf_vars(mcmclib_monitor_h p, FILE* f) {
   update_means(p);
   update_variances(p);
   gsl_vector_fprintf(f, p->xvar, "%f");
 }
 
-void mcmclib_monitor_fprintf_AR(mcmclib_monitor* p, FILE* f) {
+void mcmclib_monitor_fprintf_AR(mcmclib_monitor_h p, FILE* f) {
   update_AR(p);
   gsl_vector_fprintf(f, p->ar, "%f");
 }
 
-void mcmclib_monitor_fprintf_MSJD(mcmclib_monitor* p, FILE* f) {
+void mcmclib_monitor_fprintf_MSJD(mcmclib_monitor_h p, FILE* f) {
   update_MSJD(p);
   gsl_vector_fprintf(f, p->msjd, "%f");
 }
 
-void mcmclib_monitor_fprintf_all(mcmclib_monitor* p, FILE* f) {
+void mcmclib_monitor_fprintf_all(mcmclib_monitor_h p, FILE* f) {
   mcmclib_monitor_fprintf_means(p, f);
   mcmclib_monitor_fprintf_vars(p, f);
   mcmclib_monitor_fprintf_AR(p, f);

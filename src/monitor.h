@@ -24,41 +24,32 @@
 @{*/
 
 /** Scalar MCMC diagnostics on a 'monitored' vector */
-typedef struct {
-  const gsl_vector* x; /**< current value */
-
-  gsl_vector *sum_x, *sum_xsq, *AR, *SJD;
-  double n;
-
-  /*internal stuff*/
-  gsl_vector *xm, *xvar, *xsq, *ar, *msjd;
-  gsl_vector* x_last;
-} mcmclib_monitor;
+typedef struct mcmclib_monitor_t* mcmclib_monitor_h;
 
 /** alloc a new monitor object */
-mcmclib_monitor* mcmclib_monitor_alloc(const gsl_vector* x);
+mcmclib_monitor_h mcmclib_monitor_alloc(const gsl_vector* x);
 /** free a previously allocated monitor object */
-void mcmclib_monitor_free(mcmclib_monitor* p);
+void mcmclib_monitor_free(mcmclib_monitor_h p);
 /** updates monitor statistics using current vector value */
-int mcmclib_monitor_update(mcmclib_monitor* p);
+int mcmclib_monitor_update(mcmclib_monitor_h p);
 
 /** get scalar means */
-void mcmclib_monitor_get_means(mcmclib_monitor* p, gsl_vector* out);
+void mcmclib_monitor_get_means(mcmclib_monitor_h p, gsl_vector* out);
 /** get scalar variances */
-void mcmclib_monitor_get_vars(mcmclib_monitor* p, gsl_vector* out);
+void mcmclib_monitor_get_vars(mcmclib_monitor_h p, gsl_vector* out);
 /** get scalar acceptance rates */
-void mcmclib_monitor_get_ar(mcmclib_monitor* p, gsl_vector* out);
+void mcmclib_monitor_get_ar(mcmclib_monitor_h p, gsl_vector* out);
 /** get scalar MSJD */
-void mcmclib_monitor_get_msjd(mcmclib_monitor* p, gsl_vector* out);
+void mcmclib_monitor_get_msjd(mcmclib_monitor_h p, gsl_vector* out);
 
 /** update all the monitored stats*/
-void mcmclib_monitor_update_all(mcmclib_monitor* p);
-void mcmclib_monitor_fprintf_means(mcmclib_monitor* p, FILE* f);
-void mcmclib_monitor_fprintf_vars(mcmclib_monitor* p, FILE* f);
-void mcmclib_monitor_fprintf_AR(mcmclib_monitor* p, FILE* f);
-void mcmclib_monitor_fprintf_MSJD(mcmclib_monitor* p, FILE* f);
+void mcmclib_monitor_update_all(mcmclib_monitor_h p);
+void mcmclib_monitor_fprintf_means(mcmclib_monitor_h p, FILE* f);
+void mcmclib_monitor_fprintf_vars(mcmclib_monitor_h p, FILE* f);
+void mcmclib_monitor_fprintf_AR(mcmclib_monitor_h p, FILE* f);
+void mcmclib_monitor_fprintf_MSJD(mcmclib_monitor_h p, FILE* f);
 /** formatted print of all the diagnostics on file 'f'*/
-void mcmclib_monitor_fprintf_all(mcmclib_monitor* p, FILE* f);
+void mcmclib_monitor_fprintf_all(mcmclib_monitor_h p, FILE* f);
 /**@}*/
 /**@}*/
 
