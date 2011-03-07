@@ -47,6 +47,7 @@ void mcmclib_monitor_get_ar(mcmclib_monitor* p, gsl_vector* out);
 /** get scalar MSJD */
 void mcmclib_monitor_get_msjd(mcmclib_monitor* p, gsl_vector* out);
 
+/** update all the monitored stats*/
 void mcmclib_monitor_update_all(mcmclib_monitor* p);
 void mcmclib_monitor_fprintf_means(mcmclib_monitor* p, FILE* f);
 void mcmclib_monitor_fprintf_vars(mcmclib_monitor* p, FILE* f);
@@ -55,19 +56,15 @@ void mcmclib_monitor_fprintf_MSJD(mcmclib_monitor* p, FILE* f);
 /** formatted print of all the diagnostics on file 'f'*/
 void mcmclib_monitor_fprintf_all(mcmclib_monitor* p, FILE* f);
 
-/** Empirical CDF function live computation */
-typedef struct {
-  gsl_vector* Fn; /**< current CDF value */
-  gsl_matrix* X0; /**< vertical matrix of points on which the CDF is computed*/
-  double n; /**< current observed sample size*/
-  gsl_vector* workspace;
-} mcmclib_monitor_ecdf;
+typedef struct mcmclib_monitor_ecdf_t* mcmclib_monitor_ecdf_h;
 
-mcmclib_monitor_ecdf* mcmclib_monitor_ecdf_alloc(const gsl_matrix* X0);
-void mcmclib_monitor_ecdf_free(mcmclib_monitor_ecdf* p);
-void mcmclib_monitor_ecdf_update(mcmclib_monitor_ecdf* p, const gsl_vector* y);
+/** Empirical CDF function live computation */
+mcmclib_monitor_ecdf_h mcmclib_monitor_ecdf_alloc(const gsl_matrix* X0);
+void mcmclib_monitor_ecdf_free(mcmclib_monitor_ecdf_h p);
+void mcmclib_monitor_ecdf_update(mcmclib_monitor_ecdf_h p, const gsl_vector* y);
 
 typedef struct mcmclib_monitor_acf_t* mcmclib_monitor_acf_h;
+/** Autocorrelation function live computation */
 mcmclib_monitor_acf_h mcmclib_monitor_acf_alloc(const size_t dim, const size_t lag);
 void mcmclib_monitor_acf_update(mcmclib_monitor_acf_h m, const gsl_vector* x);
 void mcmclib_monitor_acf_free(mcmclib_monitor_acf_h m);

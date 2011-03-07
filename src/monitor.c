@@ -170,8 +170,15 @@ void mcmclib_monitor_fprintf_all(mcmclib_monitor* p, FILE* f) {
   mcmclib_monitor_fprintf_MSJD(p, f);
 }
 
-mcmclib_monitor_ecdf* mcmclib_monitor_ecdf_alloc(const gsl_matrix* X0) {
-  mcmclib_monitor_ecdf* ans = (mcmclib_monitor_ecdf*) malloc(sizeof(mcmclib_monitor_ecdf));
+struct mcmclib_monitor_ecdf_t {
+  gsl_vector* Fn; /**< current CDF value */
+  gsl_matrix* X0; /**< vertical matrix of points on which the CDF is computed*/
+  double n; /**< current observed sample size*/
+  gsl_vector* workspace;
+};
+
+mcmclib_monitor_ecdf_h mcmclib_monitor_ecdf_alloc(const gsl_matrix* X0) {
+  mcmclib_monitor_ecdf_h ans = (mcmclib_monitor_ecdf_h) malloc(sizeof(struct mcmclib_monitor_ecdf_t));
   ans->X0 = gsl_matrix_alloc(X0->size1, X0->size2);
   gsl_matrix_memcpy(ans->X0, X0);
   ans->Fn = gsl_vector_alloc(X0->size1);
@@ -180,13 +187,13 @@ mcmclib_monitor_ecdf* mcmclib_monitor_ecdf_alloc(const gsl_matrix* X0) {
   ans->workspace = gsl_vector_alloc(X0->size2);
   return ans;
 }
-void mcmclib_monitor_ecdf_free(mcmclib_monitor_ecdf* p) {
+void mcmclib_monitor_ecdf_free(mcmclib_monitor_ecdf_h p) {
   gsl_vector_free(p->workspace);
   gsl_vector_free(p->Fn);
   gsl_matrix_free(p->X0);
   free(p);
 }
-void mcmclib_monitor_ecdf_update(mcmclib_monitor_ecdf* p, const gsl_vector* y) {
+void mcmclib_monitor_ecdf_update(mcmclib_monitor_ecdf_h p, const gsl_vector* y) {
   gsl_vector_scale(p->Fn, p->n);
   for(size_t i=0; i < p->X0->size1; i++) {
     gsl_vector_view rv = gsl_matrix_row(p->X0, i);
