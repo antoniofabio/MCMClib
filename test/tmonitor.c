@@ -19,7 +19,7 @@ static int check_dequal(double a, double b) {
 void Testmonitor(CuTest* tc) {
   gsl_vector* x = gsl_vector_alloc(1);
   gsl_vector_set(x, 0, 2.0);
-  mcmclib_monitor* p = mcmclib_monitor_alloc(x);
+  mcmclib_monitor_h p = mcmclib_monitor_alloc(x);
   gsl_vector* tmp = gsl_vector_alloc(1);
   mcmclib_monitor_update(p);
 
