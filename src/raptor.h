@@ -26,7 +26,7 @@
 /** \brief alloc a new RAPTOR sampler
 @param r RNG
 @param logdistr target log-distrib. fun.
-@param logditsr_data log-distrib. fun. extra data
+@param logdistr_data log-distrib. fun. extra data
 @param x current chain value
 @param t0 burn in length
 @param Sigma_zero starting variance-covariance matrix

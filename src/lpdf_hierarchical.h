@@ -46,7 +46,10 @@ void mcmclib_post_lpdf_free(mcmclib_post_lpdf* p);
 
 /** log-posterior distribution function
 @param data pointer to a \ref mcmclib_post_lpdf object allocated with
-   \ref mcmclib_post_lpdf_alloc*/
+   \ref mcmclib_post_lpdf_alloc
+@param x point in which to compute the lpdf
+@return log-pdf
+*/
 double mcmclib_post_lpdf_compute(void* data, gsl_vector* x);
 
 /**@}*/

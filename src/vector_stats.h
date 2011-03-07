@@ -36,7 +36,7 @@ void mcmclib_covariance_update(gsl_matrix* cov, gsl_vector* mean, size_t* n, con
 @param beta first component's weight
 @param means array of 2 means
 @param variances array of two variances
-@param output result
+@param V result
 */
 void mcmclib_pooled_variance(const double beta, const gsl_vector** means,
 			     const gsl_matrix** variances, gsl_matrix* V);

@@ -84,6 +84,7 @@ void mcmclib_mvnorm_lpdf_free(mcmclib_mvnorm_lpdf* p);
 
 /** Multivariate gassian log-distribution
 @param in_p extra data, allocated via \ref mcmclib_mvnorm_lpdf_alloc
+@param x point in which to compute the lpdf
 @return log-pdf
 */
 double mcmclib_mvnorm_lpdf_compute(void* in_p, const gsl_vector* x);

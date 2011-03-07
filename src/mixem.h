@@ -20,7 +20,6 @@
 @param X matrix of observed values
 @param mu array of current mixture components means
 @param Sigma array of current mixture components variances
-@param P probability of belonging to each mixt. component, one row per point
 @param w mixture weights
 @param NITER desired number of iterations
 @return GSL_SUCCESS if all goes right, a GSL error code otherwise

@@ -51,6 +51,7 @@ void mcmclib_mcar_tilde_lpdf_free(mcmclib_mcar_tilde_lpdf* p);
 
 /** mcar_tilde log-distribution
     @param in_p extra data, allocated via \ref mcmclib_mcar_tilde_lpdf_alloc
+    @param x point in which to compute the lpdf
     @return log-pdf
 */
 double mcmclib_mcar_tilde_lpdf_compute(void* in_p, gsl_vector* x);

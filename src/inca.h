@@ -25,6 +25,7 @@ typedef struct {
 } mcmclib_inca;
 
 /**\brief alloc a new INCA sampler object
+@param amh \ref mcmclib_amh object, allocated with \ref mcmclib_amh_alloc
 @param x array of M current chain values
 @param M number of parallel chains
 */

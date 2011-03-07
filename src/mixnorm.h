@@ -39,6 +39,7 @@ void mcmclib_mixnorm_lpdf_free(mcmclib_mixnorm_lpdf* p);
 
 /** multivariate gassian mixture log-distribution
 @param p data allocated via 'mcmclib_mixnorm_lpdf_alloc'
+@param x point in which to compute the lpdf
 @return log-pdf
 */
 double mcmclib_mixnorm_lpdf_compute(void* p, gsl_vector* x);
