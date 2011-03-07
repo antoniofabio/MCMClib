@@ -68,8 +68,8 @@ void Testraptor3(CuTest* tc) {
     n1 += (x0 >= 0.0) ? 1 : 0;
   }
 
-  CuAssertIntEquals(tc, 818, n1);
-  CuAssertIntEquals(tc, 467, nacc);
+  CuAssertIntEquals(tc, 794, n1);
+  CuAssertIntEquals(tc, 458, nacc);
 
   /*free memory*/
   gsl_matrix_free(sigma_whole);
