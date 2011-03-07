@@ -55,5 +55,8 @@ void mcmclib_mixem_rec_add(mcmclib_mixem_rec* p, const gsl_vector* y);
  */
 int mcmclib_mixem_rec_update(mcmclib_mixem_rec* p);
 
-/**@}@}*/
+/**
+@}
+@}
+*/
 #endif

@@ -10,7 +10,8 @@
 #ifndef __MCMCLIB_MIXEM_H__
 
 /**\addtogroup misc
-@{*/
+@{
+*/
 
 #include<gsl/gsl_vector.h>
 #include<gsl/gsl_matrix.h>

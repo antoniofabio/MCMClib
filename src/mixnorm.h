@@ -43,5 +43,8 @@ void mcmclib_mixnorm_lpdf_free(mcmclib_mixnorm_lpdf* p);
 */
 double mcmclib_mixnorm_lpdf_compute(void* p, gsl_vector* x);
 
-/**@}@}*/
+/**
+@}
+@}
+*/
 #endif

@@ -49,5 +49,8 @@ void mcmclib_mixolem_suff_add(mcmclib_mixolem_suff* dest, mcmclib_mixolem_suff* 
 /**scale all \a p contents by \a alpha*/
 void mcmclib_mixolem_suff_scale(mcmclib_mixolem_suff* p, double alpha);
 
-/**@}*/
+/**
+@}
+@}
+*/
 #endif

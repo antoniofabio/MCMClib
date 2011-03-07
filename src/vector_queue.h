@@ -12,8 +12,7 @@
 
 /**\addtogroup utils
 @{
-\defgroup utils misc utilities
-@{*/
+*/
 
 #include <gsl/gsl_vector.h>
 
@@ -26,7 +25,6 @@ size_t mcmclib_vector_queue_size(const mcmclib_vector_queue* q);
 size_t mcmclib_vector_queue_size_max(const mcmclib_vector_queue* q);
 int mcmclib_vector_queue_get(const mcmclib_vector_queue* q, const size_t lag, gsl_vector* x);
 
-/**@}*/
 /**@}*/
 
 #endif
