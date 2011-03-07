@@ -1,4 +1,6 @@
-source("rawgsl.R")
+library(rawgsl)
+dyn.load("/usr/lib/libgslcblas.so", local=FALSE)
+dyn.load("/usr/lib/libgsl.so", local=FALSE)
 
 mcmclib <- new.env(parent=rawgsl)
 dyn.import(pst("mcmclib_",

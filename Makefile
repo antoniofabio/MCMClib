@@ -6,7 +6,7 @@ PREFIX:=/usr
 LIBDIR:=$(PREFIX)/lib
 INCLUDEDIR:=$(PREFIX)/include
 
-MODULES := src test guile test-guile R-lazyffi R-rawgsl R
+MODULES := src test guile test-guile R
 
 SRC :=
 TOCLEAN :=
