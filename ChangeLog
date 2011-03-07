@@ -1,3 +1,5 @@
+Version 0.24 A. F. Di Narzo <antonio.fabio@gmail.com>
+
 Version 0.23 7-03-2011 A. F. Di Narzo <antonio.fabio@gmail.com>
 	* add monitor_acf module, for computing ACF 'on the fly'
 	* add minimal, undocumented, Rffi-based R bindings
