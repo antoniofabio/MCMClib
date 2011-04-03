@@ -6,6 +6,7 @@
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 #include <monitor.h>
+#include "monitor.c"
 #include "CuTest.h"
 
 #define v0(x) gsl_vector_get(x, 0)
@@ -22,7 +23,7 @@ void Testmonitor2(CuTest* tc) {
     gsl_vector_view X0i_v = gsl_matrix_row(X0, i);
     gsl_vector_set_all(&(X0i_v.vector), (double)i / (double)X0->size1);
   }
-  mcmclib_monitor_ecdf* p = mcmclib_monitor_ecdf_alloc(X0);
+  mcmclib_monitor_ecdf_h p = mcmclib_monitor_ecdf_alloc(X0);
   gsl_matrix_free(X0);
   /*check state right after init*/
   CuAssertTrue(tc, gsl_vector_isnull(p->Fn));

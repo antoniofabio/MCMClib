@@ -5,7 +5,7 @@
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
-#include <monitor.h>
+#include "monitor.h"
 #include "at7.c"
 #include "CuTest.h"
 
@@ -92,7 +92,7 @@ void Testat7(CuTest* tc) {
   gsl_rng* rng;
   gsl_vector* x;
   mcmclib_amh* sampler;
-  mcmclib_monitor* m;
+  mcmclib_monitor_h m;
   gsl_vector* sf;
 
   gsl_vector* mu_hat[K];
