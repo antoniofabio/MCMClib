@@ -1,6 +1,6 @@
 /*
  *  MCMClib: A C Library for doing MCMC
- *  Copyright (C) 2009,2010 Antonio, Fabio Di Narzo
+ *  Copyright (C) 2009-2011 Antonio, Fabio Di Narzo
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -96,6 +96,8 @@ int mcmclib_monitor_update(mcmclib_monitor_h p) {
   for(size_t i=0; i < x->size; i++) {
     if(gsl_vector_get(p->xsq, i) > EQ_TOL) {
       gsl_vector_set(p->AR, i, gsl_vector_get(p->AR, i) + 1.0);
+      assert(gsl_vector_get(p->AR, i) <= p->n);
+      assert(gsl_finite(gsl_vector_get(p->AR, i)));
     }
   }
 
@@ -111,11 +113,11 @@ int mcmclib_monitor_update(mcmclib_monitor_h p) {
   gsl_vector_sub(p->xvar, p->workspace);
 
   /*AR*/
-  n1 = 1.0 / (p->n - 1.0);
   gsl_vector_memcpy(p->ar, p->AR);
   gsl_vector_scale(p->ar, n1);
 
   /*MSJD*/
+  n1 = 1.0 / (p->n - 1.0);
   gsl_vector_memcpy(p->msjd, p->SJD);
   gsl_vector_scale(p->msjd, n1);
 
