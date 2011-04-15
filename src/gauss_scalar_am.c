@@ -12,10 +12,10 @@ typedef struct {
   double scaling;
 } gamma_t;
 
-static gamma_t* gamma_t_alloc(const size_t dim, const double scaling) {
+static gamma_t* gamma_t_alloc(const size_t dim, const double s0, const double scaling) {
   gamma_t* g = (gamma_t*) malloc(sizeof(gamma_t));
   g->sd = gsl_vector_alloc(dim);
-  gsl_vector_set_all(g->sd, 1.0);
+  gsl_vector_set_all(g->sd, s0);
   g->scaling = scaling;
   return g;
 }
@@ -29,8 +29,8 @@ static void sample(mcmclib_mh_q* q, gsl_vector* x) {
   gamma_t* g = (gamma_t*) q->gamma;
   VECTOR_MAP(x, xi += gsl_ran_gaussian(q->r, gsl_vector_get(g->sd, i) * g->scaling));
 }
-static mcmclib_mh_q* mh_q_alloc(gsl_rng* r, const size_t dim, const double scaling) {
-  return mcmclib_mh_q_alloc(r, sample, NULL, gamma_t_alloc(dim, scaling), gamma_t_free);
+static mcmclib_mh_q* mh_q_alloc(gsl_rng* r, const size_t dim, const double s0, const double scaling) {
+  return mcmclib_mh_q_alloc(r, sample, NULL, gamma_t_alloc(dim, s0, scaling), gamma_t_free);
 }
 
 typedef struct {
@@ -95,8 +95,8 @@ static void gamma_update(void* s, void* in_g) {
 }
 
 mcmclib_amh* mcmclib_gauss_scalar_am_alloc(gsl_rng* r, distrfun_p logdistr, void* logdistr_data,
-					   gsl_vector* x, const double scaling, const size_t N0) {
-  mcmclib_amh* ans = mcmclib_amh_alloc(mcmclib_mh_alloc(r, logdistr, logdistr_data, mh_q_alloc(r, x->size, scaling), x), N0,
+					   gsl_vector* x, const double s0, const double scaling, const size_t N0) {
+  mcmclib_amh* ans = mcmclib_amh_alloc(mcmclib_mh_alloc(r, logdistr, logdistr_data, mh_q_alloc(r, x->size, s0, scaling), x), N0,
 				       suff_t_alloc(x->size), suff_t_free, suff_update, gamma_update);
   return ans;
 }

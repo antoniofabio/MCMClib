@@ -1,4 +1,5 @@
 Version 0.24 A. F. Di Narzo <antonio.fabio@gmail.com>
+	* add a param to gauss_scalar_am sampler
 	* add some sanity checks to monitor_ar
 	* fix memory leak in monitor_acf and its test
 	* fix memory leak in inca test

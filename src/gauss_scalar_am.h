@@ -1,6 +1,6 @@
 /*
  *  MCMClib: A C Library for doing MCMC
- *  Copyright (C) 2010 Antonio, Fabio Di Narzo
+ *  Copyright (C) 2011 Antonio, Fabio Di Narzo
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -22,11 +22,12 @@
 @param logdistr pointer to a log-distribution function
 @param logdistr_data extra data to be passed to the log-distribution function
 @param x starting value
+@param s0 initial proposal sd
 @param scaling proposal variance scaling factor
 @param N0 burn-in length before starting adaptation
 */
 mcmclib_amh* mcmclib_gauss_scalar_am_alloc(gsl_rng* r, distrfun_p logdistr, void* logdistr_data,
-					   gsl_vector* x, const double scaling, const size_t N0);
+					   gsl_vector* x, const double s0, const double scaling, const size_t N0);
 
 /**@}*/
 /**@}*/
